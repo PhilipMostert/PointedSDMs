@@ -1,0 +1,28 @@
+#' Bru_sdm output functions
+#' FIX THESE
+
+
+print.bru_sdm = function(x,...) {
+  print(summary(x))
+}
+
+summary.bru_sdm = function(x,...) {
+  cat('----bru_sdm summary STILL IN DEVELOPMENT----\n\n')
+  cat("Summary of 'bru_sdm' object:\n\n")
+  cat(paste0("inlabru version: ", x$bru_info$inlabru_version, "\n"))
+  cat(paste0("INLA version: ", x$bru_info$INLA_version, "\n\n"))
+  cat('Types of data modelled:\n')
+  names_data = data.frame(x[['data_type']])
+  names(names_data) = c('                              ')
+  print(names_data)
+  cat('\n')
+  cat('Summary of residuals:\n\n')
+  summary_residuals = sapply(x[['model_residuals']], summary, digits = 3)
+  print(summary_residuals)
+  cat('\n')
+  #Add Likelihoods with: Family, predictor and which dataset it came from
+  class(x) = 'inla'
+  x$call = NULL
+  summary(x)
+  
+}
