@@ -5,8 +5,6 @@
 #' @param marks Should the model be a marked point process. Defaults to \code{FALSE}.
 #' @param markfamily Assumed distribution of the marks. Defaults to \code{"gaussian"}.
 #' @param inclmarks. A vector of which marks should be included in the model. Defaults to \code{NULL}.
-#' @param speciespresence Name of column used if multiple species are implmented in the model. Defaults to \code{NULL}.
-#' @param inclspecies A vector of which species should be included in the model. Defaults to \code{NULL}.
 #' @param coords Vector of the names of the coordinates used in datasets. Defaults to \code{c('X','Y')} (For now should be standardized).
 #' @param poresp Name for the response variable for the presence only datasets. Defaults to \code{NULL}. If no presence only response is found in dataset, a vector of 1's will be used.  
 #' @param paresp Name for the response variable for the presence absence datasets. Defaults to \code{NULL}. Note that this column may also be logical.
@@ -17,7 +15,7 @@
 #' @param ips Integration points. Defaults to \code{NULL}.
 #' @param bdry Polygon of boundary for region, of class Polygon. If \code{NULL}, draws a boundary around the points.
 #' @param proj Projection to use if data is not a projection. Defaults to utm (hopefully).
-#' @param residuals Should residuals for each dataset be calculated. Defaults to \code{TRUE}.
+#' @param residuals Should residuals for each dataset be calculated. Options include: response, deviance, residual or \code{NULL} if no residuals should be calculated. Defaults to \code{'response'}.
 #' @param predictions Boolean: should predictions (on the linear scale) be made? Defaults to \code{FALSE}.
 #' @param intercept Include joint intercept in the model. Defaults to \code{FALSE}.
 #' @param indvintercepts Include individual intercepts for each dataset in the model. Defaults to \code{TRUE}.
@@ -34,11 +32,10 @@
 #' @import rgeos
 
 bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian',
-                   inclmarks = NULL, speciespresence = NULL, inclspecies = NULL,
-                   coords = c('X','Y'), poresp = NULL, paresp = NULL,trialname= NULL,
-                   inclcoords = FALSE, mesh = NULL, meshpars = NULL, 
+                   inclmarks = NULL, coords = c('X','Y'), poresp = NULL, paresp = NULL,
+                   trialname= NULL, inclcoords = FALSE, mesh = NULL, meshpars = NULL, 
                    ips = NULL, bdry = NULL, proj = CRS("+proj=longlat +ellps=WGS84"),
-                   predictions = FALSE, residuals = TRUE, intercept = FALSE,
+                   predictions = FALSE, residuals = 'model', intercept = FALSE,
                    indivintercepts = TRUE, pointsspatial = TRUE, marksspatial = TRUE, 
                    options = list(), poformula = NULL, paformula = NULL, tol = NULL) {
   
@@ -88,11 +85,11 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
     
     names_marks <- NULL 
     data_marks <- NULL
+    multinom_vars <- NULL
+    marksspatial <- FALSE
+  
+    }
     
-    if (!is.null(speciespresence) & marksspatial)
-    marksspatial <- TRUE
-    } else markspatial <- FALSE
-
   if (!marks & !is.null(inclmarks)) {
     
     warning('Marks to include is non null but include marks is set to FALSE.\nMarks are now being set to TRUE.')
@@ -100,21 +97,21 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
     
   }
   
-  if (is.null(speciespresence) & !is.null(inclspecies)) {
-    
-    warning('Speciespresence is set to FALSE but a list of species to include is provided. Setting speciespresence to TRUE')
-    speciespresence <- TRUE
-    
-  }
-  
-  if (is.null(speciespresence)) {
-    
-    names_all_species <- NULL 
-    species_names <- NULL
-    
+  if (!is.null(residuals)) {
+      if (!residuals%in%c('response','pearson','deviance')) {
+        stop("Residuals needs to be one of: 'response', 'pearson' or 'deviance'.")
+      }
   }
   
   datasets = list(...)
+  
+  datasets_class = sapply(datasets, class)
+  
+  if (any(!datasets_class%in%c('SpatialPointsDataFrame','SpatialPoints', 'data.frame'))) {
+    
+    stop('Datasets need to be either a SpatialPoints* object or a data frame.')
+    
+  }
   
   coords_in = unlist(lapply(datasets, function(dat) {
     
@@ -251,138 +248,6 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
     
   }
   
-  #Issues with running species and marks separately
-   #If marks = TRUE and speciespresence = FALSE and species is given as an available mark
-   #Then species are run incorrectly
-   #Could fix marks to run multinomial
-   #But then I would need to get rid of the inclspecies variable.
-  if (!is.null(speciespresence)) {
-    
-    data_species <- lapply(data_attributes, function(dat) {
-      
-      if (speciespresence%in%names(dat)) {
-        
-        if (is.null(inclspecies)) {
-          
-          if (attributes(dat)$data_type == 'Present only') {
-            
-          dat@data[,speciespresence] <- factor(dat@data[,speciespresence])
-          dat@data[,'species_response'] <- dat@data[,poresp]
-          
-          if (length(unique(dat@data[,speciespresence])) > 1) {
-            dat@data[,'phi'] <- rep(1,nrow(dat))
-            attr(dat,'family') <- 'poisson'
-          }
-          #Seems to work with only 1 species
-          #Make all poisson for now
-          #Is this the correct way to do multinomial?
-          else attr(dat, 'family') <- 'poisson'#'binomial'
-          attr(dat,'multispecies') <- TRUE
-          attr(dat,'species_included') <- dat@data[,speciespresence]
-          dat 
-          
-          }
-          
-          else {
-           #if data_type == Present absence  
-            dat@data[,speciespresence] <- factor(dat@data[,speciespresence])
-            dat@data[,'species_response'] <- dat@data[,paresp]
-            dat@data[,'phi'] <- rep(1,nrow(dat))
-            attr(dat, 'family') <- 'poisson'#'binomial'            
-            attr(dat,'multispecies') <- TRUE
-            attr(dat,'species_included') <- dat@data[,speciespresence]
-            dat
-            
-          }
-          
-        } 
-        else {
-          #if include data is not null
-          dat <- dat[dat@data[,speciespresence]%in%inclspecies,]
-          if (length(dat) == 0) NULL
-          
-          else
-            if (length(unique(dat@data[,speciespresence])) == 1) {
-            #Multinomial seems to work with only one species, might remove later  
-            dat@data[,speciespresence] <- factor(dat@data[,speciespresence])
-           
-            if (attributes(dat)$data_type == 'Present only') {
-            dat@data[,'species_response'] <- dat@data[,poresp]
-            }
-            else dat@data[,'species_response'] <- dat@data[,paresp]
-            dat@data[,'phi'] <- rep(1,nrow(dat))
-            attr(dat, 'family') <- 'poisson'#'binomial'
-            attr(dat,'multispecies') <- TRUE
-            attr(dat,'species_included') <- dat@data[,speciespresence]
-            dat
-              
-            }
-          
-          else {
-            
-            dat@data[,speciespresence] <- factor(dat@data[,speciespresence])
-            dat@data[,'species_response'] <- dat@data[,poresp]
-            dat@data[,'phi'] <- rep(1,nrow(dat))
-            attr(dat, 'family') <- 'poisson'
-            attr(dat,'multispecies') <- TRUE
-            attr(dat,'species_included') <- dat@data[,speciespresence]
-            dat 
-            
-            }
-          }
-      }
-      else NULL
-      
-    })
-    
-    ##Throw error if all attributes(dat)$species_included is NULL
-    ##I.e !is.null(speciespresence) but column name not found in any dataset
-    
-    data_species[sapply(data_species,is.null)] <- NULL
-    
-    if (length(data_species) == 0) stop("Species to include is given but species presence name column not given in any datasets.")
-    
-    names(data_species) <- paste0(names(data_species),'_',speciespresence)
-    species_names <- names(data_species)
-    
-    if (!is.null(inclspecies)) {
-      all_species_in <- lapply(data_species, function(dat) {
-        
-        if (attributes(dat)$multispecies) {
-          if (length(dat) == 0) FALSE
-          else "Multispecies included"
-        }
-        else FALSE
-      })
-      
-      all_species_in[sapply(all_species_in,is.logical)] <- NULL
-      
-      if (length(all_species_in) == 0) stop('None of the species specified are found in any datasets.')
-    }
-    
-    names_all_species <- unique(unlist(lapply(data_species, function(dat) {
-      
-      names <- as.character(attributes(dat)$species_included)
-      names
-      
-    })))
-    
-    ##Remove 'speciespresence' from data_attributes??
-    ##Not sure why but fixes issue
-    data_attributes <- lapply(data_attributes, function(dat){
-      
-      if (speciespresence%in%names(dat)) {
-      
-        dat@data[,speciespresence] <- NULL
-        dat
-        
-        }
-      else dat
-      
-    })
-    
-  }
-  
   if (marks) {
     
     data_marks = list()
@@ -396,79 +261,110 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
       if (class(data_attributes[[i]]) == 'SpatialPoints') data_marks[[ind]] <- FALSE
       else {
         
-        names = names(data_attributes[[i]])[!names(data_attributes[[i]])%in%c(poresp,paresp,coords,trialname,speciespresence)]
+        names = names(data_attributes[[i]])[!names(data_attributes[[i]])%in%c(poresp,paresp,coords,trialname)]
+        #Variable for class of variable:
+         #if numeric run family as user specified
+         #Else if character or factor run as multinomial
+        
+        class_marks <- sapply(data_attributes[[i]]@data[names], class)
         
         if (!is.null(inclmarks)) names <- names[names%in%inclmarks]
         
         if (is.null(names) | identical(names,character(0))) data_marks[[ind]] <- FALSE
         
         else
-          if(length(names) == 1) {
+          for(j in 1:length(names)) {
             
-            mark <- sp::SpatialPointsDataFrame(coords = coordinates(data_attributes[[i]]),
-                                               data = as.data.frame(data_attributes[[i]]@data[,names]),
-                                               proj4string = proj)
-            colnames(mark@data) <- paste0(names(data_attributes)[i],'_',names)
-            attr(mark,'family') <- markfamily
-            capital_markfamily <- gsub("^(\\w)(\\w+)", "\\U\\1\\L\\2", 
-                                       markfamily, perl = TRUE)
-            attr(mark,'data_type') <- paste0(capital_markfamily,' mark')
-            data_marks[[ind]] <- mark
-            names(data_marks)[[ind]] <- paste0(names(data_attributes)[i],'_',names)
-            
-          }
-        
-        else
-          if (length(names) > 1) { #I.e. more than one mark in a dataset
-            for(j in 1:length(names)) {
+              index <- ind + j - 1
+
+              if (class_marks[j] == 'character'| class_marks[j] == 'factor') {
+               
+                if (attributes(data_attributes[[i]])$family == 'poisson')  mark_response <- data_attributes[[i]]@data[,poresp]
+                 
+                 else mark_response <- data_attributes[[i]]@data[,paresp]
+                
+              mark <- sp::SpatialPointsDataFrame(coords = coordinates(data_attributes[[i]]),
+                                                                               data = data.frame(factor((data_attributes[[i]]@data[,names[j]]))),
+                                                                               proj4string = proj)
+              colnames(mark@data) <- names[j]
+              mark@data[,paste0(names[j],'_phi')] <- rep(1,nrow(mark@coords))
+              mark@data[,paste0(names[j],'_response')] <- mark_response ##How do we run the response for marks below??
               
-              ind <- ind + j - 1
+              mark@data[,'mark_response_weights'] <- mark_response
+              n_species <- sum( mark@data[,'mark_response_weights'])
+              #FOR count data do this:
+              weights = as(mark@data,'data.table')
+              weights = weights[, .(weight = n_species/sum(mark_response_weights)), by = eval(names[j])]
+              mark@data[,'weights'] <- weights[as.numeric(mark@data[,names[j]])]$weight
+              #weights <- nrow(mark@coords)/(as.numeric(table(mark@data[,names[j]])))
+              #Weights wont work for count data
+              #mark@data[,'weights'] <- weights[as.numeric(mark@data[,names[j]])]
+              attr(mark,'family') <- 'poisson'
+              attr(mark,'data_type') <- 'Multinomial mark'
+              ##Add phi and factor_variable names as attributes
+              attr(mark,'mark_name') <- names[j]
+              attr(mark, 'phi') <- paste0(names[j],'_phi')
+              attr(mark,'weights') <- TRUE
+              ##Then when adding them to component joint say unique(phi) etc... do avoid duplicates
+              data_marks[[index]] <- mark
+              names(data_marks)[[index]] <- paste0(names(data_attributes)[i],'_',names[j])
+              }
+              else
+                if (class_marks[j] == 'numeric' | class_marks[j] == 'integer')
+                  {
+              
               mark <- sp::SpatialPointsDataFrame(coords = coordinates(data_attributes[[i]]),
                                                  data = as.data.frame(data_attributes[[i]]@data[,names[j]]),
                                                  proj4string = proj)
-              colnames(mark@data) <- paste0(names(data_attributes)[i],'_',names[j])
+              colnames(mark@data) <- names[j] #paste0(names(data_attributes)[i],'_',names[j]) #Should I do this? Would we not want group effects for the marks?#But then Names marks is not the same?
               attr(mark,'family') <- markfamily
               capital_markfamily <- gsub("^(\\w)(\\w+)", "\\U\\1\\L\\2", 
                                          markfamily, perl = TRUE)
               attr(mark,'data_type') <- paste0(capital_markfamily,' mark')
-              data_marks[[ind]] <- mark
-              names(data_marks)[[ind]] <- paste0(names(data_attributes)[i],'_',names[j])
+              attr(mark,'mark_name') <- names[j]
+              attr(mark,'phi') <- NA
+              attr(mark, 'weights') <- FALSE
+              data_marks[[index]] <- mark
+              names(data_marks)[[index]] <- paste0(names(data_attributes)[i],'_',names[j])
               
+                  }
+              #else FALSE
             }
-            
-          }
-        
       }
     }
     
     data_marks[sapply(data_marks,is.logical)] <- NULL
     
     if (length(data_marks) == 0) stop("Either marks have been set to TRUE and no datasets contain marks, or marks to include only contains marks not present in any dataset.")
+  
+    names_marks <- sapply(data_marks, function(mark) attributes(mark)$mark_name)
     
-    names_marks <- sapply(data_marks, function(mark) colnames(mark@data))
-    names(data_marks) <- names_marks
+    multinom_incl <- sapply(data_marks, function(mark) attributes(mark)$data_type == 'Multinomial mark')
+    
+    if (any(multinom_incl)) {
+      
+      multinom_vars <- unique(unlist(sapply(data_marks, function(mark) {
+        
+        if(attributes(mark)$data_type == 'Multinomial mark') attributes(mark)$mark_name
+        
+        })))
+      
+      data_attributes <- lapply(data_attributes, function(dat){
+        
+        if (any(multinom_vars%in%names(dat))) {
+          
+          dat@data[,multinom_vars] <- NULL
+          dat
+          
+        }
+        else dat
+        
+      })
+      
+    }
   }
   
-  #Do I need this?
-  #Seems to work fine if I add it to the components
-
-  #if (indivintercepts) {
-  #  for (i in 1:length(data_attributes)) {
-  #    
-  #    data_attributes[[i]]@data[,paste0(names(data_attributes)[i],'_intercept')] <- 1
-  #    
-  #  }
-  #  if (marks) {
-  #    for (i in 1:length(data_marks)) {
-  #    
-  #    data_marks[[i]]@data[,paste0(names(data_marks)[i],'_intercept')] <- 1
-  #    
-  #  }
-  #  }
-  #  
-  #}
-
-    if (is.null(mesh)) {
+  if (is.null(mesh)) {
     
     warning("Mesh not provided. Will try to create own mesh.")
     
@@ -525,6 +421,7 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
   #Does this do the same thing as 'GetNearestCovariate'?
   #When inlabru update comes, change SpatialPointsDataFrame part
   #SpatialGridDataFrame?
+  #Remove the if ncol == 1,
   
   if (inherits(spatialcovariates,'Spatial')) {
     if (ncol(spatialcovariates) == 1) {
@@ -620,7 +517,14 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
     else 1
     
   }) 
-
+  
+  E_param <- sapply(family, function(x) {
+    if (x == 'poisson') 0
+    else
+      if (x == 'binomial') 1
+    
+  })
+  
   ##Take out any brackets from 'components_joint'.
   ##I.e (for now) run coordinates only on spatial covariates (and optional others).
   form_elements <- gsub(" *\\(.*?\\) *", "",components_joint)
@@ -652,7 +556,7 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
     
     if (indivintercepts) {
        
-        formula <- update(formula,paste0(' ~ . +', paste0(data_names[ind],'_intercept'), collapse = ' + '))
+      formula <- update(formula,paste0(' ~ . +', paste0(data_names[ind],'_intercept'), collapse = ' + '))
        
     }
     else formula
@@ -668,24 +572,26 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
   
   for (i in 1:1) {
 
-    lhoods <- like(formula = formula[[i]], ##Add tag to this likelihood somehow?
+    lhoods <- inlabru::like(formula = formula[[i]], ##Add tag to this likelihood somehow?
                    family = family[i],
                    data = data_attributes[[i]],
                    mesh = mesh,
                    ips = ips,
-                   Ntrials = trials[i])
+                   Ntrials = trials[i],
+                   E_param[i])
     likelihoods <- like_list(lhoods)
     
     
     if (length(family) > 1) { #Better way of doing this??
       for (j in 2:length(family)) {
 
-        lhoods <- like(formula = formula[[j]],
+        lhoods <- inlabru::like(formula = formula[[j]],
                        family = family[j],
                        data = data_attributes[[j]],
                        mesh = mesh,
                        ips = ips,
-                       Ntrials = trials[j])
+                       Ntrials = trials[j],
+                       E_param[j])
       likelihoods[[j]] <- lhoods
         
       }
@@ -700,6 +606,14 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
     formula_marks <- list()
     likelihoods_marks <- list()
     
+    mark_weights <- lapply(data_marks, function(x){
+      
+      if (attributes(x)$weights) x@data[,'weights']
+      else 1
+      
+      
+    })
+    
     for (i in 1:length(family_marks)) {
       
       formula_marks[[i]] <- formula(paste0(c(names_marks[i],'~',form_elements[2]),collapse = " "))
@@ -710,102 +624,76 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
       
       }
       
-      if (indivintercepts) {
+      if (indivintercepts) { #probably fix something here? No indiv intercepts for multinomial response, but indiv intercepts for marks
+       
+        if (attributes(data_marks[[i]])$data_type != 'Multinomial mark'){
+
+        formula_marks[[i]] <- update(formula_marks[[i]],paste0('. ~ . +', paste0(names_marks[i],'_intercept'), collapse = ' + '))
         
-        formula_marks[[i]] <- update(formula_marks[[i]],paste0(' ~ . +', paste0(names_marks[i],'_intercept'), collapse = ' + '))
-        
+        }
       }
+      
+      if (attributes(data_marks[[i]])$data_type == 'Multinomial mark') {
+
+        formula_marks[[i]] <- update(formula_marks[[i]], paste0(paste0(attributes(data_marks[[i]])$mark_name,'_response'), ' ~ . + ', paste(attributes(data_marks[[i]])$mark_name, attributes(data_marks[[i]])$phi, sep = ' + ')))
+
+        }
       
     }
     
     for (k in 1:length(family_marks)) {
-      
-      lhoods <- like(formula = formula_marks[[k]],
+      ##Need to add exposure parameter here
+      ## So probably need to add a new sapply if weights in data attributes
+      ## otherwise E = 0
+      lhoods <- inlabru::like(formula = formula_marks[[k]],
                      family = family_marks[k],
                      data = data_marks[[k]],
                      mesh = mesh,
-                     ips = ips)
+                     ips = ips,
+                     E = mark_weights[[k]])
       likelihoods_marks[[k]] <- lhoods
       
       
     }
+    n <- length(likelihoods)
     for (l in 1:length(likelihoods_marks)) {
       
       #Better way to do this?
-      likelihoods[[l+length(family)]] <- likelihoods_marks[[l]]
+      likelihoods[[l + n]] <- likelihoods_marks[[l]]
       
     }
     
   }
   
-  if(!is.null(speciespresence)) {
-    
-    family_species <- unlist(sapply(data_species, function(x) attributes(x)$family))
-    formula_species <- list()
-    
-    for (i in 1:length(family_species)){
-    
-    formula_species[[i]] <- formula(paste0(c('species_response','~',form_elements[2]),collapse = " "))
-    
-    if (family_species[[i]] == 'poisson') {
-      
-      formula_species[[i]] <- update(formula_species[[i]], '. ~ .  + phi') 
-      formula_species[[i]] <- update(formula_species[[i]], paste('. ~ . +', speciespresence))
-      
-    }
-    
-    if (family_species[[i]] == 'binomial') { #Keep this for now
-     
-      formula_species[[i]] <- update(formula_species[[i]], paste('. ~ . +', unique(data_species[[i]]@data[,speciespresence])))
-      
-    }
-    
-    if (marksspatial) {
-      
-      formula_species[[i]] <- update(formula_species[[i]],paste0('. ~ . +',species_names[i],'_spde'))
-    
-      }
-    
-    }
-
-    likelihoods_species <- list()
-
-    for (k in 1:length(data_species)) {
-      #Add NTrials above
-      lhoods <- like(formula = formula_species[[k]],
-                     family = family_species[k],
-                     data = data_species[[k]],
-                     mesh = mesh,
-                     ips = ips)
-      likelihoods_species[[k]] <- lhoods
-      
-  }
-    n <- length(likelihoods)
-    for (l in 1:length(likelihoods_species)) {
-      
-      #Better way to do this?
-      likelihoods[[l + n]] <- likelihoods_species[[l]]
-      
-    }
-    
-  }
+  
   ips$int_resp <- 0
   #ips <- spTransform(ips, proj) <- doesn't work if ips is not projected
   proj4string(ips) <- proj # <- is this fine?
   #Run integration points only on spatialcovariates?
-  like_ip = like(formula = formula(paste0(c('int_resp ~ 0', c(spatnames)) ,collapse = '+')), #formula(paste0(c("resp ~", form_elements[2]),collapse = " ")),
+  like_ip = inlabru::like(formula = formula(paste0(c('int_resp ~ 0', c(spatnames)) ,collapse = '+')), #formula(paste0(c("resp ~", form_elements[2]),collapse = " ")),
                  family = 'poisson',
                  mesh = mesh,
                  E = ips$weight,
                  data = ips)
   
   likelihoods[[length(likelihoods) + 1]] = like_ip
-
-  names(likelihoods) <- c(data_names,names_marks, species_names, 'like_ip')
+  
+ # names(likelihoods) <- c(data_names,names_marks, species_names, 'like_ip') ##Fix this
   
   if (indivintercepts) {
     
-    components_joint <- update(components_joint, paste0(' ~ . +', paste0(c(data_names,names_marks),'_intercept(1)'), collapse = ' + '))
+    components_joint <- update(components_joint, paste0(' ~ . +', paste0(c(data_names),'_intercept(1)'), collapse = ' + '))
+    
+    for (i in 1:length(data_marks)) {
+      if (marks) {
+      if (attributes(data_marks[[i]])$data_type != "Multinomial mark") {
+        
+    components_joint <- update(components_joint, paste0(' ~ . +', paste0(c(names_marks[i]),'_intercept(1)'), collapse = ' + '))
+        
+      }
+      }
+      
+    }
     
   }
   
@@ -816,44 +704,37 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
   }
   
   if (marksspatial) {
-    if (!is.null(names_marks)) { #I.e. if marks is null but species is non null. Should I add a seperate random for species?
+    #if (!is.null(names_marks)) { #I.e. if marks is null but species is non null. Should I add a seperate random for species?
     components_joint <- update(components_joint, paste('. ~ . +',paste0(names_marks,'_spde(main = coordinates, model = spde2)',collapse = ' + ')))
-    }
+    #}
     
   }
   
-  if (!is.null(speciespresence)) {
-    if ('poisson'%in%family_species) {
-      
-   #components_joint <- update(components_joint, paste0('. ~ . +' ,speciespresence,'(main =',speciespresence,' ,model = "factor_full")'))
-   components_joint <- update(components_joint, paste0('. ~ . +' ,speciespresence,'(main =',speciespresence,',model = "iid",constr = FALSE, fixed=TRUE)'))
-   components_joint <- update(components_joint, ' . ~ .  + phi(main = phi, model = "iid", initial = -10, fixed = TRUE)')
-   
-    }
+  if (marks) {
+   if (any(multinom_incl)) {
     
-    if ('binomial'%in%family_species) { #Keep for now
-      for (i in 1:length(data_species)) {
-        if (attributes(data_species[[i]])$family == 'binomial') {
-          
-          components_joint <- update(components_joint, paste0(' . ~ . +',unique(attributes(data_species[[i]])$species_included),'(1)'))
+    factor_vars <- sapply(data_marks, function(name) attributes(name)$mark_name)
+    factor_vars <- unique(factor_vars[multinom_incl])
+    components_joint <- update(components_joint, paste(' . ~ . + ', paste0(factor_vars,'(main = ', factor_vars, ', model = "iid",constr = FALSE, fixed=TRUE)', collapse = ' + ')))
 
-        }
-      }
-  
-    }
-    
-    if (marksspatial) {
-      
-      components_joint <- update(components_joint, paste(' . ~ . +',paste0(species_names,'_spde(main = coordinates, model = spde2)', collapse = ' + ')))
-    }
-  
+    phi_vars <- sapply(data_marks, function(name) attributes(name)$phi)
+    phi_vars <- unique(phi_vars[multinom_incl])
+    components_joint <- update(components_joint, paste(' . ~ . +', paste0(phi_vars, '(main = ',phi_vars, ', model = "iid", initial = -10, fixed = TRUE)', collapse = ' + ')))
+
+   }
   }
   
-  #Add options parameter here
+  for (i in 1:length(likelihoods)) {
+    
+    if (likelihoods[[i]]$response == paresp) options[['control.family']][[i]] <- list(link = 'cloglog')
+    
+    else options[['control.family']][[i]] <- list(link = 'default')
+    
+    }
+  
   model_joint <- bru(components = components_joint,
-                     likelihoods) #, options = list(control.compute = list(cpo = FALSE, dic = FALSE, waic = FALSE), control.inla = list(int.strategy = "eb")))
-
-  if (residuals) {
+                     likelihoods, options = options)
+  if (!is.null(residuals)) {
     
     name_resp <- c()
     
@@ -877,18 +758,35 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
       
     }
     
-    
-    residuals = list()
-    
-    for (k in 1:length(fitted_residuals)) {
+    calc_residuals = list()
+    if (residuals == 'response') {
+      for (k in 1:length(fitted_residuals)) {
       
-      residuals[[k]] <- likelihoods[[k]]$data@data[,name_resp[k]] - fitted_residuals[[k]]
+      calc_residuals[[k]] <- likelihoods[[k]]$data@data[,name_resp[k]] - fitted_residuals[[k]]
       
     }
+    }
+    else
+      if (residuals == 'pearson') {
+        for (k in 1:length(fitted_residuals)) {
+          stop('FIX THIS')
+        calc_residuals[[k]] <- (likelihoods[[k]]$data@data[,name_resp[k]] - fitted_residuals[[k]])/sqrt(fitted_residuals[[k]])
+        
+        }
+        
+      } 
+    else
+      if (residuals == 'deviance') {
+        for (k in 1:length(fitted_residuals)) {
+          stop('FIX THIS')
+        calc_residuals[[k]] <- sign(likelihoods[[k]]$data@data[,name_resp[k]] - fitted_residuals[[k]]) * sqrt(2 * likelihoods[[k]]$data@data[,name_resp[k]] * log(likelihoods[[k]]$data@data[,name_resp[k]]/fitted_residuals[[k]]) - (likelihoods[[k]]$data@data[,name_resp[k]] - fitted_residuals[[k]]))
+        
+        }
+      }
     
-    names(residuals) <- c(data_names,names_marks) #,'like_ip')
-    #residuals[['like_ip']] <- NULL
-    model_joint[['model_residuals']] = residuals
+    names(calc_residuals) <- c(data_names,names_marks)
+    
+    model_joint[['model_residuals']] = calc_residuals
     
     
   }
@@ -897,7 +795,11 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
   names(data_type) <- c(data_names,names_marks)
   model_joint[['data_type']] <- data_type
   
-  model_joint[['species_in_model']] <- names_all_species
+  if (!is.null(multinom_vars)) { 
+    
+  model_joint[['multinom_vars']] <- multinom_vars
+  
+  }
   
   class(model_joint) <- c('bru_sdm',class(model_joint))
   return(model_joint)
