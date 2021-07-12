@@ -12,6 +12,7 @@
 #' @param inclcoords Should coordinates be used in data. Defaults to \code{FALSE}.
 #' @param mesh An inla.mesh object. Defaults to \code{NULL}.
 #' @param meshpars List of mesh parameters. Requires the following items: "cut.off", "max.edge" and "offset". Defaults to \code{NULL}.
+#' @param spdemodel inla.spde model used in the model. Default \code{NULL} uses "inla.spde2.matern".
 #' @param ips Integration points. Defaults to \code{NULL}.
 #' @param bdry Polygon of boundary for region, of class Polygon. If \code{NULL}, draws a boundary around the points.
 #' @param proj Projection to use if data is not a projection. Defaults to utm (hopefully).
@@ -33,12 +34,12 @@
 
 bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian',
                    inclmarks = NULL, coords = c('X','Y'), poresp = NULL, paresp = NULL,
-                   trialname= NULL, inclcoords = FALSE, mesh = NULL, meshpars = NULL, 
-                   ips = NULL, bdry = NULL, proj = CRS("+proj=longlat +ellps=WGS84"),
-                   predictions = FALSE, residuals = 'model', intercept = FALSE,
-                   indivintercepts = TRUE, pointsspatial = TRUE, marksspatial = TRUE, 
-                   options = list(), poformula = NULL, paformula = NULL, tol = NULL) {
-  
+                   trialname = NULL, inclcoords = FALSE, mesh = NULL, meshpars = NULL, 
+                   spdemodel = NULL, ips = NULL, bdry = NULL,
+                   proj = CRS("+proj=longlat +ellps=WGS84"),predictions = FALSE,
+                   residuals = 'model', intercept = FALSE, indivintercepts = TRUE,
+                   pointsspatial = TRUE, marksspatial = TRUE, options = list(),
+                   poformula = NULL, paformula = NULL, tol = NULL) {
   
   if (is.null(spatialcovariates)) stop("Spatial covariates not provided.")
   
@@ -81,6 +82,12 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
     
   }
 
+  if (!is.null(spdemodel)) {
+    
+    if (!inherit(spdemodel, 'inla.model.class')) stop("spdemodel needs to be an inla.model.class object.")
+    
+  }
+  
   if (!marks) {
     
     names_marks <- NULL 
@@ -141,7 +148,7 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
                                          data = data.frame(resp = rep(1,nrow(coordinates(dat)))),
                                          proj4string = proj)
         names(dat) <- poresp
-        attr(dat,'family') <- 'poisson'
+        attr(dat,'family') <- 'cp'
         attr(dat,'data_type') <- 'Present only'
         dat
         
@@ -158,7 +165,7 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
             else attr(dat,'Ntrials') <- 1
           }
           attr(dat,'family') <- 'binomial'
-          attr(dat,'data_type') <- 'Present absent'
+          attr(dat,'data_type') <- 'Present absence'
           dat
           
         }
@@ -171,7 +178,7 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
           dat@data[,poresp] <- 1
           
         }
-        attr(dat,'family') <- 'poisson'
+        attr(dat,'family') <- 'cp'
         attr(dat,'data_type') <- 'Present only'
         dat
         
@@ -197,7 +204,7 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
               else attr(dat,'Ntrials') <- 1
             }
             attr(dat,'family') <- 'binomial'
-            attr(dat,'data_type') <- 'Present absent'
+            attr(dat,'data_type') <- 'Present absence'
             dat
             
           }
@@ -211,7 +218,7 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
                                                 data = data.frame(resp = rep(1,nrow(dat))),
                                                 proj4string = proj)
               names(dat) <- poresp
-              attr(dat,'family') <- 'poisson'
+              attr(dat,'family') <- 'cp'
               attr(dat,'data_type') <- 'Present only'
               dat
               
@@ -226,7 +233,7 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
             if (!poresp%in%colnames(dat@data)) {
               dat[,poresp] <- 1
             }
-            attr(dat,'family') <- 'poisson'
+            attr(dat,'family') <- 'cp'
             attr(dat,'data_type') <- 'Present only'
             dat
             
@@ -279,7 +286,7 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
 
               if (class_marks[j] == 'character'| class_marks[j] == 'factor') {
                
-                if (attributes(data_attributes[[i]])$family == 'poisson')  mark_response <- data_attributes[[i]]@data[,poresp]
+                if (attributes(data_attributes[[i]])$family == 'cp')  mark_response <- data_attributes[[i]]@data[,poresp]
                  
                  else mark_response <- data_attributes[[i]]@data[,paresp]
                 
@@ -305,6 +312,8 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
               attr(mark,'mark_name') <- names[j]
               attr(mark, 'phi') <- paste0(names[j],'_phi')
               attr(mark,'weights') <- TRUE
+              attr(mark,'dataset') <- names(data_attributes)[i]
+              #mark@data[,names[j]] <- as.numeric(mark@data[,names[j]])
               ##Then when adding them to component joint say unique(phi) etc... do avoid duplicates
               data_marks[[index]] <- mark
               names(data_marks)[[index]] <- paste0(names(data_attributes)[i],'_',names[j])
@@ -324,7 +333,10 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
               attr(mark,'mark_name') <- names[j]
               attr(mark,'phi') <- NA
               attr(mark, 'weights') <- FALSE
+              attr(mark,'dataset') <- names(data_attributes)[i]
               data_marks[[index]] <- mark
+              ##Does this work?
+              #Now do the grouping with name: names[j]
               names(data_marks)[[index]] <- paste0(names(data_attributes)[i],'_',names[j])
               
                   }
@@ -339,15 +351,28 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
   
     names_marks <- sapply(data_marks, function(mark) attributes(mark)$mark_name)
     
+    
+    datasets_numeric_marks <- unlist(sapply(data_marks, function(mark) {
+      
+      if (attributes(mark)$data_type != 'Multinomial mark') attributes(mark)$dataset
+      
+    }))
+    
     multinom_incl <- sapply(data_marks, function(mark) attributes(mark)$data_type == 'Multinomial mark')
     
-    if (any(multinom_incl)) {
+     if (any(multinom_incl)) {
       
       multinom_vars <- unique(unlist(sapply(data_marks, function(mark) {
         
         if(attributes(mark)$data_type == 'Multinomial mark') attributes(mark)$mark_name
         
         })))
+      
+      datasets_multinom_marks <- unlist(sapply(data_marks, function(mark) {
+        
+        if (attributes(mark)$data_type == 'Multinomial mark') attributes(mark)$dataset
+        
+      }))
       
       data_attributes <- lapply(data_attributes, function(dat){
         
@@ -361,7 +386,45 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
         
       })
       
+      for (multiname in multinom_vars) {
+        
+        ind <- list()
+        
+        for (j in 1:length(data_marks)) {
+          
+          if (multiname%in%names(data_marks[[j]]@data)) {
+            
+            ind[[j]] <- data_marks[[j]]@data[,multiname]
+            
+          } else {
+            
+            ind[j] <- NULL
+            
+            }
+          
+          }
+        
+        ##NEED TO CREATE INDEX FOR ASSIGNING EACH FACTOR VAR TO A NUMBER
+         #SO WE KNOW, SAY FACT A = 1 ...
+         #PROBABLY NEED TO ASSIGN ANOTHER VAR
+        
+        ind <- as.numeric(unlist(ind)) 
+        assign(paste(multiname), ind)
+        assign(paste0(multiname,'_ngroup'),max(ind))   
+        
+      }
+    
+      }
+    
+    else {
+        
+        multinom_vars <- NULL
+        datasets_multinom_marks <- NULL
+      
     }
+
+    if (length(multinom_incl) == length(data_marks)) datasets_numeric_marks <- NULL
+    
   }
   
   if (is.null(mesh)) {
@@ -484,14 +547,62 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
       
     }
   
-  spde2 <- inla.spde2.matern(mesh)
+  if (is.null(spdemodel)) {
+  
+    spdemodel <- inla.spde2.matern(mesh)
+  
+  }
+  
+  
+  spatdata_class <- c()
+  
+  for (cov in spatnames) {
+  
+  spatdata_class[cov] <- class(eval(call("$", eval(call("@", as.symbol(cov), as.symbol("data"))), as.symbol(cov))))
+  
+    }
   
   ##Construct joint components for the likelihoods.
   ##Will need to change with inclusion of separate covariates.
   
+  #ips$int_resp <- 0
+  #proj4string(ips) <- proj # <- is this fine?
+  #Run integration points only on spatialcovariates?
+  #like_ip = inlabru::like(formula = formula(paste0(c('int_resp ~ 0', spatnames) ,collapse = '+')), #'int_spde'
+  #                        family = 'poisson',
+  #                        mesh = mesh,
+  #                        E = ips$weight,
+  #                        data = ips)
+  
+  #likelihoods <- like_list(like_ip)
+
   if (is.null(poformula) | is.null(paformula)){
     
-    components_joint <- formula(paste(c('~ 0',paste0(spatnames,'(main = ',spatnames,', model = "linear")')), collapse = '+'))
+    components_joint <- formula( ~ 0)
+    
+    for (cov in 1:length(spatdata_class)) {
+    
+      if (spatdata_class[cov] == 'numeric') {
+      
+      components_joint <- update(components_joint, paste(c(' ~ . +', paste0(spatnames[cov],'(main = ', spatnames[cov], ', model = "linear")'))))
+      
+      }
+      else
+        
+        if (indivintercepts) {
+          
+          components_joint <- update(components_joint, paste(c(' ~ . +', paste0(spatnames[cov],'(main = ', spatnames[cov], ', model = "factor_contrast")'))))
+          
+        } else {
+          
+          components_joint <- update(components_joint, paste(c(' ~ . +', paste0(spatnames[cov],'(main = ', spatnames[cov], ', model = "factor_full")'))))
+          
+          }
+          
+      
+    }
+    
+    #components_joint <- formula(paste(c('~ 0',paste0(spatnames,'(main = ',spatnames,', model = "linear")')), collapse = '+'))
     
     if (inclcoords) {
       
@@ -507,7 +618,7 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
     
   }
   
-  likelihoods = list()
+  #likelihoods = list()
   
   family <- unlist(sapply(data_attributes, function(x) attributes(x)$family))
 
@@ -518,26 +629,27 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
     
   }) 
   
-  E_param <- sapply(family, function(x) {
-    if (x == 'poisson') 0
-    else
-      if (x == 'binomial') 1
-    
-  })
+  #E_param <- sapply(family, function(x) {
+  #  if (x == 'poisson') 0
+  #  else
+  #    if (x == 'binomial') 1
+  #  
+  #})
   
   ##Take out any brackets from 'components_joint'.
   ##I.e (for now) run coordinates only on spatial covariates (and optional others).
   form_elements <- gsub(" *\\(.*?\\) *", "",components_joint)
 
   formula <- mapply(function(fam,ind) {
-    if (!is.null(poformula) & fam == 'poisson') {
+    if (!is.null(poformula) & fam == 'cp') {
       
       formula <- poformula
     }
     else
-      if (is.null(poformula) & fam == 'poisson') {
-        
-        formula <- formula(paste0(c(poresp,'~', form_elements[2]),collapse = " ")) 
+      if (is.null(poformula) & fam == 'cp') {
+        ##CHANGED FROM PORESP
+        ##CHANGED CP FROM POISSON
+        formula <- formula(paste0(c('coordinates','~', form_elements[2]),collapse = " ")) 
         
       }
     
@@ -568,21 +680,40 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
     }
     else formula
     
+    ##ADD SOMETHING HERE
+     #IF multinom_var in data set then add multimom_var_spde
+     #SO WILL PROBABLY NEED TO ADD A NEW PARAM TO MAPPLY 
+     #MAYBE ADD IT IN A FOR LOOP??
+    
+    
   }, fam = family, ind = 1:length(family))
+  
+  include <- list()
+  
+  for (i in 1:length(formula)) {
+    
+    variables <- all.vars(formula[[i]])
+    include[[i]] <- variables[!variables%in%c(paresp,'coordinates')]
+    formula[[i]] <- as.formula(paste(variables[!variables%in%include[[i]]], '~ .'))
+    
+  }
+
+
   
   for (i in 1:1) {
 
-    lhoods <- inlabru::like(formula = formula[[i]], ##Add tag to this likelihood somehow?
+      lhoods <- inlabru::like(formula = formula[[i]], ##Add tag to this likelihood somehow?
                    family = family[i],
                    data = data_attributes[[i]],
                    mesh = mesh,
                    ips = ips,
-                   Ntrials = trials[i],
-                   E_param[i])
-    likelihoods <- like_list(lhoods)
-    
+                   Ntrials = trials[i],#,
+                   include = include[[i]])#,
+                  # E_param[i])
+     likelihoods <- like_list(lhoods)
     
     if (length(family) > 1) { #Better way of doing this??
+  
       for (j in 2:length(family)) {
 
         lhoods <- inlabru::like(formula = formula[[j]],
@@ -590,13 +721,14 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
                        data = data_attributes[[j]],
                        mesh = mesh,
                        ips = ips,
-                       Ntrials = trials[j],
-                       E_param[j])
-      likelihoods[[j]] <- lhoods
+                       Ntrials = trials[j],#,
+                       include = include[[j]])#,
+                       #E_param[j])
+      
+        likelihoods[[j]] <- lhoods
         
       }
     }
-    
     likelihoods
   }
   
@@ -619,9 +751,9 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
       formula_marks[[i]] <- formula(paste0(c(names_marks[i],'~',form_elements[2]),collapse = " "))
       
       if (marksspatial) {
-        
-        formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +", names_marks[i],'_spde'))
-      
+       if (!is.null(datasets_numeric_marks)) {
+        formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",datasets_numeric_marks,'_spde'))#names(data_marks)[i]
+       }
       }
       
       if (indivintercepts) { #probably fix something here? No indiv intercepts for multinomial response, but indiv intercepts for marks
@@ -635,9 +767,20 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
       
       if (attributes(data_marks[[i]])$data_type == 'Multinomial mark') {
 
-        formula_marks[[i]] <- update(formula_marks[[i]], paste0(paste0(attributes(data_marks[[i]])$mark_name,'_response'), ' ~ . + ', paste(attributes(data_marks[[i]])$mark_name, attributes(data_marks[[i]])$phi, sep = ' + ')))
-
+        formula_marks[[i]] <- update(formula_marks[[i]], paste0(paste0(names_marks[i],'_response'), ' ~ . + ', paste(names_marks[i], attributes(data_marks[[i]])$phi, sep = ' + ')))
+        #formula_marks[[i]] <- species_response ~ slopeangle + gorillas1_species_spde 
+        
         }
+      
+    }
+    
+    include_marks <- list()
+    
+    for (i in 1:length(formula)) {
+      
+      variables <- all.vars(formula_marks[[i]])
+      include_marks[[i]] <- variables[!variables%in%as.character(formula_marks[[i]][2])]
+      formula_marks[[i]] <- as.formula(paste(variables[!variables%in%include_marks[[i]]], '~ .'))
       
     }
     
@@ -645,15 +788,16 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
       ##Need to add exposure parameter here
       ## So probably need to add a new sapply if weights in data attributes
       ## otherwise E = 0
+      
       lhoods <- inlabru::like(formula = formula_marks[[k]],
                      family = family_marks[k],
                      data = data_marks[[k]],
                      mesh = mesh,
                      ips = ips,
-                     E = mark_weights[[k]])
+                     E = mark_weights[[k]],
+                     include = include_marks[[k]])
       likelihoods_marks[[k]] <- lhoods
-      
-      
+
     }
     n <- length(likelihoods)
     for (l in 1:length(likelihoods_marks)) {
@@ -666,17 +810,8 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
   }
   
   
-  ips$int_resp <- 0
-  #ips <- spTransform(ips, proj) <- doesn't work if ips is not projected
-  proj4string(ips) <- proj # <- is this fine?
-  #Run integration points only on spatialcovariates?
-  like_ip = inlabru::like(formula = formula(paste0(c('int_resp ~ 0', c(spatnames)) ,collapse = '+')), #formula(paste0(c("resp ~", form_elements[2]),collapse = " ")),
-                 family = 'poisson',
-                 mesh = mesh,
-                 E = ips$weight,
-                 data = ips)
-  
-  likelihoods[[length(likelihoods) + 1]] = like_ip
+
+  #likelihoods[[length(likelihoods) + 1]] = like_ip
   
  # names(likelihoods) <- c(data_names,names_marks, species_names, 'like_ip') ##Fix this
   
@@ -699,24 +834,34 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
   
   if (pointsspatial) {
     
-    components_joint <- update(components_joint, paste('. ~ . +',paste0(data_names,'_spde(main = coordinates, model = spde2)',collapse = ' + ')))
+    components_joint <- update(components_joint, paste('. ~ . +',paste0(data_names,'_spde(main = coordinates, model = spdemodel)',collapse = ' + ')))
     
   }
   
   if (marksspatial) {
-    #if (!is.null(names_marks)) { #I.e. if marks is null but species is non null. Should I add a seperate random for species?
-    components_joint <- update(components_joint, paste('. ~ . +',paste0(names_marks,'_spde(main = coordinates, model = spde2)',collapse = ' + ')))
-    #}
+    if (!is.null(datasets_numeric_marks)) {
+      
+    components_joint <- update(components_joint, paste('. ~ . +',paste0(names(datasets_numeric_marks),'_spde(main = coordinates, model = spdemodel)',collapse = ' + ')))
     
-  }
+    }
+    }
   
   if (marks) {
    if (any(multinom_incl)) {
     
+    ## ADD HERE
+     # OR SOMETHING LIKE THIS
+     #components_joint <- update(components_joint, paste('. ~ . +',paste0(multinom_vars,'_spde(main = coordinates, model = spdemodel, group = ',multinom_vars,', ngroup = ',paste0(multinom_vars,'_n'),', control.group = list(model = "iid"))')))
+     
+     
+     
+    
     factor_vars <- sapply(data_marks, function(name) attributes(name)$mark_name)
     factor_vars <- unique(factor_vars[multinom_incl])
     components_joint <- update(components_joint, paste(' . ~ . + ', paste0(factor_vars,'(main = ', factor_vars, ', model = "iid",constr = FALSE, fixed=TRUE)', collapse = ' + ')))
-
+    ##Maybe we need to add this thing after every mark?
+    #components_joint <- update(components_joint, paste(' . ~ . +',paste0(names(datasets_multinom_marks),'_spde(main = coordinates, model = spdemodel)', collapse =  ' + '))) ##add group, ngroup, control.group=list(model="iid") ]    components_joint <- update(components_joint, paste(' . ~ . + ', paste0(multinom_vars,'(main = ',multinom_vars, ', model = "iid", constr = FALSE, fixed= TRUE)', collapse = ' + ')))
+    
     phi_vars <- sapply(data_marks, function(name) attributes(name)$phi)
     phi_vars <- unique(phi_vars[multinom_incl])
     components_joint <- update(components_joint, paste(' . ~ . +', paste0(phi_vars, '(main = ',phi_vars, ', model = "iid", initial = -10, fixed = TRUE)', collapse = ' + ')))
@@ -724,7 +869,10 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
    }
   }
   
-  for (i in 1:length(likelihoods)) {
+  #length_ips <- nrow(ips) 
+  #components_joint <- update(components_joint, paste(' . ~ . + int_spde(main = coordinates, model = spdemodel, group = 1:length_ips, ngroup = 1)'))
+
+  for (i in 1:(length(likelihoods))) {
     
     if (likelihoods[[i]]$response == paresp) options[['control.family']][[i]] <- list(link = 'cloglog')
     
@@ -734,10 +882,11 @@ bru_sdm = function(..., spatialcovariates, marks = FALSE, markfamily = 'gaussian
   
   model_joint <- bru(components = components_joint,
                      likelihoods, options = options)
+  
   if (!is.null(residuals)) {
     
     name_resp <- c()
-    
+    ##change this for marks
     for (i in 1:(length(likelihoods) - 1)) {
       
       name_resp[i] <- gsub("\\(|\\)","",likelihoods[[i]]$formula[2])
