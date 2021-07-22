@@ -25,7 +25,7 @@
 #' @param marksspatial Should spatial effects be used for the marks in the model. Defaults to \code{TRUE}.
 #' @param poformula Formula given to the presence only datasets. Defaults to \code{NULL}.
 #' @param paformula Formula given to the presence/absence datasets. Defaults to \code{NULL}.
-#' @param tol Tolerance parameter for SpatialPixelsDataFrame. Defaults to \code{NULL}.
+#' @param tol Tolerance parameter for SpatialPixelsDataFrame. Defaults to \code{0.9}.
 #' 
 #' @import sp
 #' @import INLA
@@ -39,7 +39,7 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
                    proj = CRS("+proj=longlat +ellps=WGS84"),predictions = FALSE,
                    residuals = 'model', intercept = FALSE, indivintercepts = TRUE,
                    pointsspatial = TRUE, marksspatial = TRUE, options = list(),
-                   poformula = NULL, paformula = NULL, tol = NULL) {
+                   poformula = NULL, paformula = NULL, tol = 0.9) {
   
   #if (is.null(spatialcovariates)) stop("Spatial covariates not provided.")
   
@@ -526,8 +526,7 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
         spatpix <- sp::SpatialPixelsDataFrame(points = spatcoords,
                                               data = data.frame(spatdata[,i]), 
                                               tolerance = tol,
-                                              proj4string = proj,
-                                              grid = spatialcovariates@grid)
+                                              proj4string = proj)
         colnames(spatpix@data) = colnames(spatdata)[i]
         assign(names(spatpix@data),spatpix)
         
