@@ -526,7 +526,8 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
         spatpix <- sp::SpatialPixelsDataFrame(points = spatcoords,
                                               data = data.frame(spatdata[,i]), 
                                               tolerance = tol,
-                                              proj4string = proj)
+                                              proj4string = proj,
+                                              grid = spatialcovariates@grid)
         colnames(spatpix@data) = colnames(spatdata)[i]
         assign(names(spatpix@data),spatpix)
         
