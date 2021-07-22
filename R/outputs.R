@@ -58,3 +58,79 @@ summary.bru_sdm = function(x,...) {
   summary(x)
   
 }
+
+predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL, 
+                            mask = NULL, datasettopredict = NULL, 
+                            covariates = NULL, marktopredict = NULL, 
+                            spatial = TRUE, intercept = FALSE,
+                            fun = 'exp', n.samples = 100, ...) {
+
+  if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
+  
+  if (!all(covariates%in%row.names(object$summary.fixed))) stop("Covariates provided not in model.")
+  
+  if (is.null(formula) & !spatial & !intercept & is.null(covariates)) stop("Please provide at least one of spatial, intercept or covariates.")
+  
+  if (is.null(formula) & is.null(datasettopredict)) stop("Please provide either a formula or a dataset included in the bru_sdm model to be predicted.")
+  
+  #if (predictmark & is.null(markstopredict)) stop("Marks prediction is chosen but no marks to predict given.")
+  
+  if (is.null(data)) {
+    
+    if (!is.null(mask)) {
+      
+      data <- pixels(mesh, mask = mask)
+      
+    } 
+    else data <- pixels(mesh)
+    
+  }
+  
+  datasettopredict <- substitute(datasettopredict)
+  
+  if (!is.null(marktopredict)) {dataset <- paste0(datasettopredict,'_',marktopredict)}
+  
+  if (is.null(formula)) {
+    
+    if (spatial) {
+      
+      if (!paste0(datasettopredict,'_spde')%in%names(object$summary.random)) stop('Either dataset name is incorrect or bru_sdm model run without spatial effects.')
+      else spatial <- paste0(datasettopredict,'_spde')
+      
+    } 
+    else spatial <- NULL
+    
+    if (intercept) {
+      
+      if (!is.null(marktopredict)) {
+        
+        if (!paste0(marktopredict,'_intercept')%in%row.names(object$summary.fixed)) stop('Either dataset name is incorrect or bru_sdm model run without intercepts.')
+        else intercept <- paste0(marktopredict,'_intercept')
+        
+      }
+      
+      else {
+        
+        if (!paste0(datasettopredict,'_intercept')%in%row.names(object$summary.fixed)) stop('Either dataset name is incorrect or bru_sdm model run without intercepts.')
+        else intercept <- paste0(datasettopredict,'_intercept')
+        
+      }
+      
+    } 
+    else intercept <- NULL
+    
+    formula_components <- c(covariates, spatial, intercept)
+    
+    if (is.null(fun)) {fun <- ''}
+    
+    formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(formula_components, collapse = ' + '),')'))
+    
+  }
+  
+  class(object) <- c('bru','inla','iinla')
+  
+  int <- predict(object, data = data, formula = formula, n.samples = n.samples, ...)
+  return(int)
+  
+}
+
