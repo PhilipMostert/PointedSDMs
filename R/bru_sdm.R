@@ -17,7 +17,6 @@
 #' @param bdry Polygon of boundary for region, of class Polygon. If \code{NULL}, draws a boundary around the points.
 #' @param proj Projection to use if data is not a projection. Defaults to utm (hopefully).
 #' @param residuals Should residuals for each dataset be calculated. Options include: response, deviance, residual or \code{NULL} if no residuals should be calculated. Defaults to \code{'response'}.
-#' @param predictions Boolean: should predictions (on the linear scale) be made? Defaults to \code{FALSE}.
 #' @param intercept Include joint intercept in the model. Defaults to \code{FALSE}.
 #' @param indvintercepts Include individual intercepts for each dataset in the model. Defaults to \code{TRUE}.
 #' @param options A bru_options options object or a list of options passed on to bru_options()
@@ -36,8 +35,8 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
                    inclmarks = NULL, coords = c('X','Y'), poresp = NULL, paresp = NULL,
                    trialname = NULL, inclcoords = FALSE, mesh = NULL, meshpars = NULL, 
                    spdemodel = NULL, ips = NULL, bdry = NULL,
-                   proj = CRS("+proj=longlat +ellps=WGS84"),predictions = FALSE,
-                   residuals = 'model', intercept = FALSE, indivintercepts = TRUE,
+                   proj = CRS("+proj=longlat +ellps=WGS84"),residuals = 'model',
+                   intercept = FALSE, indivintercepts = TRUE,
                    pointsspatial = TRUE, marksspatial = TRUE, options = list(),
                    poformula = NULL, paformula = NULL, tol = 0.9) {
   
@@ -960,6 +959,7 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
   data_type <- sapply(c(data_attributes,data_marks), function(x) attributes(x)[['data_type']])
   names(data_type) <- c(data_names,names_marks)
   model_joint[['data_type']] <- data_type
+  model_joint[['dataset_names']] <- data_names
   
   if (!is.null(multinom_vars)) { 
     
