@@ -2,6 +2,7 @@
 #'
 #' @param ... Point process datasets with coordinates of species, and optionally marks and covariates explaining the coordinates.
 #' @param spatialcovariates Data frame of the spatial covariates accompanied by their associated coordinates. Defaults to \code{NULL}.
+#' @param covariatestoinclude A vector of spatial covariate names to include in the model. Defaults to \code{FALSE}.
 #' @param marks Should the model be a marked point process. Defaults to \code{FALSE}.
 #' @param markfamily Assumed distribution of the marks. Defaults to \code{"gaussian"}.
 #' @param inclmarks. A vector of which marks should be included in the model. Defaults to \code{NULL}.
@@ -18,7 +19,8 @@
 #' @param proj Projection to use if data is not a projection. Defaults to utm (hopefully).
 #' @param residuals Should residuals for each dataset be calculated. Options include: response, deviance, residual or \code{NULL} if no residuals should be calculated. Defaults to \code{'response'}.
 #' @param intercept Include joint intercept in the model. Defaults to \code{FALSE}.
-#' @param indvintercepts Include individual intercepts for each dataset in the model. Defaults to \code{TRUE}.
+#' @param pointsintercept Include individual intercepts for each point process in the model. Defaults to \code{TRUE}.
+#' @param marksintercept Include individual intercepts for each mark process in the model. Defaults to \code{TRUE}.
 #' @param options A bru_options options object or a list of options passed on to bru_options()
 #' @param pointsspatial Should spatial effects be used for the points in the model. Defaults to \code{TRUE}.
 #' @param marksspatial Should spatial effects be used for the marks in the model. Defaults to \code{TRUE}.
@@ -31,12 +33,13 @@
 #' @import inlabru
 #' @import rgeos
 
-bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'gaussian',
-                   inclmarks = NULL, coords = c('X','Y'), poresp = NULL, paresp = NULL,
+bru_sdm = function(..., spatialcovariates = NULL, covariatestoinclude = NULL,
+                   marks = FALSE, markfamily = 'gaussian', inclmarks = NULL,
+                   coords = c('X','Y'), poresp = NULL, paresp = NULL,
                    trialname = NULL, inclcoords = FALSE, mesh = NULL, meshpars = NULL, 
                    spdemodel = NULL, ips = NULL, bdry = NULL,
                    proj = CRS("+proj=longlat +ellps=WGS84"),residuals = 'model',
-                   intercept = FALSE, indivintercepts = TRUE,
+                   intercept = FALSE, pointsintercept = TRUE, marksintercept = TRUE,
                    pointsspatial = TRUE, marksspatial = TRUE, options = list(),
                    poformula = NULL, paformula = NULL, tol = 0.9) {
   
@@ -98,6 +101,7 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
     names_marks <- NULL 
     data_marks <- NULL
     multinom_vars <- NULL
+    marksintercept <- FALSE
     marksspatial <- FALSE
   
     }
@@ -425,10 +429,15 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
         
         multinom_vars <- NULL
         datasets_multinom_marks <- NULL
-      
+        
     }
 
-    if (all(multinom_incl)) datasets_numeric_marks <- NULL
+    if (all(multinom_incl)) {
+      
+     datasets_numeric_marks <- NULL
+     marksintercept <- FALSE
+    
+     }
     
   }
   
@@ -556,6 +565,13 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
   
   spatdata_class <- c()
   
+  if (!is.null(covariatestoinclude)) {
+    
+    spatnames <- spatnames[(spatnames%in%covariatestoinclude)]
+    if (is.null(spatnames) | identical(spatnames,character(0))) stop('covariatestoinclude contains covariate names not found in spatialcovariates')
+    
+  }
+  
   for (cov in spatnames) {
   
   spatdata_class[cov] <- class(eval(call("$", eval(call("@", as.symbol(cov), as.symbol("data"))), as.symbol(cov))))
@@ -598,7 +614,7 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
       }
       else
         
-        if (indivintercepts) {
+        if (pointsintercept | marksintercept) {
           
           components_joint <- update(components_joint, paste(c(' ~ . +', paste0(spatnames[cov],'(main = ', spatnames[cov], ', model = "factor_contrast")'))))
           
@@ -681,7 +697,7 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
       
     }
     
-    if (indivintercepts) {
+    if (pointsintercept) {
        
       formula <- update(formula,paste0(' ~ . +', paste0(data_names[ind],'_intercept'), collapse = ' + '))
        
@@ -771,11 +787,11 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
          #}
       }
       
-      if (indivintercepts) { #probably fix something here? No indiv intercepts for multinomial response, but indiv intercepts for marks
+      if (marksintercept) { #probably fix something here? No indiv intercepts for multinomial response, but indiv intercepts for marks
        
         if (attributes(data_marks[[i]])$data_type != 'Multinomial mark'){
 
-        formula_marks[[i]] <- update(formula_marks[[i]],paste0('. ~ . +', paste0(names_marks[i],'_intercept'), collapse = ' + '))
+        formula_marks[[i]] <- update(formula_marks[[i]],paste0('. ~ . +', paste0(names(data_marks)[[i]],'_intercept'), collapse = ' + '))
         
         }
       }
@@ -788,7 +804,7 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
         }
       
     }
-    
+
     include_marks <- list()
     
     for (i in 1:length(formula_marks)) {
@@ -830,22 +846,27 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
   
  # names(likelihoods) <- c(data_names,names_marks, species_names, 'like_ip') ##Fix this
   
-  if (indivintercepts) {
+  if (pointsintercept) {
     
     components_joint <- update(components_joint, paste0(' ~ . +', paste0(c(data_names),'_intercept(1)'), collapse = ' + '))
     
-    for (i in 1:length(data_marks)) {
-      if (marks) {
+  }
+  
+  
+  if (marks) {
+  
+    if (marksintercept) {
+  
+      for (i in 1:length(data_marks)) {
+    
       if (attributes(data_marks[[i]])$data_type != "Multinomial mark") {
         
-    components_joint <- update(components_joint, paste0(' ~ . +', paste0(c(names_marks[i]),'_intercept(1)'), collapse = ' + '))
+        components_joint <- update(components_joint, paste0(' ~ . +', paste0(c(names(data_marks)[[i]]),'_intercept(1)'), collapse = ' + '))
         
       }
-      }
-      
     }
-    
   }
+}
   
   if (pointsspatial) {
     
@@ -898,19 +919,19 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
  
   model_joint <- bru(components = components_joint,
                      likelihoods, options = options)
-  
+  if (marks) {
   if (!is.null(residuals)) {
     
     name_resp <- c()
     ##change this for marks
-    for (i in 1:(length(likelihoods) - 1)) {
+    for (i in 1:(length(likelihoods))) {
       
       name_resp[i] <- gsub("\\(|\\)","",likelihoods[[i]]$formula[2])
       
     }
     
     fitted_residuals = list()
-    for (i in 1:(length(likelihoods) - 1)) {
+    for (i in (length(data_names)+1):(length(likelihoods))) {
       res <- c()
       for (j in (model_joint$bru_iinla$inla_stack$data$index[[i]][1]):tail(model_joint$bru_iinla$inla_stack$data$index[[i]], n = 1)) {
         
@@ -920,41 +941,46 @@ bru_sdm = function(..., spatialcovariates = NULL, marks = FALSE, markfamily = 'g
       }
       
       fitted_residuals[[i]] <- as.vector(na.omit(res))
-      
-    }
     
-    calc_residuals = list()
-    if (residuals == 'response') {
-      for (k in 1:length(fitted_residuals)) {
-      
-      calc_residuals[[k]] <- likelihoods[[k]]$data@data[,name_resp[k]] - fitted_residuals[[k]]
-      
-    }
-    }
-    else
-      if (residuals == 'pearson') {
-        for (k in 1:length(fitted_residuals)) {
-          stop('FIX THIS')
-        calc_residuals[[k]] <- (likelihoods[[k]]$data@data[,name_resp[k]] - fitted_residuals[[k]])/sqrt(fitted_residuals[[k]])
-        
-        }
-        
-      } 
-    else
-      if (residuals == 'deviance') {
-        for (k in 1:length(fitted_residuals)) {
-          stop('FIX THIS')
-        calc_residuals[[k]] <- sign(likelihoods[[k]]$data@data[,name_resp[k]] - fitted_residuals[[k]]) * sqrt(2 * likelihoods[[k]]$data@data[,name_resp[k]] * log(likelihoods[[k]]$data@data[,name_resp[k]]/fitted_residuals[[k]]) - (likelihoods[[k]]$data@data[,name_resp[k]] - fitted_residuals[[k]]))
-        
-        }
       }
     
-    names(calc_residuals) <- c(data_names,names_marks)
+    fitted_residuals[sapply(fitted_residuals,is.null)] <- NULL
+    
+    calc_residuals = list()
+    
+  for (k in 1:length(fitted_residuals)) {
+      
+    ind <- k + length(data_names)
+  
+  if (residuals == 'response') {
+      
+    calc_residuals[[k]] <- likelihoods[[ind]]$data@data[,name_resp[ind]] - fitted_residuals[[k]]
+      
+    }
+    
+  else
+  if (residuals == 'pearson') {
+          
+    calc_residuals[[k]] <- (likelihoods[[ind]]$data@data[,name_resp[ind]] - fitted_residuals[[k]])/sqrt(fitted_residuals[[k]])
+        
+        }
+        
+      
+    else
+      if (residuals == 'deviance') {
+      
+    calc_residuals[[k]] <- sign(likelihoods[[ind]]$data@data[,name_resp[ind]] - fitted_residuals[[k]]) * sqrt(2 * likelihoods[[ind]]$data@data[,name_resp[ind]] * log(likelihoods[[ind]]$data@data[,name_resp[ind]]/fitted_residuals[[k]]) - (likelihoods[[ind]]$data@data[,name_resp[ind]] - fitted_residuals[[k]]))
+        
+      }
+      }
+    
+    names(calc_residuals) <- names_marks#c(data_names,names_marks)
     
     model_joint[['model_residuals']] = calc_residuals
     
     
   }
+ }
   
   data_type <- sapply(c(data_attributes,data_marks), function(x) attributes(x)[['data_type']])
   names(data_type) <- c(data_names,names_marks)

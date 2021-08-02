@@ -61,9 +61,9 @@ summary.bru_sdm = function(x,...) {
 
 predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL, 
                             mask = NULL, datasetstopredict = NULL, 
-                            covariates = NULL, marktopredict = NULL, 
-                            spatial = TRUE, intercept = FALSE,
-                            fun = 'exp', n.samples = 100, ...) {
+                            covariates = NULL, spatial = TRUE,
+                            intercept = FALSE,fun = 'exp',
+                            n.samples = 100, ...) {
 
   if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
   
@@ -94,8 +94,6 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
     class(object) <- c('bru','inla','iinla')
     
     for(i in 1:length(datasetstopredict)) {
-  
-    if (!is.null(marktopredict)) {dataset <- paste0(datasetstopredict,'_',marktopredict)}
     
     if (spatial) {
       
@@ -106,21 +104,10 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
     else spatial_obj <- NULL
     
     if (intercept) {
-      
-      if (!is.null(marktopredict)) {
-        
-        if (!paste0(marktopredict,'_intercept')%in%row.names(object$summary.fixed)) stop('Either dataset name is incorrect or bru_sdm model run without intercepts.')
-        else intercept_obj <- paste0(marktopredict,'_intercept')
-        
-      }
-      
-      else {
-        
+       
         if (!paste0(datasetstopredict[[i]],'_intercept')%in%row.names(object$summary.fixed)) stop('Either dataset name is incorrect or bru_sdm model run without intercepts.')
         else intercept_obj <- paste0(datasetstopredict[[i]],'_intercept')
         
-      }
-      
     } 
     else intercept_obj <- NULL
     
