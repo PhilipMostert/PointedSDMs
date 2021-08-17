@@ -1,12 +1,13 @@
 #' Bru_sdm output functions
 #' 
 
-
-print.bru_sdm = function(x,...) {
+print.bru_sdm <- function(x, ...) {
+  
   print(summary(x))
+  
 }
 
-summary.bru_sdm = function(x,...) {
+summary.bru_sdm <- function(x,...) {
   #cat('----bru_sdm summary STILL IN DEVELOPMENT----\n\n')
   
   cat("Summary of 'bru_sdm' object:\n\n")
@@ -35,11 +36,17 @@ summary.bru_sdm = function(x,...) {
   if(!is.null(x[['multinom_vars']])){
     cat('Summary of multinomial variables:\n\n')
     for (i in x[['multinom_vars']]) {
-      
+      if (i%in%names(x$summary.random)) { 
       variable <- x$summary.random[[i]]
       names(variable)[1] <- i
       print(variable[,1:7], row.names = FALSE, digits = 3)
       cat('\n\n')
+      } else {
+        
+      cat('Variable',i,'not run in model')
+      cat('\n\n')
+        
+      }
       
     }
     }
@@ -58,83 +65,3 @@ summary.bru_sdm = function(x,...) {
   summary(x)
   
 }
-
-predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL, 
-                            mask = NULL, datasetstopredict = NULL, 
-                            covariates = NULL, spatial = TRUE,
-                            intercept = FALSE,fun = 'exp',
-                            n.samples = 100, ...) {
-
-  if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
-  
-  if (!all(covariates%in%row.names(object$summary.fixed))) stop("Covariates provided not in model.")
-  
-  if (is.null(formula) & !spatial & !intercept & is.null(covariates)) stop("Please provide at least one of spatial, intercept or covariates.")
-  
-  if (is.null(formula) & is.null(datasetstopredict)) stop("Please provide either a formula or a dataset included in the bru_sdm model to be predicted.")
-  
-  #if (predictmark & is.null(markstopredict)) stop("Marks prediction is chosen but no marks to predict given.")
-  
-  if (is.null(data)) {
-    
-    if (!is.null(mask)) {
-      
-      data <- pixels(mesh, mask = mask)
-      
-    } 
-    
-    else data <- pixels(mesh)
-    
-  }
-
-  if (is.null(formula)) {
-    
-    int <- list()
-    
-    class(object) <- c('bru','inla','iinla')
-    
-    for(i in 1:length(datasetstopredict)) {
-    
-    if (spatial) {
-      
-      if (!paste0(datasetstopredict[[i]],'_spde')%in%names(object$summary.random)) stop('Either dataset name is incorrect or bru_sdm model run without spatial effects.')
-      else spatial_obj <- paste0(datasetstopredict[[i]],'_spde')
-      
-    } 
-    else spatial_obj <- NULL
-    
-    if (intercept) {
-       
-        if (!paste0(datasetstopredict[[i]],'_intercept')%in%row.names(object$summary.fixed)) stop('Either dataset name is incorrect or bru_sdm model run without intercepts.')
-        else intercept_obj <- paste0(datasetstopredict[[i]],'_intercept')
-        
-    } 
-    else intercept_obj <- NULL
-    
-    formula_components <- c(covariates, spatial_obj, intercept_obj)
-    
-    if (is.null(fun)) {fun <- ''}
-    
-    formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(formula_components, collapse = ' + '),')'))
-    
-    
-    int[[i]] <- predict(object, data = data, formula = formula, n.samples = n.samples, ...)
-    
-    
-    }
-  
-  names(int) <- datasetstopredict
-  return(int)
-  
-    }
-  
-  else {
-  
-  class(object) <- c('bru','inla','iinla')
-  int <- predict(object, data = data, formula = formula, n.samples = n.samples, ...)
-  return(int)
-  
-  }
-  
-}
-
