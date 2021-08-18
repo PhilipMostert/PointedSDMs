@@ -120,8 +120,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   for (name in spatnames) {
       
   pixels_df <- sp::SpatialPixelsDataFrame(points = spatialcovariates@coords,
-                                              data = data.frame(spatialcovariates@data[,name]),
-                                              proj4string = proj)
+                                          data = data.frame(spatialcovariates@data[,name]),
+                                          proj4string = proj)
   names(pixels_df) <- name
   assign(name,pixels_df)
       
@@ -347,7 +347,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
       
   if (pointsspatial) {
       
-  components_joint <- update(components_joint, paste(' ~ . +',paste0(names(data_marks),'_spde(main = coordinates, copy = ', paste0("\"",attributes(data)$Mark_dataset,'_spde',"\""),', fixed = TRUE)'),collapse = ' + '))
+  components_joint <- update(components_joint, paste(' ~ . +',paste0(names(data_marks),'_spde(main = coordinates, copy = ', paste0("\"",attributes(data)$Mark_dataset,'_spde',"\""),', fixed = FALSE)'),collapse = ' + '))
 
   }
   else {
