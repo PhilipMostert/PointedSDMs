@@ -25,7 +25,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   points_family <- sapply(data_points, function(data) attributes(data)$family)
   #points_family <- attributes(data)$Points_family
   points_response <- attributes(data)$Points_response
-
+  
   if (attributes(data)$Marks) {
     
   data_marks <- data@Mark_data
@@ -43,7 +43,6 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   data_marks <- NULL
   multinom_incl <- NULL
   multinom_vars <- NULL
-  
     
   }
   
@@ -68,67 +67,68 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   spatialcovariates <- sp::SpatialPointsDataFrame(coords = spatialcovariates[,coords],
                                                   data = spatialcovariates[,!names(spatialcovariates)%in%coords],
                                                   proj4string = proj)
-  spatialcovariates <- as(spatialcovariates, 'SpatialPixelsDataFrame')
   
+  spatialcovariates <- as(spatialcovariates, 'SpatialPixelsDataFrame')
+      
   }
     
   spatnames <- names(spatialcovariates@data)
   spatdata_class <- sapply(spatialcovariates@data, class)
-  
-  if (!is.null(covariatestoinclude)) {
     
+  if (!is.null(covariatestoinclude)) {
+      
   spatdata_class <- spatdata_class[spatnames%in%covariatestoinclude] 
   spatnames <- spatnames[(spatnames%in%covariatestoinclude)]
-    
+      
   if (is.null(spatnames) | identical(spatnames,character(0))) stop('covariatestoinclude contains covariate names not found in spatialcovariates')
-    
+      
   }
-   
-  #data_points <- lapply(data_points, get_nearest_covariate,
-  #                      spatialcovariates = spatialcovariates,
-  #                      covariatestokeep = spatnames,
-  #                      coords = coords,
-  #                      proj = proj,
-  #                      componentstokeep = c(points_response,'weight'))
     
-  #if (attributes(data)$Marks) {
-      
-  #data_marks <- lapply(data_marks, get_nearest_covariate,
-  #                     spatialcovariates = spatialcovariates,
-  #                     covariatestokeep = spatnames,
-  #                     coords = coords,
-  #                     proj = proj,
-  #                     componentstokeep = c(response_marks,
-  #                                          attributes(data)$Mark_phi,
-  #                                          attributes(data)$Multinom_vars),
-  #                     attributestokeep = c('data_type','mark_name',
-  #                                          'phi','weights',
-  #                                          'dataset','family',
-  #                                          'Mark_response'))
-      
-      
-  #}
+    #data_points <- lapply(data_points, get_nearest_covariate,
+    #                      spatialcovariates = spatialcovariates,
+    #                      covariatestokeep = spatnames,
+    #                      coords = coords,
+    #                      proj = proj,
+    #                      componentstokeep = c(points_response,'weight'))
     
-  #ips <- get_nearest_covariate(data@ips,
-  #                             spatialcovariates = spatialcovariates,
-  #                             covariatestokeep = spatnames,
-  #                             coords = coords,
-  #                             proj = proj,
-  #                             componentstokeep = 'weight')
-  ##Assign covs to function environment
-  
+    #if (attributes(data)$Marks) {
+    
+    #data_marks <- lapply(data_marks, get_nearest_covariate,
+    #                     spatialcovariates = spatialcovariates,
+    #                     covariatestokeep = spatnames,
+    #                     coords = coords,
+    #                     proj = proj,
+    #                     componentstokeep = c(response_marks,
+    #                                          attributes(data)$Mark_phi,
+    #                                          attributes(data)$Multinom_vars),
+    #                     attributestokeep = c('data_type','mark_name',
+    #                                          'phi','weights',
+    #                                          'dataset','family',
+    #                                          'Mark_response'))
+    
+    
+    #}
+    
+    #ips <- get_nearest_covariate(data@ips,
+    #                             spatialcovariates = spatialcovariates,
+    #                             covariatestokeep = spatnames,
+    #                             coords = coords,
+    #                             proj = proj,
+    #                             componentstokeep = 'weight')
+    ##Assign covs to function environment
+    
   for (name in spatnames) {
-    
+      
   pixels_df <- sp::SpatialPixelsDataFrame(points = spatialcovariates@coords,
-                                          data = data.frame(spatialcovariates@data[,name]),
-                                          proj4string = proj)
+                                              data = data.frame(spatialcovariates@data[,name]),
+                                              proj4string = proj)
   names(pixels_df) <- name
   assign(name,pixels_df)
+      
+  }
     
   }
   
-  }
-
   if (is.null(spdemodel)) {
     
   spdemodel <- inla.spde2.matern(data@mesh)
@@ -146,7 +146,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   components_joint <- update(components_joint, paste(c(' ~ . +', paste0(spatnames[cov],'(main = ', spatnames[cov], ', model = "linear")'))))
         
   }
-  
+      
   else
         
   if (pointsintercept | marksintercept) {
@@ -154,15 +154,15 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   components_joint <- update(components_joint, paste(c(' ~ . +', paste0(spatnames[cov],'(main = ', spatnames[cov], ', model = "factor_contrast")'))))
           
   } 
-    
+      
   else {
-          
+        
   components_joint <- update(components_joint, paste(c(' ~ . +', paste0(spatnames[cov],'(main = ', spatnames[cov], ', model = "factor_full")'))))
-          
+        
   }
-
+      
   }
-  
+    
   }
   
   form_elements <- gsub(" *\\(.*?\\) *", "",components_joint)
@@ -170,16 +170,16 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   formula <- mapply(function(fam,index) {
     
   if (fam == 'cp') {
-  
+      
   formula <- formula(paste0(c('coordinates','~', form_elements[2]),collapse = " ")) 
-        
+      
   }
     
   else
   if (fam == 'poisson') {
-    
-    formula <- formula(paste0(c(points_response[1],'~', form_elements[2]),collapse = " ")) 
-    
+        
+  formula <- formula(paste0(c(points_response[1],'~', form_elements[2]),collapse = " ")) 
+        
   }
     
   else
@@ -190,31 +190,31 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
     
   if (pointsintercept) {
-  
+      
   formula <- update(formula,paste0(' ~ . +', paste0(data_names[index],'_intercept'), collapse = ' + '))
       
   }
-  
+    
   else formula
   if (pointsspatial) {
       
   formula <- update(formula, paste0('~ . +',data_names[[index]],'_spde'))
       
   }
-  
+    
   else formula
-     
-  #if (!is.null(multinom_vars)) {
-  #  
-  #if (any(names(ind) == data_names[[index]])) {
-  #
-  #formula <- update(formula, paste0('~ . +',multinom_vars,'_fact_spatial'))  
-  #  
-  #}
-  #else formula
-  #    
-  #}
-  #else formula  
+    
+#    if (!is.null(multinom_vars)) {
+#      
+#      if (any(names(ind) == data_names[[index]])) {
+#        
+#        formula <- update(formula, paste0('~ . +',multinom_vars,'_fact_spatial'))  
+#        
+#      }
+#      else formula
+#      
+#    }
+#    else formula  
     
   }, fam = points_family, index = 1:length(points_family))
   
@@ -227,7 +227,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   formula[[i]] <- as.formula(paste(variables[!variables%in%include[[i]]], '~ .'))
     
   }
- 
+  
   for (i in 1:1) {
     
   lhoods <- inlabru::like(formula = formula[[i]],
@@ -251,46 +251,46 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                           ips = data@ips,
                           Ntrials = attributes(data_points[[j]])$Ntrials,
                           include = include[[j]])
-  
+        
   likelihoods[[j]] <- lhoods
         
   }
-  
+      
   }
-  
+    
   likelihoods
-  
+    
   }
- 
+  
   if (attributes(data)$Marks) {
     
   formula_marks <- list()
   likelihoods_marks <- list()
     
   for (i in 1:length(response_marks)) {
-  
+      
   formula_marks[[i]] <- formula(paste0(c(response_marks[i],'~',form_elements[2]),collapse = " "))
-  
+      
   if (marksspatial) {
-
+        
   formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",names(data_marks)[[i]],'_spde'))
         
   }
       
   if (marksintercept) {
         
-  if (attributes(data_marks[[i]])$data_type != 'Multinomial mark'){
+  if (attributes(data_marks[[i]])$data_type != 'Multinomial mark') {
           
   formula_marks[[i]] <- update(formula_marks[[i]],paste0('. ~ . +', paste0(names(data_marks)[[i]],'_intercept'), collapse = ' + '))
           
   }
-  
+        
   }
-  
-  if (attributes(data_marks[[i]])$data_type == 'Multinomial mark') {
-  
-  formula_marks[[i]] <- update(formula_marks[[i]], paste0(paste0(names_marks[i],'_response'), ' ~ . + ', paste(attributes(data_marks[[i]])$mark_name, attributes(data_marks[[i]])$phi, sep = ' + ')))
       
+  if (attributes(data_marks[[i]])$data_type == 'Multinomial mark') {
+        
+  formula_marks[[i]] <- update(formula_marks[[i]], paste0(paste0(names_marks[i],'_response'), ' ~ . + ', paste(attributes(data_marks[[i]])$mark_name, attributes(data_marks[[i]])$phi, sep = ' + ')))
+        
   }
       
   }
@@ -298,11 +298,11 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   include_marks <- list()
     
   for (i in 1:length(formula_marks)) {
-  
+      
   variables <- all.vars(formula_marks[[i]])
   include_marks[[i]] <- variables[!variables%in%c(response_marks,coords)]
   formula_marks[[i]] <- as.formula(paste(response_marks[i], '~ .'))
-  
+      
   }
     
   for (k in 1:length(family_marks)) {
@@ -331,10 +331,10 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (pointsspatial) {
     
-    components_joint <- update(components_joint, paste(' ~ . +',paste0(data_names,'_spde(main = coordinates, model = spdemodel)',collapse = ' + ')))
+  components_joint <- update(components_joint, paste(' ~ . +',paste0(data_names,'_spde(main = coordinates, model = spdemodel)',collapse = ' + ')))
     
   }
-
+  
   if (pointsintercept) {
     
   components_joint <- update(components_joint, paste0(' ~ . +', paste0(data_names,'_intercept(1)'), collapse = ' + '))
@@ -345,7 +345,16 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   if (marksspatial) {
       
+  if (pointsspatial) {
+      
+  components_joint <- update(components_joint, paste(' ~ . +',paste0(names(data_marks),'_spde(main = coordinates, copy = ', paste0("\"",attributes(data)$Mark_dataset,'_spde',"\""),', fixed = TRUE)'),collapse = ' + '))
+
+  }
+  else {
+        
   components_joint <- update(components_joint, paste(' ~ . +',paste0(names(data_marks),'_spde(main = coordinates, model = spdemodel)',collapse = ' + ')))
+        
+  }
       
   }
     
@@ -358,9 +367,9 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   components_joint <- update(components_joint, paste0(' ~ . +', paste0(c(names(data_marks)[[i]]),'_intercept(1)'), collapse = ' + '))
           
   }
-  
+        
   }
-  
+      
   }
     
   if (any(multinom_incl)) {
@@ -373,12 +382,12 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   phi_vars <- unique(phi_vars[multinom_incl])
   components_joint <- update(components_joint, paste('  ~ . +', paste0(phi_vars, '(main = ',phi_vars, ', model = "iid", initial = -10, fixed = TRUE)', collapse = ' + ')))
       
-  #if (!is.null(multinom_vars)) {
-  #  
-  #components_joint <- update(components_joint, paste(c('~ . +',paste0(multinom_vars,'_fact_spatial(main = coordinates, model = spdemodel, group = ',multinom_vars,'_fact',', ngroup = ',max(unlist_ind),',control.group = list(model = "iid"))'))))
-  #  
-  #}
-  
+ #     if (!is.null(multinom_vars)) {
+#        
+#        components_joint <- update(components_joint, paste(c('~ . +',paste0(multinom_vars,'_fact_spatial(main = coordinates, model = spdemodel, group = ',multinom_vars,'_fact',', ngroup = ',max(unlist_ind),',control.group = list(model = "iid"))'))))
+#        
+#      }
+      
   }
     
   }
@@ -404,11 +413,10 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (any(multinom_incl)) { 
     
-    model_joint[['multinom_vars']] <- multinom_vars
+  model_joint[['multinom_vars']] <- multinom_vars
     
   }
   
-  #model_joint[['sources_of_information']] <- unlist(attributes(data)$Sources_of_information)
   model_joint[['sources_of_information']] <- unname(c(data_names, sapply(data_marks, function(dat) attributes(dat)$dataset)))
   
   model_joint[['components']] <- components_joint
@@ -419,4 +427,4 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   return(model_joint)
   
-}
+  }
