@@ -15,6 +15,8 @@ leave_one_out <- function(model, dataset,
     
   model_results <- list()
   
+  model_differences <- list()
+  
   for (dataname in dataset) {
   
   index <- !model[['sources_of_information']]%in%dataname
@@ -48,8 +50,16 @@ leave_one_out <- function(model, dataset,
   
   model_results[[paste0('Leaving_out_',dataname)]] <- model_reduced
   
+  var_names <- row.names(model_reduced$summary.fixed)[row.names(model_reduced$summary.fixed)%in%row.names(model$summary.fixed)]
+  model_differences[[paste0('Leaving_out_',dataname)]] <- model_reduced$summary.fixed[var_names,] - model$summary.fixed[var_names,]
+  
   }
   
+  
+  attributes(model_results)[['differences']] <- model_differences
+  names(attributes(model_results)[['differences']]) <- dataset
+  names(model_results) <- paste0('Leaving_out_',dataset)
+  class(model_results) <- c('bru_sdm_leave_one_out', 'list')
   
   return(model_results)
 
