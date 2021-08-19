@@ -1,5 +1,5 @@
 #' Outputs predict_bru_sdm
-#' 
+#'
 
 predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL, 
                             mask = NULL, datasetstopredict = NULL, 
@@ -79,6 +79,23 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
     return(int)
     
   }
+  
+}
+
+print.predict_bru_sdm <- function(x, ...) {
+  
+  
+  for(name in names(x)) {
+    
+    cat('Summary of predicted data for', paste0(name,':'))
+    cat('\n\n')
+    print(summary(x[[name]]@data))
+    cat('\n\n')
+    
+    
+  }
+  
+  
   
 }
 
