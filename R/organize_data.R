@@ -8,7 +8,7 @@
 #' @param proj Projection to use if data is not a projection. Defaults to utm (hopefully).
 #' @param marks Should the model be a marked point process. Defaults to \code{FALSE}.
 #' @param inclmarks. A vector of which marks should be included in the model. Defaults to \code{NULL}.
-#' @param markfamily Assumed distribution of the marks. Defaults to \code{"gaussian"}.
+#' @param markfamily Assumed distribution of the marks. May be either a single character string or a named list/vector of each mark's distribution in the form: <mark name> = <distribution family>. Defaults to \code{"gaussian"}.
 #' @param ips Integration points. Defaults to \code{NULL}.
 #' @param mesh An inla.mesh object. Defaults to \code{NULL}.
 #' @param meshpars List of mesh parameters. Requires the following items: "cut.off", "max.edge" and "offset". Defaults to \code{NULL}.
@@ -227,11 +227,36 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
                                      data = as.data.frame(data_points[[i]]@data[,names[j]]),
                                      proj4string = proj)
   colnames(mark@data) <- names[j]
-                
+  
+  if (!is.null(names(markfamily))) {
+  
+  if (names[j]%in%names(markfamily)) {
+      
+  attr(mark,'family') <- markfamily[names(markfamily) == names[j]] 
+  capital_markfamily <- gsub("^(\\w)(\\w+)", "\\U\\1\\L\\2", 
+                             markfamily[names(markfamily) == names[j]], perl = TRUE)
+  attr(mark,'data_type') <- paste0(capital_markfamily,' mark')
+      
+  }
+  else {
+    
+  warning(names[j], ' has not been assigned a family. Will assign it "gaussian"')  
+  attr(mark,'family') <- 'gaussian'
+  attr(mark,'data_type') <- 'Gaussian'    
+  
+  }
+    
+  }
+  else {
+    
   attr(mark,'family') <- markfamily
+  
   capital_markfamily <- gsub("^(\\w)(\\w+)", "\\U\\1\\L\\2", 
                              markfamily, perl = TRUE)
   attr(mark,'data_type') <- paste0(capital_markfamily,' mark')
+  
+  }
+  
   attr(mark,'response') <- names[j]
   attr(mark,'mark_name') <- names[j]
   attr(mark,'phi') <- NULL
