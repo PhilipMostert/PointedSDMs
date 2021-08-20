@@ -74,8 +74,8 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     class(object) <- c('bru','inla','iinla')
     int <- predict(object, data = data, formula = formula, n.samples = n.samples, ...)
-    int <- list(int)
-    class(int) <- c('bru_sdm_predict',class(int))
+    #int <- list(int)
+    #class(int) <- c('predict_bru_sdm',class(int))
     return(int)
     
   }
