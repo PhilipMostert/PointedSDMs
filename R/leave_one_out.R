@@ -1,7 +1,7 @@
 #' Function which calculate the difference in covariate values between a full bru_sdm model and a model with one dataset left out
 #' 
-#' @param model Model of class bru_sdm run with all datasets
-#' @param dataset Dataset to leave out
+#' @param model Model of class bru_sdm run with all datasets.
+#' @param dataset Datasets to leave out.
 #' @param predictions Will new models be used for predictions. If \code{TRUE} returns marginals and bru_info in model. Defaults to \code{FALSE}. 
 
 leave_one_out <- function(model, dataset,
@@ -30,6 +30,7 @@ leave_one_out <- function(model, dataset,
   reduced_options$control.compute <- list(return.marginals = FALSE)
   
   }
+  
   model_reduced <- bru(components = model$components,
                        model$bru_info$lhoods[index],
                        options = reduced_options)
