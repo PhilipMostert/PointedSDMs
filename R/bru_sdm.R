@@ -308,7 +308,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   for (k in 1:length(family_marks)) {
       
   lhoods <- inlabru::like(formula = formula_marks[[k]],
-                          family = family_marks[k],
+                          family = family_marks[[k]],
                           data = data_marks[[k]],
                           mesh = mesh,
                           ips = data@ips,
