@@ -70,22 +70,11 @@ setMethod('show', 'bru_sdm_data',
               
               
             } 
-            #else {
-            #  
-            #  cat('Marks included:\n\n')
-            #  cat('No marks included.')
-            #  
-            #}
-            
-            #if (attributes(x)$spatialcovariates) {
-            #  
-            #  cat('Spatial covariates included:\n\n') 
-            #  covs <-                 data.frame(c('-----',attributes(x)$spatnames),
-            #                          c('',rep('|  ---  |', length(attributes(x)$spatnames))),
-            #                          c('-----',gsub("^(\\w)(\\w+)", "\\U\\1\\L\\2",attributes(x)$spatdata_class,perl = TRUE)))
-            #  names(covs) <- c('Name:','', 'Class:')
-            #  print.data.frame(covs[,1:3], row.names = FALSE, right = FALSE)
-            
-            #}
+            if (!is.null(attributes(x)$Timevariable)) {
+              
+            cat('Temporal variable included: ', attributes(x)$Timevariable)  
+              
+              
+            }
             
           })

@@ -9,6 +9,7 @@
 #' @param marks Should the model be a marked point process. Defaults to \code{FALSE}.
 #' @param inclmarks. A vector of which marks should be included in the model. Defaults to \code{NULL}.
 #' @param markfamily Assumed distribution of the marks. May be either a single character string or a named list/vector of each mark's distribution in the form: <mark name> = <distribution family>. Defaults to \code{"gaussian"}.
+#' @param timevariable Name of the time variable used in the model. Defaults to /code{NULL}.
 #' @param ips Integration points. Defaults to \code{NULL}.
 #' @param mesh An inla.mesh object. Defaults to \code{NULL}.
 #' @param meshpars List of mesh parameters. Requires the following items: "cut.off", "max.edge" and "offset". Defaults to \code{NULL}.
@@ -18,7 +19,7 @@
 organize_data <- function(..., poresp = NULL, paresp = NULL,
                           trialname = NULL, coords = NULL, proj = NULL,
                           marks = FALSE, inclmarks = NULL,
-                          markfamily = 'gaussian', 
+                          markfamily = 'gaussian', timevariable = NULL,
                           ips = NULL, mesh = NULL,
                           meshpars = NULL, boundary = NULL) {
   
@@ -71,7 +72,6 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   }))
   
   if (!all(coords_in)) stop("At least one dataset does not have coordinates in it.\nEither check your datasets or change your coordinates argument.")
-  
   
   data_names <- setdiff(as.character(match.call(expand.dots=TRUE)), 
                         as.character(match.call(expand.dots=FALSE)))
@@ -153,6 +153,25 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   }
     
   })
+
+  if (!is.null(timevariable)) {
+    
+  all_time <- sapply(data_points, function(dat) {
+      
+  timevariable%in%names(dat@data)
+
+  })
+    
+  if (!all(all_time)) stop('All datasets are required to have the temporal variable included.')
+  
+  data_points <- lapply(data_points, function(dat) {
+   
+  dat@data[,timevariable] <- factor(dat@data[,timevariable])
+  dat
+  
+  })
+  
+  }
   
   names(data_points) <- data_names
   
@@ -168,7 +187,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
 
   else {
         
-  names = names(data_points[[i]])[!names(data_points[[i]])%in%c(poresp,paresp,coords,trialname)]
+  names = names(data_points[[i]])[!names(data_points[[i]])%in%c(poresp,paresp,coords,trialname,timevariable)]
   
   if (!is.null(inclmarks)) names <- names[names%in%inclmarks]      
   
@@ -327,14 +346,14 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   multinom_vars <- NULL
   datasets_multinom_marks <- NULL
       
-    }
+  }
     
-    if (all(multinom_incl)) {
+  if (all(multinom_incl)) {
       
   datasets_numeric_marks <- NULL
   marksintercept <- FALSE
       
-    }
+  }
     
   }
   else {
@@ -411,6 +430,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
     
   }
   else
+  
   if (all(family_index)) {
     
     PO_data <- data_points
@@ -448,21 +468,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   attr(object, 'Multinom_vars') <- multinom_vars
   attr(object, 'Sources_of_information') <- unname(c(data_names, sapply(data_marks, function(dat) attributes(dat)$dataset)))
   
-  #attr(object, 'spatialcovariates') <- ifelse(is.null(spatialcovariates),FALSE,TRUE)
-  #
-  #if (!is.null(spatialcovariates)) {
-  #  
-  #  attr(object,'spatnames') <- spatnames
-  #  attr(object, 'spatdata_class') <- spatdata_class
-  #  #attr(object, 'spatialcovariatedata') <- spatialcovariates
-#  
-#  }
-#  else {
-#    
-#    attr(object,'spatnames') <- NULL
-#    attr(object, 'spatdata_class') <- NULL  
-#    
-#  }
+  attr(object, 'Timevariable') <- timevariable  
   
   return(object)
   
