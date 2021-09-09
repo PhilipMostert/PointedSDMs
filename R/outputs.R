@@ -1,6 +1,8 @@
 #' Bru_sdm output functions
 #' 
 
+setClass('bru_sdm')
+
 print.bru_sdm <- function(x, ...) {
   
   print(summary(x))
