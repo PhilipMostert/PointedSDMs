@@ -12,8 +12,8 @@ Depends:
     sp (>= 1.4-5),
     stats
 Imports:
-    INLA
-    inlabru,
+    INLA (>= 21.08.31)
+    inlabru (>= 2.3.1),
     dplyr,
     rgeos,
     sp
