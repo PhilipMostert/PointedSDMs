@@ -1,0 +1,19 @@
+Package: inlabru_SDMs
+Type: Package
+Title: Fit Models derived from Point Processes to Species Distributions using
+    inlabru.
+Version: 1.00
+Authors@R: person("Philip", "Mostert", email = "philip.s.mostert@ntnu.no")
+URL: https://github.com/PhilipMostert/inlabru_SDMs
+BugReports: https://github.com/PhilipMostert/inlabru_SDMs/issues
+Description: A package to fit models based on point processes to a variety of data types.
+Depends:
+    R (>= 3.5),
+    sp (>= 1.4-5),
+    stats
+Imports:
+    INLA
+    inlabru,
+    dplyr,
+    rgeos,
+    sp
