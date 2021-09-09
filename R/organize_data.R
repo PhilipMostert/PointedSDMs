@@ -14,6 +14,8 @@
 #' @param mesh An inla.mesh object. Defaults to \code{NULL}.
 #' @param meshpars List of mesh parameters. Requires the following items: "cut.off", "max.edge" and "offset". Defaults to \code{NULL}.
 #' @param boundary Polygon of boundary for region, of class Polygon. If \code{NULL}, draws a boundary around the points.
+#' 
+#' @export
 
 
 organize_data <- function(..., poresp = NULL, paresp = NULL,

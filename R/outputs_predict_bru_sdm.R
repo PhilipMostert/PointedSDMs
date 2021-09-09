@@ -1,6 +1,8 @@
-#' Outputs predict_bru_sdm
-#'
 setClass('predict_bru_sdm')
+
+#' Predict for bru_sdm
+#' 
+#' @export predict.bru_sdm
 
 predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL, 
                             mask = NULL, datasetstopredict = NULL, 
@@ -99,6 +101,10 @@ print.predict_bru_sdm <- function(x, ...) {
   
   
 }
+
+#' Plot for preduct_bru_sdm
+#' 
+#' @export plot.predict_bru_sdm
 
 plot.predict_bru_sdm <- function(x, plotall = TRUE,
                                  datasettoplot = NULL,

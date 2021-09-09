@@ -10,6 +10,8 @@
 #' @param marksspatial Should spatial effects be used for the marks in the model. Defaults to \code{TRUE}.
 #' @param timemodel Time-series model to use. Defaults to \code{list(model = 'ar1')}.
 #' @param options INLA or inlabru options to be used in the model.
+#' 
+#' @export
 
 bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                     pointsintercept = TRUE, marksintercept = TRUE,

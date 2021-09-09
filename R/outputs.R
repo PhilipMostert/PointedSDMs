@@ -1,13 +1,18 @@
-#' Bru_sdm output functions
-#' 
-
 setClass('bru_sdm')
+
+#' Print method for bru_sdm
+#' 
+#' @export print.bru_sdm
 
 print.bru_sdm <- function(x, ...) {
   
   print(summary(x))
   
 }
+
+#' Summary for bru_sdm
+#' 
+#' @export summary.bru_sdm
 
 summary.bru_sdm <- function(x,...) {
   #cat('----bru_sdm summary STILL IN DEVELOPMENT----\n\n')

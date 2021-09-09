@@ -3,6 +3,8 @@
 #' @param model Model of class bru_sdm run with all datasets.
 #' @param dataset Datasets to leave out.
 #' @param predictions Will new models be used for predictions. If \code{TRUE} returns marginals and bru_info in model. Defaults to \code{FALSE}. 
+#' 
+#' @export
 
 leave_one_out <- function(model, dataset,
                           predictions = FALSE) {
