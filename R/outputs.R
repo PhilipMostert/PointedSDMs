@@ -21,7 +21,7 @@ summary.bru_sdm <- function(x,...) {
   cat('\n')
   
   ##Make this a for loop to print out
-   # all 'mulitnom_vars' summaries
+  # all 'mulitnom_vars' summaries
   if(!is.null(x[['species_in_model']])){
     #cat('Species in model:\n\n')
     #cat(paste0(x[['species_in_model']],collapse = ", "))
@@ -37,26 +37,26 @@ summary.bru_sdm <- function(x,...) {
     cat('Summary of multinomial variables:\n\n')
     for (i in x[['multinom_vars']]) {
       if (i%in%names(x$summary.random)) { 
-      variable <- x$summary.random[[i]]
-      names(variable)[1] <- i
-      print(variable[,1:7], row.names = FALSE, digits = 3)
-      cat('\n\n')
+        variable <- x$summary.random[[i]]
+        names(variable)[1] <- i
+        print(variable[,1:7], row.names = FALSE, digits = 3)
+        cat('\n\n')
       } else {
         
-      cat('Variable',i,'not run in model')
-      cat('\n\n')
+        cat('Variable',i,'not run in model')
+        cat('\n\n')
         
       }
       
     }
-    }
+  }
   
   ##Fix naming of datasets in bru_sdm file
   if(length(x[['model_residuals']]) > 0){
-  cat('Summary of residuals:\n\n')
-  summary_residuals = sapply(x[['model_residuals']], summary, digits = 3)
-  print(summary_residuals)
-  cat('\n\n')
+    cat('Summary of residuals:\n\n')
+    summary_residuals = sapply(x[['model_residuals']], summary, digits = 3)
+    print(summary_residuals)
+    cat('\n\n')
   }
   
   #Add Likelihoods with: Family, predictor and which dataset it came from

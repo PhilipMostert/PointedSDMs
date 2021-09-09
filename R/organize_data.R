@@ -23,7 +23,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
                           ips = NULL, mesh = NULL,
                           meshpars = NULL, boundary = NULL) {
   
-
+  
   if (is.null(poresp) | is.null(paresp)) stop('Both poresp and paresp must be non-null.')
   
   if (poresp == paresp) stop('Presence only response cannot be the same as present absence response. Please change one of them.')
@@ -66,7 +66,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   x_coord <- colnames(dat@coords)[1]
   y_coord <- colnames(dat@coords)[2]
   coords%in%c(x_coord,y_coord)
-      
+        
   }
     
   }))
@@ -76,101 +76,100 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   data_names <- setdiff(as.character(match.call(expand.dots=TRUE)), 
                         as.character(match.call(expand.dots=FALSE)))
   
-
+  
   data_points <- lapply(datasets, function(data) {
-
+    
   data <- as.data.frame(data)
   data_vars <- names(data)
     
   if (paresp%in%data_vars) {
-  
+      
   dat <- sp::SpatialPointsDataFrame(coords = data[,coords],
                                     data = data.frame(data[,!data_vars%in%coords]),
                                     proj4string = proj)
-  
+      
   if (ncol(dat@data) == 1) names(dat@data) <- paresp
-  
+      
   if (!is.null(trialname)) {
-    
+        
   if (trialname%in%data_vars) attr(dat, 'Ntrials') <- data.frame(dat@data[,trialname])[,1]
   else attr(dat, 'Ntrials') <- rep(1,nrow(dat@coords))
-  
+        
   }
-  
+      
   attr(dat, 'family') <- 'binomial'
   attr(dat, 'data_type') <- 'Present absence'
-  
+      
   dat
-  
+      
   }
   else
   if (poresp%in%data_vars) {
-      
+        
   dat <- sp::SpatialPointsDataFrame(coords = data[,coords],
                                     data = data.frame(data[,!data_vars%in%coords]),
                                     proj4string = proj)
-      
+        
   if (ncol(dat@dat) == 1) names(dat@data) = poresp
-      
+        
   if (any(dat@data[,poresp] > 1)) {
-      
+          
   attr(dat, 'Ntrials') <- rep(1,nrow(dat@coords))
   attr(dat, 'family') <- 'poisson'
   attr(dat, 'data_type') <- 'Present only abundance'
-      
+          
   dat
-      
+          
   }
   else {
-        
+          
   attr(dat, 'Ntrials') <- rep(1,nrow(dat@coords))
   attr(dat, 'family') <- 'cp'
   attr(dat, 'data_type') <- 'Present only' 
-      
+          
   dat
-        
+          
   }
-      
-      
+        
   }
   else {
       
   data[,poresp] <- rep(1,nrow(data))
   data_vars <- c(data_vars,poresp)
-  
+      
   dat <- sp::SpatialPointsDataFrame(coords = data[,coords],
-                                        data = data.frame(data[,!data_vars%in%coords]),
-                                        proj4string = proj)
-  
+                                    data = data.frame(data[,!data_vars%in%coords]),
+                                    proj4string = proj)
+      
   if (ncol(dat@data) == 1) names(dat@data) <- poresp
       
   attr(dat, 'Ntrials') <- 1
   attr(dat, 'family') <- 'cp'
   attr(dat, 'data_type') <- 'Present only'
-
+      
   dat
       
   }
     
   })
-
+  
   if (!is.null(timevariable)) {
     
   all_time <- sapply(data_points, function(dat) {
       
   timevariable%in%names(dat@data)
-
+      
   })
     
   if (!all(all_time)) stop('All datasets are required to have the temporal variable included.')
-  
+    
   data_points <- lapply(data_points, function(dat) {
-   
+      
   dat@data[,timevariable] <- factor(dat@data[,timevariable])
   dat
-  
+      
   })
-  
+    
   }
   
   names(data_points) <- data_names
@@ -184,19 +183,19 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   ind <- 1 + length(data_marks)
       
   if (class(data_points[[i]]) == 'SpatialPoints') data_marks[[ind]] <- FALSE
-
+      
   else {
         
   names = names(data_points[[i]])[!names(data_points[[i]])%in%c(poresp,paresp,coords,trialname,timevariable)]
-  
+        
   if (!is.null(inclmarks)) names <- names[names%in%inclmarks]      
-  
+        
   class_marks <- sapply(data_points[[i]]@data[names], class)
         
   if (is.null(names) | identical(names,character(0))) data_marks[[ind]] <- FALSE
-  
+        
   else
-    
+          
   for(j in 1:length(names)) {
             
   index <- ind + j - 1
@@ -216,14 +215,14 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   mark@data[,paste0(names[j],'_response')] <- mark_response
   mark@data[,'mark_response_weights'] <- mark_response
   mark@data[,'placeholder_for_factor'] <- mark@data[,names[j]]
-  
+              
   weights <- mark@data %>% 
-    dplyr::group_by(placeholder_for_factor) %>% 
-    dplyr::summarize(n_factor = sum(mark_response_weights)) %>%
-    dplyr::mutate(weight = sum(n_factor)/n_factor) %>%
-    dplyr::select(weight) %>%
-    data.frame()
-  
+             dplyr::group_by(placeholder_for_factor) %>% 
+             dplyr::summarize(n_factor = sum(mark_response_weights)) %>%
+             dplyr::mutate(weight = sum(n_factor)/n_factor) %>%
+             dplyr::select(weight) %>%
+             data.frame()
+              
   attr(mark,'weights') <- weights$weight[as.numeric(mark@data[,names[j]])]
   mark@data[,'placeholder_for_factor'] <- NULL
   mark@data[,'mark_response_weights'] <- NULL
@@ -233,49 +232,49 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   attr(mark,'mark_name') <- names[j]
   attr(mark, 'phi') <- paste0(names[j],'_phi')
   attr(mark,'dataset') <- names(data_points)[i]
-
+              
   data_marks[[index]] <- mark
   names(data_marks)[[index]] <- paste0(names(data_points)[i],'_',names[j])
-            
+              
   }
   else
-  
+              
   if (class_marks[j] == 'numeric' | class_marks[j] == 'integer') {
                 
   mark <- sp::SpatialPointsDataFrame(coords = coordinates(data_points[[i]]),
                                      data = as.data.frame(data_points[[i]]@data[,names[j]]),
                                      proj4string = proj)
   colnames(mark@data) <- names[j]
-  
+                
   if (!is.null(names(markfamily))) {
-  
+                  
   if (names[j]%in%names(markfamily)) {
-      
+                    
   attr(mark,'family') <- markfamily[names(markfamily) == names[j]] 
   capital_markfamily <- gsub("^(\\w)(\\w+)", "\\U\\1\\L\\2", 
                              markfamily[names(markfamily) == names[j]], perl = TRUE)
   attr(mark,'data_type') <- paste0(capital_markfamily,' mark')
-      
+                    
   }
-  else {
-    
+  else {  
+                    
   warning(names[j], ' has not been assigned a family. Will assign it "gaussian"')  
   attr(mark,'family') <- 'gaussian'
   attr(mark,'data_type') <- 'Gaussian'    
-  
+                    
   }
-    
+                  
   }
   else {
-    
+                  
   attr(mark,'family') <- markfamily
-  
+                  
   capital_markfamily <- gsub("^(\\w)(\\w+)", "\\U\\1\\L\\2", 
                              markfamily, perl = TRUE)
   attr(mark,'data_type') <- paste0(capital_markfamily,' mark')
-  
+                  
   }
-  
+                
   attr(mark,'response') <- names[j]
   attr(mark,'mark_name') <- names[j]
   attr(mark,'phi') <- NULL
@@ -284,14 +283,13 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   data_marks[[index]] <- mark
   names(data_marks)[[index]] <- paste0(names(data_points)[i],'_',names[j])
                 
-              }
-            
+  }
   else FALSE
-          
+            
+  }
+        
   }
       
-  }
-    
   }
     
   data_marks[sapply(data_marks,is.logical)] <- NULL
@@ -299,17 +297,17 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   if (length(data_marks) == 0) stop("Either marks have been set to TRUE and no datasets contain marks, or marks to include only contains marks not present in any dataset.")
     
   names_marks <- sapply(data_marks, function(mark) attributes(mark)$mark_name)
-  
+    
   response_marks <- sapply(data_marks, function(dat) attributes(dat)$response)
     
   datasets_numeric_marks <- unlist(sapply(data_marks, function(mark) {
       
   if (attributes(mark)$data_type != 'Multinomial mark') attributes(mark)$dataset
       
-    }))
+  }))
     
   multinom_incl <- sapply(data_marks, function(mark) attributes(mark)$data_type == 'Multinomial mark')
-  
+    
   phi_vars <- sapply(data_marks, function(mark) attributes(mark)$phi)
     
   if (any(multinom_incl)) {
@@ -318,13 +316,13 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
         
   if(attributes(mark)$data_type == 'Multinomial mark') attributes(mark)$mark_name
         
-      })))
+  })))
       
   datasets_multinom_marks <- unlist(sapply(data_marks, function(mark) {
         
   if (attributes(mark)$data_type == 'Multinomial mark') attributes(mark)$dataset
         
-      }))
+  }))
       
   data_points <- lapply(data_points, function(dat){
         
@@ -332,9 +330,8 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
           
   dat@data[,multinom_vars] <- NULL
   dat
-  
+          
   }
-  
   else dat
         
   })
@@ -362,20 +359,20 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   multinom_incl <- NULL
   multinom_vars <- NULL
   response_marks <- NULL
-  
+    
   }
   
   if (is.null(mesh)) {
     
   warning("Mesh not provided. Will try to create own mesh.")
     
-    #Make mesh same way as PointedSDMs
+  #Make mesh same way as PointedSDMs
   if (is.null(boundary)) {
       
   if (inherits(spatialcovariates, "Spatial")) spatcoords <- sp::SpatialPoints(coords = spatialcovariates@coords,
-                                                                                  proj4string = proj)
+                                                                              proj4string = proj)
   else spatcoords <- sp::SpatialPoints(coords = spatialcovariates[,coords],
-                                           proj4string  = proj)
+                                       proj4string  = proj)
       
   bstart <- min(c(diff(sort(unique(spatcoords@coords[,1]))), diff(sort(unique(spatcoords@coords[,2])))))
       
@@ -392,19 +389,19 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
         
   } 
   else {
-  
+        
   if (!is.projected(boundary)) boundary <- spTransform(boundary, CRSobj = proj)
-      
+        
   }
       
   }
     
   region.bdry <- inla.sp2segment(boundary)
-   
+    
   mesh <- inla.mesh.2d(boundary=region.bdry, 
-                        cutoff=meshpars$cutoff,
-                        max.edge=meshpars$max.edge, 
-                        offset=meshpars$offset)
+                       cutoff=meshpars$cutoff,
+                       max.edge=meshpars$max.edge, 
+                       offset=meshpars$offset)
     
   }
   
@@ -430,18 +427,18 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
     
   }
   else
-  
-  if (all(family_index)) {
     
-    PO_data <- data_points
-    PA_data <- NULL
+  if (all(family_index)) {
+      
+  PO_data <- data_points
+  PA_data <- NULL
       
   }
   else {
     
   PO_data <- NULL
   PA_data <- data_points
-    
+  
   }
   
   object <- new('bru_sdm_data',

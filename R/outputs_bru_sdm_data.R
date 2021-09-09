@@ -72,7 +72,7 @@ setMethod('show', 'bru_sdm_data',
             } 
             if (!is.null(attributes(x)$Timevariable)) {
               
-            cat('Temporal variable included: ', attributes(x)$Timevariable)  
+              cat('Temporal variable included: ', attributes(x)$Timevariable)  
               
               
             }

@@ -10,58 +10,143 @@ leave_one_out <- function(model, dataset,
   if (!inherits(model, 'bru_sdm')) stop('Model needs to be of class "bru_sdm".')
   
   if (!all(dataset%in%model[['sources_of_information']])) stop('Dataset provided not run in initial model.')
-
+  
   if (length(unique(model[['sources_of_information']])) == 1) stop('Model was only run with one dataset. Leaving a dataset out is not possible.')
-    
+  
   model_results <- list()
   
   model_differences <- list()
   
-  for (dataname in dataset) {
-  
-  index <- !model[['sources_of_information']]%in%dataname
-  
-  reduced_options <- model[['bru_sdm_options']]
-  
-  reduced_options <- model[['bru_sdm_options']]$control.family[index]
-  
-  if (!predictions) {
-  
-  reduced_options$control.compute <- list(return.marginals = FALSE)
-  
+  if (predictions) {
+    
+  if (!is.null(model$spatial_covariates_used)) {
+      
+  for (names in model$spatial_covariates_used) {
+        
+  assign(names, model$bru_info$model$effects[[names]]$env[[names]])  
+        
   }
+      
+  if (!is.null(model$bru_info$model$effects[[1]]$env[['spdemodel']])) {
+        
+  assign('spdemodel', model$bru_info$model$effects[[1]]$env[['spdemodel']])
+        
+  }
+      
+  if (is.list(spdemodel[[1]])) {
+        
+  for (name in names(spdemodel)) {
+          
+  assign(paste0(name,'_spde'),spdemodel[[name]])  
+          
+  }
+        
+  }    
+      
+  }
+    
+  validation_results <- list()  
+    
+  }
+  else validation_results <- list()
   
-  model_reduced <- bru(components = model$components,
+  for (dataname in dataset) {
+    
+  index <- !model[['sources_of_information']]%in%dataname
+    
+  reduced_options <- model[['bru_sdm_options']]
+    
+  reduced_options <- model[['bru_sdm_options']]$control.family[index]
+    
+  if (!predictions) {
+      
+  reduced_options$control.compute <- list(return.marginals = FALSE)
+      
+  }
+    
+  model_components <- as.character(model$components)
+  reduced_components <- gsub(paste0('[+] ', dataname,'_intercept*\\(.*?\\) *'), '', model_components[2], perl = T)
+  reduced_components <- gsub(paste0('[+] ', dataname,'_spde*\\(.*?\\) *'), '', reduced_components, perl = T)
+    
+  if (!is.null(model$marks_used)) {
+      
+  for (i in 1:length(model$marks_used)) {
+        
+  if (names(model$marks_used)[[i]] == dataset) {  
+          
+  reduced_components <- gsub(paste0('[+] ', dataname,'_',model$marks_used[i],'_intercept*\\(.*?\\) *'), '', reduced_components, perl = T)
+  reduced_components <- gsub(paste0('[+] ', dataname,'_',model$marks_used[i],'_spde*\\(.*?\\) *'), '', reduced_components, perl = T)
+          
+  }
+        
+  }
+      
+  }
+    
+  reduced_components <- formula(paste('~', reduced_components))
+  model_reduced <- bru(components = reduced_components,
                        model$bru_info$lhoods[index],
                        options = reduced_options)
-  
-  
+    
+  model_reduced[['components']] <- reduced_components
+    
   if (!predictions) {
-  
+      
   model_reduced[['bru_info']] <- NULL
   model_reduced[['call']] <- NULL
-  
+      
   }
-  
+    
   model_reduced[['data_type']] <- model[['data_type']][index]
   model_reduced[['dataset_names']] <- model[['dataset_names']][index]
   model_reduced[['multinom_vars']] <- model[['multinom_vars']]
-  
+    
   class(model_reduced) <- c('bru_sdm',class(model_reduced))
-  
+    
   model_results[[paste0('Leaving_out_',dataname)]] <- model_reduced
-  
+    
   var_names <- row.names(model_reduced$summary.fixed)[row.names(model_reduced$summary.fixed)%in%row.names(model$summary.fixed)]
   model_differences[[paste0('Leaving_out_',dataname)]] <- model_reduced$summary.fixed[var_names,] - model$summary.fixed[var_names,]
-  
+    
+  if (predictions) {
+      
+  if (model$bru_info$lhoods[[dataname]]$family == 'cp') {
+        
+  dataset <- model$bru_info$lhoods[[dataname]]$data[model$bru_info$lhoods[[dataname]]$data@data$BRU_response_cp == 1,'BRU_response_cp']
+        
+  }
+  else dataset <- model$bru_info$lhoods[[dataname]]$data
+      ##Something if NULL spatial covariates then don't run?
+  train <- predict(model_reduced, data = dataset, formula = eval(parse(text = paste0('~exp(',paste(model$spatial_covariates_used, collapse = ' + '),')'))), A = A)  
+      
+      ##Need to add a bunch of loss functions here
+      ## i.e Add RMSE SEL ...
+  validation_results[[dataname]] <- sum((dataset@data[,model$bru_info$lhoods[[dataname]]$response] - train$mean)^2)
+      
+  }
+    
+    ##Add some sort of cross validation here
+    ## To predict the left out dataset and then
+    ## Produce some score.
   }
   
-  
   attributes(model_results)[['differences']] <- model_differences
-  names(attributes(model_results)[['differences']]) <- dataset
-  names(model_results) <- paste0('Leaving_out_',dataset)
+  #names(attributes(model_results)[['differences']]) <- dataset
+  
+  if (predictions) {
+    
+  attributes(model_results)[['validation_results']] <- unlist(validation_results)
+    
+  }
+  else attributes(model_results)['validation_results'] <- NULL
+  
+  #names(model_results) <- paste0('Leaving_out_',dataset)
   class(model_results) <- c('bru_sdm_leave_one_out', 'list')
   
   return(model_results)
+  
+}
 
-  }
+## Predict w/ dataset
+## Predict with new dataset, but use predicted covariate values as exposure term
+## Compare with likelihood

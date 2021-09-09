@@ -5,15 +5,16 @@
 #' @param covariatestoinclude A vector of spatial covariate names to include in the model. Defaults to \code{NULL}.
 #' @param pointsintercept Include individual intercepts for each point process in the model. Defaults to \code{TRUE}.
 #' @param marksintercept Include individual intercepts for each mark process in the model. Defaults to \code{TRUE}.
-#' @param spdemodel inla.spde model used in the model. Default \code{NULL} uses \code{inla.spde2.matern}.
+#' @param spdemodel inla.spde model used in the model. May be a named list where the name of the spde object is the name of the associated dataset. Default \code{NULL} uses \code{inla.spde2.matern}.
 #' @param pointsspatial Should spatial effects be used for the points in the model. Defaults to \code{TRUE}.
 #' @param marksspatial Should spatial effects be used for the marks in the model. Defaults to \code{TRUE}.
+#' @param timemodel Time-series model to use. Defaults to \code{list(model = 'ar1')}.
 #' @param options INLA or inlabru options to be used in the model.
 
 bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                     pointsintercept = TRUE, marksintercept = TRUE,
                     spdemodel = NULL, pointsspatial = TRUE, marksspatial = TRUE,
-                    options = list()) {
+                    timemodel = list(model = 'ar1'), options = list()) {
   
   if (class(data)[1] != 'bru_sdm_data') stop('Please supply data formed by the "organize_data" function.')
   
@@ -42,21 +43,22 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   data_marks <- NULL
   multinom_incl <- NULL
   multinom_vars <- NULL
+  response_marks <- NULL
     
   }
   
   time_var <- attributes(data)$Timevariable
   
   if (!is.null(time_var)) {
-   
+    
   ##leave a var which translates factor var to numeric  
   numeric_time <- as.numeric(unlist(sapply(data_points, function(data) {
-    
+      
   data@data[,time_var]  
-    
+      
   })))
-  
-  
+    
+    
   for (k in 1:length(data_points)) {
       
   if (k == 1) { 
@@ -73,25 +75,24 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   data_points[[k]]@data[,time_var] <- numeric_time[length_var]   
       
   }
-  
+    
   ips_coords <- do.call(rbind, replicate(max(numeric_time), data@ips@coords, simplify = FALSE))
-   
+    
   ips_weight <- do.call(rbind, replicate(max(numeric_time), data@ips@data, simplify = FALSE))
-      
+    
   ips_fact <- rep(1:max(numeric_time), each = nrow(data@ips@coords))
-      
+    
   ips_data <- data.frame(ips_weight, ips_fact)
     
   data@ips <- sp::SpatialPointsDataFrame(coords = ips_coords,
                                          data = ips_data,
                                          proj = proj,
                                          match.ID = FALSE)
-      
+    
   names(data@ips@data) <- c(names(ips_weight), paste0(time_var))
-  
+    
     
   }
-  
   
   if (!is.null(spatialcovariates)) {
     
@@ -122,7 +123,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   if (is.null(spatnames) | identical(spatnames,character(0))) stop('covariatestoinclude contains covariate names not found in spatialcovariates')
       
   }
-
+    
   for (name in spatnames) {
       
   pixels_df <- sp::SpatialPixelsDataFrame(points = spatialcovariates@coords,
@@ -134,12 +135,46 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
     
   }
+  else spatnames <- NULL
   
   if (is.null(spdemodel)) {
     
   spdemodel <- inla.spde2.matern(data@mesh)
     
   }
+  else
+    
+  if (is.list(spdemodel[[1]])) { 
+      
+  if (length(names(spdemodel)) > 1) {
+        
+  if (is.null(names(spdemodel))) stop('Please provide a named list of spatial objects where the name of the object is the associated datasets name.') 
+        
+  if (length(names(spdemodel)) < length(names(data_points))) {
+          
+  names_out <- names(data_points)[!names(data_points)%in%names(spdemodel)]
+          
+  for (name in names_out)
+            
+  spdemodel[[name]] <- inla.spde2.matern(data@mesh)   
+          
+  }
+        
+  if (length(names(spdemodel)) == length(names(data_points))) {
+          
+  if (!all(names(spdemodel)%in%names(data_points))) stop('Names provided in spdemodel are not the same as the dataset names.')  
+          
+  }    
+        
+  }
+      
+  for (name in names(spdemodel)) {
+        
+  assign(paste0(name,'_spde'),spdemodel[[name]])  
+        
+  }  
+      
+  }  
   
   components_joint <- formula( ~ - 1)
   
@@ -152,7 +187,6 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   components_joint <- update(components_joint, paste(c(' ~ . +', paste0(spatnames[cov],'(main = ', spatnames[cov], ', model = "linear")'))))
         
   }
-      
   else
         
   if (pointsintercept | marksintercept) {
@@ -197,9 +231,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   formula <- update(formula,paste0(' ~ . +', paste0(data_names[index],'_intercept'), collapse = ' + '))
       
   }
-    
   else formula
-  
+    
   if (pointsspatial) {
       
   formula <- update(formula, paste0('~ . +',data_names[[index]],'_spde'))
@@ -208,10 +241,10 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   else formula
     
   if (!is.null(time_var)) {
-    
+      
   formula <- update(formula, paste0('~ . +',time_var,'_spde'))
-  
-    
+      
+      
   }
   else formula
     
@@ -234,7 +267,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                           data = data_points[[i]],
                           mesh = data@mesh,
                           ips = data@ips,
-                          Ntrials = attributes(data_points[[i]])$Ntrials[i],
+                          Ntrials = attributes(data_points[[i]])$Ntrials,
                           include = include[[i]])
     
   likelihoods <- inlabru::like_list(lhoods)
@@ -329,9 +362,22 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (pointsspatial) {
     
+  if (is.list(spdemodel[[1]])) { 
+      
+  for (name in names(data_points)) {
+        
+  components_joint <- update(components_joint, paste(' ~ . +',paste0(name,'_spde(main = coordinates, model =',name,'_spde)')))
+        
+  }    
+      
+  } 
+  else {  
+      
   components_joint <- update(components_joint, paste(' ~ . +',paste0(data_names,'_spde(main = coordinates, model = spdemodel)',collapse = ' + ')))
-    
+      
   }
+    
+  }  
   
   if (pointsintercept) {
     
@@ -341,7 +387,9 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (!is.null(time_var)) {
     
-  components_joint <- update(components_joint, paste0('~ . +', time_var,'_spde(main = coordinates, model = spdemodel, group = ', time_var,', ngroup = ', max(numeric_time),', control.group = list(model = "ar1"))'))
+  components_joint <- update(components_joint, paste0('~ . +', time_var,'_spde(main = coordinates, model = spdemodel, group = ', time_var,', ngroup = ', max(numeric_time),', control.group = ', timemodel,')'))
+  #if bottom one remove ips things
+  #components_joint <- update(components_joint, paste0('~ . +', time_var,'_spde(main = ', time_var,', model = ','\"', timemodel,'\"',')'))
     
   }
   
@@ -351,7 +399,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
       
   if (pointsspatial) {
         
-  components_joint <- update(components_joint, paste(' ~ . +',paste0(names(data_marks),'_spde(main = coordinates, copy = ', paste0("\"",attributes(data)$Mark_dataset,'_spde',"\""),', fixed = FALSE)'),collapse = ' + '))
+  components_joint <- update(components_joint, paste(' ~ . +',paste0(names(data_marks),'_spde(main = coordinates, copy = ', paste0("\"",attributes(data)$Mark_dataset,'_spde',"\""),',  hyper = list(beta = list(fixed = FALSE)))'),collapse = ' + '))
         
   }
   else {
@@ -400,7 +448,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   
   names(likelihoods) <- c(data_names,names_marks)
-    
+  
   model_joint <- inlabru::bru(components = components_joint,
                               likelihoods, options = options)
   
@@ -420,6 +468,16 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   model_joint[['components']] <- components_joint
   
   model_joint[['bru_sdm_options']] <- options
+  
+  model_joint[['spatial_covariates_used']] <- spatnames
+  
+  if (!is.null(data_marks)) {
+    
+  model_joint[['marks_used']] <- response_marks
+  names(model_joint[['marks_used']]) <- sapply(data_marks, function(x) attributes(x)$dataset)
+    
+  }
+  else model_joint[['marks_used']] <- NULL
   
   class(model_joint) <- c('bru_sdm',class(model_joint))
   
