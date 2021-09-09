@@ -1,5 +1,6 @@
 #' Outputs predict_bru_sdm
 #'
+setClass('predict_bru_sdm')
 
 predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL, 
                             mask = NULL, datasetstopredict = NULL, 

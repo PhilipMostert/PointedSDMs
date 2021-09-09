@@ -446,12 +446,12 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   }
   
-  
+
   names(likelihoods) <- c(data_names,names_marks)
   
   model_joint <- inlabru::bru(components = components_joint,
                               likelihoods, options = options)
-  
+
   data_type <- sapply(c(data_points,data_marks), function(x) attributes(x)$data_type)
   names(data_type) <- c(data_names,attributes(data)$Mark_name)
   model_joint[['data_type']] <- data_type

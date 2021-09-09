@@ -1,3 +1,5 @@
+setClass('bru_sdm_leave_one_out')
+
 print.bru_sdm_leave_one_out <- function(x, ...) {
   
   for (name in 1:length(x)) {
