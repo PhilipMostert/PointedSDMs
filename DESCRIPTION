@@ -1,4 +1,4 @@
-Package: inlabru_SDMs
+Package: inlabruSDMs
 Type: Package
 Title: Fit Models derived from Point Processes to Species Distributions using
     inlabru.
