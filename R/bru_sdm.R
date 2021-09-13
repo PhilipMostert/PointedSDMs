@@ -1,11 +1,12 @@
 #' Function to run marked species distribution models with data from marked presence only and presence absence data.
 #' 
-#' @param data A bru_sdm_data object created with /code{organize_data}.
+#' @param data A bru_sdm_data object created with \code{organize_data}.
 #' @param spatialcovariates Data frame of the spatial covariates accompanied by their associated coordinates. Defaults to \code{NULL}.
 #' @param covariatestoinclude A vector of spatial covariate names to include in the model. Defaults to \code{NULL}.
 #' @param pointsintercept Include individual intercepts for each point process in the model. Defaults to \code{TRUE}.
 #' @param marksintercept Include individual intercepts for each mark process in the model. Defaults to \code{TRUE}.
-#' @param spatialdatasets A vectir of which datasets have spatial effects. Defaults to \code{NULL} which implies all datasets have spatial effects.
+#' @param spatialdatasets A vector of which datasets have spatial effects. Defaults to \code{NULL} which implies all datasets have spatial effects.
+#' @param sharedspatial Should a spatial effect be shared across datasets. Defaults to \code{FALSE}.
 #' @param spdemodel inla.spde model used in the model. May be a named list where the name of the spde object is the name of the associated dataset. Default \code{NULL} uses \code{inla.spde2.matern}.
 #' @param pointsspatial Should spatial effects be used for the points in the model. Defaults to \code{TRUE}.
 #' @param marksspatial Should spatial effects be used for the marks in the model. Defaults to \code{TRUE}.
@@ -16,12 +17,11 @@
 
 bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                     pointsintercept = TRUE, marksintercept = TRUE,
-                    spdemodel = NULL, pointsspatial = TRUE, marksspatial = TRUE,
+                    sharedspatial = FALSE, spdemodel = NULL, 
+                    pointsspatial = TRUE, marksspatial = TRUE,
                     spatialdatasets = NULL, timemodel = list(model = 'ar1'),
                     options = list()) {
- ##Add a new argument which allows for either joint spatial effects or individual
- ##Add an argument which specifies which datasets should have spatial effects
-  ### Should I join that in points spatial?
+
   if (class(data)[1] != 'bru_sdm_data') stop('Please supply data formed by the "organize_data" function.')
   
   proj <- data@ips@proj4string
@@ -247,6 +247,21 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   if (pointsspatial) {
     
+  if (sharedspatial) {
+  
+  if (!is.null(spatialdatasets)) {
+    
+  if (data_names[[index]]%in%spatialdatasets) {
+    
+  formula <- update(formula, paste0('~ . +','shared_spatial'))
+    
+  }  
+    
+  }
+  else formula <- update(formula, paste0('~ . +','shared_spatial'))
+
+  }  
+  else  
   if (!is.null(spatialdatasets)) {
   
   if (data_names[[index]]%in%spatialdatasets) {
@@ -326,7 +341,22 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   formula_marks[[i]] <- formula(paste0(c(response_marks[i],'~',form_elements[2]),collapse = " "))
       
   if (marksspatial) {
+    
+  if (sharedspatial) {
+    
+  if (!is.null(spatialdatasets)) {
   
+  if (gsub('_.*$',"",names(data_marks)[[i]])%in%spatialdatasets) {
+      
+  formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",'shared_spatial'))
+      
+  }   
+    
+  }
+  else formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",'shared_spatial'))
+ 
+  }
+  else
   if (!is.null(spatialdatasets)) {
   
   if (gsub('_.*$',"",names(data_marks)[[i]])%in%spatialdatasets) {
@@ -397,6 +427,12 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (pointsspatial) {
     
+  if (sharedspatial) {
+    
+  components_joint <- update(components_joint, paste(' ~ . +','shared_spatial(main = coordinates, model = spdemodel)'))  
+    
+  }  
+  else  
   if (is.list(spdemodel[[1]])) { 
       
   for (name in names(data_points)) {
@@ -454,6 +490,16 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   if (marksspatial) {
     
+  if (sharedspatial) {
+    
+  if (!pointsspatial) {
+    
+  components_joint <- update(components_joint, paste(' ~ . +', 'shared_spatial(main = coordinates, model = spdemodel)'))  
+    
+  }  
+    
+  }  
+  else {  
   if (!is.null(spatialdatasets)) {
     
   marks_spatial_names <- names(data_marks)[gsub('_.*$',"",names(data_marks))%in%spatialdatasets]  
@@ -466,7 +512,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   marks_spatial_datasets <- attributes(data)$Mark_dataset
   
   }
-      
+     
   if (pointsspatial) {
   
   components_joint <- update(components_joint, paste(' ~ . +',paste0(marks_spatial_names,'_spde(main = coordinates, copy = ', paste0("\"", marks_spatial_datasets,'_spde',"\""),',  hyper = list(beta = list(fixed = FALSE)))'),collapse = ' + '))
@@ -479,6 +525,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
       
   }
+    
+  }  
     
   if (marksintercept) {
       
