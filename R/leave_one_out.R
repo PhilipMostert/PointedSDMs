@@ -135,7 +135,7 @@ leave_one_out <- function(model, dataset,
   reduced_link <- 'cloglog'
   
   }
-  stop(dataset)
+  
   train <- predict(model_reduced, data = model$bru_info$lhoods[[dataname]]$data, formula = eval(parse(text = paste0('~ (',paste(model$spatial_covariates_used, collapse = ' + '),')'))))  
 
   offset_components <- update(model$components, ~ . + offset)

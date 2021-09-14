@@ -17,7 +17,7 @@ print.bru_sdm_leave_one_out <- function(x, ...) {
     if (!is.null(attributes(x)$validation_results)) {
       cat('\n')
       
-      cat('Leave one out cross-validation score:', attributes(x)$validation_results[name])
+      cat('Leave-one-out cross-validation score:', attributes(x)$validation_results[name])
   
       cat('\n\n')
     
