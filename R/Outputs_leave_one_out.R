@@ -14,9 +14,11 @@ print.bru_sdm_leave_one_out <- function(x, ...) {
     
     if (!is.null(attributes(x)$validation_results)) {
       cat('\n')
-      ##Somehow add loss functions name into results i.e 'loss function name': 'result'  
-      cat('RMSE for prediction of left out dataset:', attributes(x)$validation_results[name])
-    }
+      ##Somehow add loss functions name into results i.e 'loss function name': 'result'
+      ## Need to change this output
+      cat('Leave one out cross-validation score:', attributes(x)$validation_results[name])
+    
+      }
     
     
     cat('\n\n')

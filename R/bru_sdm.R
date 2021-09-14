@@ -250,7 +250,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   if (sharedspatial) {
   
   if (!is.null(spatialdatasets)) {
-    
+  
   if (data_names[[index]]%in%spatialdatasets) {
     
   formula <- update(formula, paste0('~ . +','shared_spatial'))
@@ -596,6 +596,18 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   }
   else model_joint[['marks_used']] <- NULL
+  
+  if (pointsspatial | marksspatial) {
+    
+  if (is.null(spatialdatasets)) {
+    
+  model_joint[['spatial_datasets']] <- data_names   
+    
+  }
+  else model_joint[['spatial_datasets']] <- spatialdatasets
+    
+  }
+  else model_joint[['spatial_datasets']] <- NULL
   
   class(model_joint) <- c('bru_sdm',class(model_joint))
   

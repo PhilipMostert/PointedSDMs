@@ -19,7 +19,6 @@ leave_one_out <- function(model, dataset,
   
   model_differences <- list()
   
-  if (predictions) {
     
   if (!is.null(model$spatial_covariates_used)) {
       
@@ -44,8 +43,6 @@ leave_one_out <- function(model, dataset,
   }
         
   }    
-      
-  }
     
   validation_results <- list()  
     
@@ -55,10 +52,15 @@ leave_one_out <- function(model, dataset,
   for (dataname in dataset) {
     
   index <- !model[['sources_of_information']]%in%dataname
+  reduced_options <- list()
+  
+  for (option in names(model[['bru_sdm_options']])) {
     
-  reduced_options <- model[['bru_sdm_options']]
+  reduced_options[[option]] <- model[['bru_sdm_options']][[option]][index] 
     
-  reduced_options <- model[['bru_sdm_options']]$control.family[index]
+  }
+    
+  #reduced_options <- model[['bru_sdm_options']]$control.family[index]
     
   if (!predictions) {
       
@@ -69,7 +71,17 @@ leave_one_out <- function(model, dataset,
   model_components <- as.character(model$components)
   reduced_components <- gsub(paste0('[+] ', dataname,'_intercept*\\(.*?\\) *'), '', model_components[2], perl = T)
   reduced_components <- gsub(paste0('[+] ', dataname,'_spde*\\(.*?\\) *'), '', reduced_components, perl = T)
+ 
+  if (!is.null(model[['spatial_datasets']])) {
     
+  if (!any(names(model$bru_info$lhoods)[!names(model$bru_info$lhoods)%in%dataname])%in%model[['spatial_datasets']]) {
+    
+  reduced_components <- gsub(paste0('[+] ','shared_spatial*\\(.*?\\) *'), '', reduced_components, perl = T)
+    
+  }  
+    
+  }
+  
   if (!is.null(model$marks_used)) {
       
   for (i in 1:length(model$marks_used)) {
@@ -86,10 +98,11 @@ leave_one_out <- function(model, dataset,
   }
     
   reduced_components <- formula(paste('~', reduced_components))
+  
   model_reduced <- bru(components = reduced_components,
                        model$bru_info$lhoods[index],
                        options = reduced_options)
-    
+   
   model_reduced[['components']] <- reduced_components
     
   if (!predictions) {
@@ -113,18 +126,35 @@ leave_one_out <- function(model, dataset,
   if (predictions) {
       
   if (model$bru_info$lhoods[[dataname]]$family == 'cp') {
-        
-  dataset <- model$bru_info$lhoods[[dataname]]$data[model$bru_info$lhoods[[dataname]]$data@data$BRU_response_cp == 1,'BRU_response_cp']
-        
+  
+  reduced_link <- 'default'
+  
   }
-  else dataset <- model$bru_info$lhoods[[dataname]]$data
-      ##Something if NULL spatial covariates then don't run?
-  train <- predict(model_reduced, data = dataset, formula = eval(parse(text = paste0('~exp(',paste(model$spatial_covariates_used, collapse = ' + '),')'))), A = A)  
-      
+  else {
+  
+  reduced_link <- 'cloglog'
+  
+  }
+  stop(dataset)
+  train <- predict(model_reduced, data = model$bru_info$lhoods[[dataname]]$data, formula = eval(parse(text = paste0('~ (',paste(model$spatial_covariates_used, collapse = ' + '),')'))))  
+
+  offset_components <- update(model$components, ~ . + offset)
+  
+  train_lik <- model$bru_info$lhoods[[dataname]]
+  
+  train_lik$include_components <- c(train_lik$include_components, 'offset')
+  train_lik$data$offset <- train$mean
+    
+  reduced_lik <- model$bru_info$lhoods[index]
+  reduced_lik[['offset']] <- train_lik
+  #Add other options later...
+  reduced_options[['control.family']][[length(reduced_options) + 1]] <- list(link = reduced_link)
+  reduced_mlik <- bru(offset_components, reduced_lik,
+                      options = reduced_options)
+  
+  validation_results[[dataname]] <- model$mlik[1] - reduced_mlik$mlik[1]
       ##Need to add a bunch of loss functions here
       ## i.e Add RMSE SEL ...
-  validation_results[[dataname]] <- sum((dataset@data[,model$bru_info$lhoods[[dataname]]$response] - train$mean)^2)
-      
   }
     
     ##Add some sort of cross validation here
@@ -148,7 +178,3 @@ leave_one_out <- function(model, dataset,
   return(model_results)
   
 }
-
-## Predict w/ dataset
-## Predict with new dataset, but use predicted covariate values as exposure term
-## Compare with likelihood
