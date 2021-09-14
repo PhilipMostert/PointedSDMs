@@ -41,9 +41,25 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
     for(i in 1:length(datasetstopredict)) {
       
       if (spatial) {
+      
+      if(any(grepl('shared_spatial',object[['components']], fixed = TRUE))) {
         
-        if (!paste0(datasetstopredict[[i]],'_spde')%in%names(object$summary.random)) stop('Either dataset name is incorrect or bru_sdm model run without spatial effects.')
-        else spatial_obj <- paste0(datasetstopredict[[i]],'_spde')
+      if (datasetstopredict[[i]]%in%object[['spatial_datasets']]) {
+        
+      spatial_obj <- 'shared_spatial'  
+        
+      }
+      else spatial_obj <- NULL
+        
+      }
+      else       
+      
+      if (!datasetstopredict[[i]]%in%object[['spatial_datasets']]) {
+        
+    stop('Either dataset name is incorrect or bru_sdm model run without spatial effects.')
+    
+    }
+    else spatial_obj <- paste0(datasetstopredict[[i]],'_spde')
         
       } 
       else spatial_obj <- NULL
@@ -57,11 +73,10 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
       else intercept_obj <- NULL
       
       formula_components <- c(covariates, spatial_obj, intercept_obj)
-      
+      if (all(is.null(formula_components))) stop('Please specify at least one of: covariates, spatial or intercept.')
       if (is.null(fun) | fun == 'linear') {fun <- ''}
       
       formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(formula_components, collapse = ' + '),')'))
-      
       
       int[[i]] <- predict(object, data = data, formula = formula, n.samples = n.samples, ...)
       
