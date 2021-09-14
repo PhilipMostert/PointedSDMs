@@ -17,3 +17,4 @@ Imports:
     dplyr,
     rgeos,
     sp
+RoxygenNote: 7.1.2
