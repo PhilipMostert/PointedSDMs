@@ -429,6 +429,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   if (sharedspatial) {
     
+  if (is.list(spdemodel[[1]])) stop('Shared spatial model should only have one spde model.')  
+    
   components_joint <- update(components_joint, paste(' ~ . +','shared_spatial(main = coordinates, model = spdemodel)'))  
     
   }  
