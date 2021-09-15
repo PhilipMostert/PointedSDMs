@@ -32,11 +32,12 @@ leave_one_out <- function(model, dataset,
         
   assign('spdemodel', model$bru_info$model$effects[[1]]$env[['spdemodel']])
         
-  }
+  } else spdemodel <- NULL
       
+  
   if (is.list(spdemodel[[1]])) {
         
-  for (name in names(spdemodel)) {
+  for (name in model[['spatial_datasets']]) {
           
   assign(paste0(name,'_spde'),spdemodel[[name]])  
           
