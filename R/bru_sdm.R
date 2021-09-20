@@ -6,10 +6,10 @@
 #' @param pointsintercept Include individual intercepts for each point process in the model. Defaults to \code{TRUE}.
 #' @param marksintercept Include individual intercepts for each mark process in the model. Defaults to \code{TRUE}.
 #' @param spatialdatasets A vector of which datasets have spatial effects. Defaults to \code{NULL} which implies all datasets have spatial effects.
-#' @param sharedspatial Should a spatial effect be shared across datasets. Defaults to \code{FALSE}.
 #' @param spdemodel inla.spde model used in the model. May be a named list where the name of the spde object is the name of the associated dataset. Default \code{NULL} uses \code{inla.spde2.matern}.
 #' @param pointsspatial Should spatial effects be used for the points in the model. Defaults to \code{TRUE}.
 #' @param marksspatial Should spatial effects be used for the marks in the model. Defaults to \code{TRUE}.
+#' @param sharedspatial Should a spatial effect be shared across datasets. Defaults to \code{FALSE}.
 #' @param timemodel Time-series model to use. Defaults to \code{list(model = 'ar1')}.
 #' @param options INLA or inlabru options to be used in the model.
 #' 
@@ -407,7 +407,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   lhoods <- inlabru::like(formula = formula_marks[[k]],
                           family = family_marks[[k]],
                           data = data_marks[[k]],
-                          mesh = mesh,
+                          mesh = data@mesh,
                           ips = data@ips,
                           E = mark_weights[[k]],
                           include = include_marks[[k]])
