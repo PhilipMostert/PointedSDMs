@@ -593,7 +593,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (!is.null(data_marks)) {
     
-  model_joint[['marks_used']] <- response_marks
+  model_joint[['marks_used']] <- sapply(data_marks, function(x) attributes(x)$mark_name)
   names(model_joint[['marks_used']]) <- sapply(data_marks, function(x) attributes(x)$dataset)
     
   }
