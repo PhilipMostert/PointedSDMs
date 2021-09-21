@@ -34,7 +34,6 @@ leave_one_out <- function(model, dataset,
         
   } else spdemodel <- NULL
       
-  
   if (is.list(spdemodel[[1]])) {
         
   for (name in model[['spatial_datasets']]) {
@@ -56,11 +55,11 @@ leave_one_out <- function(model, dataset,
   reduced_options <- list()
   
   for (option in names(model[['bru_sdm_options']])) {
-    
+  
   reduced_options[[option]] <- model[['bru_sdm_options']][[option]][index] 
     
   }
-    
+  
   #reduced_options <- model[['bru_sdm_options']]$control.family[index]
     
   if (!predictions) {
@@ -84,14 +83,27 @@ leave_one_out <- function(model, dataset,
   }
   
   if (!is.null(model$marks_used)) {
-      
+  
+  if (any(names(model$marks_used) == dataname)) {   
+       
   for (i in 1:length(model$marks_used)) {
-        
-  if (names(model$marks_used)[[i]] == dataset) {  
           
   reduced_components <- gsub(paste0('[+] ', dataname,'_',model$marks_used[i],'_intercept*\\(.*?\\) *'), '', reduced_components, perl = T)
   reduced_components <- gsub(paste0('[+] ', dataname,'_',model$marks_used[i],'_spde*\\(.*?\\) *'), '', reduced_components, perl = T)
-          
+  reduced_components <- gsub(' ))', "", reduced_components)
+  
+  dataset_marks <- model$marks_used[dataname]
+  
+  for (mark in dataset_marks) {
+    
+  if (sum(model$marks_used == mark) == 1) {
+    ##Test
+  reduced_components <- gsub(paste0('[+] ', mark,'*\\(.*?\\) *'), '', reduced_components, perl = T)
+  reduced_components <- gsub(paste0('[+] ', mark,'_phi*\\(.*?\\) *'), '', reduced_components, perl = T)  
+  }
+    
+  }
+  
   }
         
   }
@@ -99,7 +111,6 @@ leave_one_out <- function(model, dataset,
   }
     
   reduced_components <- formula(paste('~', reduced_components))
-  
   model_reduced <- bru(components = reduced_components,
                        model$bru_info$lhoods[index],
                        options = reduced_options)
@@ -149,7 +160,8 @@ leave_one_out <- function(model, dataset,
   reduced_lik <- model$bru_info$lhoods[index]
   reduced_lik[['offset']] <- train_lik
   #Add other options later...
-  reduced_options[['control.family']][[length(reduced_options) + 1]] <- list(link = reduced_link)
+  reduced_options[['control.family']][[length(reduced_options$control.family) + 1]] <- list(link = reduced_link)
+ 
   reduced_mlik <- bru(offset_components, reduced_lik,
                       options = reduced_options)
   
