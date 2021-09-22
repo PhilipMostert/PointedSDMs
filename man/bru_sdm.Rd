@@ -10,15 +10,17 @@ bru_sdm(
   covariatestoinclude = NULL,
   pointsintercept = TRUE,
   marksintercept = TRUE,
+  sharedspatial = FALSE,
   spdemodel = NULL,
   pointsspatial = TRUE,
   marksspatial = TRUE,
+  spatialdatasets = NULL,
   timemodel = list(model = "ar1"),
   options = list()
 )
 }
 \arguments{
-\item{data}{A bru_sdm_data object created with /code{organize_data}.}
+\item{data}{A bru_sdm_data object created with \code{organize_data}.}
 
 \item{spatialcovariates}{Data frame of the spatial covariates accompanied by their associated coordinates. Defaults to \code{NULL}.}
 
@@ -28,11 +30,15 @@ bru_sdm(
 
 \item{marksintercept}{Include individual intercepts for each mark process in the model. Defaults to \code{TRUE}.}
 
+\item{sharedspatial}{Should a spatial effect be shared across datasets. Defaults to \code{FALSE}.}
+
 \item{spdemodel}{inla.spde model used in the model. May be a named list where the name of the spde object is the name of the associated dataset. Default \code{NULL} uses \code{inla.spde2.matern}.}
 
 \item{pointsspatial}{Should spatial effects be used for the points in the model. Defaults to \code{TRUE}.}
 
 \item{marksspatial}{Should spatial effects be used for the marks in the model. Defaults to \code{TRUE}.}
+
+\item{spatialdatasets}{A vector of which datasets have spatial effects. Defaults to \code{NULL} which implies all datasets have spatial effects.}
 
 \item{timemodel}{Time-series model to use. Defaults to \code{list(model = 'ar1')}.}
 
