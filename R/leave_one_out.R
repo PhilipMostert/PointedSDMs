@@ -88,9 +88,9 @@ leave_one_out <- function(model, dataset,
        
   for (i in 1:length(model$marks_used)) {
           
-  reduced_components <- gsub(paste0('[+]*\\.*?\\ *', dataname,'_',model$marks_used[i],'_intercept*\\(.*?\\) *'), '', reduced_components, perl = T)
-  reduced_components <- gsub(paste0('[+]*\\.*?\\ *', dataname,'_',model$marks_used[i],'_spde*\\(.*?\\) *'), '', reduced_components, perl = T)
-  reduced_components <- gsub('*\\.*?\\ *))', "", reduced_components)
+  reduced_components <- gsub(paste0('[+]', dataname,'_',model$marks_used[i],'_intercept*\\(.*?\\) *'), '', reduced_components, perl = T)
+  reduced_components <- gsub(paste0('[+]', dataname,'_',model$marks_used[i],'_spde*\\(.*?\\) *'), '', reduced_components, perl = T)
+  reduced_components <- gsub(' ))', "", reduced_components)
   reduced_components <- gsub(paste0('[+]*\\.*?\\ *', dataname,'_',model$marks_used[i],'_spde(*\\(.*?\\) *)'),
                              "", reduced_components, ignore.case = TRUE)
   reduced_components <- gsub("\n)) + ", "", reduced_components)
