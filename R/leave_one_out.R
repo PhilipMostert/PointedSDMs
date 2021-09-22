@@ -54,20 +54,20 @@ leave_one_out <- function(model, dataset,
   index <- !model[['sources_of_information']]%in%dataname
   reduced_options <- list()
   
-  for (option in names(model[['bru_sdm_options']])) {
-  
-  reduced_options[[option]] <- model[['bru_sdm_options']][[option]][index] 
-    
-  }
-  
-  #reduced_options <- model[['bru_sdm_options']]$control.family[index]
+  #for (option in names(model[['bru_sdm_options']])) {
+  #
+  #reduced_options[[option]] <- model[['bru_sdm_options']][[option]][index] 
+  #  
+  #}
+  reduced_options <- model[['bru_sdm_options']]
+  reduced_options$control.family <- model[['bru_sdm_options']]$control.family[index]
     
   if (!predictions) {
       
   reduced_options$control.compute <- list(return.marginals = FALSE)
       
   }
-    
+  ##is it update formula that crashes the model?  
   reduced_components <- update(model$components, paste0(' ~ . -',dataname,'_intercept(1)'))
   reduced_components <- update(reduced_components, paste0(' ~ . - ',
                                                           dataname,'_spde(main = coordinates, model = spdemodel)'))
@@ -114,7 +114,7 @@ leave_one_out <- function(model, dataset,
   }
       
   }
-    
+ s
   model_reduced <- bru(components = reduced_components,
                        model$bru_info$lhoods[index],
                        options = reduced_options)
