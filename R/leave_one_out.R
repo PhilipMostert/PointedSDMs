@@ -68,16 +68,16 @@ leave_one_out <- function(model, dataset,
       
   }
     
-  model_components <- as.character(model$components)
-  reduced_components <- gsub(paste0('[+] ', dataname,'_intercept*\\(.*?\\) *'), '', model_components[2], perl = T)
-  reduced_components <- gsub(paste0('[+] ', dataname,'_spde*\\(.*?\\) *'), '', reduced_components, perl = T)
+  reduced_components <- update(model$components, paste0(' ~ . -',dataname,'_intercept(1)'))
+  reduced_components <- update(reduced_components, paste0(' ~ . - ',
+                                                          dataname,'_spde(main = coordinates, model = spdemodel)'))
  
   if (!is.null(model[['spatial_datasets']])) {
     
   if (!any(names(model$bru_info$lhoods)[!names(model$bru_info$lhoods)%in%dataname])%in%model[['spatial_datasets']]) {
     
-  reduced_components <- gsub(paste0('[+] ','shared_spatial*\\(.*?\\) *'), '', reduced_components, perl = T)
-    
+  reduced_components <- update(reduced_components, paste0(' ~ . -','shared_spatial(main = coordinates, model = spdemodel)'))    
+  
   }  
     
   }
@@ -88,19 +88,20 @@ leave_one_out <- function(model, dataset,
        
   for (i in 1:length(model$marks_used)) {
           
-  reduced_components <- gsub(paste0('[+]', dataname,'_',model$marks_used[i],'_intercept*\\(.*?\\) *'), '', reduced_components, perl = T)
-  reduced_components <- gsub(paste0('[+]', dataname,'_',model$marks_used[i],'_spde*\\(.*?\\) *'), '', reduced_components, perl = T)
-  reduced_components <- gsub(' ))', "", reduced_components)
-  reduced_components <- gsub(paste0('[+]*\\.*?\\ *', dataname,'_',model$marks_used[i],'_spde(*\\(.*?\\) *)'),
-                             "", reduced_components, ignore.case = TRUE)
-  reduced_components <- gsub("\n)) + ", "", reduced_components)
-  
-  dataset_marks <- model$marks_used[dataname]
+  reduced_components <- update(reduced_components, paste0(' ~ . -', dataname, '_',
+                                                          model$marks_used[i],'_intercept(1)'))
+  reduced_components <- update(reduced_components, paste0(' ~ . -', dataname, '_',
+                                                          model$marks_used[i],'_spde(main = coordinates, model = spdemodel)'))
+  reduced_components <- update(reduced_components, paste0(' ~ . -', dataname, '_',
+                                                          model$marks_used[i],'_spde(main = coordinates, copy = \"', dataname,
+                                                          '_spde\", hyper = list(beta = list(fixed = FALSE)))'))
 
   }
         
   }
-    
+
+  dataset_marks <- model$marks_used[dataname]  
+      
   for (mark in dataset_marks) {
       
   if (sum(model$marks_used == mark) == 1) {
@@ -114,7 +115,6 @@ leave_one_out <- function(model, dataset,
       
   }
     
-  reduced_components <- formula(paste('~', reduced_components))
   model_reduced <- bru(components = reduced_components,
                        model$bru_info$lhoods[index],
                        options = reduced_options)
