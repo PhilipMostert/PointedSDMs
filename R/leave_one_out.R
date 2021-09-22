@@ -114,7 +114,7 @@ leave_one_out <- function(model, dataset,
   }
       
   }
- s
+ 
   model_reduced <- bru(components = reduced_components,
                        model$bru_info$lhoods[index],
                        options = reduced_options)
