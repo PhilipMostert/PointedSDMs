@@ -91,21 +91,24 @@ leave_one_out <- function(model, dataset,
   reduced_components <- gsub(paste0('[+] ', dataname,'_',model$marks_used[i],'_intercept*\\(.*?\\) *'), '', reduced_components, perl = T)
   reduced_components <- gsub(paste0('[+] ', dataname,'_',model$marks_used[i],'_spde*\\(.*?\\) *'), '', reduced_components, perl = T)
   reduced_components <- gsub(' ))', "", reduced_components)
+  reduced_components <- gsub(paste0('[+] ', dataname,'_',model$marks_used[i],'_spde(*\\(.*?\\) *)'),
+                             "", reduced_components, ignore.case = TRUE)
   
   dataset_marks <- model$marks_used[dataname]
-  
-  for (mark in dataset_marks) {
-    
-  if (sum(model$marks_used == mark) == 1) {
-    ##Test
-  reduced_components <- gsub(paste0('[+] ', mark,'*\\(.*?\\) *'), '', reduced_components, perl = T)
-  reduced_components <- gsub(paste0('[+] ', mark,'_phi*\\(.*?\\) *'), '', reduced_components, perl = T)  
-  }
-    
-  }
-  
+
   }
         
+  }
+    
+  for (mark in dataset_marks) {
+      
+  if (sum(model$marks_used == mark) == 1) {
+        
+  reduced_components <- gsub(paste0('[+] ', mark,'*\\(.*?\\) *'), '', reduced_components, perl = T)
+  reduced_components <- gsub(paste0('[+] ', mark,'_phi*\\(.*?\\) *'), '', reduced_components, perl = T)  
+      
+  }
+      
   }
       
   }
