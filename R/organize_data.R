@@ -25,7 +25,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
                           ips = NULL, mesh = NULL,
                           meshpars = NULL, boundary = NULL) {
   
-  
+
   if (is.null(poresp) | is.null(paresp)) stop('Both poresp and paresp must be non-null.')
   
   if (poresp == paresp) stop('Presence only response cannot be the same as present absence response. Please change one of them.')
@@ -78,7 +78,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   data_names <- setdiff(as.character(match.call(expand.dots=TRUE)), 
                         as.character(match.call(expand.dots=FALSE)))
   
-  
+
   data_points <- lapply(datasets, function(data) {
     
   data <- as.data.frame(data)
@@ -154,7 +154,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   }
     
   })
-  
+
   if (!is.null(timevariable)) {
     
   all_time <- sapply(data_points, function(dat) {
@@ -293,7 +293,6 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   }
       
   }
-    
   data_marks[sapply(data_marks,is.logical)] <- NULL
     
   if (length(data_marks) == 0) stop("Either marks have been set to TRUE and no datasets contain marks, or marks to include only contains marks not present in any dataset.")
@@ -404,6 +403,8 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
                        cutoff=meshpars$cutoff,
                        max.edge=meshpars$max.edge, 
                        offset=meshpars$offset)
+  
+  mesh$crs <- proj
     
   }
   
