@@ -58,6 +58,27 @@ summary.bru_sdm <- function(x,...) {
     }
   }
   
+  ##Add categorical variables here
+  ## So something like:
+   # if name of covariates is in random effects
+   # then print it
+  
+  if(any(x[['spatial_covariates_used']]%in%names(x[['summary.random']]))) {
+    
+    cat('Summary of categorical variables:\n\n')
+    
+    for (cov in x[['spatial_covariates_used']]) {
+    if (cov %in%names(x[['summary.random']])) {
+    cat(cov)
+    cat('\n')
+    print(x[['summary.random']][[cov]], row.names = FALSE, digits = 3)
+
+    cat('\n')
+    
+    }
+    }
+  }
+  
   ##Fix naming of datasets in bru_sdm file
   if(length(x[['model_residuals']]) > 0){
     cat('Summary of residuals:\n\n')
