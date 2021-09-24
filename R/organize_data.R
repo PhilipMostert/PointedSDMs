@@ -3,7 +3,8 @@
 #' @param ... Point process datasets with coordinates of species, and optionally marks and covariates explaining the coordinates.
 #' @param poresp Name for the response variable for the presence only datasets. Defaults to \code{NULL}. If no presence only response is found in dataset, a vector of 1's will be used.  
 #' @param paresp Name for the response variable for the presence absence datasets. Defaults to \code{NULL}. Note that this column may also be logical.
-#' @param trialname Names of column of number of columns in observs. Defaults to \code{NULL}.
+#' @param trialname Name of column in data denoting the number of trials used in a binomial process for the points. Defaults to \code{NULL}.
+#' @param marktrialname Name of column in data denoting the number of trials used in a binomial process for the points. Defaults to \code{NULL}.
 #' @param coords Vector of the names of the coordinates used in datasets. Defaults to \code{c('X','Y')} (For now should be standardized).
 #' @param proj Projection to use if data is not a projection. Defaults to utm (hopefully).
 #' @param marks Should the model be a marked point process. Defaults to \code{FALSE}.
@@ -19,7 +20,8 @@
 
 
 organize_data <- function(..., poresp = NULL, paresp = NULL,
-                          trialname = NULL, coords = NULL, proj = NULL,
+                          trialname = NULL, marktrialname = NULL,
+                          coords = NULL, proj = NULL,
                           marks = FALSE, inclmarks = NULL,
                           markfamily = 'gaussian', timevariable = NULL,
                           ips = NULL, mesh = NULL,
@@ -188,7 +190,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
       
   else {
         
-  names = names(data_points[[i]])[!names(data_points[[i]])%in%c(poresp,paresp,coords,trialname,timevariable)]
+  names = names(data_points[[i]])[!names(data_points[[i]])%in%c(poresp,paresp,coords,trialname,timevariable, marktrialname)]
         
   if (!is.null(inclmarks)) names <- names[names%in%inclmarks]      
         
@@ -228,6 +230,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   attr(mark,'weights') <- weights$weight[as.numeric(mark@data[,names[j]])]
   mark@data[,'placeholder_for_factor'] <- NULL
   mark@data[,'mark_response_weights'] <- NULL
+  attr(mark, 'Ntrials') <- rep(1,nrow(mark@coords))
   attr(mark,'response') <- paste0(names[j],'_response')
   attr(mark,'family') <- 'poisson'
   attr(mark,'data_type') <- 'Multinomial mark'
@@ -242,7 +245,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   else
               
   if (class_marks[j] == 'numeric' | class_marks[j] == 'integer') {
-                
+    
   mark <- sp::SpatialPointsDataFrame(coords = coordinates(data_points[[i]]),
                                      data = as.data.frame(data_points[[i]]@data[,names[j]]),
                                      proj4string = proj)
@@ -278,13 +281,32 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   }
                 
   attr(mark,'response') <- names[j]
+  
+  if (!is.null(marktrialname)) {
+      
+  if (attributes(mark)$family == 'binomial') {
+  
+  if (marktrialname%in%names(data_points[[i]]@data)) {
+    
+  attr(mark, 'Ntrials') <- data.frame(data_points[[i]]@data[,marktrialname])[,1]
+    
+  }
+  else attr(mark, 'Ntrials') <- rep(1, nrow(mark@data))
+    
+  }
+  else attr(mark, 'Ntrials') <- rep(1, nrow(mark@data))
+    
+  }
+  else attr(mark, 'Ntrials') <- rep(1, nrow(mark@data))
+    
+  
   attr(mark,'mark_name') <- names[j]
   attr(mark,'phi') <- NULL
   attr(mark, 'weights') <- rep(1,nrow(mark@coords))
   attr(mark,'dataset') <- names(data_points)[i]
   data_marks[[index]] <- mark
   names(data_marks)[[index]] <- paste0(names(data_points)[i],'_',names[j])
-                
+               
   }
   else FALSE
             
@@ -464,6 +486,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   attr(object,'Mark_dataset') <- sapply(data_marks, function(dat) attributes(dat)$dataset)
   attr(object,'Mark_weight') <- lapply(data_marks, function(dat) attributes(dat)$weight)
   attr(object,'Mark_response') <- response_marks
+  attr(object, 'Mark_trials') <- lapply(data_marks, function(dat) attributes(dat)$Ntrials)
   attr(object, 'Multinom_incl') <- multinom_incl
   attr(object, 'Multinom_vars') <- multinom_vars
   attr(object, 'Sources_of_information') <- unname(c(data_names, sapply(data_marks, function(dat) attributes(dat)$dataset)))
