@@ -408,6 +408,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                           family = family_marks[[k]],
                           data = data_marks[[k]],
                           mesh = data@mesh,
+                          Ntrials = attributes(data_marks[[k]])$Ntrials,
                           ips = data@ips,
                           E = mark_weights[[k]],
                           include = include_marks[[k]])
