@@ -97,27 +97,27 @@ leave_one_out <- function(model, dataset,
                                                           '_spde\", hyper = list(beta = list(fixed = FALSE)))'))
 
   }
-        
-  }
-
+    
   dataset_marks <- model$marks_used[dataname]  
-      
+    
   for (mark in dataset_marks) {
       
   if (sum(model$marks_used == mark) == 1) {
         
   reduced_components <- gsub(paste0('[+] ', mark,'*\\(.*?\\) *'), '', reduced_components, perl = T)
-  reduced_components <- gsub(paste0('[+] ', mark,'_phi*\\(.*?\\) *'), '', reduced_components, perl = T)  
-      
+  reduced_components <- gsub(paste0('[+] ', mark,'_phi*\\(.*?\\) *'), '', reduced_components, perl = T)   
+        
   }
       
   }
       
   }
- 
-  model_reduced <- bru(components = reduced_components,
-                       model$bru_info$lhoods[index],
-                       options = reduced_options)
+      
+  }
+
+  model_reduced <- inlabru::bru(components = formula(reduced_components),
+                                model$bru_info$lhoods[index],
+                                options = reduced_options)
    
   model_reduced[['components']] <- reduced_components
     
@@ -141,34 +141,37 @@ leave_one_out <- function(model, dataset,
     
   if (predictions) {
       
-  if (model$bru_info$lhoods[[dataname]]$family == 'cp') {
+  #if (model$bru_info$lhoods[[dataname]]$family == 'cp') {
+  #
+  #reduced_link <- 'default'
+  #
+  #}
+  #else {
+  #
+  #reduced_link <- 'cloglog'
+  #
+  #}
+  reduced_lik <- model$bru_info$lhoods
   
-  reduced_link <- 'default'
+  for (data in names(model$bru_info$lhoods)[!index]) { 
   
-  }
-  else {
+  train <- predict(model_reduced, data = model$bru_info$lhoods[[data]]$data, formula = eval(parse(text = paste0('~ (',paste(model$spatial_covariates_used, collapse = ' + '),')'))))  
   
-  reduced_link <- 'cloglog'
+  reduced_lik[[data]]$data@data['offset'] <- train$mean
+  reduced_lik[[data]]$include_components <- c(reduced_lik[data]$include_components, 'offset')
   
-  }
-  
-  train <- predict(model_reduced, data = model$bru_info$lhoods[[dataname]]$data, formula = eval(parse(text = paste0('~ (',paste(model$spatial_covariates_used, collapse = ' + '),')'))))  
 
+  }
+  #reduced_lik <- model$bru_info$lhoods[index]
+  #reduced_lik[['offset']] <- train_lik
+  #Add other options later...
+  #reduced_options[['control.family']][[length(reduced_options$control.family) + 1]] <- list(link = reduced_link)
+  
   offset_components <- update(model$components, ~ . + offset)
   
-  train_lik <- model$bru_info$lhoods[[dataname]]
-  
-  train_lik$include_components <- c(train_lik$include_components, 'offset')
-  train_lik$data$offset <- train$mean
-    
-  reduced_lik <- model$bru_info$lhoods[index]
-  reduced_lik[['offset']] <- train_lik
-  #Add other options later...
-  reduced_options[['control.family']][[length(reduced_options$control.family) + 1]] <- list(link = reduced_link)
- 
-  reduced_mlik <- bru(offset_components, reduced_lik,
-                      options = reduced_options)
-  
+  reduced_mlik <- inlabru::bru(offset_components, reduced_lik,
+                               options = model$bru_sdm_options)
+
   validation_results[[dataname]] <- model$mlik[1] - reduced_mlik$mlik[1]
       ##Need to add a bunch of loss functions here
       ## i.e Add RMSE SEL ...
