@@ -19,7 +19,6 @@ leave_one_out <- function(model, dataset,
   
   model_differences <- list()
   
-    
   if (!is.null(model$spatial_covariates_used)) {
       
   for (names in model$spatial_covariates_used) {
@@ -114,13 +113,39 @@ leave_one_out <- function(model, dataset,
   }
       
   }
+  
+  if (!is.null(model$species_in)) {
+  reduced_species <- unlist(unique(model$species_in[!names(model$species_in)%in%dataname]))
+  species_dataset <- unlist(unique(model$species_in[dataname]))
+  
+  species_rm <- intersect(reduced_species, species_dataset)
+  
+  if (!is.null(species_rm)) {
+  if (!all(unique(reduced_species)%in%unique(species_dataset))) {
+    
+  for (species in unique(species_dataset[!species_dataset%in%species_rm])) {
+  
+  reduced_components <- update(reduced_components, paste('~ . -', species))
+  
+  }
+  n_species <- as.character(max(as.numeric(unlist(model$species_in))))
+  n_species_reduced <- as.character(max(as.numeric(reduced_species)))
+  
+  reduced_components <- update(reduced_components, paste('~ . -', paste0(attributes(model)$Species,'_spde(main = coordinates, model = spdemodel, group = ',attributes(model)$Species, ', ngroup = ', n_species,', control.group = list(model = \"', attributes(model)$Speciesmodel, '\"))')))
+  reduced_components <- update(reduced_components, paste('~ . +', paste0(attributes(model)$Species,'_spde(main = coordinates, model = spdemodel, group = ',attributes(model)$Species, ', ngroup = ', n_species_reduced,', control.group = list(model = \"', attributes(model)$Speciesmodel, '\"))')))
+  
+  }
+  
+  }  
+    
+  }
 
   model_reduced <- inlabru::bru(components = formula(reduced_components),
                                 model$bru_info$lhoods[index],
                                 options = reduced_options)
    
   model_reduced[['components']] <- reduced_components
-    
+  
   if (!predictions) {
       
   model_reduced[['bru_info']] <- NULL
@@ -138,19 +163,10 @@ leave_one_out <- function(model, dataset,
     
   var_names <- row.names(model_reduced$summary.fixed)[row.names(model_reduced$summary.fixed)%in%row.names(model$summary.fixed)]
   model_differences[[paste0('Leaving_out_',dataname)]] <- model_reduced$summary.fixed[var_names,] - model$summary.fixed[var_names,]
-    
+  
+  
   if (predictions) {
       
-  #if (model$bru_info$lhoods[[dataname]]$family == 'cp') {
-  #
-  #reduced_link <- 'default'
-  #
-  #}
-  #else {
-  #
-  #reduced_link <- 'cloglog'
-  #
-  #}
   reduced_lik <- model$bru_info$lhoods
   
   for (data in names(model$bru_info$lhoods)[!index]) { 
