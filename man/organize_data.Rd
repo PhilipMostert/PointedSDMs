@@ -9,11 +9,13 @@ organize_data(
   poresp = NULL,
   paresp = NULL,
   trialname = NULL,
+  marktrialname = NULL,
   coords = NULL,
   proj = NULL,
   marks = FALSE,
   inclmarks = NULL,
   markfamily = "gaussian",
+  speciesname = NULL,
   timevariable = NULL,
   ips = NULL,
   mesh = NULL,
@@ -28,7 +30,9 @@ organize_data(
 
 \item{paresp}{Name for the response variable for the presence absence datasets. Defaults to \code{NULL}. Note that this column may also be logical.}
 
-\item{trialname}{Names of column of number of columns in observs. Defaults to \code{NULL}.}
+\item{trialname}{Name of column in data denoting the number of trials used in a binomial process for the points. Defaults to \code{NULL}.}
+
+\item{marktrialname}{Name of column in data denoting the number of trials used in a binomial process for the points. Defaults to \code{NULL}.}
 
 \item{coords}{Vector of the names of the coordinates used in datasets. Defaults to \code{c('X','Y')} (For now should be standardized).}
 
@@ -38,7 +42,9 @@ organize_data(
 
 \item{markfamily}{Assumed distribution of the marks. May be either a single character string or a named list/vector of each mark's distribution in the form: <mark name> = <distribution family>. Defaults to \code{"gaussian"}.}
 
-\item{timevariable}{Name of the time variable used in the model. Defaults to /code{NULL}.}
+\item{speciesname}{Name of the species name variable used in the model. Defaults to \code{NULL}.}
+
+\item{timevariable}{Name of the time variable used in the model. Defaults to \code{NULL}.}
 
 \item{ips}{Integration points. Defaults to \code{NULL}.}
 
