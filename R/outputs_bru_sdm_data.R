@@ -69,12 +69,23 @@ setMethod('show', 'bru_sdm_data',
               cat('\n')
               
               
-            } 
-            if (!is.null(attributes(x)$Timevariable)) {
-              
-              cat('Temporal variable included: ', attributes(x)$Timevariable)  
-              
+            }
+            
+            if (!is.null(attributes(x)$Species)) {
+            
+            cat('Species name variable included: ', attributes(x)$Species)  
+            cat('\n')
               
             }
             
+            if (!is.null(attributes(x)$Timevariable)) {
+              
+              cat('Temporal variable included: ', attributes(x)$Timevariable)  
+              cat('\n')
+              
+            }
+            
+          
+            
           })
+
