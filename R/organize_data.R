@@ -10,7 +10,8 @@
 #' @param marks Should the model be a marked point process. Defaults to \code{FALSE}.
 #' @param inclmarks. A vector of which marks should be included in the model. Defaults to \code{NULL}.
 #' @param markfamily Assumed distribution of the marks. May be either a single character string or a named list/vector of each mark's distribution in the form: <mark name> = <distribution family>. Defaults to \code{"gaussian"}.
-#' @param timevariable Name of the time variable used in the model. Defaults to /code{NULL}.
+#' @param speciesname Name of the species name variable used in the model. Defaults to \code{NULL}.
+#' @param timevariable Name of the time variable used in the model. Defaults to \code{NULL}.
 #' @param ips Integration points. Defaults to \code{NULL}.
 #' @param mesh An inla.mesh object. Defaults to \code{NULL}.
 #' @param meshpars List of mesh parameters. Requires the following items: "cut.off", "max.edge" and "offset". Defaults to \code{NULL}.
@@ -23,9 +24,10 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
                           trialname = NULL, marktrialname = NULL,
                           coords = NULL, proj = NULL,
                           marks = FALSE, inclmarks = NULL,
-                          markfamily = 'gaussian', timevariable = NULL,
-                          ips = NULL, mesh = NULL,
-                          meshpars = NULL, boundary = NULL) {
+                          markfamily = 'gaussian',speciesname = NULL,
+                          timevariable = NULL, ips = NULL, 
+                          mesh = NULL, meshpars = NULL,
+                          boundary = NULL) {
   
 
   if (is.null(poresp) | is.null(paresp)) stop('Both poresp and paresp must be non-null.')
@@ -157,6 +159,25 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
     
   })
 
+  if (!is.null(speciesname)) {
+    
+  all_species <- sapply(data_points, function(dat) {
+      
+  speciesname%in%names(dat@data)
+      
+  })
+    
+  if (!all(all_species)) stop('All datasets are required to have the species name variable included.')
+    
+  data_points <- lapply(data_points, function(dat) {
+      
+  dat@data[,speciesname] <- factor(dat@data[,speciesname])
+  dat
+      
+  })
+    
+  }
+  
   if (!is.null(timevariable)) {
     
   all_time <- sapply(data_points, function(dat) {
@@ -190,7 +211,8 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
       
   else {
         
-  names = names(data_points[[i]])[!names(data_points[[i]])%in%c(poresp,paresp,coords,trialname,timevariable, marktrialname)]
+  names = names(data_points[[i]])[!names(data_points[[i]])%in%c(poresp, paresp, coords, trialname,
+                                                                timevariable, speciesname, marktrialname)]
         
   if (!is.null(inclmarks)) names <- names[names%in%inclmarks]      
         
@@ -491,7 +513,9 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   attr(object, 'Multinom_vars') <- multinom_vars
   attr(object, 'Sources_of_information') <- unname(c(data_names, sapply(data_marks, function(dat) attributes(dat)$dataset)))
   
-  attr(object, 'Timevariable') <- timevariable  
+  attr(object, 'Timevariable') <- timevariable
+  
+  attr(object, 'Species') <- speciesname
   
   return(object)
   
