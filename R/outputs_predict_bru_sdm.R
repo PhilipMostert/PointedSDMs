@@ -5,7 +5,7 @@ setClass('predict_bru_sdm')
 #' @export predict.bru_sdm
 
 predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL, 
-                            mask = NULL, datasetstopredict = NULL, 
+                            mask = NULL, datasetstopredict = NULL, species = FALSE,
                             covariates = NULL, spatial = TRUE,
                             intercept = FALSE, fun = 'exp',
                             n.samples = 100, ...) {
@@ -16,89 +16,113 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
   
   if (is.null(formula) & !spatial & !intercept & is.null(covariates)) stop("Please provide at least one of spatial, intercept or covariates.")
   
-  if (is.null(formula) & is.null(datasetstopredict)) stop("Please provide either a formula or a dataset included in the bru_sdm model to be predicted.")
+  if (species & is.null(object[['species_in']])) stop('Predictions for species was selected but no species were included in model. Please run bru_sdm with specieseffects = TRUE.')
   
-  #if (predictmark & is.null(markstopredict)) stop("Marks prediction is chosen but no marks to predict given.")
+  if (is.null(formula) & is.null(datasetstopredict) | is.null(formula) & !species) stop("Please provide either a formula, and species or a dataset included in the bru_sdm model to be predicted.")
   
   if (is.null(data)) {
     
-    if (!is.null(mask)) {
+  if (!is.null(mask)) {
       
-      data <- pixels(mesh, mask = mask)
+  data <- pixels(mesh, mask = mask)
       
-    } 
+  } 
     
-    else data <- pixels(mesh)
+  else data <- pixels(mesh)
     
   }
   
   if (is.null(formula)) {
     
-    int <- list()
+  int <- list()
     
-    class(object) <- c('bru','inla','iinla')
+  class(object) <- c('bru','inla','iinla')
+  
+  if (species) {
     
-    for(i in 1:length(datasetstopredict)) {
-      
-      if (spatial) {
-      
-      if(any(grepl('shared_spatial',object[['components']], fixed = TRUE))) {
-        
-      if (datasetstopredict[[i]]%in%object[['spatial_datasets']]) {
-        
-      spatial_obj <- 'shared_spatial'  
-        
-      }
-      else spatial_obj <- NULL
-        
-      }
-      else       
-      
-      if (!datasetstopredict[[i]]%in%object[['spatial_datasets']]) {
-        
-    stop('Either dataset name is incorrect or bru_sdm model run without spatial effects.')
+  numeric_species <- as.numeric(unlist(object[['species_in']]))
+  
+  species_variable <- attributes(object)$Species
+  
+  species_data <- data.frame(seq_len(max(numeric_species)))
+  names(species_data) <- species_variable
+  
+  pixels <- inlabru::cprod(data, species_data)
+  
+  if (is.null(fun) | fun == 'linear') {fun <- ''}
+  species_formula = paste0(fun,'(',paste(paste0(species_variable,'_spde'), covariates, sep = ' + '),')')
+  
+  int <- predict(object, pixels, ~ data.frame(species_variable = eval(parse(text = species_variable))  ,formula = eval(parse(text = species_formula))))
+  
+  int[[species_variable]] <- as.character(rep(unique(unlist(object[['species_in']])), length(data)))
+  
+  return(int)
     
-    }
-    else spatial_obj <- paste0(datasetstopredict[[i]],'_spde')
+  }
+  else {  
+  
+  for(i in 1:length(datasetstopredict)) {
+      
+  if (spatial) {
+      
+  if(any(grepl('shared_spatial',object[['components']], fixed = TRUE))) {
         
-      } 
-      else spatial_obj <- NULL
-      
-      if (intercept) {
+  if (datasetstopredict[[i]]%in%object[['spatial_datasets']]) {
         
-        if (!paste0(datasetstopredict[[i]],'_intercept')%in%row.names(object$summary.fixed)) stop('Either dataset name is incorrect or bru_sdm model run without intercepts.')
-        else intercept_obj <- paste0(datasetstopredict[[i]],'_intercept')
+  spatial_obj <- 'shared_spatial'  
         
-      } 
-      else intercept_obj <- NULL
+  }
+  else spatial_obj <- NULL
+        
+  }
+  else       
       
-      formula_components <- c(covariates, spatial_obj, intercept_obj)
-      if (all(is.null(formula_components))) stop('Please specify at least one of: covariates, spatial or intercept.')
-      if (is.null(fun) | fun == 'linear') {fun <- ''}
-      
-      formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(formula_components, collapse = ' + '),')'))
-      
-      int[[i]] <- predict(object, data = data, formula = formula, n.samples = n.samples, ...)
-      
-    }
+  if (!datasetstopredict[[i]]%in%object[['spatial_datasets']]) {
+        
+  stop('Either dataset name is incorrect or bru_sdm model run without spatial effects.')
     
-    names(int) <- datasetstopredict
-    class(int) <- c('predict_bru_sdm', class(int))
-    return(int)
+  }
+  else spatial_obj <- paste0(datasetstopredict[[i]],'_spde')
+        
+  } 
+  else spatial_obj <- NULL
+      
+  if (intercept) {
+        
+  if (!paste0(datasetstopredict[[i]],'_intercept')%in%row.names(object$summary.fixed)) stop('Either dataset name is incorrect or bru_sdm model run without intercepts.')
+  else intercept_obj <- paste0(datasetstopredict[[i]],'_intercept')
+        
+  } 
+  else intercept_obj <- NULL
+      
+  formula_components <- c(covariates, spatial_obj, intercept_obj)
+  if (all(is.null(formula_components))) stop('Please specify at least one of: covariates, spatial or intercept.')
+  if (is.null(fun) | fun == 'linear') {fun <- ''}
+      
+  formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(formula_components, collapse = ' + '),')'))
+      
+  int[[i]] <- predict(object, data = data, formula = formula, n.samples = n.samples, ...)
+      
+  }
     
+  names(int) <- datasetstopredict
+  class(int) <- c('predict_bru_sdm', class(int))
+  return(int)
+    
+  }
+  
   }
   
   else {
     
-    class(object) <- c('bru','inla','iinla')
-    int <- predict(object, data = data, formula = formula, n.samples = n.samples, ...)
-    #int <- list(int)
-    #class(int) <- c('predict_bru_sdm',class(int))
-    return(int)
+  class(object) <- c('bru','inla','iinla')
+  int <- predict(object, data = data, formula = formula, n.samples = n.samples, ...)
+
+  return(int)
     
   }
   
-}
+  }
 
 print.predict_bru_sdm <- function(x, ...) {
   
