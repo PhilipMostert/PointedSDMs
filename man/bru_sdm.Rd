@@ -8,6 +8,7 @@ bru_sdm(
   data,
   spatialcovariates = NULL,
   covariatestoinclude = NULL,
+  specieseffects = FALSE,
   pointsintercept = TRUE,
   marksintercept = TRUE,
   sharedspatial = FALSE,
@@ -16,6 +17,7 @@ bru_sdm(
   marksspatial = TRUE,
   spatialdatasets = NULL,
   timemodel = list(model = "ar1"),
+  speciesmodel = "exchangeable",
   options = list()
 )
 }
@@ -25,6 +27,8 @@ bru_sdm(
 \item{spatialcovariates}{Data frame of the spatial covariates accompanied by their associated coordinates. Defaults to \code{NULL}.}
 
 \item{covariatestoinclude}{A vector of spatial covariate names to include in the model. Defaults to \code{NULL}.}
+
+\item{specieseffects}{Calculate effects for the species. Defaults to \code{FALSE}.}
 
 \item{pointsintercept}{Include individual intercepts for each point process in the model. Defaults to \code{TRUE}.}
 
@@ -41,6 +45,8 @@ bru_sdm(
 \item{spatialdatasets}{A vector of which datasets have spatial effects. Defaults to \code{NULL} which implies all datasets have spatial effects.}
 
 \item{timemodel}{Time-series model to use. Defaults to \code{list(model = 'ar1')}.}
+
+\item{speciesmodel}{INLA \code{control.group} model to use. Defaults to \code{"exchangable"}.}
 
 \item{options}{INLA or inlabru options to be used in the model.}
 }
