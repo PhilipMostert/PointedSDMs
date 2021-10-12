@@ -11,6 +11,7 @@
   mesh = NULL,
   mask = NULL,
   datasetstopredict = NULL,
+  species = FALSE,
   covariates = NULL,
   spatial = TRUE,
   intercept = FALSE,
