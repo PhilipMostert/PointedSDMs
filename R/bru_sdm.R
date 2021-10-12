@@ -3,6 +3,7 @@
 #' @param data A bru_sdm_data object created with \code{organize_data}.
 #' @param spatialcovariates Data frame of the spatial covariates accompanied by their associated coordinates. Defaults to \code{NULL}.
 #' @param covariatestoinclude A vector of spatial covariate names to include in the model. Defaults to \code{NULL}.
+#' @param specieseffects Calculate effects for the species. Defaults to \code{FALSE}.
 #' @param pointsintercept Include individual intercepts for each point process in the model. Defaults to \code{TRUE}.
 #' @param marksintercept Include individual intercepts for each mark process in the model. Defaults to \code{TRUE}.
 #' @param spatialdatasets A vector of which datasets have spatial effects. Defaults to \code{NULL} which implies all datasets have spatial effects.
@@ -11,16 +12,17 @@
 #' @param marksspatial Should spatial effects be used for the marks in the model. Defaults to \code{TRUE}.
 #' @param sharedspatial Should a spatial effect be shared across datasets. Defaults to \code{FALSE}.
 #' @param timemodel Time-series model to use. Defaults to \code{list(model = 'ar1')}.
+#' @param speciesmodel INLA \code{control.group} model to use. Defaults to \code{"exchangable"}.
 #' @param options INLA or inlabru options to be used in the model.
 #' 
 #' @export
 
 bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
-                    pointsintercept = TRUE, marksintercept = TRUE,
-                    sharedspatial = FALSE, spdemodel = NULL, 
+                    specieseffects = FALSE, pointsintercept = TRUE,
+                    marksintercept = TRUE, sharedspatial = FALSE, spdemodel = NULL, 
                     pointsspatial = TRUE, marksspatial = TRUE,
                     spatialdatasets = NULL, timemodel = list(model = 'ar1'),
-                    options = list()) {
+                    speciesmodel = "exchangeable", options = list()) {
 
   if (class(data)[1] != 'bru_sdm_data') stop('Please supply data formed by the "organize_data" function.')
   
@@ -59,8 +61,80 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   }
   
-  time_var <- attributes(data)$Timevariable
   
+  species <- attributes(data)$Species
+  
+  if (!is.null(species)) {
+  
+  species_dataset <- lapply(data_points, function(data) {
+    
+  data@data[,species]  
+    
+  }) 
+    
+  all_species <- unlist(species_dataset)
+  
+  numeric_species <- as.numeric(all_species)
+  
+  for (k in 1:length(data_points)) {
+      
+  if (k == 1) { 
+        
+  length_var <- (1:length(data_points[[1]]))
+        
+  }
+  else {
+        
+  length_var <- (length(data_points[[k-1]]) + 1):(length(data_points[[k-1]]) + length(data_points[[k]]))
+        
+  }
+    
+  if (pointsintercept) {
+    
+  for (i in 1:length(unique(all_species[length_var]))) {
+   
+  data_points[[k]]@data[,paste0(unique(all_species[length_var])[i])] <- 0
+  
+  int_index <- as.character(data_points[[k]]@data[,species]) == unique(all_species[length_var])[i]
+  
+  data_points[[k]]@data[int_index, paste0(unique(all_species[length_var])[i])] <- 1
+    
+  }  
+    
+  }  
+    
+  data_points[[k]]@data[,species] <- numeric_species[length_var]
+  
+  }
+   
+  ips_coords <- do.call(rbind, replicate(max(numeric_species), data@ips@coords, simplify = FALSE))
+    
+  ips_weight <- do.call(rbind, replicate(max(numeric_species), data@ips@data, simplify = FALSE))
+    
+  ips_fact <- rep(1:max(numeric_species), each = nrow(data@ips@coords))
+    
+  ips_data <- data.frame(ips_weight, ips_fact)
+    
+  data@ips <- sp::SpatialPointsDataFrame(coords = ips_coords,
+                                          data = ips_data,
+                                          proj = proj,
+                                          match.ID = FALSE)
+    
+  names(data@ips@data) <- c(names(ips_weight), paste0(species))
+  
+  if (pointsintercept) {
+  
+  species_intercepts <- data.frame(matrix(data = 0, nrow = nrow(data@ips@data), ncol = length(unique(all_species))))
+  names(species_intercepts) <- unique(all_species)
+  data@ips@data <- dplyr::bind_cols(data@ips@data, species_intercepts)
+  
+  }
+  
+  }
+  
+  ##For now ignore time var
+  time_var <- attributes(data)$Timevariable
+  if (!is.null(time_var)) stop('For now time var is unavailable.')
   if (!is.null(time_var)) {
     
   ##leave a var which translates factor var to numeric  
@@ -69,7 +143,6 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   data@data[,time_var]  
       
   })))
-    
     
   for (k in 1:length(data_points)) {
       
@@ -102,7 +175,6 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                                          match.ID = FALSE)
     
   names(data@ips@data) <- c(names(ips_weight), paste0(time_var))
-    
     
   }
   
@@ -239,8 +311,15 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
     
   if (pointsintercept) {
-      
-  formula <- update(formula,paste0(' ~ . +', paste0(data_names[index],'_intercept'), collapse = ' + '))
+  
+  if (specieseffects) {
+    
+  species_in <- unique(species_dataset[[index]])
+    
+  formula <- update(formula, paste0(' ~ . +', paste(species_in, collapse = ' + ')))  
+  
+  }
+  else formula <- update(formula, paste0(' ~ . +', paste0(data_names[index],'_intercept'), collapse = ' + '))
       
   }
   else formula
@@ -281,6 +360,12 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
       
   formula <- update(formula, paste0('~ . +',time_var,'_spde'))
       
+  }
+  else formula
+    
+  if (specieseffects) {
+      
+  formula <- update(formula, paste0(' ~ . + ', species, '_spde'))
       
   }
   else formula
@@ -477,7 +562,16 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (pointsintercept) {
     
+  if (specieseffects) {
+    
+  components_joint <- update(components_joint, paste0(' ~ . +', paste(unique(all_species), collapse = ' + ')))
+    
+    
+  }
+  else {  
   components_joint <- update(components_joint, paste0(' ~ . +', paste0(data_names,'_intercept(1)'), collapse = ' + '))
+  
+  }
     
   }
   
@@ -486,6 +580,13 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   components_joint <- update(components_joint, paste0('~ . +', time_var,'_spde(main = coordinates, model = spdemodel, group = ', time_var,', ngroup = ', max(numeric_time),', control.group = ', timemodel,')'))
   #if bottom one remove ips things
   #components_joint <- update(components_joint, paste0('~ . +', time_var,'_spde(main = ', time_var,', model = ','\"', timemodel,'\"',')'))
+    
+  }
+  
+  if (specieseffects) {
+    ##Make this an argument
+    ##Should this be exchangable??
+  components_joint <- update(components_joint, paste0('~ . +', species,'_spde(main = coordinates, model = spdemodel, group = ', species,', ngroup = ', max(numeric_species),', control.group = list(model = \"', speciesmodel, '\"))'))
     
   }
   
@@ -611,6 +712,15 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   }
   else model_joint[['spatial_datasets']] <- NULL
+  
+  if (specieseffects) {
+    
+  model_joint[['species_in']] <- species_dataset  
+  attr(model_joint, 'Species')  <- species
+  attr(model_joint, 'Speciesmodel') <- speciesmodel
+  
+  }
+  else model_joint[['species_in']] <- NULL
   
   class(model_joint) <- c('bru_sdm',class(model_joint))
   
