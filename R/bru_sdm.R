@@ -3,6 +3,7 @@
 #' @param data A bru_sdm_data object created with \code{organize_data}.
 #' @param spatialcovariates Data frame of the spatial covariates accompanied by their associated coordinates. Defaults to \code{NULL}.
 #' @param covariatestoinclude A vector of spatial covariate names to include in the model. Defaults to \code{NULL}.
+#' @param covariatesbydataset A named list which includes which covariates are modeled to each dataset. Defaults to \code{NULL}.
 #' @param specieseffects Calculate effects for the species. Defaults to \code{FALSE}.
 #' @param pointsintercept Include individual intercepts for each point process in the model. Defaults to \code{TRUE}.
 #' @param marksintercept Include individual intercepts for each mark process in the model. Defaults to \code{TRUE}.
@@ -18,7 +19,7 @@
 #' @export
 
 bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
-                    specieseffects = FALSE, pointsintercept = TRUE,
+                    covariatesbydataset = NULL, specieseffects = FALSE, pointsintercept = TRUE,
                     marksintercept = TRUE, sharedspatial = FALSE, spdemodel = NULL, 
                     pointsspatial = TRUE, marksspatial = TRUE,
                     spatialdatasets = NULL, timemodel = list(model = 'ar1'),
@@ -61,6 +62,15 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   }
   
+  if (!is.null(covariatesbydataset)) {
+    
+  if (any(!names(covariatesbydataset)%in%data_names)) stop('covariatesbydataset includes a dataset not available')  
+  
+  covs_for_all_datasets <- unique(unlist(covariatesbydataset))
+  
+  if (!all(covs_for_all_datasets%in%names(spatialcovariates))) stop('Covariates supplied to dataset are not included in the spatialcovariates object.')
+    
+  }
   
   species <- attributes(data)$Species
   
@@ -288,25 +298,41 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   }
   
-  form_elements <- gsub(" *\\(.*?\\) *", "",components_joint)
+  #form_elements <- gsub(" *\\(.*?\\) *", "",components_joint)
   
   formula <- mapply(function(fam,index) {
     
+  if (!is.null(covariatesbydataset)) {
+      
+  if (data_names[index]%in%names(covariatesbydataset)) {
+    
+  covs <- covariatesbydataset[[data_names[index]]]
+    
+  } else {
+    
+  covs <- spatnames
+  
+  }
+  
+  } else covs <- spatnames
+
+  if (is.null(spatnames)) covs <- '.'
+  
   if (fam == 'cp') {
       
-  formula <- formula(paste0(c('coordinates','~', form_elements[2]),collapse = " ")) 
+  formula <- formula(paste0(c('coordinates','~', paste(covs, collapse = ' + ')),collapse = " ")) 
       
   }
   else
   if (fam == 'poisson') {
         
-  formula <- formula(paste0(c(points_response[1],'~', form_elements[2]),collapse = " ")) 
+  formula <- formula(paste0(c(points_response[1],'~', paste(covs, collapse = ' + ')),collapse = " ")) 
         
   }
   else
   if (fam == 'binomial') {
         
-  formula <- formula(paste0(c(points_response[2],"~", form_elements[2]),collapse = " "))
+  formula <- formula(paste0(c(points_response[2],"~", paste(covs, collapse = ' + ')),collapse = " "))
         
   }
     
@@ -422,8 +448,20 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   likelihoods_marks <- list()
     
   for (i in 1:length(response_marks)) {
+    
+  if(!is.null(covariatesbydataset)) {  
       
-  formula_marks[[i]] <- formula(paste0(c(response_marks[i],'~',form_elements[2]),collapse = " "))
+  if (gsub('_.*$',"",names(data_marks)[[i]])%in%names(covariatesbydataset)) {
+    
+  markscovs <- covariatesbydataset[[gsub('_.*$',"",names(data_marks)[[i]])]]  
+    
+  } else markscovs <- spatnames
+  
+  } else markscovs <- spatnames
+  
+  if (is.null(spatnames)) markscovs <- '.'
+    
+  formula_marks[[i]] <- formula(paste0(c(response_marks[i],'~',paste(markscovs, collapse = ' + ')),collapse = " "))
       
   if (marksspatial) {
     
