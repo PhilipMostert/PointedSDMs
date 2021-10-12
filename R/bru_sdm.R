@@ -13,7 +13,7 @@
 #' @param marksspatial Should spatial effects be used for the marks in the model. Defaults to \code{TRUE}.
 #' @param sharedspatial Should a spatial effect be shared across datasets. Defaults to \code{FALSE}.
 #' @param timemodel Time-series model to use. Defaults to \code{list(model = 'ar1')}.
-#' @param speciesmodel INLA \code{control.group} model to use. Defaults to \code{"exchangable"}.
+#' @param speciesmodel INLA \code{control.group} model to use. Defaults to \code{list(model = "exchangeable")}.
 #' @param options INLA or inlabru options to be used in the model.
 #' 
 #' @export
@@ -23,7 +23,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                     marksintercept = TRUE, sharedspatial = FALSE, spdemodel = NULL, 
                     pointsspatial = TRUE, marksspatial = TRUE,
                     spatialdatasets = NULL, timemodel = list(model = 'ar1'),
-                    speciesmodel = "exchangeable", options = list()) {
+                    speciesmodel = list(model = "exchangeable"), options = list()) {
 
   if (class(data)[1] != 'bru_sdm_data') stop('Please supply data formed by the "organize_data" function.')
   
@@ -624,7 +624,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   if (specieseffects) {
     ##Make this an argument
     ##Should this be exchangable??
-  components_joint <- update(components_joint, paste0('~ . +', species,'_spde(main = coordinates, model = spdemodel, group = ', species,', ngroup = ', max(numeric_species),', control.group = list(model = \"', speciesmodel, '\"))'))
+  components_joint <- update(components_joint, paste0('~ . +', species,'_spde(main = coordinates, model = spdemodel, group = ', species,', ngroup = ', max(numeric_species),', control.group = ', speciesmodel, ')'))
     
   }
   
