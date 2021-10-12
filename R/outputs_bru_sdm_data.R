@@ -73,7 +73,7 @@ setMethod('show', 'bru_sdm_data',
             
             if (!is.null(attributes(x)$Species)) {
             
-            cat('Species name variable included: ', attributes(x)$Species)  
+            cat('Species variable name included: ', attributes(x)$Species)  
             cat('\n')
               
             }
