@@ -73,7 +73,7 @@ leave_one_out <- function(model, dataset,
  
   if (!is.null(model[['spatial_datasets']])) {
     
-  if (!any(names(model$bru_info$lhoods)[!names(model$bru_info$lhoods)%in%dataname])%in%model[['spatial_datasets']]) {
+  if (!dataname%in%model[['spatial_datasets']]) {
     
   reduced_components <- update(reduced_components, paste0(' ~ . -','shared_spatial(main = coordinates, model = spdemodel)'))    
   
