@@ -28,6 +28,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   if (class(data)[1] != 'bru_sdm_data') stop('Please supply data formed by the "organize_data" function.')
   
   proj <- data@ips@proj4string
+  ##Change covariate coords name prior to running GNC
   coords <- colnames(data@ips@coords)
   
   data_points <- append(data@PO_data, data@PA_data)
@@ -72,6 +73,49 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   }
   
+  if (!is.null(spatialcovariates)) {
+    
+  if (class(spatialcovariates) == 'RasterLayer') {
+      
+  spatialcovariates <- as(spatialcovariates, 'SpatialPixelsDataFrame')
+      
+  }
+    
+  if (class(spatialcovariates) == 'data.frame') {
+      
+  spatialcovariates <- sp::SpatialPointsDataFrame(coords = spatialcovariates[,coords],
+                                                  data = spatialcovariates[,!names(spatialcovariates)%in%coords],
+                                                  proj4string = proj)
+      
+  spatialcovariates <- as(spatialcovariates, 'SpatialPixelsDataFrame')
+      
+  }
+    
+  spatnames <- names(spatialcovariates@data)
+  spatdata_class <- sapply(spatialcovariates@data, class)
+    
+  if (!is.null(covariatestoinclude)) {
+      
+  spatdata_class <- spatdata_class[spatnames%in%covariatestoinclude] 
+  spatnames <- spatnames[(spatnames%in%covariatestoinclude)]
+      
+  if (is.null(spatnames) | identical(spatnames,character(0))) stop('covariatestoinclude contains covariate names not found in spatialcovariates')
+      
+  }
+    
+  for (name in spatnames) {
+      
+  pixels_df <- sp::SpatialPixelsDataFrame(points = spatialcovariates@coords,
+                                          data = data.frame(spatialcovariates@data[,name]),
+                                          proj4string = proj)
+  names(pixels_df) <- name
+  assign(name,pixels_df)
+      
+  }
+    
+  }
+  else spatnames <- NULL
+  
   species <- attributes(data)$Species
   
   if (!is.null(species)) {
@@ -81,7 +125,12 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   data@data[,species]  
     
   }) 
-    
+  
+  data_points <- model_matrix_maker(datasets = data_points, species = species, covariates = spatdata,
+                                    componentstokeep = c(points_response, species, 'weight'), coords = coords,
+                                    attributestokeep = c('Ntrials'), covariatesbydataset = covariatesbydataset,
+                                    proj =  proj)
+  
   all_species <- unlist(species_dataset)
   
   numeric_species <- as.numeric(all_species)
@@ -99,46 +148,27 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
         
   }
     
-  if (pointsintercept) {
-    
-  for (i in 1:length(unique(all_species[length_var]))) {
-   
-  data_points[[k]]@data[,paste0(unique(all_species[length_var])[i])] <- 0
-  
-  int_index <- as.character(data_points[[k]]@data[,species]) == unique(all_species[length_var])[i]
-  
-  data_points[[k]]@data[int_index, paste0(unique(all_species[length_var])[i])] <- 1
-    
-  }  
-    
-  }  
+  #if (pointsintercept) {
+  ##Probably wont need these
+  #for (i in 1:length(unique(all_species[length_var]))) {
+  # 
+  #data_points[[k]]@data[,paste0(unique(all_species[length_var])[i])] <- 0
+ 
+  #int_index <- as.character(data_points[[k]]@data[,species]) == unique(all_species[length_var])[i]
+  #
+  #data_points[[k]]@data[int_index, paste0(unique(all_species[length_var])[i])] <- 1
+  #  
+  #}  
+  #  
+  #}  
     
   data_points[[k]]@data[,species] <- numeric_species[length_var]
   
   }
-   
-  ips_coords <- do.call(rbind, replicate(max(numeric_species), data@ips@coords, simplify = FALSE))
-    
-  ips_weight <- do.call(rbind, replicate(max(numeric_species), data@ips@data, simplify = FALSE))
-    
-  ips_fact <- rep(1:max(numeric_species), each = nrow(data@ips@coords))
-    
-  ips_data <- data.frame(ips_weight, ips_fact)
-    
-  data@ips <- sp::SpatialPointsDataFrame(coords = ips_coords,
-                                          data = ips_data,
-                                          proj = proj,
-                                          match.ID = FALSE)
-    
-  names(data@ips@data) <- c(names(ips_weight), paste0(species))
   
-  if (pointsintercept) {
-  
-  species_intercepts <- data.frame(matrix(data = 0, nrow = nrow(data@ips@data), ncol = length(unique(all_species))))
-  names(species_intercepts) <- unique(all_species)
-  data@ips@data <- dplyr::bind_cols(data@ips@data, species_intercepts)
-  
-  }
+  data@ips <- ips_model_matrix_maker(ips = data@ips, covariates = spatdata, all_species = as.character(unique(all_species)),
+                                     coords = coords, proj =  CRS(proj4string(bndry)),
+                                     species = species, componentstokeep = c(points_response, species, 'weight'))
   
   }
   
@@ -187,49 +217,6 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   names(data@ips@data) <- c(names(ips_weight), paste0(time_var))
     
   }
-  
-  if (!is.null(spatialcovariates)) {
-    
-  if (class(spatialcovariates) == 'RasterLayer') {
-      
-  spatialcovariates <- as(spatialcovariates, 'SpatialPixelsDataFrame')
-      
-  }
-    
-  if (class(spatialcovariates) == 'data.frame') {
-      
-  spatialcovariates <- sp::SpatialPointsDataFrame(coords = spatialcovariates[,coords],
-                                                  data = spatialcovariates[,!names(spatialcovariates)%in%coords],
-                                                  proj4string = proj)
-      
-  spatialcovariates <- as(spatialcovariates, 'SpatialPixelsDataFrame')
-      
-  }
-    
-  spatnames <- names(spatialcovariates@data)
-  spatdata_class <- sapply(spatialcovariates@data, class)
-    
-  if (!is.null(covariatestoinclude)) {
-      
-  spatdata_class <- spatdata_class[spatnames%in%covariatestoinclude] 
-  spatnames <- spatnames[(spatnames%in%covariatestoinclude)]
-      
-  if (is.null(spatnames) | identical(spatnames,character(0))) stop('covariatestoinclude contains covariate names not found in spatialcovariates')
-      
-  }
-    
-  for (name in spatnames) {
-      
-  pixels_df <- sp::SpatialPixelsDataFrame(points = spatialcovariates@coords,
-                                          data = data.frame(spatialcovariates@data[,name]),
-                                          proj4string = proj)
-  names(pixels_df) <- name
-  assign(name,pixels_df)
-      
-  }
-    
-  }
-  else spatnames <- NULL
   
   if (is.null(spdemodel)) {
     
@@ -341,7 +328,15 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   if (specieseffects) {
     
   species_in <- unique(species_dataset[[index]])
-    
+  
+  species_covs <- apply(expand.grid(paste0(species_in,'_'),covs), MARGIN = 1, FUN = paste0,collapse='')
+  
+  for(i in 1:length(species_covs)) {
+  
+  formula <- update(formula, paste('~ . +', species_covs[i], sep = ' + '))
+  
+  }
+  
   formula <- update(formula, paste0(' ~ . +', paste(species_in, collapse = ' + ')))  
   
   }
@@ -395,11 +390,13 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
       
   }
   else formula
+  
+  return(formula)
     
   }, fam = points_family, index = 1:length(points_family))
   
   include <- list()
-  
+
   for (i in 1:length(formula)) {
     
   variables <- all.vars(formula[[i]])
@@ -449,7 +446,14 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   for (i in 1:length(response_marks)) {
     
-  if(!is.null(covariatesbydataset)) {  
+  if (!is.null(covariatesbydataset)) {
+    
+  ## Add another if statement here:
+    # If name of mark is in the covariatesbydataset
+    # Then select those covariates for the mark
+    # Else if the dataset is part of the name
+    # Then select those covariates
+    # Need to change the defense above such that it also includes mark names
       
   if (gsub('_.*$',"",names(data_marks)[[i]])%in%names(covariatesbydataset)) {
     
@@ -622,9 +626,35 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   
   if (specieseffects) {
-    ##Make this an argument
-    ##Should this be exchangable??
-  components_joint <- update(components_joint, paste0('~ . +', species,'_spde(main = coordinates, model = spdemodel, group = ', species,', ngroup = ', max(numeric_species),', control.group = ', speciesmodel, ')'))
+
+  if (!is.null(spatnames)) {  
+    
+  for (name in data_names) {
+    
+  if (!is.null(covariatesbydataset)) {
+      
+  if (name%in%names(covariatesbydataset)) {
+        
+  incl_cov <- covariatesbydataset[[name]]
+        
+  } else {
+        
+  incl_cov <- spatnames
+        
+  }
+      
+  } 
+  else incl_cov <- spatnames
+  
+  cov_list <- paste(as.vector(outer(paste0(as.character(unique(species_dataset[[name]])),'_'),incl_cov, 'paste0')), collapse = ' + ')
+
+  components_joint <- update(components_joint, paste('~ . +', cov_list))
+    
+  } 
+  
+  }
+    
+  components_joint <- update(components_joint, paste0('~ . +', species,'_spde(main = coordinates, model = spdemodel, group = ', species,', ngroup = ', max(numeric_species),', control.group = ', list(speciesmodel), ')'))
     
   }
   
