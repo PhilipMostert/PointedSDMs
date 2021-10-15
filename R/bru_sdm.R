@@ -606,7 +606,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   if (specieseffects) {
     
-  components_joint <- update(components_joint, paste0(' ~ . +', paste(unique(all_species), collapse = ' + ')))
+  components_joint <- update(components_joint, paste0(' ~ . +', paste(paste0(unique(all_species),'_intercept'), collapse = ' + ')))
     
     
   }
