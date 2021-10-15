@@ -131,8 +131,8 @@ leave_one_out <- function(model, dataset,
   n_species <- as.character(max(as.numeric(unlist(model$species_in))))
   n_species_reduced <- as.character(max(as.numeric(reduced_species)))
   
-  reduced_components <- update(reduced_components, paste('~ . -', paste0(attributes(model)$Species,'_spde(main = coordinates, model = spdemodel, group = ',attributes(model)$Species, ', ngroup = ', n_species,', control.group = ', attributes(model)$Speciesmodel, ')')))
-  reduced_components <- update(reduced_components, paste('~ . +', paste0(attributes(model)$Species,'_spde(main = coordinates, model = spdemodel, group = ',attributes(model)$Species, ', ngroup = ', n_species_reduced,', control.group = ', attributes(model)$Speciesmodel, ')')))
+  reduced_components <- update(reduced_components, paste('~ . -', paste0(attributes(model)$Species,'_spde(main = coordinates, model = spdemodel, group = ',attributes(model)$Species, ', ngroup = ', n_species,', control.group = ', list(attributes(model)$Speciesmodel), ')')))
+  reduced_components <- update(reduced_components, paste('~ . +', paste0(attributes(model)$Species,'_spde(main = coordinates, model = spdemodel, group = ',attributes(model)$Species, ', ngroup = ', n_species_reduced,', control.group = ', list(attributes(model)$Speciesmodel), ')')))
   
   }
   
