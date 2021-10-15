@@ -126,7 +126,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   }) 
   
-  data_points <- model_matrix_maker(datasets = data_points, species = species, covariates = spatdata,
+  data_points <- model_matrix_maker(datasets = data_points, species = species, covariates = spatialcovariates,
                                     componentstokeep = c(points_response, species, 'weight'), coords = coords,
                                     attributestokeep = c('Ntrials', 'data_type'), covariatesbydataset = covariatesbydataset,
                                     proj =  proj)
@@ -166,7 +166,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   }
   
-  data@ips <- ips_model_matrix_maker(ips = data@ips, covariates = spatdata, all_species = as.character(unique(all_species)),
+  data@ips <- ips_model_matrix_maker(ips = data@ips, covariates = spatialcovariates, all_species = as.character(unique(all_species)),
                                      coords = coords, proj =  CRS(proj4string(bndry)),
                                      species = species, componentstokeep = c(points_response, species, 'weight'))
   
@@ -738,7 +738,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
 
   names(likelihoods) <- c(data_names,names_marks)
-  
+  stop(return(likelihoods))
   model_joint <- inlabru::bru(components = components_joint,
                               likelihoods, options = options)
 
