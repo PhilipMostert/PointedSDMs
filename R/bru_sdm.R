@@ -736,9 +736,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   }
   
-
   names(likelihoods) <- c(data_names,names_marks)
-  stop(return(likelihoods))
+  
   model_joint <- inlabru::bru(components = components_joint,
                               likelihoods, options = options)
 
