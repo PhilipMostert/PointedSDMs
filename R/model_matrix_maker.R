@@ -43,7 +43,7 @@ model_matrix_maker <- function(datasets, species, covariates,
                                                          proj = proj,
                                                          attributestokeep = attributestokeep)
   
-  matrix_formula <- formula(paste(' ~ - 1', species,  paste0(species, ':', names(covariates), collapse = ' + '), sep = ' + '))
+  matrix_formula <- formula(paste(' ~ - 1', species,  paste0(species, ':', covariatestokeep, collapse = ' + '), sep = ' + '))
   
   }
     
