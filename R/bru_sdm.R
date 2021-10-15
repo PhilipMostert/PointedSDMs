@@ -128,7 +128,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   data_points <- model_matrix_maker(datasets = data_points, species = species, covariates = spatdata,
                                     componentstokeep = c(points_response, species, 'weight'), coords = coords,
-                                    attributestokeep = c('Ntrials'), covariatesbydataset = covariatesbydataset,
+                                    attributestokeep = c('Ntrials', 'data_type'), covariatesbydataset = covariatesbydataset,
                                     proj =  proj)
   
   all_species <- unlist(species_dataset)
@@ -337,7 +337,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   }
   
-  formula <- update(formula, paste0(' ~ . +', paste(species_in, collapse = ' + ')))  
+  formula <- update(formula, paste0(' ~ . +', paste(paste0(species_in,'_intercept'), collapse = ' + ')))  
   
   }
   else formula <- update(formula, paste0(' ~ . +', paste0(data_names[index],'_intercept'), collapse = ' + '))
