@@ -167,7 +167,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   
   data@ips <- ips_model_matrix_maker(ips = data@ips, covariates = spatialcovariates, all_species = as.character(unique(all_species)),
-                                     coords = coords, proj =  CRS(proj4string(bndry)),
+                                     coords = coords, proj =  proj,
                                      species = species, componentstokeep = c(points_response, species, 'weight'))
   
   }
