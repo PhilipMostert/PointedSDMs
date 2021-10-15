@@ -125,7 +125,15 @@ leave_one_out <- function(model, dataset,
     
   for (species in unique(species_dataset[!species_dataset%in%species_rm])) {
   
-  reduced_components <- update(reduced_components, paste('~ . -', species))
+  species_covs <- as.vector(outer(paste0(species,'_'), model$spatial_covariates_used, FUN = 'paste0'))
+  
+  for (i in 1:length(species_covs)) {
+    
+  reduced_components <- update(reduced_components, paste('~ . -', species_covs[i]))  
+    
+  }
+    
+  reduced_components <- update(reduced_components, paste('~ . -', paste0(species,'_intercept')))
   
   }
   n_species <- as.character(max(as.numeric(unlist(model$species_in))))
