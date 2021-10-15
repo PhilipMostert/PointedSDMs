@@ -59,7 +59,7 @@ model_matrix_maker <- function(datasets, species, covariates,
 
   unique_species <- as.character(unique(datasets[[dataset]]@data[,species]))
 
-  names(species_matrix)[names(species_matrix)%in%paste0(species, unique_species)] <- unique_species
+  names(species_matrix)[names(species_matrix)%in%paste0(species, unique_species)] <- paste0(unique_species, '_intercept')
   
   names(species_matrix)[names(species_matrix)%in%as.vector(outer(paste0(species,unique_species,'.'),names(covariates), FUN = 'paste0'))] <- as.vector(outer(paste0(unique_species,'_'),names(covariates), FUN = 'paste0'))
   
@@ -72,7 +72,7 @@ model_matrix_maker <- function(datasets, species, covariates,
   
   unique_species <- as.character(unique(datasets[[dataset]]@data[,species]))
   
-  datasets[[dataset]]@data[, unique_species] <- 1  
+  datasets[[dataset]]@data[, paste0(unique_species,'_intercept')] <- 1  
   
   names(datasets[[dataset]]@data)[names(datasets[[dataset]]@data) == covariatestokeep] <- paste0(unique_species,'_',covariatestokeep)
     
@@ -161,7 +161,7 @@ ips_model_matrix_maker <- function(ips, covariates, species,
   
   #names(ips_matrix)[names(ips_matrix)%in%paste0(species, unique_species)] <- unique_species
   
-  ips@data[,unique_species] <- 0
+  ips@data[,paste0(unique_species,'_intercept')] <- 0
   
   ips@data[, names(ips@data)%in%names(covariates)] <- NULL
   
@@ -171,7 +171,7 @@ ips_model_matrix_maker <- function(ips, covariates, species,
     
   unique_species <- as.character(unique(all_species))
   
-  ips@data[, unique_species] <- 0  
+  ips@data[, paste0(unique_species,'_intercept')] <- 0  
 
   names(ips@data)[names(ips@data) == covariatestokeep] <- paste0(species, unique_species,'_',covariatestokeep)
     
