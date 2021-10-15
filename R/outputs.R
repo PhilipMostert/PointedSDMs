@@ -27,19 +27,6 @@ summary.bru_sdm <- function(x,...) {
   print(names_data)
   cat('\n')
   
-  ##Make this a for loop to print out
-  # all 'mulitnom_vars' summaries
-  if(!is.null(x[['species_in_model']])){
-    #cat('Species in model:\n\n')
-    #cat(paste0(x[['species_in_model']],collapse = ", "))
-    #cat('\n\n')
-    cat('Summary of species:\n\n')
-    species <- x$summary.random$species
-    names(species)[1] <- 'species'
-    print(species[,1:7])#, digits = 3, row.names = FALSE)
-    cat('\n\n')
-  }
-  
   if(!is.null(x[['multinom_vars']])){
     cat('Summary of multinomial variables:\n\n')
     for (i in x[['multinom_vars']]) {
@@ -58,10 +45,6 @@ summary.bru_sdm <- function(x,...) {
     }
   }
   
-  ##Add categorical variables here
-  ## So something like:
-   # if name of covariates is in random effects
-   # then print it
   
   if(any(x[['spatial_covariates_used']]%in%names(x[['summary.random']]))) {
     
@@ -79,17 +62,35 @@ summary.bru_sdm <- function(x,...) {
     }
   }
   
-  ##Fix naming of datasets in bru_sdm file
-  if(length(x[['model_residuals']]) > 0){
-    cat('Summary of residuals:\n\n')
-    summary_residuals = sapply(x[['model_residuals']], summary, digits = 3)
-    print(summary_residuals)
-    cat('\n\n')
+  if (!is.null(x[['species_in']])) {
+  
+  cat('Summary of the fixed effects for the species:')
+  cat('\n\n')
+  
+  for (species in as.character(unique(unlist(x$species_in)))) {
+    
+  cat('Summary for:', species)
+  cat('\n')
+  print.data.frame(x[['summary.fixed']][grepl(paste0(species,'_'), row.names(x[['summary.fixed']])),])    
+    
+  cat('\n')
+  
+      
   }
   
-  #Add Likelihoods with: Family, predictor and which dataset it came from
   class(x) = 'inla'
   x$call = NULL
+  x$summary.fixed = NULL
   summary(x)
+
+  }
+  
+  else {
+    
+    class(x) = 'inla'
+    x$call = NULL
+    summary(x)
+    
+  }
   
 }
