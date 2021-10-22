@@ -77,7 +77,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (!is.null(spatialcovariates)) {
     
-  if (class(spatialcovariates) == 'RasterLayer') {
+  if (class(spatialcovariates) == 'RasterLayer' | class(spatialcovariates) == 'RasterBrick') {
       
   spatialcovariates <- as(spatialcovariates, 'SpatialPixelsDataFrame')
       
@@ -92,7 +92,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   spatialcovariates <- as(spatialcovariates, 'SpatialPixelsDataFrame')
       
   }
-    
+  
   spatnames <- names(spatialcovariates@data)
   spatdata_class <- sapply(spatialcovariates@data, class)
     
