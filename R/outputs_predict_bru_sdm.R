@@ -18,8 +18,12 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
   
   if (species & is.null(object[['species_in']])) stop('Predictions for species was selected but no species were included in model. Please run bru_sdm with specieseffects = TRUE.')
   
-  if (is.null(formula) & is.null(datasetstopredict) | is.null(formula) & !species) stop("Please provide either a formula, and species or a dataset included in the bru_sdm model to be predicted.")
+  if (!species) {
   
+  if (is.null(formula) & is.null(datasetstopredict)) stop("Please provide either a formula, and species or a dataset included in the bru_sdm model to be predicted.")
+  
+  }
+    
   if (is.null(data)) {
     
   if (!is.null(mask)) {
@@ -50,7 +54,12 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
   pixels <- inlabru::cprod(data, species_data)
   
   if (is.null(fun) | fun == 'linear') {fun <- ''}
-  species_formula = paste0(fun,'(',paste(paste0(species_variable,'_spde'), covariates, sep = ' + '),')')
+  
+  if (!is.null(covariates)) {
+  species_formula <- paste0(fun,'(',paste(paste0(species_variable,'_spde'), covariates, sep = ' + '),')')
+  
+  }
+  else  species_formula <- paste0(fun,'(',paste(paste0(species_variable,'_spde')),')')
   
   int <- predict(object, pixels, ~ data.frame(species_variable = eval(parse(text = species_variable))  ,formula = eval(parse(text = species_formula))))
   
