@@ -438,7 +438,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }, fam = points_family, index = 1:length(points_family))
   
   include <- list()
-  stop(return(formula))
+ 
   for (i in 1:length(formula)) {
     
   variables <- all.vars(formula[[i]])
