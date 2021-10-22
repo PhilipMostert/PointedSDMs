@@ -24,7 +24,9 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                     pointsspatial = TRUE, marksspatial = TRUE,
                     spatialdatasets = NULL, timemodel = list(model = 'ar1'),
                     speciesmodel = list(model = "exchangeable"), options = list()) {
-
+##Things to fix:
+  #Raster layer (or brick raster)
+  #Predictions of species w/ covs
   if (class(data)[1] != 'bru_sdm_data') stop('Please supply data formed by the "organize_data" function.')
   
   proj <- data@ips@proj4string
@@ -322,6 +324,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   formula <- formula(paste0(c(points_response[2],"~", paste(covs, collapse = ' + ')),collapse = " "))
         
   }
+  
+  if (covs == '.') covs <- NULL
     
   if (pointsintercept) {
   
@@ -331,13 +335,29 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   species_covs <- apply(expand.grid(paste0(species_in,'_'),covs), MARGIN = 1, FUN = paste0,collapse='')
   
+  if (!identical(species_covs, character(0))) {
+  
   for(i in 1:length(species_covs)) {
   
   formula <- update(formula, paste('~ . +', species_covs[i], sep = ' + '))
   
   }
+    
+  }
+  else formula
   
-  formula <- update(formula, paste0(' ~ . +', paste(paste0(species_in,'_intercept'), collapse = ' + ')))  
+  if (!is.null(covs)) {
+  
+  formula <- update(formula, paste0(' ~ . +', paste(paste0(species_in,'_intercept'), collapse = ' + ')))
+  
+  }
+  else {
+  
+  resp <- as.character(formula)[2]
+  
+  formula <- formula(paste(resp, ' ~ ', paste0(species_in,'_intercept',collapse = ' + ')))
+    
+  }
   
   }
   else formula <- update(formula, paste0(' ~ . +', paste0(data_names[index],'_intercept'), collapse = ' + '))
@@ -353,7 +373,14 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (data_names[[index]]%in%spatialdatasets) {
     
-  formula <- update(formula, paste0('~ . +','shared_spatial'))
+  if (is.null(covs) & !pointsintercept) {
+  
+  resp <- as.character(formula)[2]
+    
+  formula <- formula(paste(resp, ' ~ +', paste0('~ . +','shared_spatial')))
+    
+  }   
+  else formula <- update(formula, paste0('~ . +','shared_spatial'))
     
   }  
     
@@ -366,11 +393,26 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (data_names[[index]]%in%spatialdatasets) {
     
-  formula <- update(formula, paste0('~ . +',data_names[[index]],'_spde'))
+  if (is.null(covs) & !pointsintercept) {
+      
+  resp <- as.character(formula)[2]
+      
+  formula <- formula(paste0(resp, ' ~ ',data_names[[index]],'_spde'))
+      
+  }   
+  else formula <- update(formula, paste0('~ . +',data_names[[index]],'_spde'))
     
   }
   else formula
     
+  }  
+  else 
+  if (is.null(covs) & !pointsintercept) {
+      
+  resp <- as.character(formula)[2]
+      
+  formula <- formula(paste0(resp, ' ~ ',data_names[[index]],'_spde'))
+      
   }  
   else formula <- update(formula, paste0('~ . +',data_names[[index]],'_spde'))
       
@@ -396,7 +438,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }, fam = points_family, index = 1:length(points_family))
   
   include <- list()
-
+  stop(return(formula))
   for (i in 1:length(formula)) {
     
   variables <- all.vars(formula[[i]])
@@ -467,6 +509,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   formula_marks[[i]] <- formula(paste0(c(response_marks[i],'~',paste(markscovs, collapse = ' + ')),collapse = " "))
       
+  if (markscovs == '.') markscovs <- NULL
+  
   if (marksspatial) {
     
   if (sharedspatial) {
@@ -475,10 +519,21 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (gsub('_.*$',"",names(data_marks)[[i]])%in%spatialdatasets) {
       
-  formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",'shared_spatial'))
+  if (is.null(markscovs)) {
+    
+  formula_marks[[i]] <- formula(paste(response_marks[i], ' ~ + shared_spatial'))  
+    
+  }
+  else formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",'shared_spatial'))
       
   }   
     
+  }
+  else
+  if (is.null(markscovs)) {
+  
+  formula_marks[[i]] <- formula(paste(response_marks[i], ' ~ + shared_spatial'))  
+  
   }
   else formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",'shared_spatial'))
  
@@ -488,30 +543,48 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (gsub('_.*$',"",names(data_marks)[[i]])%in%spatialdatasets) {
     
-  formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",names(data_marks)[[i]],'_spde'))
+  if (is.null(markscovs)) {
+   
+  formula(paste(response_marks[i], ' ~ + ',paste0(names(data_marks)[[i]],'_spde')))   
+    
+  }
+  else formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",names(data_marks)[[i]],'_spde'))
     
   }
     
   }  
-  else {  
-
-  formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",names(data_marks)[[i]],'_spde'))
-        
-  }
+  else
+  if (is.null(markscovs)) {
     
+  formula(paste(response_marks[i], ' ~ + ',paste0(names(data_marks)[[i]],'_spde')))   
+  
+  }  
+  else formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",names(data_marks)[[i]],'_spde'))
+        
   }
       
   if (marksintercept) {
         
   if (attributes(data_marks[[i]])$data_type != 'Multinomial mark') {
-          
-  formula_marks[[i]] <- update(formula_marks[[i]],paste0('. ~ . +', paste0(names(data_marks)[[i]],'_intercept'), collapse = ' + '))
+  
+  if (is.null(markscovs) & !marksspatial) {
+    
+  formula_marks[[i]] <- formula(paste(response_marks[i], ' ~ + ',paste0(names(data_marks)[[i]],'_intercept')))  
+    
+  }
+  else formula_marks[[i]] <- update(formula_marks[[i]],paste0('. ~ . +', paste0(names(data_marks)[[i]],'_intercept'), collapse = ' + '))
           
   }
         
   }
       
   if (attributes(data_marks[[i]])$data_type == 'Multinomial mark') {
+    
+  if (is.null(markscovs) & !marksspatial) {
+      
+  formula_marks[[i]] <- formula(paste0(paste0(names_marks[i],'_response'), ' ~ +',  paste(attributes(data_marks[[i]])$mark_name, attributes(data_marks[[i]])$phi, sep = ' + ')))
+      
+  }
         
   formula_marks[[i]] <- update(formula_marks[[i]], paste0(paste0(names_marks[i],'_response'), ' ~ . + ', paste(attributes(data_marks[[i]])$mark_name, attributes(data_marks[[i]])$phi, sep = ' + ')))
         
