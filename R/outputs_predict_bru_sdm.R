@@ -191,7 +191,9 @@ plot.predict_bru_sdm <- function(x, plotall = TRUE,
     
     species_name_var <- names(x[[1]]@data)[sapply(x[[1]]@data, class) == 'character']
     
-    plot_grid <- ggplot() + gg(x[[1]], aes(fill = whattoplot)) + facet_grid(~ species_name_var)
+    species_title <- ggtitle('Plot of the species predictions')
+    
+    plot_grid <- ggplot() + gg(x[[1]], aes_string(fill = whattoplot)) + facet_grid(~ eval(parse(text = species_name_var))) + plot_colours + species_title
     return(plot_grid)
   }
   
