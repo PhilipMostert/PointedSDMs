@@ -71,7 +71,7 @@ summary.bru_sdm <- function(x,...) {
     
   cat('Summary for:', species)
   cat('\n')
-  print.data.frame(x[['summary.fixed']][grepl(paste0(species,'_'), row.names(x[['summary.fixed']])),])    
+  print.data.frame(x[['summary.fixed']][grepl(paste0('\\<',species,'_'), row.names(x[['summary.fixed']])),])    
     
   cat('\n')
   
