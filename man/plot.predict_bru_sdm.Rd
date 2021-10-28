@@ -8,7 +8,7 @@
   x,
   plotall = TRUE,
   datasettoplot = NULL,
-  whattoplot = c("mean", "var"),
+  whattoplot = c("mean"),
   colours = NULL,
   cols = length(whattoplot),
   layout = NULL,

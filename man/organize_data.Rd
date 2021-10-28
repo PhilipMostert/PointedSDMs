@@ -16,7 +16,6 @@ organize_data(
   inclmarks = NULL,
   markfamily = "gaussian",
   speciesname = NULL,
-  timevariable = NULL,
   ips = NULL,
   mesh = NULL,
   meshpars = NULL,
@@ -43,8 +42,6 @@ organize_data(
 \item{markfamily}{Assumed distribution of the marks. May be either a single character string or a named list/vector of each mark's distribution in the form: <mark name> = <distribution family>. Defaults to \code{"gaussian"}.}
 
 \item{speciesname}{Name of the species name variable used in the model. Defaults to \code{NULL}.}
-
-\item{timevariable}{Name of the time variable used in the model. Defaults to \code{NULL}.}
 
 \item{ips}{Integration points. Defaults to \code{NULL}.}
 
