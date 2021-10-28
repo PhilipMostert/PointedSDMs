@@ -11,7 +11,6 @@
 #' @param inclmarks. A vector of which marks should be included in the model. Defaults to \code{NULL}.
 #' @param markfamily Assumed distribution of the marks. May be either a single character string or a named list/vector of each mark's distribution in the form: <mark name> = <distribution family>. Defaults to \code{"gaussian"}.
 #' @param speciesname Name of the species name variable used in the model. Defaults to \code{NULL}.
-#' @param timevariable Name of the time variable used in the model. Defaults to \code{NULL}.
 #' @param ips Integration points. Defaults to \code{NULL}.
 #' @param mesh An inla.mesh object. Defaults to \code{NULL}.
 #' @param meshpars List of mesh parameters. Requires the following items: "cut.off", "max.edge" and "offset". Defaults to \code{NULL}.
@@ -25,8 +24,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
                           coords = NULL, proj = NULL,
                           marks = FALSE, inclmarks = NULL,
                           markfamily = 'gaussian',speciesname = NULL,
-                          timevariable = NULL, ips = NULL, 
-                          mesh = NULL, meshpars = NULL,
+                          ips = NULL, mesh = NULL, meshpars = NULL,
                           boundary = NULL) {
   
 
@@ -178,25 +176,6 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
     
   }
   
-  if (!is.null(timevariable)) {
-    
-  all_time <- sapply(data_points, function(dat) {
-      
-  timevariable%in%names(dat@data)
-      
-  })
-    
-  if (!all(all_time)) stop('All datasets are required to have the temporal variable included.')
-    
-  data_points <- lapply(data_points, function(dat) {
-      
-  dat@data[,timevariable] <- factor(dat@data[,timevariable])
-  dat
-      
-  })
-    
-  }
-  
   names(data_points) <- data_names
   
   if (marks) {
@@ -212,7 +191,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   else {
         
   names = names(data_points[[i]])[!names(data_points[[i]])%in%c(poresp, paresp, coords, trialname,
-                                                                timevariable, speciesname, marktrialname)]
+                                                                speciesname, marktrialname)]
         
   if (!is.null(inclmarks)) names <- names[names%in%inclmarks]      
         
@@ -512,8 +491,6 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   attr(object, 'Multinom_incl') <- multinom_incl
   attr(object, 'Multinom_vars') <- multinom_vars
   attr(object, 'Sources_of_information') <- unname(c(data_names, sapply(data_marks, function(dat) attributes(dat)$dataset)))
-  
-  attr(object, 'Timevariable') <- timevariable
   
   attr(object, 'Species') <- speciesname
   

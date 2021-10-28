@@ -12,7 +12,6 @@
 #' @param pointsspatial Should spatial effects be used for the points in the model. Defaults to \code{TRUE}.
 #' @param marksspatial Should spatial effects be used for the marks in the model. Defaults to \code{TRUE}.
 #' @param sharedspatial Should a spatial effect be shared across datasets. Defaults to \code{FALSE}.
-#' @param timemodel Time-series model to use. Defaults to \code{list(model = 'ar1')}.
 #' @param speciesmodel INLA \code{control.group} model to use. Defaults to \code{list(model = "exchangeable")}.
 #' @param options INLA or inlabru options to be used in the model.
 #' 
@@ -22,11 +21,9 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                     covariatesbydataset = NULL, specieseffects = FALSE, pointsintercept = TRUE,
                     marksintercept = TRUE, sharedspatial = FALSE, spdemodel = NULL, 
                     pointsspatial = TRUE, marksspatial = TRUE,
-                    spatialdatasets = NULL, timemodel = list(model = 'ar1'),
+                    spatialdatasets = NULL,
                     speciesmodel = list(model = "exchangeable"), options = list()) {
-##Things to fix:
-  #Raster layer (or brick raster)
-  #Predictions of species w/ covs
+
   if (class(data)[1] != 'bru_sdm_data') stop('Please supply data formed by the "organize_data" function.')
   
   proj <- data@ips@proj4string
@@ -172,52 +169,6 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                                      coords = coords, proj =  proj,
                                      species = species, componentstokeep = c(points_response, species, 'weight'))
   
-  }
-  
-  ##For now ignore time var
-  time_var <- attributes(data)$Timevariable
-  if (!is.null(time_var)) stop('For now time var is unavailable.')
-  if (!is.null(time_var)) {
-    
-  ##leave a var which translates factor var to numeric  
-  numeric_time <- as.numeric(unlist(sapply(data_points, function(data) {
-      
-  data@data[,time_var]  
-      
-  })))
-    
-  for (k in 1:length(data_points)) {
-      
-  if (k == 1) { 
-        
-  length_var <- (1:length(data_points[[1]]))
-        
-  }
-  else {
-        
-  length_var <- (length(data_points[[k-1]]) + 1):(length(data_points[[k-1]]) + length(data_points[[k]]))
-        
-  }
-      
-  data_points[[k]]@data[,time_var] <- numeric_time[length_var]   
-      
-  }
-    
-  ips_coords <- do.call(rbind, replicate(max(numeric_time), data@ips@coords, simplify = FALSE))
-    
-  ips_weight <- do.call(rbind, replicate(max(numeric_time), data@ips@data, simplify = FALSE))
-    
-  ips_fact <- rep(1:max(numeric_time), each = nrow(data@ips@coords))
-    
-  ips_data <- data.frame(ips_weight, ips_fact)
-    
-  data@ips <- sp::SpatialPointsDataFrame(coords = ips_coords,
-                                         data = ips_data,
-                                         proj = proj,
-                                         match.ID = FALSE)
-    
-  names(data@ips@data) <- c(names(ips_weight), paste0(time_var))
-    
   }
   
   if (is.null(spdemodel)) {
@@ -415,13 +366,6 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
       
   }  
   else formula <- update(formula, paste0('~ . +',data_names[[index]],'_spde'))
-      
-  }
-  else formula
-    
-  if (!is.null(time_var)) {
-      
-  formula <- update(formula, paste0('~ . +',time_var,'_spde'))
       
   }
   else formula
@@ -687,14 +631,6 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   components_joint <- update(components_joint, paste0(' ~ . +', paste0(data_names,'_intercept(1)'), collapse = ' + '))
   
   }
-    
-  }
-  
-  if (!is.null(time_var)) {
-    
-  components_joint <- update(components_joint, paste0('~ . +', time_var,'_spde(main = coordinates, model = spdemodel, group = ', time_var,', ngroup = ', max(numeric_time),', control.group = ', timemodel,')'))
-  #if bottom one remove ips things
-  #components_joint <- update(components_joint, paste0('~ . +', time_var,'_spde(main = ', time_var,', model = ','\"', timemodel,'\"',')'))
     
   }
   
