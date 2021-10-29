@@ -64,6 +64,8 @@ summary.bru_sdm <- function(x,...) {
   
   if (!is.null(x[['species_in']])) {
   
+  if (length(unique(unlist(x[['species_in']]))) > 1) {
+  
   cat('Summary of the fixed effects for the species:')
   cat('\n\n')
   
@@ -83,6 +85,14 @@ summary.bru_sdm <- function(x,...) {
   x$summary.fixed = NULL
   summary(x)
 
+  }
+  else {
+    
+  class(x) = 'inla'
+  x$call = NULL
+  summary(x)  
+  
+  }
   }
   
   else {
