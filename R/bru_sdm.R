@@ -276,37 +276,39 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
         
   }
   
+  if (specieseffects) {
+    
+  species_in <- unique(species_dataset[[index]])
+  
+  }
+  else formula
+  
   if (covs == '.') covs <- NULL
     
   if (pointsintercept) {
   
   if (specieseffects) {
-    
-  species_in <- unique(species_dataset[[index]])
-  
-  species_covs <- apply(expand.grid(paste0(species_in,'_'),covs), MARGIN = 1, FUN = paste0,collapse='')
-  
-  if (!identical(species_covs, character(0))) {
-  
-  for(i in 1:length(species_covs)) {
-  
-  formula <- update(formula, paste('~ . +', species_covs[i], sep = ' + '))
-  
-  }
-    
-  }
-  else formula
   
   if (!is.null(covs)) {
+    
+  if (length(unique(all_species)) > 1) {  
   
   formula <- update(formula, paste0(' ~ . +', paste(paste0(species_in,'_intercept'), collapse = ' + ')))
+  
+  }
+  else formula <- update(formula, paste0(' ~ . + intercept'))
   
   }
   else {
   
   resp <- as.character(formula)[2]
   
+  if (length(unique(all_species)) > 1) { 
+  
   formula <- formula(paste(resp, ' ~ ', paste0(species_in,'_intercept',collapse = ' + ')))
+  
+  }
+  else formula <- formula(paste(resp, ' ~ ', paste0('intercept',collapse = ' + ')))
     
   }
   
@@ -314,6 +316,29 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   else formula <- update(formula, paste0(' ~ . +', paste0(data_names[index],'_intercept'), collapse = ' + '))
       
   }
+  else formula
+  
+  
+  if (specieseffects) {
+    
+  if (length(unique(all_species)) > 1) {
+    
+  species_covs <- apply(expand.grid(paste0(species_in,'_'),covs), MARGIN = 1, FUN = paste0,collapse='')
+    
+  if (!identical(species_covs, character(0))) {
+      
+  for(i in 1:length(species_covs)) {
+        
+  formula <- update(formula, paste('~ . +', species_covs[i], sep = ' + '))
+        
+  }
+      
+  }else formula
+  
+  }
+  else formula  
+    
+  } 
   else formula
     
   if (pointsspatial) {
@@ -623,8 +648,12 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   if (specieseffects) {
     
-  components_joint <- update(components_joint, paste0(' ~ . +', paste(paste0(unique(all_species),'_intercept'), collapse = ' + ')))
+  if (length(unique(all_species)) > 1) {  
     
+  components_joint <- update(components_joint, paste0(' ~ . +', paste(paste0(unique(all_species),'_intercept'), collapse = ' + ')))
+  
+  }
+  else components_joint <- update(components_joint, paste0(' ~ . + intercept(1)'))
     
   }
   else {  
@@ -635,6 +664,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   
   if (specieseffects) {
+    
+  if (length(unique(all_species)) > 1) {  
 
   if (!is.null(spatnames)) {  
     
@@ -662,6 +693,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   } 
   
   }
+    
+  }  
     
   components_joint <- update(components_joint, paste0('~ . +', species,'_spde(main = coordinates, model = spdemodel, group = ', species,', ngroup = ', max(numeric_species),', control.group = ', list(speciesmodel), ')'))
     
