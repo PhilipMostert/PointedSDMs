@@ -69,12 +69,12 @@ model_matrix_maker <- function(datasets, species, covariates,
   
   }
   else {
-  
+
   unique_species <- as.character(unique(datasets[[dataset]]@data[,species]))
   
-  datasets[[dataset]]@data[, paste0(unique_species,'_intercept')] <- 1  
+  #datasets[[dataset]]@data[, paste0(unique_species,'_intercept')] <- 1  
   
-  names(datasets[[dataset]]@data)[names(datasets[[dataset]]@data) == covariatestokeep] <- paste0(unique_species,'_',covariatestokeep)
+  #names(datasets[[dataset]]@data)[names(datasets[[dataset]]@data) == covariatestokeep] <- paste0(unique_species,'_',covariatestokeep)
     
   }
 
@@ -84,11 +84,6 @@ model_matrix_maker <- function(datasets, species, covariates,
 
 }
 
-## After this:
- # Need to add all these created interactions to the relevant formulas/include components
-  # probably not difficult: just need to add dataset:covariate name
-  # Add all of these interactions to the components
-  # Then go to the leave one out function and remove all dodge components
 
 #' Function to create model matrix for the integration points.
 #' @param ips Is the matrix being constructed for the integration points. Defaults to \code{False}.
@@ -171,9 +166,9 @@ ips_model_matrix_maker <- function(ips, covariates, species,
     
   unique_species <- as.character(unique(all_species))
   
-  ips@data[, paste0(unique_species,'_intercept')] <- 0  
+  #ips@data[, paste0(unique_species,'_intercept')] <- 0  
 
-  names(ips@data)[names(ips@data) == covariatestokeep] <- paste0(species, unique_species,'_',covariatestokeep)
+  #names(ips@data)[names(ips@data) == covariatestokeep] <- paste0(species, unique_species,'_',covariatestokeep)
     
   }
   
