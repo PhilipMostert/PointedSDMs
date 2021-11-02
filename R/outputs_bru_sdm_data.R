@@ -1,7 +1,12 @@
 #' Outputs for bru_sdm_data
 #' 
+#' @export
 
 setClassUnion("listorNULL", c('list','NULL'))
+
+#'bru_sdm_data class
+#'
+#'@export
 
 setClass('bru_sdm_data', 
          slots = c(PO_data = 'listorNULL',
@@ -10,6 +15,9 @@ setClass('bru_sdm_data',
                    ips = 'SpatialPointsDataFrame',
                    mesh = 'inla.mesh'))
 
+#'Export for show for 'bru_sdm_data'
+#'
+#'@export
 
 setMethod('show', 'bru_sdm_data',
           function(x) {
