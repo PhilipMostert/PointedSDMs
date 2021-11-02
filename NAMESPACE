@@ -17,3 +17,7 @@ export(plot.predict_bru_sdm)
 export(model_matrix_maker)
 export(ips_model_matrix_maker)
 export(get_nearest_covariate)
+exportClasses(bru_sdm_data)
+exportClasses(listorNULL)
+exportMethods(show)
+
