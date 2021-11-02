@@ -114,7 +114,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
                                     data = data.frame(data[,!data_vars%in%coords]),
                                     proj4string = proj)
         
-  if (ncol(dat@dat) == 1) names(dat@data) = poresp
+  if (ncol(dat@data) == 1) names(dat@data) = poresp
         
   if (any(dat@data[,poresp] > 1)) {
           
