@@ -177,14 +177,14 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
     
   }
   
-  if (is.null(pointcovariates)) {
+  if (!is.null(pointcovariates)) {
     
   all_covariates <- sapply(data_points, function(dat) {
       
   pointcovariates%in%names(dat@data)
       
   })
-    
+   
   if (!all(all_covariates)) stop('All datasets are required to have all the points covariates included.')
     
   }
