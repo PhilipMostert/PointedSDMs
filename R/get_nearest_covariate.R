@@ -8,6 +8,7 @@
 #' @param proj Projection to use if data is not a projection.
 #' @param attributestokeep A vector of attributes to keep from the points object. Defaults to \code{c('Ntrials','family','data_type')}.
 #' 
+#' @export
 
 get_nearest_covariate <- function(points, spatialcovariates, covariatestokeep = NULL,
                                   componentstokeep = c(poresp,paresp,'weight'),

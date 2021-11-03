@@ -1,8 +1,12 @@
+#' Export class predict_bru_sdm
+#' 
+#' @export 
+
 setClass('predict_bru_sdm')
 
 #' Predict for bru_sdm
 #' 
-#' @export predict.bru_sdm
+#' @exportS3Method 
 
 predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL, 
                             mask = NULL, datasetstopredict = NULL, species = FALSE,
@@ -156,7 +160,7 @@ print.predict_bru_sdm <- function(x, ...) {
 
 #' Plot for preduct_bru_sdm
 #' 
-#' @export plot.predict_bru_sdm
+#' @exportS3Method 
 
 plot.predict_bru_sdm <- function(x, plotall = TRUE,
                                  datasettoplot = NULL,

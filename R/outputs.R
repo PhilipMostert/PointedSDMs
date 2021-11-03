@@ -1,8 +1,13 @@
+#' Export bru_sdm class
+#' 
+#' @export
+
 setClass('bru_sdm')
 
 #' Print method for bru_sdm
 #' 
-#' @export print.bru_sdm
+#' @exportS3Method 
+
 
 print.bru_sdm <- function(x, ...) {
   
@@ -12,7 +17,7 @@ print.bru_sdm <- function(x, ...) {
 
 #' Summary for bru_sdm
 #' 
-#' @export summary.bru_sdm
+#' @exportS3Method 
 
 summary.bru_sdm <- function(x,...) {
   #cat('----bru_sdm summary STILL IN DEVELOPMENT----\n\n')

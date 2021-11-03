@@ -12,6 +12,7 @@
 #' @param proj Projection to use if data is not a projection.
 #' @param attributestokeep A vector of attributes to keep from the points object. Defaults to \code{NULL}.
 #'
+#'@export
 
 model_matrix_maker <- function(datasets, species, covariates,
                                covariatesbydataset = NULL,
@@ -96,6 +97,7 @@ model_matrix_maker <- function(datasets, species, covariates,
 #' @param proj Projection to use if data is not a projection.
 #' @param attributestokeep A vector of attributes to keep from the points object. Defaults to \code{NULL}.
 #' 
+#' @export
 ips_model_matrix_maker <- function(ips, covariates, species,
                                    all_species,
                                    covariatestokeep = NULL,

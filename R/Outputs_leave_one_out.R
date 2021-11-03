@@ -1,8 +1,16 @@
+#' Export class bru_sdm_leave_one_out
+#' 
+#' @export
+
 setClass('bru_sdm_leave_one_out')
 
 #' Print for bru_sdm_leave_one_out
 #' 
 #' @export print.bru_sdm_leave_one_out
+
+#' Export print.bru_sdm_leave_one_out
+#' 
+#' @exportS3Method 
 
 print.bru_sdm_leave_one_out <- function(x, ...) {
   

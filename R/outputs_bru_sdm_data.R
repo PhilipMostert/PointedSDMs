@@ -6,7 +6,7 @@ setClassUnion("listorNULL", c('list','NULL'))
 
 #'bru_sdm_data class
 #'
-#'@export
+#' @export
 
 setClass('bru_sdm_data', 
          slots = c(PO_data = 'listorNULL',
@@ -17,7 +17,7 @@ setClass('bru_sdm_data',
 
 #'Export for show for 'bru_sdm_data'
 #'
-#'@export
+#' @exportS3Method 
 
 setMethod('show', 'bru_sdm_data',
           function(x) {
