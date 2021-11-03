@@ -86,7 +86,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   
   if (!all(coords_in)) stop("At least one dataset does not have coordinates in it.\nEither check your datasets or change your coordinates argument.")
   
-  if (data_list) data_names <- paste0('dataset_',seq_len(length(datasets)))
+  if (data_list) data_names <- paste0('dataset_',seq_len(length(datasets))) ## Fix this
   
   else {
     
