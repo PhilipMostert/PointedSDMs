@@ -107,8 +107,11 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
   if (intercept) {
         
   if (!paste0(datasetstopredict[[i]],'_intercept')%in%row.names(object$summary.fixed) & !'intercept'%in%row.names(object$summary.fixed)) stop('Either dataset name is incorrect or bru_sdm model run without intercepts.')
-  else intercept_obj <- paste0(datasetstopredict[[i]],'_intercept')
-        
+  
+  else
+  if(!paste0(datasetstopredict[[i]],'_intercept')%in%row.names(object$summary.fixed)) intercept_obj <- paste0(datasetstopredict[[i]],'_intercept')
+  
+  else intercept_obj <- NULL      
   } 
   else intercept_obj <- NULL
       
