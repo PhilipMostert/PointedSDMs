@@ -51,11 +51,19 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   stop("Meshpars requires three items in a list: cut.off, max.edge and offset.")
     
   }
+  
+  datasets <- list(...)
+  
+  datasets_class <- lapply(datasets, class)
+  
+  if (length(datasets_class) == 1 & class(datasets_class) == 'list') {
 
-  datasets = list(...)
+  datasets <- unlist(datasets)
+  datasets_class <- lapply(datasets, class)
+  data_list <- TRUE
   
-  datasets_class = sapply(datasets, class)
-  
+  } else data_list <- FALSE
+
   if (any(!datasets_class%in%c('SpatialPointsDataFrame','SpatialPoints', 'data.frame'))) {
     
   stop('Datasets need to be either a SpatialPoints* object or a data frame.')
@@ -78,10 +86,14 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   
   if (!all(coords_in)) stop("At least one dataset does not have coordinates in it.\nEither check your datasets or change your coordinates argument.")
   
+  if (data_list) data_names <- paste0('dataset_',seq_len(length(datasets)))
+  
+  else {
+    
   data_names <- setdiff(as.character(match.call(expand.dots=TRUE)), 
                         as.character(match.call(expand.dots=FALSE)))
+  }
   
-
   data_points <- lapply(datasets, function(data) {
     
   data <- as.data.frame(data)
