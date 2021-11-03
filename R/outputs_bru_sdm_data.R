@@ -79,20 +79,30 @@ setMethod('show', 'bru_sdm_data',
               
             }
             
+            if (!is.null(attributes(x)$Pointcovariates)) {
+            
+            if (length(attributes(x)$Pointcovariates) == 1) {
+              
+            cat('Point covariate included: ', attributes(x)$Pointcovariates)
+            cat('\n')  
+            }
+            else {
+            cat('Point covariates included:', paste(attributes(x)$Pointcovariates, collapse = ', '))
+            cat('\n')  
+              
+              
+            }
+              
+              
+            }  
+            
             if (!is.null(attributes(x)$Species)) {
             
             cat('Species variable name included: ', attributes(x)$Species)  
             cat('\n')
               
             }
-            
-            if (!is.null(attributes(x)$Timevariable)) {
-              
-              cat('Temporal variable included: ', attributes(x)$Timevariable)  
-              cat('\n')
-              
-            }
-            
+          
           
             
           })
