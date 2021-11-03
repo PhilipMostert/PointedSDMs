@@ -10,6 +10,7 @@
 #' @param marks Should the model be a marked point process. Defaults to \code{FALSE}.
 #' @param inclmarks. A vector of which marks should be included in the model. Defaults to \code{NULL}.
 #' @param markfamily Assumed distribution of the marks. May be either a single character string or a named list/vector of each mark's distribution in the form: <mark name> = <distribution family>. Defaults to \code{"gaussian"}.
+#' @param pointcovariates The names of the non-spatial covariates in the model that are attached to the dataset. Defaults to \code{NULL}.
 #' @param speciesname Name of the species name variable used in the model. Defaults to \code{NULL}.
 #' @param ips Integration points. Defaults to \code{NULL}.
 #' @param mesh An inla.mesh object. Defaults to \code{NULL}.
@@ -23,11 +24,11 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
                           trialname = NULL, marktrialname = NULL,
                           coords = NULL, proj = NULL,
                           marks = FALSE, inclmarks = NULL,
-                          markfamily = 'gaussian',speciesname = NULL,
+                          markfamily = 'gaussian', 
+                          pointcovariates = NULL, speciesname = NULL,
                           ips = NULL, mesh = NULL, meshpars = NULL,
                           boundary = NULL) {
   
-
   if (is.null(poresp) | is.null(paresp)) stop('Both poresp and paresp must be non-null.')
   
   if (poresp == paresp) stop('Presence only response cannot be the same as present absence response. Please change one of them.')
@@ -50,7 +51,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   stop("Meshpars requires three items in a list: cut.off, max.edge and offset.")
     
   }
-  
+
   datasets = list(...)
   
   datasets_class = sapply(datasets, class)
@@ -176,6 +177,18 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
     
   }
   
+  if (is.null(pointcovariates)) {
+    
+  all_covariates <- sapply(data_points, function(dat) {
+      
+  pointcovariates%in%names(dat@data)
+      
+  })
+    
+  if (!all(all_covariates)) stop('All datasets are required to have all the points covariates included.')
+    
+  }
+  
   names(data_points) <- data_names
   
   if (marks) {
@@ -191,7 +204,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   else {
         
   names = names(data_points[[i]])[!names(data_points[[i]])%in%c(poresp, paresp, coords, trialname,
-                                                                speciesname, marktrialname)]
+                                                                speciesname, marktrialname, pointcovariates)]
         
   if (!is.null(inclmarks)) names <- names[names%in%inclmarks]      
         
@@ -491,6 +504,8 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   attr(object, 'Multinom_incl') <- multinom_incl
   attr(object, 'Multinom_vars') <- multinom_vars
   attr(object, 'Sources_of_information') <- unname(c(data_names, sapply(data_marks, function(dat) attributes(dat)$dataset)))
+  
+  attr(object, 'Pointcovariates') <- pointcovariates
   
   attr(object, 'Species') <- speciesname
   
