@@ -23,6 +23,23 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                     pointsspatial = TRUE, marksspatial = TRUE,
                     spatialdatasets = NULL,
                     speciesmodel = list(model = "exchangeable"), options = list()) {
+  
+  ##Add another argument called ** EXTRA COVARIATES **
+  ##ie non-spatial; non-marks values attached to the datasets
+  ##That act as additional covariates within the model
+  ##e.g. effort covariate and coordinates
+  ##Then make go to bru_sdm and add 0's onto the 
+  ##ips such that they are modeled as well.
+  ##Maybe just call it pointcovariates??
+  
+  #if (!is.null(attributes(data)$Pointcovariates)) point_covs_incl <- TRUE
+  #else point_covs_incl <- FALSE
+  
+  ##Go to model matrix maker and say if point_covs_incl add those extra cols??
+  ##Or just do it completely sep; prob easier to just add columns of 0's afterwards
+  
+  ##Then add to formulas
+  ##Then add to components_joint
 
   if (class(data)[1] != 'bru_sdm_data') stop('Please supply data formed by the "organize_data" function.')
   
@@ -61,6 +78,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   response_marks <- NULL
     
   }
+  
+  pointcovariates_incl <- attributes(data)$Pointcovariates
   
   if (!is.null(covariatesbydataset)) {
     
@@ -147,20 +166,6 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
         
   }
     
-  #if (pointsintercept) {
-  ##Probably wont need these
-  #for (i in 1:length(unique(all_species[length_var]))) {
-  # 
-  #data_points[[k]]@data[,paste0(unique(all_species[length_var])[i])] <- 0
- 
-  #int_index <- as.character(data_points[[k]]@data[,species]) == unique(all_species[length_var])[i]
-  #
-  #data_points[[k]]@data[int_index, paste0(unique(all_species[length_var])[i])] <- 1
-  #  
-  #}  
-  #  
-  #}  
-    
   data_points[[k]]@data[,species] <- numeric_species[length_var]
   
   }
@@ -169,7 +174,17 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                                      coords = coords, proj =  proj,
                                      species = species, componentstokeep = c(points_response, species, 'weight'))
   
+  } else specieseffects <- FALSE
+  
+  if (!is.null(pointcovariates_incl)) {
+  
+  pointcovariates_dataframe <-  data.frame(matrix(data=0, nrow = nrow(data@ips@data), ncol = length(pointcovariates_incl)))
+  names(pointcovariates_dataframe) <- pointcovariates_incl
+  
+  data@ips@data <- cbind(data@ips@data, pointcovariates_dataframe)
+    
   }
+  
   
   if (is.null(spdemodel)) {
     
@@ -402,10 +417,16 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   else formula
   
+  if (!is.null(pointcovariates_incl)) {
+    
+  formula <- update(formula, paste(' ~ . +', paste(pointcovariates_incl, collapse = ' + ')))  
+    
+  }
+  
   return(formula)
     
   }, fam = points_family, index = 1:length(points_family))
-  
+
   include <- list()
  
   for (i in 1:length(formula)) {
@@ -686,10 +707,13 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   } 
   else incl_cov <- spatnames
   
+  if (specieseffects) {
+    
   cov_list <- paste(as.vector(outer(paste0(as.character(unique(species_dataset[[name]])),'_'),incl_cov, 'paste0')), collapse = ' + ')
 
   components_joint <- update(components_joint, paste('~ . +', cov_list))
-    
+  
+  }  
   } 
   
   }
@@ -699,6 +723,12 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   components_joint <- update(components_joint, paste0('~ . +', species,'_spde(main = coordinates, model = spdemodel, group = ', species,', ngroup = ', max(numeric_species),', control.group = ', list(speciesmodel), ')'))
     
   }
+  
+  if (!is.null(pointcovariates_incl)) {
+    
+  components_joint <- update(components_joint, paste(' ~ . +', paste(pointcovariates_incl, collapse = ' + ')))    
+   
+  }  
   
   if (attributes(data)$Marks) {
     
