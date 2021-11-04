@@ -124,7 +124,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   if (!is.null(trialname)) {
         
   if (trialname%in%data_vars) attr(dat, 'Ntrials') <- data.frame(dat@data[,trialname])[,1]
-  else attr(dat, 'Ntrials') <- rep(1,nrow(dat@coords))
+  else attr(dat, 'Ntrials') <- 1
         
   }
       
@@ -145,7 +145,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
         
   if (any(dat@data[,poresp] > 1)) {
           
-  attr(dat, 'Ntrials') <- rep(1,nrow(dat@coords))
+  attr(dat, 'Ntrials') <- 1
   attr(dat, 'family') <- 'poisson'
   attr(dat, 'data_type') <- 'Present only abundance'
           
@@ -154,7 +154,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   }
   else {
           
-  attr(dat, 'Ntrials') <- rep(1,nrow(dat@coords))
+  attr(dat, 'Ntrials') <- 1
   attr(dat, 'family') <- 'cp'
   attr(dat, 'data_type') <- 'Present only' 
           
