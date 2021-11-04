@@ -1,6 +1,6 @@
 #' Function to organize data to input into bru_sdm
 #' 
-#' @param ... Point process datasets with coordinates of species, and optionally marks and covariates explaining the coordinates.
+#' @param ... Point process datasets with coordinates of species, and optionally marks and covariates explaining the coordinates. May be the dataset objects as \code{SpatialPoints*} or \code{data.frame} objects, or may be a list of \code{SpatialPoints} or \code{data.frame} objects.
 #' @param poresp Name for the response variable for the presence only datasets. Defaults to \code{NULL}. If no presence only response is found in dataset, a vector of 1's will be used.  
 #' @param paresp Name for the response variable for the presence absence datasets. Defaults to \code{NULL}. Note that this column may also be logical.
 #' @param trialname Name of column in data denoting the number of trials used in a binomial process for the points. Defaults to \code{NULL}.

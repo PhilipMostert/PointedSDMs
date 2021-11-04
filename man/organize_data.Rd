@@ -15,6 +15,7 @@ organize_data(
   marks = FALSE,
   inclmarks = NULL,
   markfamily = "gaussian",
+  pointcovariates = NULL,
   speciesname = NULL,
   ips = NULL,
   mesh = NULL,
@@ -23,7 +24,7 @@ organize_data(
 )
 }
 \arguments{
-\item{...}{Point process datasets with coordinates of species, and optionally marks and covariates explaining the coordinates.}
+\item{...}{Point process datasets with coordinates of species, and optionally marks and covariates explaining the coordinates. May be the dataset objects as \code{SpatialPoints*} or \code{data.frame} objects, or may be a list of \code{SpatialPoints} or \code{data.frame} objects.}
 
 \item{poresp}{Name for the response variable for the presence only datasets. Defaults to \code{NULL}. If no presence only response is found in dataset, a vector of 1's will be used.}
 
@@ -40,6 +41,8 @@ organize_data(
 \item{marks}{Should the model be a marked point process. Defaults to \code{FALSE}.}
 
 \item{markfamily}{Assumed distribution of the marks. May be either a single character string or a named list/vector of each mark's distribution in the form: <mark name> = <distribution family>. Defaults to \code{"gaussian"}.}
+
+\item{pointcovariates}{The names of the non-spatial covariates in the model that are attached to the dataset. Defaults to \code{NULL}.}
 
 \item{speciesname}{Name of the species name variable used in the model. Defaults to \code{NULL}.}
 
