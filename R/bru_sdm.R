@@ -328,11 +328,22 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   
   }
-  else formula <- update(formula, paste0(' ~ . +', paste0(data_names[index],'_intercept'), collapse = ' + '))
-      
+  else
+  if (!is.null(covs))  { 
+  
+  formula <- update(formula, paste0(' ~ . +', paste0(data_names[index],'_intercept'), collapse = ' + '))
+  
+  }
+  else {
+    
+  resp <- as.character(formula)[2]
+  
+  formula <- update(formula, paste(resp, ' ~ ', paste0(data_names[index],'_intercept', collapse = ' + ')))
+    
+  }
+    
   }
   else formula
-  
   
   if (specieseffects) {
     
@@ -364,7 +375,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (data_names[[index]]%in%spatialdatasets) {
     
-  if (is.null(covs) & !pointsintercept) {
+  if (is.null(covs) & ! pointsintercept) {
   
   resp <- as.character(formula)[2]
     
@@ -376,6 +387,14 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }  
     
   }
+  else
+  if (is.null(covs) & ! pointsintercept) {
+      
+  resp <- as.character(formula)[2]
+      
+  formula <- formula(paste(resp, ' ~ +', paste0('~ . +','shared_spatial')))
+      
+  }    
   else formula <- update(formula, paste0('~ . +','shared_spatial'))
 
   }  
@@ -809,7 +828,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   
   names(likelihoods) <- c(data_names,names_marks)
-  
+
   model_joint <- inlabru::bru(components = components_joint,
                               likelihoods, options = options)
 
