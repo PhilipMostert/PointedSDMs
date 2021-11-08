@@ -42,7 +42,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   ##Then add to components_joint
 
   if (class(data)[1] != 'bru_sdm_data') stop('Please supply data formed by the "organize_data" function.')
-  
+
   proj <- data@ips@proj4string
   ##Change covariate coords name prior to running GNC
   coords <- colnames(data@ips@coords)
@@ -93,7 +93,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (!is.null(spatialcovariates)) {
     
-  if (class(spatialcovariates) == 'RasterLayer' | class(spatialcovariates) == 'RasterBrick') {
+  if (class(spatialcovariates) == 'RasterLayer' | class(spatialcovariates) == 'RasterBrick' | class(spatialcovariates) == 'RasterStack') {
       
   spatialcovariates <- as(spatialcovariates, 'SpatialPixelsDataFrame')
       
@@ -111,7 +111,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   spatnames <- names(spatialcovariates@data)
   spatdata_class <- sapply(spatialcovariates@data, class)
-    
+ 
   if (!is.null(covariatestoinclude)) {
       
   spatdata_class <- spatdata_class[spatnames%in%covariatestoinclude] 
@@ -185,7 +185,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   }
   
-  
+ 
   if (is.null(spdemodel)) {
     
   spdemodel <- inla.spde2.matern(data@mesh)
