@@ -12,6 +12,7 @@ Depends:
     INLA,
     inlabru (>= 2.3.1),
     sp (>= 1.4-5),
+    RANN,
     stats
 Imports:
     dplyr,
