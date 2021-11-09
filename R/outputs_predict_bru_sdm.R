@@ -118,9 +118,9 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
   formula_components <- c(covariates, spatial_obj, intercept_obj)
   if (all(is.null(formula_components))) stop('Please specify at least one of: covariates, spatial or intercept.')
   if (is.null(fun) | fun == 'linear') {fun <- ''}
-      
+ 
   formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(formula_components, collapse = ' + '),')'))
-      
+     
   int[[i]] <- predict(object, data = data, formula = formula, n.samples = n.samples, ...)
       
   }
