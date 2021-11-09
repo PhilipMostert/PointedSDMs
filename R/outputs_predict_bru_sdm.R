@@ -6,13 +6,25 @@ setClass('predict_bru_sdm')
 
 #' Predict for bru_sdm
 #' 
+#' @param object A \code{bru_sdm object}.
+#' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
+#' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercept} are not \code{NULL}.
+#' @param mesh An inla.mesh object
+#' @param mask A mask of the study background
+#' @param datasetstopredict A vector of dataset names to predict.
+#' @param species Create plot of species. Note: \code{speciesname} in the \code{organize_data} function needs to be specidied first.
+#' @param covariates Name of covariates to predict.
+#' @param spatial Include spatial effects in prediction.
+#' @param intercept Include intercept in prediction.
+#' @param fun Function used to predict. Set to \code{'linear'} if effects on the linear scale are desired.
+#' @param ... Additional arguments used by the inlabru \code{predict} function.
+#' 
 #' @exportS3Method 
 
 predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL, 
                             mask = NULL, datasetstopredict = NULL, species = FALSE,
                             covariates = NULL, spatial = TRUE,
-                            intercept = FALSE, fun = 'exp',
-                            n.samples = 100, ...) {
+                            intercept = FALSE, fun = 'exp', ...) {
   
   if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
   
@@ -109,7 +121,7 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
   if (!paste0(datasetstopredict[[i]],'_intercept')%in%row.names(object$summary.fixed) & !'intercept'%in%row.names(object$summary.fixed)) stop('Either dataset name is incorrect or bru_sdm model run without intercepts.')
   
   else
-  if(!paste0(datasetstopredict[[i]],'_intercept')%in%row.names(object$summary.fixed)) intercept_obj <- paste0(datasetstopredict[[i]],'_intercept')
+  if(paste0(datasetstopredict[[i]],'_intercept')%in%row.names(object$summary.fixed)) intercept_obj <- paste0(datasetstopredict[[i]],'_intercept')
   
   else intercept_obj <- NULL      
   } 
@@ -121,7 +133,7 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
  
   formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(formula_components, collapse = ' + '),')'))
      
-  int[[i]] <- predict(object, data = data, formula = formula, n.samples = n.samples, ...)
+  int[[i]] <- predict(object, data = data, formula = formula, ...)
       
   }
     
@@ -169,7 +181,7 @@ plot.predict_bru_sdm <- function(x, plotall = TRUE,
                                  datasettoplot = NULL,
                                  whattoplot = c('mean'),
                                  colours = NULL,
-                                 cols = length(whattoplot),
+                                 cols = NULL,
                                  layout = NULL,
                                  plot = TRUE,
                                  ...) {
@@ -228,7 +240,7 @@ plot.predict_bru_sdm <- function(x, plotall = TRUE,
     }
     
     if (plot) {
-      
+      if (is.null(cols)) cols <- length(whattoplot)
       plot_grid <- inlabru::multiplot(plotlist = plot_list, cols = cols, layout = layout)
       
     }
