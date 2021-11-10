@@ -122,16 +122,15 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   if (ncol(dat@data) == 1) names(dat@data) <- paresp
       
   if (!is.null(trialname)) {
-        
+   return(trialname%in%data_vars)
   if (trialname%in%data_vars) attr(dat, 'Ntrials') <- data.frame(dat@data[,trialname])[,1]
   else attr(dat, 'Ntrials') <- NULL
         
   }
-      
+  else attr(dat, 'Ntrials') <- NULL 
+    
   attr(dat, 'family') <- 'binomial'
   attr(dat, 'data_type') <- 'Present absence'
-  attr(dat, 'Ntrials') <- NULL
-      
   dat
       
   }
@@ -215,7 +214,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   if (!all(all_covariates)) stop('All datasets are required to have all the points covariates included.')
     
   }
-  
+  stop(return(data_points))
   names(data_points) <- data_names
   
   if (marks) {
