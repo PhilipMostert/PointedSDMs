@@ -431,20 +431,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   warning("Mesh not provided. Will try to create own mesh.")
     
   #Make mesh same way as PointedSDMs
-  if (is.null(boundary)) {
-      
-  if (inherits(spatialcovariates, "Spatial")) spatcoords <- sp::SpatialPoints(coords = spatialcovariates@coords,
-                                                                              proj4string = proj)
-  else spatcoords <- sp::SpatialPoints(coords = spatialcovariates[,coords],
-                                       proj4string  = proj)
-      
-  bstart <- min(c(diff(sort(unique(spatcoords@coords[,1]))), diff(sort(unique(spatcoords@coords[,2])))))
-      
-  poly.tmp <- rgeos::gBuffer(spatcoords, width=bstart, byid=TRUE)
-      
-  boundary <- rgeos::gBuffer(rgeos::gUnaryUnion(poly.tmp), width=bstart)
-      
-  }
+  if (is.null(boundary)) stop('A boundary is required to create a mesh.')
     
   else {
   if (class(boundary)!="SpatialPolygons") {
