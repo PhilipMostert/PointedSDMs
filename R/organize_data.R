@@ -46,9 +46,9 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   
   if (is.null(mesh)) {
     
-  if (sum(names(meshpars)%in%c( "cut.off", "max.edge", "offset")) < 3)
+  if (sum(names(meshpars)%in%c( "cutoff", "max.edge", "offset")) < 3)
       
-  stop("Meshpars requires three items in a list: cut.off, max.edge and offset.")
+  stop("Meshpars requires three items in a list: cutoff, max.edge and offset.")
     
   }
   
