@@ -214,7 +214,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   if (!all(all_covariates)) stop('All datasets are required to have all the points covariates included.')
     
   }
-  stop(return(data_points))
+
   names(data_points) <- data_names
   
   if (marks) {
