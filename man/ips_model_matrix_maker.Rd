@@ -8,7 +8,7 @@ ips_model_matrix_maker(
   ips,
   covariates,
   species,
-  all_species,
+  allspecies,
   covariatestokeep = NULL,
   componentstokeep = NULL,
   coords,
@@ -23,7 +23,7 @@ ips_model_matrix_maker(
 
 \item{species}{Name of the species variable name used in the model.}
 
-\item{all_species}{If integration points are considered, what are the names of all the species. Defaults to \code{NULL}.}
+\item{allspecies}{If integration points are considered, what are the names of all the species. Defaults to \code{NULL}.}
 
 \item{covariatestokeep}{A vector of covariate names to keep in the model. Defaults to \code{NULL}.}
 

@@ -7,6 +7,7 @@
 model_matrix_maker(
   datasets,
   species,
+  allspecies,
   covariates,
   covariatesbydataset = NULL,
   covariatestokeep = NULL,
@@ -20,6 +21,8 @@ model_matrix_maker(
 \item{datasets}{A list of datasets with a species variable}
 
 \item{species}{Species variable name in the datasets.}
+
+\item{allspecies}{Vector of unique species in the model.}
 
 \item{covariates}{Spatial covariates used in the model.}
 

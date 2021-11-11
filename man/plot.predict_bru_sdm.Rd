@@ -10,7 +10,7 @@
   datasettoplot = NULL,
   whattoplot = c("mean"),
   colours = NULL,
-  cols = length(whattoplot),
+  cols = NULL,
   layout = NULL,
   plot = TRUE,
   ...
