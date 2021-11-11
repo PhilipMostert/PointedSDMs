@@ -195,14 +195,6 @@ plot.predict_bru_sdm <- function(x, plotall = TRUE,
   if (any(!whattoplot%in%c("mean", "sd", "q0.025", "median","q0.975",
                            "smin", "smax", "cv", "var" ))) stop('Whattoplot is not a valid variable to plot')
   
-  if (!is.null(colours)) {
-    
-    plot_colours <- scale_fill_gradientn(colours = rev(brewer.pal(9,colours)),
-                                         limits = range(x[[plotname]]@data[,stat]))
-    
-  }
-  else plot_colours <- NULL
-  
   
   if (length(x) == 1 & names(x) == 'Species predictions') {
     
@@ -211,6 +203,14 @@ plot.predict_bru_sdm <- function(x, plotall = TRUE,
     species_name_var <- names(x[[1]]@data)[sapply(x[[1]]@data, class) == 'character']
     
     species_title <- ggtitle('Plot of the species predictions')
+    
+    if (!is.null(colours)) {
+      
+      plot_colours <- scale_fill_gradientn(colours = rev(brewer.pal(9,colours)),
+                                           limits = range(x[['Species predictions']]@data[,stat]))
+      
+    }
+    else plot_colours <- NULL
     
     plot_grid <- ggplot() + gg(x[[1]], aes_string(fill = whattoplot)) + facet_grid(~ eval(parse(text = species_name_var))) + plot_colours + species_title
     return(plot_grid)
@@ -234,8 +234,16 @@ plot.predict_bru_sdm <- function(x, plotall = TRUE,
       
       if (!plot) prediction_list[[stat]] <- prediction
       
+      if (!is.null(colours)) {
+        
+        plot_colours <- scale_fill_gradientn(colours = rev(brewer.pal(9,colours)),
+                                             limits = range(x[[plotname]]@data[,stat]))
+        
+      }
+      else plot_colours <- NULL
       
-      plot_list[[stat]] <- ggplot() + prediction + title  + plot_colours
+      
+      plot_list[[stat]] <- ggplot() + prediction + title + plot_colours
       
     }
     
