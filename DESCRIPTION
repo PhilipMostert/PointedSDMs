@@ -11,6 +11,8 @@ Depends:
     R (>= 3.5),
     INLA,
     inlabru (>= 2.3.1),
+    dplyr,
+    raster,
     sp (>= 1.4-5),
     RANN,
     stats
