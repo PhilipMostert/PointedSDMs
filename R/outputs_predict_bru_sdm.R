@@ -148,7 +148,7 @@ predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL,
   else {
     
   class(object) <- c('bru','inla','iinla')
-  int <- predict(object, data = data, formula = formula, n.samples = n.samples, ...)
+  int <- predict(object, data = data, formula = formula, ...)
 
   return(int)
     
