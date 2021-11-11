@@ -19,7 +19,7 @@ setClass('predict_bru_sdm')
 #' @param fun Function used to predict. Set to \code{'linear'} if effects on the linear scale are desired.
 #' @param ... Additional arguments used by the inlabru \code{predict} function.
 #' 
-#' @exportS3Method 
+#' @export
 
 predict.bru_sdm <- function(object, data = NULL, formula = NULL, mesh = NULL, 
                             mask = NULL, datasetstopredict = NULL, species = FALSE,
