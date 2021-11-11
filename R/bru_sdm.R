@@ -144,14 +144,19 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   }) 
   
-  data_points <- model_matrix_maker(datasets = data_points, species = species, covariates = spatialcovariates,
-                                    componentstokeep = c(points_response, species, 'weight'), coords = coords,
-                                    attributestokeep = c('Ntrials', 'data_type'), covariatesbydataset = covariatesbydataset,
-                                    proj =  proj)
-  
   all_species <- unlist(species_dataset)
   
   numeric_species <- as.numeric(all_species)
+  
+  data_points <- model_matrix_maker(datasets = data_points, species = species,
+                                    covariates = spatialcovariates,
+                                    allspecies = as.character(unique(all_species)),
+                                    componentstokeep = c(points_response, species, 'weight', pointcovariates_incl),
+                                    coords = coords,
+                                    attributestokeep = c('Ntrials', 'data_type'),
+                                    covariatesbydataset = covariatesbydataset,
+                                    proj =  proj)
+
   
   for (k in 1:length(data_points)) {
       
@@ -170,7 +175,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   }
   
-  data@ips <- ips_model_matrix_maker(ips = data@ips, covariates = spatialcovariates, all_species = as.character(unique(all_species)),
+  data@ips <- ips_model_matrix_maker(ips = data@ips, covariates = spatialcovariates, allspecies = as.character(unique(all_species)),
                                      coords = coords, proj =  proj,
                                      species = species, componentstokeep = c(points_response, species, 'weight'))
   
@@ -346,11 +351,11 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   else formula
   
   if (specieseffects) {
-    
+   
   if (length(unique(all_species)) > 1) {
     
   species_covs <- apply(expand.grid(paste0(species_in,'_'),covs), MARGIN = 1, FUN = paste0,collapse='')
-    
+ 
   if (!identical(species_covs, character(0))) {
       
   for(i in 1:length(species_covs)) {
