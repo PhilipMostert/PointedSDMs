@@ -1,6 +1,7 @@
 
-test_that('organize_data gives the correct output given arguments', {
-  library(testthat)
+
+testthat::test_that('organize_data gives the correct output given arguments', {
+  
  #Arbitrary projection
 projection <- CRS('+proj=tmerc')
 
