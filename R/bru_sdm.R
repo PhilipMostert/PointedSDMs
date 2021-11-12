@@ -13,6 +13,7 @@
 #' @param marksspatial Should spatial effects be used for the marks in the model. Defaults to \code{TRUE}.
 #' @param sharedspatial Should a spatial effect be shared across datasets. Defaults to \code{FALSE}.
 #' @param speciesmodel INLA \code{control.group} model to use. Defaults to \code{list(model = "exchangeable")}.
+#' @param tolerance Tolerance parameter to convert covariates to SpatialPixelsDataFrame. Defaults to \code{NULL}.
 #' @param options INLA or inlabru options to be used in the model.
 #' 
 #' @export
@@ -21,8 +22,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                     covariatesbydataset = NULL, specieseffects = FALSE, pointsintercept = TRUE,
                     marksintercept = TRUE, sharedspatial = FALSE, spdemodel = NULL, 
                     pointsspatial = TRUE, marksspatial = TRUE,
-                    spatialdatasets = NULL,
-                    speciesmodel = list(model = "exchangeable"), options = list()) {
+                    spatialdatasets = NULL, speciesmodel = list(model = "exchangeable"),
+                    tolerance = NULL, options = list()) {
   
   ##Add another argument called ** EXTRA COVARIATES **
   ##ie non-spatial; non-marks values attached to the datasets
@@ -122,10 +123,22 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
     
   for (name in spatnames) {
-      
+  
+  if (is.null(tolerance)) {
+        
   pixels_df <- sp::SpatialPixelsDataFrame(points = spatialcovariates@coords,
                                           data = data.frame(spatialcovariates@data[,name]),
                                           proj4string = proj)
+  
+  } 
+  else {
+    
+  pixels_df <- sp::SpatialPixelsDataFrame(points = spatialcovariates@coords,
+                                          data = data.frame(spatialcovariates@data[,name]),
+                                          proj4string = proj, tolerance = tolerance)  
+    
+  }
+    
   names(pixels_df) <- name
   assign(name,pixels_df)
       
