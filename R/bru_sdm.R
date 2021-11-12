@@ -105,8 +105,19 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   spatialcovariates <- sp::SpatialPointsDataFrame(coords = spatialcovariates[,coords],
                                                   data = spatialcovariates[,!names(spatialcovariates)%in%coords],
                                                   proj4string = proj)
+  
+  if (is.null(tolerance)) {
       
   spatialcovariates <- as(spatialcovariates, 'SpatialPixelsDataFrame')
+  
+  }
+  else {
+    
+  spatialcovariates <- sp::SpatialPixelsDataFrame(points = spatialcovariates@coords,
+                                                  data = spatialcovariates@data,
+                                                  proj4string = proj, tolerance = tolerance)  
+    
+  }
       
   }
   
