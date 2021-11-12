@@ -138,6 +138,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   if (!is.null(species)) {
   
+  if (specieseffects) {  
+    
   species_dataset <- lapply(data_points, function(data) {
     
   data@data[,species]  
@@ -178,7 +180,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   data@ips <- ips_model_matrix_maker(ips = data@ips, covariates = spatialcovariates, allspecies = as.character(unique(all_species)),
                                      coords = coords, proj =  proj,
                                      species = species, componentstokeep = c(points_response, species, 'weight'))
-  
+  }
+    
   } else specieseffects <- FALSE
   
   if (!is.null(pointcovariates_incl)) {
