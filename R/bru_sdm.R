@@ -216,8 +216,15 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                                      coords = coords, proj =  proj,
                                      species = species, componentstokeep = c(points_response, species, 'weight'))
   }
+  else species <- NULL
     
-  } else specieseffects <- FALSE
+  } 
+  else {
+    
+  specieseffects <- FALSE
+  species_dataset <- NULL
+
+  }
   
   if (!is.null(pointcovariates_incl)) {
   
@@ -295,7 +302,6 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
     
   }
-  
   #form_elements <- gsub(" *\\(.*?\\) *", "",components_joint)
   formula <- formula_maker(response = points_response_variables, dataset = data_names,
                            covariates = spatnames, pointsspatial = pointsspatial,
