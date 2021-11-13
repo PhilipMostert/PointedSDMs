@@ -52,7 +52,15 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   data_names <- names(data_points)
   points_family <- sapply(data_points, function(data) attributes(data)$family)
   points_response <- attributes(data)$Points_response
-  
+  points_response_variables <- sapply(data_points, function(data) {
+    
+    if(attributes(data)$family == 'cp') return('coordinates')
+    else
+    if(attributes(data)$family == 'binomial') return(points_response[2])
+    else return(points_response[1])
+    
+  })
+
   if (!is.null(spatialdatasets)) {
     
   if (!all(spatialdatasets%in%data_names)) stop('At least one of the datasets speciefied to include spatial effects were not included in the model.')  
@@ -68,6 +76,9 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   response_marks <- attributes(data)$Mark_response
   multinom_incl <- attributes(data)$Multinom_incl
   multinom_vars <- attributes(data)$Multinom_vars
+  marks_name <- sapply(data_marks, function(x) attributes(x)$mark_name)
+  mark_type <- sapply(data_marks, function(x) attributes(x)$data_type)
+  mark_phi <- sapply(data_marks, function(x) attributes(x)$phi)
     
   }
   else {
@@ -286,7 +297,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   
   #form_elements <- gsub(" *\\(.*?\\) *", "",components_joint)
-  formula <- formula_maker(response = points_response, dataset = dataset_names,
+  formula <- formula_maker(response = points_response_variables, dataset = data_names,
                            covariates = spatnames, pointsspatial = pointsspatial,
                            pointsintercept = pointsintercept,
                            spatialdatasets = spatialdatasets, covariatesbydataset = covariatesbydataset,
@@ -338,116 +349,15 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   
   if (attributes(data)$Marks) {
-    
-  formula_marks <- list()
+  
   likelihoods_marks <- list()
-    
-  for (i in 1:length(response_marks)) {
-    
-  if (!is.null(covariatesbydataset)) {
-    
-  ## Add another if statement here:
-    # If name of mark is in the covariatesbydataset
-    # Then select those covariates for the mark
-    # Else if the dataset is part of the name
-    # Then select those covariates
-    # Need to change the defense above such that it also includes mark names
-      
-  if (gsub('_.*$',"",names(data_marks)[[i]])%in%names(covariatesbydataset)) {
-    
-  markscovs <- covariatesbydataset[[gsub('_.*$',"",names(data_marks)[[i]])]]  
-    
-  } else markscovs <- spatnames
   
-  } else markscovs <- spatnames
+  formula_marks <- mark_formula_maker(responsemarks = response_marks, namesdatasetmarks = names_marks,
+                                      marksname = marks_name, covariates = spatnames,
+                                      covariatesbydataset = covariatesbydataset, marksspatial = marksspatial,
+                                      sharedspatial = sharedspatial, spatialdatasets = spatialdatasets,
+                                      marksintercept = marksintercept, marktype = mark_type, markphi = mark_phi)
   
-  if (is.null(spatnames)) markscovs <- '.'
-    
-  formula_marks[[i]] <- formula(paste0(c(response_marks[i],'~',paste(markscovs, collapse = ' + ')),collapse = " "))
-      
-  if (markscovs == '.') markscovs <- NULL
-  
-  if (marksspatial) {
-    
-  if (sharedspatial) {
-    
-  if (!is.null(spatialdatasets)) {
-  
-  if (gsub('_.*$',"",names(data_marks)[[i]])%in%spatialdatasets) {
-      
-  if (is.null(markscovs)) {
-    
-  formula_marks[[i]] <- formula(paste(response_marks[i], ' ~ + shared_spatial'))  
-    
-  }
-  else formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",'shared_spatial'))
-      
-  }   
-    
-  }
-  else
-  if (is.null(markscovs)) {
-  
-  formula_marks[[i]] <- formula(paste(response_marks[i], ' ~ + shared_spatial'))  
-  
-  }
-  else formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",'shared_spatial'))
- 
-  }
-  else
-  if (!is.null(spatialdatasets)) {
-  
-  if (gsub('_.*$',"",names(data_marks)[[i]])%in%spatialdatasets) {
-    
-  if (is.null(markscovs)) {
-   
-  formula(paste(response_marks[i], ' ~ + ',paste0(names(data_marks)[[i]],'_spde')))   
-    
-  }
-  else formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",names(data_marks)[[i]],'_spde'))
-    
-  }
-    
-  }  
-  else
-  if (is.null(markscovs)) {
-    
-  formula(paste(response_marks[i], ' ~ + ',paste0(names(data_marks)[[i]],'_spde')))   
-  
-  }  
-  else formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",names(data_marks)[[i]],'_spde'))
-        
-  }
-      
-  if (marksintercept) {
-        
-  if (attributes(data_marks[[i]])$data_type != 'Multinomial mark') {
-  
-  if (is.null(markscovs) & !marksspatial) {
-    
-  formula_marks[[i]] <- formula(paste(response_marks[i], ' ~ + ',paste0(names(data_marks)[[i]],'_intercept')))  
-    
-  }
-  else formula_marks[[i]] <- update(formula_marks[[i]],paste0('. ~ . +', paste0(names(data_marks)[[i]],'_intercept'), collapse = ' + '))
-          
-  }
-        
-  }
-      
-  if (attributes(data_marks[[i]])$data_type == 'Multinomial mark') {
-    
-  if (is.null(markscovs) & !marksspatial) {
-      
-  formula_marks[[i]] <- formula(paste0(paste0(names_marks[i],'_response'), ' ~ +',  paste(attributes(data_marks[[i]])$mark_name, attributes(data_marks[[i]])$phi, sep = ' + ')))
-      
-  }
-        
-  formula_marks[[i]] <- update(formula_marks[[i]], paste0(paste0(names_marks[i],'_response'), ' ~ . + ', paste(attributes(data_marks[[i]])$mark_name, attributes(data_marks[[i]])$phi, sep = ' + ')))
-        
-  }
-      
-  }
-    
   include_marks <- list()
     
   for (i in 1:length(formula_marks)) {
