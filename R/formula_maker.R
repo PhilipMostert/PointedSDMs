@@ -213,7 +213,7 @@ formula_maker <- function(response,
 #' 
 #' @export
 
-mark_formuka_maker <- function(responsemarks,
+mark_formula_maker <- function(responsemarks,
                                namesdatasetmarks,
                                marksname,
                                covariates,
