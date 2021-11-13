@@ -196,4 +196,138 @@ formula_maker <- function(response,
   return(formula)
   
 }
+
+
+#' Function to make formulas for the marks
+#' @param responsemarks Names of the response variables for the marks.
+#' @param namesdatasetmarks Names of the datasets of the marks. In the form: 'dataset','_','mark'.
+#' @param marksname The name of the marks.
+#' @param covariates The names of the covariates used in the model.
+#' @param covariatesbydataset Are there specific covariates for specific datasets.
+#' @param marksspatial Are spatial effects considered for the marks.
+#' @param sharedspatial Are the spatial effects shared across the marks.
+#' @param spatialdatasets Which datasets should have spatial effects.
+#' @param marksintercept Are intercepts run for the marks.
+#' @param marktype What is the marks type.
+#' @param markphi Phi variable for mark if multinomial.
+#' 
+#' @export
+
+mark_formuka_maker <- function(responsemarks,
+                               namesdatasetmarks,
+                               marksname,
+                               covariates,
+                               covariatesbydataset,
+                               marksspatial,
+                               sharedspatial,
+                               spatialdatasets,
+                               marksintercept,
+                               marktype,
+                               markphi) {
   
+  formula_marks <- list()
+  
+  for (i in 1:length(responsemarks)) {
+    
+  if (!is.null(covariatesbydataset)) {
+      
+  if (gsub('_.*$',"",namesdatasetmarks)%in%names(covariatesbydataset)) {
+        
+  markscovs <- covariatesbydataset[[gsub('_.*$',"",namesdatasetmarks[[i]])]]  
+        
+  } 
+  else markscovs <- covariates
+      
+  } 
+  else markscovs <- covariates
+    
+  if (is.null(covariates)) markscovs <- '.'
+    
+  formula_marks[[i]] <- formula(paste0(c(responsemarks[i],'~',paste(markscovs, collapse = ' + ')),collapse = " "))
+    
+  if (markscovs == '.') markscovs <- NULL
+    
+  if (marksspatial) {
+      
+  if (sharedspatial) {
+        
+  if (!is.null(spatialdatasets)) {
+          
+  if (gsub('_.*$',"",namesdatasetmarks[[i]])%in%spatialdatasets) {
+            
+  if (is.null(markscovs)) {
+              
+  formula_marks[[i]] <- formula(paste(responsemarks[i], ' ~ + shared_spatial'))  
+              
+  }
+  else formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",'shared_spatial'))
+            
+  }   
+          
+  }
+  else
+  if (is.null(markscovs)) {
+            
+  formula_marks[[i]] <- formula(paste(responsemarks[i], ' ~ + shared_spatial'))  
+            
+  }
+  else formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",'shared_spatial'))
+        
+  }
+  else
+  if (!is.null(spatialdatasets)) {
+          
+  if (gsub('_.*$',"",namesdatasetmarks[[i]])%in%spatialdatasets) {
+            
+  if (is.null(markscovs)) {
+              
+  formula(paste(responsemarks[i], ' ~ + ',paste0(namesdatasetmarks[[i]],'_spde')))   
+              
+  }
+  else formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",namesdatasetmarks[[i]],'_spde'))
+            
+  }
+          
+  }  
+  else
+  if (is.null(markscovs)) {
+          
+  formula(paste(responsemarks[i], ' ~ + ',paste0(namesdatasetmarks[[i]],'_spde')))   
+          
+  }  
+  else formula_marks[[i]] <- update(formula_marks[[i]], paste0(" . ~ . +",namesdatasetmarks[[i]],'_spde'))
+      
+  }
+  
+  if (marksintercept) {
+      
+  if (marktype != 'Multinomial mark') {
+        
+  if (is.null(markscovs) & !marksspatial) {
+          
+  formula_marks[[i]] <- formula(paste(responsemarks[i], ' ~ + ',paste0(namesdatasetmarks[[i]],'_intercept')))  
+          
+  }
+  else formula_marks[[i]] <- update(formula_marks[[i]],paste0('. ~ . +', paste0(namesdatasetmarks[[i]],'_intercept'), collapse = ' + '))
+        
+  }
+      
+  }
+    
+  if (marktype == 'Multinomial mark') {
+      
+  if (is.null(markscovs) & !marksspatial) {
+        
+  formula_marks[[i]] <- formula(paste0(paste0(namesdatasetmarks[[i]],'_response'), ' ~ +',  paste(marksname, markphi, sep = ' + ')))
+        
+  }
+      
+  formula_marks[[i]] <- update(formula_marks[[i]], paste0(paste0(namesdatasetmarks[[i]],'_response'), ' ~ . + ', paste(marksname, markphi, sep = ' + ')))
+      
+  }
+    
+  }
+  
+  return(formula_marks)
+  
+}
