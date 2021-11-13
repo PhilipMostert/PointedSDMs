@@ -18,6 +18,7 @@ bru_sdm(
   marksspatial = TRUE,
   spatialdatasets = NULL,
   speciesmodel = list(model = "exchangeable"),
+  tolerance = NULL,
   options = list()
 )
 }
@@ -47,6 +48,8 @@ bru_sdm(
 \item{spatialdatasets}{A vector of which datasets have spatial effects. Defaults to \code{NULL} which implies all datasets have spatial effects.}
 
 \item{speciesmodel}{INLA \code{control.group} model to use. Defaults to \code{list(model = "exchangeable")}.}
+
+\item{tolerance}{Tolerance parameter to convert covariates to SpatialPixelsDataFrame. Defaults to \code{NULL}.}
 
 \item{options}{INLA or inlabru options to be used in the model.}
 }
