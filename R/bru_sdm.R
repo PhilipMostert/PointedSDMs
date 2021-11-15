@@ -305,7 +305,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   #form_elements <- gsub(" *\\(.*?\\) *", "",components_joint)
   formula <- formula_maker(response = points_response_variables, dataset = data_names,
                            covariates = spatnames, pointsspatial = pointsspatial,
-                           pointsintercept = pointsintercept,
+                           pointsintercept = pointsintercept, sharedspatial = sharedspatial,
                            spatialdatasets = spatialdatasets, covariatesbydataset = covariatesbydataset,
                            species = species, speciesdataset = species_dataset,
                            pointcovariates = pointcovariates_incl)
