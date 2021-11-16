@@ -231,7 +231,12 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   
   }
-  else species <- NULL
+  else {
+  
+  warning(cat('Species were specified in organize_data but specieseffects is FALSE. No species effects will be run.'))
+  species <- NULL    
+    
+  } 
     
   } 
   else {
@@ -258,7 +263,9 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   else
     
-  if (is.list(spdemodel[[1]])) { 
+  if (is.list(spdemodel[[1]])) {
+    
+  if (sharedspatial) stop('A list of SPDE models was provided but shared spatial was set to TRUE. Please only use one SPDE model with class inla.spde.')  
       
   if (length(names(spdemodel)) > 1) {
         
@@ -317,7 +324,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
     
   }
-  #form_elements <- gsub(" *\\(.*?\\) *", "",components_joint)
+  
   formula <- formula_maker(response = points_response_variables, dataset = data_names,
                            covariates = spatnames, pointsspatial = pointsspatial,
                            pointsintercept = pointsintercept, sharedspatial = sharedspatial,
@@ -347,7 +354,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
     
   likelihoods <- inlabru::like_list(lhoods)
     
-  if (length(points_family) > 1) { #Better way of doing this??
+  if (length(points_family) > 1) {
       
   for (j in 2:length(points_family)) {
         
