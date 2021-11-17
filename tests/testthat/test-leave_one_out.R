@@ -49,14 +49,18 @@ testthat::test_that('Test that leave_one out works properly.', {
                         tolerance = 0.2, specieseffects = TRUE,
                         options = list(control.inla = list(int.strategy = 'eb')))
   
-  ebird_out_2 <- leave_one_out(model = integrated_model, dataset = 'ebird')
+  ebird_out_2 <- leave_one_out(model = integrated_model_2, dataset = 'ebird')
   
   ##Should leave out all the components related to ebird.
   expect_false('ebird_species_intercept'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
   expect_false('ebird_species_Altitude'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
   expect_false('ebird_species_NPP'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
   expect_false('ebird_species_Forest'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
+
+  expect_true('parks_species_intercept'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
+  expect_true('parks_species_Altitude'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
+  expect_true('parks_species_NPP'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
+  expect_true('parks_species_Forest'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
   
+  })
   
-    
-})
