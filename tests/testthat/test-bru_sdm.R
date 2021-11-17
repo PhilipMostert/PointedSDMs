@@ -1,5 +1,3 @@
-
-
 testthat::test_that('Test that bru_sdm creates desired outputs based on different arguments', {
   
   ##Use data from PointedSDMs
@@ -68,7 +66,7 @@ testthat::test_that('Test that bru_sdm creates desired outputs based on differen
   expect_false('Forest'%in%integrated_model_diff_covs$bru_info$lhoods$parks$include_components)
   expect_true('NPP'%in%integrated_model_diff_covs$bru_info$lhoods$parks$include_components)
   
-  ##Test species effects are included
+  #Test species effects are included
   
   integrated_model_species <- bru_sdm(data_to_use, 
                               spatialcovariates = SolTin_covariates,
@@ -77,9 +75,9 @@ testthat::test_that('Test that bru_sdm creates desired outputs based on differen
                               tolerance = 0.2)
   
   expect_true('species_spde'%in%names(integrated_model_species$summary.random))
-  expect_false(c('ebird_species_Forest','parks_species_Forest')%in%names(integrated_model_species$summary.fixed))
-  expect_false(c('ebird_species_NPP','parks_species_NPP')%in%names(integrated_model_species$summary.fixed))
-  expect_true(c('ebird_species_Altitude ','parks_species_Altitude')%in%names(integrated_model_species$summary.fixed))
+  expect_true(all(c('ebird_species_Forest','parks_species_Forest')%in%row.names(integrated_model_species$summary.fixed)))
+  expect_true(all(c('ebird_species_NPP','parks_species_NPP')%in%row.names(integrated_model_species$summary.fixed)))
+  expect_true(all(c('ebird_species_Altitude','parks_species_Altitude')%in%row.names(integrated_model_species$summary.fixed)))
   
   
   })
