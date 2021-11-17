@@ -8,7 +8,7 @@ testthat::test_that('Test that bru_sdm creates desired outputs based on differen
   library(sp)
   
   Projection <- CRS("+proj=longlat +ellps=WGS84")
-  Meshpars <- list(cutoff=0.8, max.edge=c(1, 3), offset=c(1,1))
+  Meshpars <- list(cutoff=5, max.edge=c(5, 10), offset=c(1,1))
   
   ebird <- PointedSDMs::SolTin_ebird
   parks <- PointedSDMs::SolTin_parks
