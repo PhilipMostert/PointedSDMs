@@ -37,7 +37,7 @@ testthat::test_that('Test that bru_sdm creates desired outputs based on differen
   expect_equal(class(integrated_model), c("bru_sdm", "bru", "iinla", "inla"))
   
   #Test that each dataset has own spde
-  expect_true(c('ebird_spde','parks_spde')%in%names(integrated_model$summary.random))
+  expect_true(all(c('ebird_spde','parks_spde')%in%names(integrated_model$summary.random)))
   
   #Test that link function is picked up
   expect_setequal(unlist(integrated_model$bru_sdm_options$control.family), c('default', 'cloglog'))
