@@ -1,5 +1,3 @@
-
-
 testthat::test_that('Test that formula_maker makes formulas given differnt arguments', {
   
   #Arbitrary projection

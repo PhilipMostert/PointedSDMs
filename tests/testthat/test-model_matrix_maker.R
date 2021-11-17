@@ -1,5 +1,3 @@
-
-
 testthat::test_that('Test model_matrix_maker makes a matrix of covariate effects for each species', {
   
   ##Use PointedSDMs

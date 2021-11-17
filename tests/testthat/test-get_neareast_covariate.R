@@ -1,5 +1,3 @@
-
-
 testthat::test_that('Test that get_nearest_covariate returns non-null covariates at each data point', {
   
   ##Use data from PointedSDMs

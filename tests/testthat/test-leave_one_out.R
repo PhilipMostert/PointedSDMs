@@ -1,5 +1,3 @@
-
-
 testthat::test_that('Test that leave_one out works properly.', {
   
   ##Use data from PointedSDMs
@@ -8,7 +6,7 @@ testthat::test_that('Test that leave_one out works properly.', {
   library(sp)
   
   Projection <- CRS("+proj=longlat +ellps=WGS84")
-  Meshpars <- list(cutoff=0.8, max.edge=c(1, 3), offset=c(1,1))
+  Meshpars <- list(cutoff=5, max.edge=c(5, 10), offset=c(1,1))
   
   ebird <- PointedSDMs::SolTin_ebird
   parks <- PointedSDMs::SolTin_parks
@@ -33,7 +31,8 @@ testthat::test_that('Test that leave_one out works properly.', {
   
   integrated_model <- bru_sdm(data_to_use, 
                               spatialcovariates = SolTin_covariates, 
-                              tolerance = 0.2)
+                              tolerance = 0.2,
+                              options = list(control.inla = list(int.strategy = 'eb')))
 
   ##Test leaving out ebird dataset
   ebird_out <- leave_one_out(model = integrated_model, dataset = 'ebird',
@@ -41,7 +40,23 @@ testthat::test_that('Test that leave_one out works properly.', {
   
   ##
   expect_false('ebird'%in%names(ebird_out$Leaving_out_ebird$dataset_names))
+  expect_false('ebird'%in%names(ebird_out$Leaving_out_ebird$bru_info$lhoods))
   expect_length(ebird_out$Leaving_out_ebird$.args$control.family, 1)
+  
+  ##Run model with species
+  integrated_model_2 <- bru_sdm(data_to_use, 
+                        spatialcovariates = SolTin_covariates, 
+                        tolerance = 0.2, specieseffects = TRUE,
+                        options = list(control.inla = list(int.strategy = 'eb')))
+  
+  ebird_out_2 <- leave_one_out(model = integrated_model, dataset = 'ebird')
+  
+  ##Should leave out all the components related to ebird.
+  expect_false('ebird_species_intercept'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
+  expect_false('ebird_species_Altitude'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
+  expect_false('ebird_species_NPP'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
+  expect_false('ebird_species_Forest'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
+  
   
     
 })

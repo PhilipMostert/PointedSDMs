@@ -1,5 +1,3 @@
-
-
 testthat::test_that('Test ips_model_matrix_maker makes a matrix for the integration points', {
   
   ##Make integration points

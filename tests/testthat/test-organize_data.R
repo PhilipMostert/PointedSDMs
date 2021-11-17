@@ -1,5 +1,3 @@
-
-
 testthat::test_that('organize_data gives the correct output given arguments', {
   
  #Arbitrary projection
