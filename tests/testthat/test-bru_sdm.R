@@ -78,6 +78,6 @@ testthat::test_that('Test that bru_sdm creates desired outputs based on differen
   expect_true(all(c('ebird_species_Forest','parks_species_Forest')%in%row.names(integrated_model_species$summary.fixed)))
   expect_true(all(c('ebird_species_NPP','parks_species_NPP')%in%row.names(integrated_model_species$summary.fixed)))
   expect_true(all(c('ebird_species_Altitude','parks_species_Altitude')%in%row.names(integrated_model_species$summary.fixed)))
-  
+  expect_output(print(integrated_model_species), 'Summary of the fixed effects for the species:')
   
   })
