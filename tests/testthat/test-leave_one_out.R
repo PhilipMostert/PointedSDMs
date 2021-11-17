@@ -43,6 +43,9 @@ testthat::test_that('Test that leave_one out works properly.', {
   expect_false('ebird'%in%names(ebird_out$Leaving_out_ebird$bru_info$lhoods))
   expect_length(ebird_out$Leaving_out_ebird$.args$control.family, 1)
   
+  expect_output(print(ebird_out), 'Changes in fixed values by leaving out ebird')
+  expect_output(print(ebird_out), 'Leave-one-out cross-validation score:')
+  
   ##Run model with species
   integrated_model_2 <- bru_sdm(data_to_use, 
                         spatialcovariates = SolTin_covariates, 
