@@ -147,7 +147,7 @@ leave_one_out <- function(model, dataset,
   }  
     
   }
-
+  
   model_reduced <- inlabru::bru(components = formula(reduced_components),
                                 model$bru_info$lhoods[index],
                                 options = reduced_options)
