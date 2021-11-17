@@ -24,23 +24,6 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                     pointsspatial = TRUE, marksspatial = TRUE,
                     spatialdatasets = NULL, speciesmodel = list(model = "exchangeable"),
                     tolerance = NULL, options = list()) {
-  
-  ##Add another argument called ** EXTRA COVARIATES **
-  ##ie non-spatial; non-marks values attached to the datasets
-  ##That act as additional covariates within the model
-  ##e.g. effort covariate and coordinates
-  ##Then make go to bru_sdm and add 0's onto the 
-  ##ips such that they are modeled as well.
-  ##Maybe just call it pointcovariates??
-  
-  #if (!is.null(attributes(data)$Pointcovariates)) point_covs_incl <- TRUE
-  #else point_covs_incl <- FALSE
-  
-  ##Go to model matrix maker and say if point_covs_incl add those extra cols??
-  ##Or just do it completely sep; prob easier to just add columns of 0's afterwards
-  
-  ##Then add to formulas
-  ##Then add to components_joint
 
   if (class(data)[1] != 'bru_sdm_data') stop('Please supply data formed by the "organize_data" function.')
 
@@ -223,7 +206,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   else {
     
-  warning(cat('Only one species was found across the datasets. Setting specieseffects to FALSE.'))
+  warning(cat('Only one species was found across the datasets. Setting specieseffects to FALSE.\n'))
   species <- NULL
   specieseffects <- FALSE
   species_dataset <- NULL
@@ -233,7 +216,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   else {
   
-  warning(cat('Species were specified in organize_data but specieseffects is FALSE. No species effects will be run.'))
+  warning(cat('Species were specified in organize_data but specieseffects is FALSE. No species effects will be run.\n'))
   species <- NULL    
     
   } 
