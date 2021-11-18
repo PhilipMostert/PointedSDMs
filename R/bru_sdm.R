@@ -206,7 +206,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   else {
     
-  warning('Only one species was found across the datasets. Setting specieseffects to FALSE.\n',immediate. = TRUE)
+  warning('Only one species was found across the datasets. Setting specieseffects to FALSE.',immediate. = FALSE)
+  cat('\n')
   species <- NULL
   specieseffects <- FALSE
   species_dataset <- NULL
@@ -216,7 +217,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   else {
   
-  warning('Species were specified in organize_data but specieseffects is FALSE. No species effects will be run.\n',immediate. = TRUE)
+  warning('Species were specified in organize_data but specieseffects is FALSE. No species effects will be run.',immediate. = FALSE)
+  cat('\n')
   species <- NULL    
     
   } 
