@@ -69,4 +69,23 @@ expect_equal(attributes(obj)$Points_family, c(PO = 'cp', PA = 'binomial'))
 expect_null(attributes(obj)$Points_trials$PO)
 expect_identical(attributes(obj)$Points_trials$PA, PA$trial)
 
+expect_warning(organize_data(PO, PA, poresp = 'POresp', paresp = 'PAresp',
+                                              trialname = 'trial', coords = colnames(PO@coords), proj = projection,
+                                              marks = TRUE, markfamily = c(mark1 = 'gamma'),
+                                              speciesname = 'species',
+                                              meshpars = list(cutoff=0.8, max.edge=c(1, 3), offset=c(1,1)),
+                                              boundary = SpatialPoly), "Mesh not provided. Will try to create own mesh.")
+expect_warning(organize_data(PO, PA, poresp = 'POresp', paresp = 'PAresp',
+                             trialname = 'trial', coords = colnames(PO@coords), proj = projection,
+                             marks = TRUE, markfamily = c(mark1 = 'gamma'),
+                             speciesname = 'species',
+                             meshpars = list(cutoff=0.8, max.edge=c(1, 3), offset=c(1,1)),
+                             boundary = SpatialPoly), "Integration points not provided. Will try to create own points.")
+expect_warning(organize_data(PO, PA, poresp = 'POresp', paresp = 'PAresp',
+                             trialname = 'trial', coords = colnames(PO@coords), proj = projection,
+                             marks = TRUE, markfamily = c(mark1 = 'gamma'),
+                             speciesname = 'species',
+                             meshpars = list(cutoff=0.8, max.edge=c(1, 3), offset=c(1,1)),
+                             boundary = SpatialPoly), "mark2 has not been assigned a family. Will assign it \"gaussian\".")
+
 })
