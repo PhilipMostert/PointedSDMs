@@ -3,4 +3,3 @@
 ^\.travis\.yml$
 ^appveyor\.yml$
 ^LICENSE\.md$
-*.yml
