@@ -80,4 +80,26 @@ testthat::test_that('Test that bru_sdm creates desired outputs based on differen
   expect_true(all(c('ebird_species_Altitude','parks_species_Altitude')%in%row.names(integrated_model_species$summary.fixed)))
   expect_output(print(integrated_model_species), 'Summary of the fixed effects for the species:')
   
+  
+  ##Make only one species for the two datasets
+  ebird$species <- 'species'
+  parks$species <- 'species'
+  
+  data_to_use <- organize_data(ebird, parks, poresp = 'poresp', paresp = 'Present',
+                               coords = c('X','Y'), proj = Projection,
+                               boundary = region.polygon, meshpars = Meshpars,
+                               speciesname = 'species')
+  
+  
+  expect_warning(bru_sdm(data_to_use, 
+                         spatialcovariates = SolTin_covariates,
+                         sharedspatial = TRUE,
+                         specieseffects = TRUE,
+                         tolerance = 0.2), 'Only one species was found across the datasets. Setting specieseffects to FALSE.')
+  expect_warning(bru_sdm(data_to_use, 
+                         spatialcovariates = SolTin_covariates,
+                         sharedspatial = TRUE,
+                         specieseffects = FALSE,
+                         tolerance = 0.2), 'Species were specified in organize_data but specieseffects is FALSE. No species effects will be run.')
+  
   })
