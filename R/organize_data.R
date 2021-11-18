@@ -37,7 +37,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   
   if (!is.null(inclmarks) & !marks) {
     
-  warning('Marks is set to false but inclmarks is non-null. Setting marks to TRUE.', immediate. = TRUE)
+  warning('Marks is set to false but inclmarks is non-null. Setting marks to TRUE.', immediate. = FALSE)
   cat('\n')
   marks <- TRUE
     
@@ -96,7 +96,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   
   if (length(data_names) != length(datasets)) {
     
-  warning('Issues with naming the datasets from a list. Will create generic dataset names.', immediate. = TRUE)
+  warning('Issues with naming the datasets from a list. Will create generic dataset names.', immediate. = FALSE)
   cat('\n')
   data_names <- paste0('dataset_',seq_len(length(datasets))) ## Fix this  
     
@@ -308,7 +308,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   }
   else {  
                     
-  warning(paste(names[j], ' has not been assigned a family. Will assign it "gaussian".'), immediate. = TRUE)
+  warning(paste(names[j], ' has not been assigned a family. Will assign it "gaussian".'), immediate. = FALSE)
   cat('\n')
   attr(mark,'family') <- 'gaussian'
   attr(mark,'data_type') <- 'Gaussian'    
@@ -433,7 +433,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   
   if (is.null(mesh)) {
     
-  warning("Mesh not provided. Will try to create own mesh.", immediate. = TRUE)
+  warning("Mesh not provided. Will try to create own mesh.", immediate. = FALSE)
   cat('\n')
     
   #Make mesh same way as PointedSDMs
@@ -466,7 +466,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   
   if (is.null(ips)) {
     
-  warning('Integration points not provided. Will try to create own points.',immediate. = TRUE)
+  warning('Integration points not provided. Will try to create own points.', immediate. = FALSE)
   cat('\n')
     
   ips <- inlabru::ipoints(samplers = boundary,
