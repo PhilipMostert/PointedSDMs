@@ -65,5 +65,19 @@ testthat::test_that('Test that leave_one out works properly.', {
   expect_true('parks_species_NPP'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
   expect_true('parks_species_Forest'%in%row.names(ebird_out_2$Leaving_out_ebird$summary.fixed))
   
+  ##Test with different covariate values
+  
+  integrated_model_3 <- bru_sdm(data_to_use, 
+                                spatialcovariates = SolTin_covariates, 
+                                tolerance = 0.2,
+                                covariatesbydataset = c(ebird = 'Forest', parks = 'NPP'),
+                                options = list(control.inla = list(int.strategy = 'eb')))
+  
+  ebird_out_3 <- leave_one_out(model = integrated_model_3, dataset = 'ebird')
+  
+  expect_true('NPP'%in%row.names(ebird_out_3$Leaving_out_ebird$summary.fixed))
+  expect_false('Forest'%in%row.names(ebird_out_3$Leaving_out_ebird$summary.fixed))
+  
+  
   })
   
