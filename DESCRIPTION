@@ -3,7 +3,8 @@ Type: Package
 Title: Fit Models derived from Point Processes to Species Distributions using
     inlabru.
 Version: 1.00
-Author: Philip Mostert <philip.s.mostert@ntnu.no>
+Author: Philip Mostert
+Maintainer: Philip Mostert <philip.s.mostert@ntnu.no>
 URL: https://github.com/PhilipMostert/inlabru_SDMs
 BugReports: https://github.com/PhilipMostert/inlabru_SDMs/issues
 Description: A package to fit models based on point processes to a variety of data types.
@@ -21,3 +22,4 @@ Imports:
     rgeos,
     sp
 RoxygenNote: 7.1.2
+License: GPL (>= 3)
