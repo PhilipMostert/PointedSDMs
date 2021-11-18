@@ -308,7 +308,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   }
   else {  
                     
-  warning(paste(names[j], ' has not been assigned a family. Will assign it "gaussian".'), immediate. = FALSE)
+  warning(paste(names[j], 'has not been assigned a family. Will assign it "gaussian".'), immediate. = FALSE)
   cat('\n')
   attr(mark,'family') <- 'gaussian'
   attr(mark,'data_type') <- 'Gaussian'    
