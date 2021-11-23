@@ -129,7 +129,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
       
   if (ncol(dat@data) == 1) names(dat@data) <- paresp
   
-  if (is.logical(dat@data[,paresp])) dat@data[,paresp] <- as.numeric(dat@data[,paresp])
+  if (is.logical(dat@data[,paresp])) stop('Your present absence response should be numerical.')#dat@data[,paresp] <- as.numeric(dat@data[,paresp])
       
   if (!is.null(trialname)) {
    
