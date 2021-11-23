@@ -67,7 +67,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   
     } else data_list <- FALSE
 
-  if (any(!datasets_class%in%c('SpatialPointsDataFrame','SpatialPoints', 'data.frame'))) {
+  if (any(!unlist(datasets_class)%in%c('SpatialPointsDataFrame','SpatialPoints', 'data.frame'))) {
     
   stop('Datasets need to be either a SpatialPoints* object or a data frame.')
     
@@ -129,7 +129,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
       
   if (ncol(dat@data) == 1) names(dat@data) <- paresp
   
-  if (is.logical(dat@data[,paresp])) stop('Your present absence response should be numerical.')#dat@data[,paresp] <- as.numeric(dat@data[,paresp])
+  #if (is.logical(dat@data[,paresp])) stop('Your present absence response should be numerical.')#dat@data[,paresp] <- as.numeric(dat@data[,paresp])
       
   if (!is.null(trialname)) {
    
