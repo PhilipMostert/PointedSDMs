@@ -59,11 +59,13 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   
   if (length(datasets_class) == 1 & class(datasets_class) == 'list') {
 
+  data_names <- unlist(lapply(datasets, function(x) names(x)))
+    
   datasets <- unlist(datasets)
   datasets_class <- lapply(datasets, class)
   data_list <- TRUE
   
-  } else data_list <- FALSE
+    } else data_list <- FALSE
 
   if (any(!datasets_class%in%c('SpatialPointsDataFrame','SpatialPoints', 'data.frame'))) {
     
@@ -89,6 +91,8 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   
   if (data_list) {
   
+  if (is.null(data_names)) { 
+    
   data_names <-  setdiff(gsub('list[(]|[)]','',as.character(match.call(expand.dots=TRUE))), 
                         gsub('list[(]|[)]','',as.character(match.call(expand.dots=FALSE))))
 
@@ -100,6 +104,8 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   cat('\n')
   data_names <- paste0('dataset_',seq_len(length(datasets))) ## Fix this  
     
+  }
+  
   }
   
   }
