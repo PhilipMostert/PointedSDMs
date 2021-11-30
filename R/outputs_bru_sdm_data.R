@@ -11,6 +11,7 @@ setClassUnion("listorNULL", c('list','NULL'))
 setClass('bru_sdm_data', 
          slots = c(PO_data = 'listorNULL',
                    PA_data = 'listorNULL',
+                   Count_data = 'listorNULL',
                    Mark_data = 'listorNULL',
                    ips = 'SpatialPointsDataFrame',
                    mesh = 'inla.mesh'))
@@ -52,6 +53,18 @@ setMethod('show', 'bru_sdm_data',
               names(PO_data) <- c('Name:','','# of observations:')
               print.data.frame(PO_data[,1:3], row.names = FALSE, right = FALSE)
               cat('\n')
+              
+            }
+            
+            if (!is.null(x@Count_data)) {
+              
+              cat('Count datasets:\n\n')
+              Count_data <- data.frame(c('-----',names(x@Count_data)),
+                                    c('',rep('|  ---  |', length(x@Count_data))),
+                                    c('------------------',unlist(lapply(x@Count_data, function(dat) nrow(dat@coords)))))
+              names(Count_data) <- c('Name:','','# of observations:')
+              print.data.frame(Count_data[,1:3], row.names = FALSE, right = FALSE)
+              cat('\n')  
               
             }
             #else {
