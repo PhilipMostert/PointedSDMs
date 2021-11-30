@@ -34,6 +34,8 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   data_points <- append(data@PO_data, data@PA_data)
   data_names <- names(data_points)
   points_family <- sapply(data_points, function(data) attributes(data)$family)
+  
+  #In form: count, po, pa
   points_response <- attributes(data)$Points_response
   points_response_variables <- sapply(data_points, function(data) {
     
@@ -41,7 +43,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   else
   
-  if(attributes(data)$family == 'binomial') return(points_response[2])
+  if(attributes(data)$family == 'binomial') return(points_response[3])
   
   else return(points_response[1])
     
@@ -591,7 +593,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   
   for (i in 1:(length(likelihoods))) {
     
-  if (likelihoods[[i]]$response == points_response[[2]]) options[['control.family']][[i]] <- list(link = 'cloglog')
+  if (likelihoods[[i]]$response == points_response[[3]]) options[['control.family']][[i]] <- list(link = 'cloglog')
     
   else options[['control.family']][[i]] <- list(link = 'default')
     
