@@ -31,10 +31,10 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   ##Change covariate coords name prior to running GNC
   coords <- colnames(data@ips@coords)
   
-  data_points <- append(data@PO_data, data@PA_data)
+  data_points <- c(data@PO_data, data@PA_data, data@Count_data)
+  
   data_names <- names(data_points)
   points_family <- sapply(data_points, function(data) attributes(data)$family)
-  
   #In form: count, po, pa
   points_response <- attributes(data)$Points_response
   points_response_variables <- sapply(data_points, function(data) {
