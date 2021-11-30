@@ -1,7 +1,7 @@
 #' Function to organize data to input into bru_sdm
 #' 
 #' @param ... Point process datasets with coordinates of species, and optionally marks and covariates explaining the coordinates. May be the dataset objects as \code{SpatialPoints*} or \code{data.frame} objects, or may be a list of \code{SpatialPoints} or \code{data.frame} objects.
-#' @param poresp Name for the response variable for the presence only datasets. Defaults to \code{NULL}. If no presence only response is found in dataset, a vector of 1's will be used.  
+#' @param countresp Name for the response variable for the count datasets. Defaults to \code{NULL}.
 #' @param paresp Name for the response variable for the presence absence datasets. Defaults to \code{NULL}. Note that this column may also be logical.
 #' @param trialname Name of column in data denoting the number of trials used in a binomial process for the points. Defaults to \code{NULL}.
 #' @param marktrialname Name of column in data denoting the number of trials used in a binomial process for the points. Defaults to \code{NULL}.
@@ -20,7 +20,7 @@
 #' @export
 
 
-organize_data <- function(..., poresp = NULL, paresp = NULL,
+organize_data <- function(..., countresp = NULL, paresp = NULL,
                           trialname = NULL, marktrialname = NULL,
                           coords = NULL, proj = NULL,
                           marks = FALSE, inclmarks = NULL,
@@ -29,9 +29,9 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
                           ips = NULL, mesh = NULL, meshpars = NULL,
                           boundary = NULL) {
   
-  if (is.null(poresp) | is.null(paresp)) stop('Both poresp and paresp must be non-null.')
+  #if (is.null(poresp) | is.null(paresp)) stop('Both poresp and paresp must be non-null.')
   
-  if (poresp == paresp) stop('Presence only response cannot be the same as present absence response. Please change one of them.')
+  if (countresp == paresp) stop('The count response variable name cannot be the same as present absence response variable name. Please change one of them.')
   
   if (length(coords) != 2) stop('Coordinates needs to have two components')
   
@@ -115,7 +115,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
   data_names <- setdiff(as.character(match.call(expand.dots=TRUE)), 
                         as.character(match.call(expand.dots=FALSE)))
   }
-  
+  poresp <- 'poresp'
   data_points <- lapply(datasets, function(data) {
     
   data <- as.data.frame(data)
@@ -146,7 +146,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
       
   }
   else
-  if (poresp%in%data_vars) {
+  if (countresp%in%data_vars) {
         
   dat <- sp::SpatialPointsDataFrame(coords = data[,coords],
                                     data = data.frame(data[,!data_vars%in%coords]),
@@ -175,7 +175,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
         
   }
   else {
-      
+  
   data[,poresp] <- rep(1,nrow(data))
   data_vars <- c(data_vars,poresp)
       
@@ -240,7 +240,7 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
       
   else {
         
-  names = names(data_points[[i]])[!names(data_points[[i]])%in%c(poresp, paresp, coords, trialname,
+  names <- names(data_points[[i]])[!names(data_points[[i]])%in%c(countresp, poresp, paresp, coords, trialname,
                                                                 speciesname, marktrialname, pointcovariates)]
         
   if (!is.null(inclmarks)) names <- names[names%in%inclmarks]      
@@ -257,8 +257,18 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
             
   if (class_marks[j] == 'character'| class_marks[j] == 'factor') {
               
-  if (attributes(data_points[[i]])$family == 'cp' | attributes(data_points[[i]])$family == 'poisson') mark_response <- data_points[[i]]@data[,poresp]
-              
+  if (attributes(data_points[[i]])$family == 'cp') {
+    
+    mark_response <- data_points[[i]]@data[,poresp]
+    
+  }
+  else
+  if (attributes(data_points[[i]])$family == 'poisson') {
+    
+  mark_response <- data_points[[i]]@data[,countresp]
+    
+  }
+    
   else mark_response <- data_points[[i]]@data[,paresp]
               
   mark <- sp::SpatialPointsDataFrame(coords = coordinates(data_points[[i]]),
@@ -513,8 +523,8 @@ organize_data <- function(..., poresp = NULL, paresp = NULL,
                 Mark_data = data_marks,
                 ips = ips,
                 mesh = mesh)
-  
-  attr(object,'Points_response') <- c(poresp, paresp)
+  ##Maybe need to change this>>
+  attr(object,'Points_response') <- c(countresp, poresp, paresp)
   attr(object,'Points_family') <- sapply(data_points, function(dat) attributes(dat)$family)
   attr(object,'Points_trials') <- lapply(data_points, function(dat) attributes(dat)$Ntrials)
   attr(object,'Points_data_type') <- sapply(data_points, function(dat) attributes(dat)$data_type)
