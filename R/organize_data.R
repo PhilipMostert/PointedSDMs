@@ -29,9 +29,14 @@ organize_data <- function(..., countresp = NULL, paresp = NULL,
                           ips = NULL, mesh = NULL, meshpars = NULL,
                           boundary = NULL) {
   
-  #if (is.null(poresp) | is.null(paresp)) stop('Both poresp and paresp must be non-null.')
+ #if (is.null(poresp) | is.null(paresp)) stop('Both poresp and paresp must be non-null.')
+  if (!is.null(match.call(expand.dots = TRUE)$poresp)) stop('poresp has been depreciated for countresp. Please try again.')
+  #stop(return(exists('poresp')))
+  if (!is.null(countresp) && !is.null(paresp)) {
   
   if (countresp == paresp) stop('The count response variable name cannot be the same as present absence response variable name. Please change one of them.')
+  
+  }
   
   if (length(coords) != 2) stop('Coordinates needs to have two components')
   
