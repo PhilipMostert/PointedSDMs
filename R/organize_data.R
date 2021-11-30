@@ -120,7 +120,10 @@ organize_data <- function(..., countresp = NULL, paresp = NULL,
   data_names <- setdiff(as.character(match.call(expand.dots=TRUE)), 
                         as.character(match.call(expand.dots=FALSE)))
   }
-  poresp <- 'poresp'
+  
+  if (countresp != 'poresp') poresp <- 'poresp'
+  else poresp <- 'responsePO'
+    
   data_points <- lapply(datasets, function(data) {
     
   data <- as.data.frame(data)
