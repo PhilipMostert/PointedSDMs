@@ -6,7 +6,7 @@
 \usage{
 organize_data(
   ...,
-  poresp = NULL,
+  countresp = NULL,
   paresp = NULL,
   trialname = NULL,
   marktrialname = NULL,
@@ -26,7 +26,7 @@ organize_data(
 \arguments{
 \item{...}{Point process datasets with coordinates of species, and optionally marks and covariates explaining the coordinates. May be the dataset objects as \code{SpatialPoints*} or \code{data.frame} objects, or may be a list of \code{SpatialPoints} or \code{data.frame} objects.}
 
-\item{poresp}{Name for the response variable for the presence only datasets. Defaults to \code{NULL}. If no presence only response is found in dataset, a vector of 1's will be used.}
+\item{countresp}{Name for the response variable for the count datasets. Defaults to \code{NULL}.}
 
 \item{paresp}{Name for the response variable for the presence absence datasets. Defaults to \code{NULL}. Note that this column may also be logical.}
 
