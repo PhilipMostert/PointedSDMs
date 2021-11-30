@@ -70,7 +70,7 @@ organize_data <- function(..., countresp = NULL, paresp = NULL,
   datasets_class <- lapply(datasets, class)
   data_list <- TRUE
   
-    } else data_list <- FALSE
+  } else data_list <- FALSE
 
   if (any(!unlist(datasets_class)%in%c('SpatialPointsDataFrame','SpatialPoints', 'data.frame'))) {
     
@@ -504,13 +504,9 @@ organize_data <- function(..., countresp = NULL, paresp = NULL,
   
   #family_index <- sapply(data_points, function(x) attributes(x)$family == 'poisson' | attributes(x)$family == 'cp')
   
-  index_PO <- sapply(data_points, function(x) attributes(x)$data_type == 'Present only')
-  index_PA <- sapply(data_points, function(x) attributes(x)$data_type == 'Present absence')
-  index_count <- sapply(data_points, function(x) attributes(x)$data_type == 'Count data')
-
-  PO_data <- data_points[index_PO]
-  PA_data <- data_points[index_PA]
-  Count_data <- data_points[index_count]
+  PO_data <- data_points[sapply(data_points, function(x) attributes(x)$data_type == 'Present only')]
+  PA_data <- data_points[sapply(data_points, function(x) attributes(x)$data_type == 'Present absence')]
+  Count_data <- data_points[sapply(data_points, function(x) attributes(x)$data_type == 'Count data')]
   
   if (length(PO_data) == 0) PO_data <- NULL
   if (length(PA_data) == 0) PA_data <- NULL
@@ -525,6 +521,7 @@ organize_data <- function(..., countresp = NULL, paresp = NULL,
                 Mark_data = data_marks,
                 ips = ips,
                 mesh = mesh)
+  
   ##Maybe need to change this>>
   attr(object,'Points_response') <- c(countresp, poresp, paresp)
   attr(object,'Points_family') <- sapply(data_points, function(dat) attributes(dat)$family)
