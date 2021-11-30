@@ -121,9 +121,9 @@ organize_data <- function(..., countresp = NULL, paresp = NULL,
                         as.character(match.call(expand.dots=FALSE)))
   }
   
-  if (countresp != 'poresp') poresp <- 'poresp'
-  else poresp <- 'responsePO'
-    
+  if (countresp == 'poresp') poresp <- 'responsePO'
+  else poresp <- 'poresp'
+ 
   data_points <- lapply(datasets, function(data) {
     
   data <- as.data.frame(data)
@@ -160,13 +160,13 @@ organize_data <- function(..., countresp = NULL, paresp = NULL,
                                     data = data.frame(data[,!data_vars%in%coords]),
                                     proj4string = proj)
         
-  if (ncol(dat@data) == 1) names(dat@data) = poresp
+  if (ncol(dat@data) == 1) names(dat@data) = countresp
         
-  if (any(dat@data[,poresp] > 1)) {
+  if (any(dat@data[,countresp] > 1)) {
           
   attr(dat, 'Ntrials') <- NULL
   attr(dat, 'family') <- 'poisson'
-  attr(dat, 'data_type') <- 'Present only abundance'
+  attr(dat, 'data_type') <- 'Count data'
           
   dat
           
@@ -502,32 +502,26 @@ organize_data <- function(..., countresp = NULL, paresp = NULL,
   proj4string(ips) <- proj
   
   
-  family_index <- sapply(data_points, function(x) attributes(x)$family == 'poisson' | attributes(x)$family == 'cp')
+  #family_index <- sapply(data_points, function(x) attributes(x)$family == 'poisson' | attributes(x)$family == 'cp')
   
-  if (any(family_index) & !all(family_index)) {
-    
-  PO_data <- data_points[family_index]
-  PA_data <- data_points[!family_index]
-    
-  }
-  else
-    
-  if (all(family_index)) {
-      
-  PO_data <- data_points
-  PA_data <- NULL
-      
-  }
-  else {
-    
-  PO_data <- NULL
-  PA_data <- data_points
+  index_PO <- sapply(data_points, function(x) attributes(x)$data_type == 'Present only')
+  index_PA <- sapply(data_points, function(x) attributes(x)$data_type == 'Present absence')
+  index_count <- sapply(data_points, function(x) attributes(x)$data_type == 'Count data')
+
+  PO_data <- data_points[index_PO]
+  PA_data <- data_points[index_PA]
+  Count_data <- data_points[index_count]
   
-  }
+  if (length(PO_data) == 0) PO_data <- NULL
+  if (length(PA_data) == 0) PA_data <- NULL
+  if (length(Count_data) == 0) Count_data <- NULL
+  
+  
   
   object <- new('bru_sdm_data',
                 PO_data = PO_data,
                 PA_data = PA_data,
+                Count_data = Count_data,
                 Mark_data = data_marks,
                 ips = ips,
                 mesh = mesh)
