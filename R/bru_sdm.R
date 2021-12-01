@@ -11,7 +11,7 @@
 #' @param spdemodel inla.spde model used in the model. May be a named list where the name of the spde object is the name of the associated dataset. Default \code{NULL} uses \code{inla.spde2.matern}.
 #' @param pointsspatial Should spatial effects be used for the points in the model. Defaults to \code{TRUE}.
 #' @param marksspatial Should spatial effects be used for the marks in the model. Defaults to \code{TRUE}.
-#' @param sharedspatial Should a spatial effect be shared across datasets. Defaults to \code{FALSE}.
+#' @param sharedspatial Should a spatial effect be shared across datasets. Defaults to \code{TRUE}.
 #' @param speciesmodel INLA \code{control.group} model to use. Defaults to \code{list(model = "exchangeable")}.
 #' @param tolerance Tolerance parameter to convert covariates to SpatialPixelsDataFrame. Defaults to \code{NULL}.
 #' @param options INLA or inlabru options to be used in the model.
@@ -20,7 +20,7 @@
 
 bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                     covariatesbydataset = NULL, specieseffects = FALSE, pointsintercept = TRUE,
-                    marksintercept = TRUE, sharedspatial = FALSE, spdemodel = NULL, 
+                    marksintercept = TRUE, sharedspatial = TRUE, spdemodel = NULL, 
                     pointsspatial = TRUE, marksspatial = TRUE,
                     spatialdatasets = NULL, speciesmodel = list(model = "exchangeable"),
                     tolerance = NULL, options = list()) {
