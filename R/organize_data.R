@@ -5,7 +5,7 @@
 #' @param paresp Name for the response variable for the presence absence datasets. Defaults to \code{NULL}. Note that this column may also be logical.
 #' @param trialname Name of column in data denoting the number of trials used in a binomial process for the points. Defaults to \code{NULL}.
 #' @param marktrialname Name of column in data denoting the number of trials used in a binomial process for the points. Defaults to \code{NULL}.
-#' @param coords Vector of the names of the coordinates used in datasets. Defaults to \code{c('X','Y')} (For now should be standardized).
+#' @param coords Vector of the names of the coordinates used in datasets. Defaults to \code{c('Long','Lat')} (For now should be standardized).
 #' @param proj Projection to use if data is not a projection. Defaults to utm (hopefully).
 #' @param marks Should the model be a marked point process. Defaults to \code{FALSE}.
 #' @param inclmarks. A vector of which marks should be included in the model. Defaults to \code{NULL}.
@@ -22,7 +22,7 @@
 
 organize_data <- function(..., countresp = NULL, paresp = NULL,
                           trialname = NULL, marktrialname = NULL,
-                          coords = NULL, proj = NULL,
+                          coords = c('Long','Lat'), proj = NULL,
                           marks = FALSE, inclmarks = NULL,
                           markfamily = 'gaussian', 
                           pointcovariates = NULL, speciesname = NULL,
