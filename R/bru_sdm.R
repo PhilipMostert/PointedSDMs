@@ -25,8 +25,15 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
                     spatialdatasets = NULL, speciesmodel = list(model = "exchangeable"),
                     tolerance = NULL, options = list()) {
 
+  ##Things to do:
+  #Add data to either GitHub or the other data sharing website (osf.io??).
+  #Change pointspatial to a biasfield:: then add bias field...
+   # Maybe even depreciate pointspatial and only keep spatialdatasets (rename to biasfield?)
+  #Change BBS in rmd to count data
+  #Graphical outputs for loo
+  
   if (class(data)[1] != 'bru_sdm_data') stop('Please supply data formed by the "organize_data" function.')
-
+  
   proj <- data@ips@proj4string
   ##Change covariate coords name prior to running GNC
   coords <- colnames(data@ips@coords)
@@ -592,7 +599,7 @@ bru_sdm <- function(data, spatialcovariates = NULL, covariatestoinclude = NULL,
   }
   
   for (i in 1:(length(likelihoods))) {
-    
+    ##Change this; I assume we are using a 'log' link for for all families not binomial?
   if (likelihoods[[i]]$response == points_response[[3]]) options[['control.family']][[i]] <- list(link = 'cloglog')
     
   else options[['control.family']][[i]] <- list(link = 'default')
