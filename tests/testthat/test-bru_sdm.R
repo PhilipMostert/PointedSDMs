@@ -90,7 +90,6 @@ testthat::test_that('Test that bru_sdm creates desired outputs based on differen
                                boundary = region.polygon, meshpars = Meshpars,
                                speciesname = 'species')
   
-  
   expect_warning(bru_sdm(data_to_use, 
                          spatialcovariates = SolTin_covariates,
                          sharedspatial = TRUE,
