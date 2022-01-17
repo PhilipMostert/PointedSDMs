@@ -27,6 +27,9 @@ bruSDM(
   speciesName = NULL
 )
 }
+\arguments{
+\item{speciesName}{}
+}
 \description{
 bruSDM function to ...
 }

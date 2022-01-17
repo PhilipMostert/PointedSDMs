@@ -15,7 +15,6 @@ A data object containing the data and the relevant information about the integra
 \item \href{#method-addData}{\code{dataSDM$addData()}}
 \item \href{#method-spatialCovariates}{\code{dataSDM$spatialCovariates()}}
 \item \href{#method-addBias}{\code{dataSDM$addBias()}}
-\item \href{#method-addOptions}{\code{dataSDM$addOptions()}}
 \item \href{#method-speciesFormula}{\code{dataSDM$speciesFormula()}}
 \item \href{#method-addComponents}{\code{dataSDM$addComponents()}}
 }
@@ -103,15 +102,6 @@ A data object containing the data and the relevant information about the integra
 \subsection{Method \code{addBias()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$addBias(datasetNames = NULL, allPO = FALSE, biasField = NULL)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addOptions"></a>}}
-\if{latex}{\out{\hypertarget{method-addOptions}{}}}
-\subsection{Method \code{addOptions()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$addOptions(...)}\if{html}{\out{</div>}}
 }
 
 }
