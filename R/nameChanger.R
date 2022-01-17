@@ -1,0 +1,37 @@
+#' @description An internal function used to change the name of a variable.
+#' @param data A list of datasets.
+#' @param oldName The old variable name.
+#' @param newName The new variable name.
+
+nameChanger <- function(data, oldName, newName) {
+  
+  lapply(data, function(dat) {
+    
+    if (class(dat) == 'data.frame') {
+      
+      if (oldName %in% names(dat)) {
+        
+        names(dat)[names(dat) == oldName] <- newName
+        dat
+      }
+      else dat
+
+      
+    }
+    else {
+      
+      if (oldName %in% names(dat@data)) {
+        
+        names(dat@data)[names(dat@data) == oldName] <- newName
+        dat
+        
+      }
+      else dat
+      
+    }
+    
+    
+  })
+  
+  
+}
