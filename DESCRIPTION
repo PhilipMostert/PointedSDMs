@@ -18,6 +18,7 @@ Depends:
     RANN,
     stats
 Imports:
+    R6,
     dplyr,
     rgeos,
     sp
