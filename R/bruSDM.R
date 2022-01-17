@@ -15,6 +15,8 @@
 #' @param trialsPA
 #' @param trialsMarks
 #' @param speciesName
+#' 
+#' @export
 
 
 ##Is markFamily even being used??
