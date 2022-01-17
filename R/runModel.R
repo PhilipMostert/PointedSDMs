@@ -1,10 +1,10 @@
 #' @title runModel: function used to run the integrated model.
 #' @param data A bruSDM data file to be used in the integrated model.
-#' @param options A list of INLA options used in the model. ADD
+#' @param options A list of INLA options used in the model.
 #' 
 #' @export
 
-runModel <- function(data) {
+runModel <- function(data, options) {
   
   if (!inherits(data, 'dataSDM')) stop('data needs to be a dataSDM object.')
 
@@ -92,8 +92,10 @@ runModel <- function(data) {
 
   ##For now just set bru_max_iter = 1
   
-  optionsJoint <- data$.__enclos_env__$private$optionsINLA
-  #optionsJoint$bru_max_iter <- 1
+  optionsJoint <- append(data$.__enclos_env__$private$optionsINLA, options)
+  
+  ##For now set bru_max_iter to 1
+  optionsJoint$bru_max_iter <- 1
 
   inlaModel <- inlabru::bru(components = componentsJoint,
                             allLiks, options = optionsJoint)
