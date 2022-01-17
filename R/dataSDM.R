@@ -708,11 +708,11 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
 #' @param ... A list of INLA options.
 
 #Obsolete function? Maybe just add options in runModel
-dataSDM$set('public', 'addOptions', function(...) {
-  
-  private$optionsINLA <- append(private$optionsINLA, ...)
-  
-})
+#dataSDM$set('public', 'addOptions', function(...) {
+#  
+#  private$optionsINLA <- append(private$optionsINLA, ...)
+#  
+#})
 
 
 dataSDM$set('public', 'speciesFormula', function(...) {
