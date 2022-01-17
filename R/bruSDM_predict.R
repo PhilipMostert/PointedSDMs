@@ -124,6 +124,12 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
         } 
         else intercept_obj <- NULL
         
+        if (!is.null(covariates)) {
+          
+          if (speciesin) covariates <- as.vector(outer(paste0(unique(as.character(speciesin)),'_'), model[['spatCovs']][['name']], FUN = 'paste0'))
+          
+        }
+        
         formula_components <- c(covariates, spatial_obj, intercept_obj)
         if (all(is.null(formula_components))) stop('Please specify at least one of: covariates, spatial or intercept.')
         if (is.null(fun) | fun == 'linear') {fun <- ''}
