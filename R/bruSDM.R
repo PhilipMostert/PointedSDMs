@@ -36,10 +36,12 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
   
   if (class(INLAmesh) != 'inla.mesh') stop('INLAmesh needs to be a inla.mesh object.')
   
-  if (length(list(...)) > 0)  dataPoints <- list(...)
+  #if (length(list(...)) > 0)  
+  dataPoints <- list(...)
   
-  if (length(dataPoints) == 0) stop('Please provide data in the ... argument.')
-  
+  #if (length(dataPoints) == 0) stop('Please provide data in the ... argument.')
+  if (length(dataPoints) > 0) {
+    
   datasetClass <- lapply(dataPoints, class)
   
   if (length(datasetClass) == 1 && class(datasetClass) == "list") {
@@ -81,6 +83,8 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                             as.character(match.call(expand.dots = FALSE)))
   }
   
+  } else initialnames <- NULL
+  
   bruData <- dataSDM$new(coordinates = Coordinates, projection = Projection,
                          Inlamesh = INLAmesh, initialnames = initialnames,
                          responsecounts = responseCounts,
@@ -103,7 +107,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
     
     if (is.null(responseCounts) || is.null(responsePA)) stop('One of responseCounts and responsePA are NULL. Both are required arguments.')
     
-    if (!is.null(responsePA) && is.null(trialsPA)) warning('Present absence response name given but trials name is NULL.')
+    #if (!is.null(responsePA) && is.null(trialsPA)) warning('Present absence response name given but trials name is NULL.')
 
    bruData$addData(..., responseCounts = responseCounts,
                     responsePA = responsePA, trialsPA = trialsPA,
