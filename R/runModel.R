@@ -114,7 +114,7 @@ runModel <- function(data, options) {
 
   inlaModel[['componentsJoint']] <- componentsJoint
   inlaModel[['optionsJoint']] <- optionsJoint
-  inlaModel[['source']] <- data$.__enclos_env__$private$dataSource
+  inlaModel[['source']] <- as.vector(unlist(data$.__enclos_env__$private$dataSource))
   inlaModel[['spatCovs']] <- list(name = data$.__enclos_env__$private$spatcovsNames,
                                   class = data$.__enclos_env__$private$ptcovsClass)
   inlaModel[['species']] <- list(speciesIn = data$.__enclos_env__$private$speciesIn,
