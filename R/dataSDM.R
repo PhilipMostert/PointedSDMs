@@ -99,7 +99,7 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
   private$markFamily <- marksfamily
 
   private$pointCovariates <- pointcovariates
-  
+
   if (!is.null(spatialcovariates)) self$spatialCovariates(spatialcovariates)
 
   if (!is.null(ips)) private$IPS <- ips
@@ -475,8 +475,8 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     ##Will need to create a new function which can update the indexing on multinoVars if new data is added...
     for (i in names(pointData$multinomIndex)) {
       
-      if (i %in% names(private$multinomIndex)) private$multinomIndex[[i]] <- c(private$multinomIndex[[i]],unique(unlist(pointData$multinomIndex[[i]])))
-      else private$multinomIndex[[i]] <- unique(unlist(pointData$multinomIndex[[i]]))
+      if (i %in% names(private$multinomIndex)) private$multinomIndex[[i]] <- c(private$multinomIndex[[i]],unique(unlist(pointData$multinomIndex[[i]])))[!is.na(c(private$multinomIndex[[i]],unique(unlist(pointData$multinomIndex[[i]]))))]
+      else private$multinomIndex[[i]] <- unique(unlist(pointData$multinomIndex[[i]]))[!is.na(unique(unlist(pointData$multinomIndex[[i]])))]
       
     }
     
@@ -598,10 +598,10 @@ dataSDM$set('public', 'spatialCovariates', function(spatialCovariates) {
   spatcovsIncl <- names(spatialCovariates)
   
   if (!inherits(spatialCovariates, 'Spatial')) {
-    
+    #This won't work... will have to convert in runModel
     objSpat <- as(spatialCovariates, 'SpatialPixelsDataFrame')
     covsClass <- sapply(objSpat@data, class)
-    
+   
   } else covsClass <- sapply(spatialCovariates@data, class)
   
   if (is.null(private$ptcovsClass))   private$ptcovsClass <- covsClass
