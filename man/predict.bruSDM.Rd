@@ -4,7 +4,7 @@
 \alias{predict.bruSDM}
 \title{Predict for bru_sdm}
 \usage{
-predict.bruSDM(
+\method{predict}{bruSDM}(
   model,
   data = NULL,
   formula = NULL,
