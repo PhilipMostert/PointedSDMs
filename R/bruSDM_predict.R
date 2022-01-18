@@ -9,7 +9,7 @@ setClass('bruSDM_predict')
 #' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
 #' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercept} are not \code{NULL}.
 #' @param mesh An inla.mesh object
-#' @param mask Logical argument to remove pixels that are outside the mesh.
+#' @param mask A mask of the study background. Defaults to \code{NULL}.
 #' @param datasetNames A vector of dataset names to predict.
 #' @param species Create plot of species. Note: \code{speciesname} in the \code{organize_data} function needs to be specidied first.
 #' @param covariates Name of covariates to predict.
@@ -23,7 +23,7 @@ setClass('bruSDM_predict')
 #' 
 
 predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL, 
-                           mask = TRUE, datasetNames = NULL, species = FALSE,
+                           mask = NULL, datasetNames = NULL, species = FALSE,
                            covariates = NULL, spatial = TRUE,
                            intercept = FALSE, fun = 'exp', ...) {
   ##MASK IS NOW LOGICAL???
@@ -43,7 +43,15 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
     
   }
   
-  if (is.null(data)) data <- pixels(mesh, mask = mask)
+  if (is.null(data)) {
+    
+    if (!is.null(mask)) {
+      
+      data <- pixels(mesh, mask = mask)
+      
+    } 
+    
+    else data <- pixels(mesh)
       
   if (is.null(formula)) {
     
@@ -64,7 +72,6 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
       names(speciesData@data) <- c(species_variable, 'weight')
     
       if (is.null(fun) | fun == 'linear') {fun <- ''}
-      
       
       ##How do we do this?? species covs are now: speciesname_covariatename??
       if (!is.null(covariates)) {
