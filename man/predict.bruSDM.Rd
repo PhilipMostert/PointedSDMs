@@ -9,7 +9,7 @@
   data = NULL,
   formula = NULL,
   mesh = NULL,
-  mask = TRUE,
+  mask = NULL,
   datasetNames = NULL,
   species = FALSE,
   covariates = NULL,
@@ -26,7 +26,7 @@
 
 \item{mesh}{An inla.mesh object}
 
-\item{mask}{Logical argument to remove pixels that are outside the mesh.}
+\item{mask}{A mask of the study background. Defaults to \code{NULL}.}
 
 \item{datasetNames}{A vector of dataset names to predict.}
 
