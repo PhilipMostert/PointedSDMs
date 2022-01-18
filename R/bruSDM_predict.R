@@ -49,10 +49,11 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
       
       data <- pixels(mesh, mask = mask)
       
-    } 
-    
+    }   
     else data <- pixels(mesh)
-      
+  }
+ 
+
   if (is.null(formula)) {
     
     int <- list()
@@ -273,5 +274,3 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
   if (!plot) return(all_plots)
   
 }
-
-  
