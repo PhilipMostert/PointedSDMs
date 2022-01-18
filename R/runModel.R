@@ -27,7 +27,7 @@ runModel <- function(data, options) {
     spatCovs <- get(data$.__enclos_env__$private$spatcovsObj, 
                     envir = data$.__enclos_env__$private$spatcovsEnv)
     
-    if (!inherit(spatCovs, 'Spatial')) spatCovs <- as(spatCovs, 'SpatialPixelsDataFrame')
+    if (!inherits(spatCovs, 'Spatial')) spatCovs <- as(spatCovs, 'SpatialPixelsDataFrame')
     
     if (is.null(data$.__enclos_env__$private$speciesIn)) {
     
