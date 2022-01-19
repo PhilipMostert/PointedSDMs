@@ -197,12 +197,12 @@ datasetOut <- function(model, dataset,
         
       }
       
-      #for (data in names(model$bru_info$lhoods[index])) {
+      for (data in names(model$bru_info$lhoods[index])) {
       
-      #reduced_lik[[data]]$data@data['offset'] <- 0
-      #reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
+      reduced_lik[[data]]$data@data['offset'] <- 0
+      reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
 
-      #}
+      }
       offset_components <- update(model$componentsJoint, ~ . + offset)
 
       reduced_mlik <- inlabru::bru(offset_components, reduced_lik,
