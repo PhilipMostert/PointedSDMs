@@ -121,7 +121,8 @@ runModel <- function(data, options) {
                                  speciesVar = data$.__enclos_env__$private$speciesName)
   inlaModel[['dataType']] <- na.omit(c(data$.__enclos_env__$private$printSummary$Type,
                                unlist(unname(data$.__enclos_env__$private$printSummary$marksType))))
-  inlaModel[['multinomVars']] <- data$.__enclos_env__$private$multinomVars
+  inlaModel[['marks']] <- list(marksIn = data$.__enclos_env__$private$printSummary$Marks,
+                                      multinomVars = data$.__enclos_env__$private$multinomVars)
   
   class(inlaModel) <- c('bruSDM', class(inlaModel)) # ie I'm writing an s3 class for this?
   
