@@ -159,8 +159,17 @@ datasetOut <- function(model, dataset,
                                   model$bru_info$lhoods[index],
                                   options = reduced_options)
     
-    model_reduced[['components']] <- reduced_components
+    model_reduced[['componentsJoint']] <- reduced_components
+    model_reduced[['optionsJoint']] <- reduced_options
+    model_reduced[['spatCovs']] <- model[['spatCovs']]
+    model_reduced[['species']] <- list(speciesIn = model[['species']][['speciesIn']][!names(model[['species']][['speciesIn']]) %in% dataset],
+                                       speciesVar = model[['species']][['speciesVar']])
     
+    model_reduced[['dataType']] <- model[['dataType']][index]
+    model_reduced[['source']] <- model[['source']][index]
+    model_reduced[['marks']] <- list(marksIn = model[['marks']][['marksIn']][!names(model[['marks']][['marksIn']]) %in% dataset],
+                                 multinomVars = model[['marks']][['multinomVars']])
+
     if (!predictions) {
       
       model_reduced[['bru_info']] <- NULL
@@ -168,9 +177,7 @@ datasetOut <- function(model, dataset,
       
     }
     
-    model_reduced[['data_type']] <- model[['data_type']][index]
-    model_reduced[['dataset_names']] <- model[['dataset_names']][index]
-    model_reduced[['multinom_vars']] <- model[['multinom_vars']]
+
     
     class(model_reduced) <- c('bru_sdm',class(model_reduced))
     
@@ -231,7 +238,7 @@ datasetOut <- function(model, dataset,
   #names(model_results) <- paste0('Leaving_out_',dataset)
   class(model_results) <- c('datasetOut', 'list')
   
-  return(model_results)
+  model_results
   
 }
 
@@ -253,7 +260,7 @@ print.datasetOut <- function(x, ...) {
   
   for (name in 1:length(x)) {
     
-    cat('Changes in fixed values by leaving out', gsub("Leaving_out_.*?","",paste0(names(attributes(x)$differences)[name]),':'))
+    cat('Changes in fixed values by leaving out', gsub("Leaving_out_.*?","",paste0(names(attributes(x)$differences)[name],':')))
     cat('\n\n')
     
     print(attributes(x)$differences[[name]])
