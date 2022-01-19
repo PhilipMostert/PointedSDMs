@@ -119,8 +119,8 @@ runModel <- function(data, options) {
                                   class = data$.__enclos_env__$private$ptcovsClass)
   inlaModel[['species']] <- list(speciesIn = data$.__enclos_env__$private$speciesIn,
                                  speciesVar = data$.__enclos_env__$private$speciesName)
-  inlaModel[['dataType']] <- na.omit(c(data$.__enclos_env__$private$printSummary$Type,
-                               unlist(unname(data$.__enclos_env__$private$printSummary$marksType))))
+  inlaModel[['dataType']] <- c(na.omit(data$.__enclos_env__$private$printSummary$Type),
+                               na.omit(unlist(unname(data$.__enclos_env__$private$printSummary$marksType))))
   inlaModel[['marks']] <- list(marksIn = data$.__enclos_env__$private$printSummary$Marks,
                                       multinomVars = data$.__enclos_env__$private$multinomVars)
   
