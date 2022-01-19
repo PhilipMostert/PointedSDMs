@@ -88,36 +88,30 @@ datasetOut <- function(model, dataset,
       
   #  }
     ##Add a new marks used
-    if (!is.null(model$marks_used)) {
+    
+    ##Redo
+    
+    if (!all(is.na(unlist(model$marks$marksIn)))) {
       
-      if (any(names(model$marks_used) == dataname)) {   
+      marksOut <- model$marks$marksIn[[dataname]]
+      marksIn <- unique(unlist(model$marks$marksIn[!names(model$marks$marksIn)%in%dataname]))
+      
+      marksRM <- marksOut[!marksOut %in% marksIn]
+      
+      if (!identical(marksRM, 'charachter(0)')) {
+        ##Still need to add markintercepts to the model...
+        reduced_components <- update(reduced_components, paste0(' ~ . -', marksRM,
+                                                                '_intercept(1)'))
+        reduced_components <- update(reduced_components, paste0(' ~ . -', marksRM,
+                                                                '_spatial(main = coordinates, model = markModel)'))
+        reduced_components <- update(reduced_components, paste0(' ~ . -', marksRM,
+                                                                paste0('_phi(main =', marksRM, '_phi, model = "iid", initial = -10, fixed = TRUE)')))
+        reduced_components <- update(reduced_components, paste0(' ~ . -', marksRM,
+                                                                paste0('(main =', marksRM, ', model = "iid", constr = FALSE, fixed = TRUE)')))
         
-        for (i in 1:length(model$marks_used)) {
-          ##Still need to add markintercepts to the model...
-          reduced_components <- update(reduced_components, paste0(' ~ . -', dataname, '_',
-                                                                  model$marks_used[i],'_intercept(1)'))
-          reduced_components <- update(reduced_components, paste0(' ~ . -', dataname, '_',
-                                                                  model$marks_used[i],'_spde(main = coordinates, model = spdemodel)'))
-          reduced_components <- update(reduced_components, paste0(' ~ . -', dataname, '_',
-                                                                  model$marks_used[i],'_spde(main = coordinates, copy = \"', dataname,
-                                                                  '_spde\", hyper = list(beta = list(fixed = FALSE)))'))
-          
-        }
-        
-        dataset_marks <- model$marks_used[dataname]  
-        
-        for (mark in dataset_marks) {
-          
-          if (sum(model$marks_used == mark) == 1) {
-            ##Not sure why sum == 1???
-            reduced_components <- gsub(paste0('[+] ', mark,'*\\(.*?\\) *'), '', reduced_components, perl = T)
-            reduced_components <- gsub(paste0('[+] ', mark,'_phi*\\(.*?\\) *'), '', reduced_components, perl = T)   
-            
-          }
-          
-        }
         
       }
+      
       
     }
 
@@ -127,7 +121,7 @@ datasetOut <- function(model, dataset,
       #species in left out data
       species_dataset <- unlist(unique(model[['species']][['speciesIn']][dataname]))
       #Need diff ## REDO
-      species_rm <- intersect(reduced_species, species_dataset)
+      #species_rm <- intersect(reduced_species, species_dataset)
       species_rm <- species_dataset[!species_dataset %in% reduced_species]
 
       if (!identical(species_rm, 'character(0)')) {
@@ -160,7 +154,7 @@ datasetOut <- function(model, dataset,
       }
       
     }
-    stop(return(reduced_components))
+
     model_reduced <- inlabru::bru(components = formula(reduced_components),
                                   model$bru_info$lhoods[index],
                                   options = reduced_options)
@@ -192,18 +186,27 @@ datasetOut <- function(model, dataset,
       
       for (data in names(model$bru_info$lhoods)[!index]) { 
         
-        train <- predict(model_reduced, data = model$bru_info$lhoods[[data]]$data, formula = eval(parse(text = paste0('~ (',paste(model$spatial_covariates_used, collapse = ' + '),')'))))  
+        if (!is.null(model[['species']][['speciesIn']])) covs <- as.vector(outer(paste0(reduced_species,'_'), model$spatCovs$name, FUN = 'paste0'))
+        else covs <- model$spatCovs$name
+        
+        train <- predict(model_reduced, data = model$bru_info$lhoods[[data]]$data, formula = eval(parse(text = paste0('~ (',paste(covs, collapse = ' + '),')'))))  
         
         reduced_lik[[data]]$data@data['offset'] <- train$mean
-        reduced_lik[[data]]$include_components <- c(reduced_lik[data]$include_components, 'offset')
+        reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
         
         
       }
       
-      offset_components <- update(model$components, ~ . + offset)
+      #for (data in names(model$bru_info$lhoods[index])) {
       
+      #reduced_lik[[data]]$data@data['offset'] <- 0
+      #reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
+
+      #}
+      offset_components <- update(model$componentsJoint, ~ . + offset)
+
       reduced_mlik <- inlabru::bru(offset_components, reduced_lik,
-                                   options = model$bru_sdm_options)
+                                   options = model$optionsJoint)
       
       validation_results[[dataname]] <- model$mlik[1] - reduced_mlik$mlik[1]
       ##Need to add a bunch of loss functions here
