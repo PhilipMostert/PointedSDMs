@@ -86,7 +86,6 @@ test_that('runModel runs a dataSDM object, and produces an INLA model with extra
                        options  = list(control.inla=list(int.strategy='eb')))
   
   expect_output(summary(spatMod2), 'Summary of multinomial variables:')
-  expect_true(spatMod2[['multinomVars']] == 'factvar')
   expect_setequal(spatMod2[['source']], c('PO', 'PO', 'PA', 'PA'))
   expect_setequal(sapply(spatMod2$.args$control.family, function(x) x$link), c('log', 'log', 'cloglog', 'cloglog'))
   
