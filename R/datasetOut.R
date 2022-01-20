@@ -199,17 +199,17 @@ datasetOut <- function(model, dataset,
         train <- predict(model_reduced, data = model$bru_info$lhoods[[data]]$data, formula = eval(parse(text = paste0('~ (',paste(covs, collapse = ' + '),')'))))  
         
         reduced_lik[[data]]$data@data['offset'] <- train$mean
-        reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
-        
+        #reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
+        reduced_lik[[data]]$include_components <- c(reduced_lik[[data]]$include_components, 'offset')
         
       }
-      
+     
       #for (data in names(model$bru_info$lhoods[index])) {
-      #
-      #reduced_lik[[data]]$data@data['offset'] <- 0
-      #reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
+    #  
+    #  reduced_lik[[data]]$data@data['offset'] <- 0
+    #  reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
 
-      #}
+#      }
       offset_components <- update(model$componentsJoint, ~ . + offset)
 
       reduced_mlik <- inlabru::bru(offset_components, reduced_lik,
