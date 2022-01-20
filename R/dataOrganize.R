@@ -274,7 +274,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             
             if (length(self$speciesIndex[[speciesname]][[dataset]][[species]]) != 0) {
               
-              if (spatial) spat <- c(paste0(speciesname,'_spatial'), ' shared_spatial')
+              if (spatial) spat <- c(paste0(speciesname,'_spatial'), 'shared_spatial')
               else spat <- NULL
             } 
           else {  
