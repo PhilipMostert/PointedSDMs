@@ -42,10 +42,10 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
   #if (length(dataPoints) == 0) stop('Please provide data in the ... argument.')
   if (length(dataPoints) > 0) {
     
-  datasetClass <- lapply(dataPoints, class)
-  
+  datasetClass <- unlist(lapply(dataPoints, class))
+
   if (length(datasetClass) == 1 && class(datasetClass) == "list") {
-    
+
     dataNames <- NULL
     dataPoints <- unlist(dataPoints)
     datasetClass <- lapply(dataPoints, class)
@@ -54,7 +54,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
   }
   else dataList <- FALSE
   
-  if (any(!unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame"))) stop("Datasets need to be either a SpatialPoints* object or a data frame.")
+  if (!all(unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame"))) stop("Datasets need to be either a SpatialPoints* object or a data frame.")
   
   if (dataList) {
     
