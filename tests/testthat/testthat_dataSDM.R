@@ -208,7 +208,7 @@ test_that('spatialCovariates can add spatial covariates to the model and succesf
   #Is the new covariate in the formulas
   expect_true(all(unlist(lapply(check$.__enclos_env__$private$modelData, function(x) {
     
-    'covariate'%in%attr(terms(x$formula,),'term.labels')
+    'covariate'%in% x$include
     
   } ))))
   
@@ -229,12 +229,12 @@ test_that('addBias is able to add bias fields to the model as well as succesfull
   POdats <- grepl('^PO', names(check$.__enclos_env__$private$modelData))
   expect_true(all(unlist(lapply(check$.__enclos_env__$private$modelData[POdats], function(x) {
     
-    'PO_bias_field' %in% attr(terms(x$formula,),'term.labels')
+    'PO_bias_field' %in% x$include
     
   }))))
   expect_false(all(unlist(lapply(check$.__enclos_env__$private$modelData[!POdats], function(x) {
     
-    'PO_bias_field' %in% attr(terms(x$formula,),'term.labels')
+    'PO_bias_field' %in% x$include
     
   }))))
   expect_true('PO_bias_field(main = coordinates, model = biasField)' %in% check$.__enclos_env__$private$Components)
