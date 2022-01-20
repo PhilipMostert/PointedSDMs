@@ -613,15 +613,15 @@ dataSDM$set('public', 'spatialCovariates', function(spatialCovariates) {
     
     if (is.null(private$spatcovsObj)) {
       
-      newForms <- sapply(private$modelData, function(x) {
+    #  newForms <- sapply(private$modelData, function(x) {
         
-        update(x$formula, paste('~ . +', paste(spatcovsIncl, collapse = ' + ')))
+    #    update(x$formula, paste('~ . +', paste(spatcovsIncl, collapse = ' + ')))
         
-      })
+    #  })
       
-      for (form in 1:length(newForms)) {
+      for (form in 1:length(private$modelData)) {
         
-        private$modelData[[form]]['formula'] <- newForms[form]
+        private$modelData[[form]][['include']] <- c(private$modelData[[form]][['include']], spatcovsIncl)
         
       }
       
@@ -681,8 +681,8 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
     
     for (lik in index) {
       
-      private$modelData[[lik]]$formula <- update(private$modelData[[lik]]$formula, paste0(' ~ . + ', dat,'_bias_field'))
-      
+      #private$modelData[[lik]]$formula <- update(private$modelData[[lik]]$formula, paste0(' ~ . + ', dat,'_bias_field'))
+      private$modelData[[lik]]$include <- c(private$modelData[[lik]]$include, paste0(dat, '_bias_field'))
     }
     
   }
