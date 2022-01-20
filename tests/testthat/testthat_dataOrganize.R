@@ -169,19 +169,32 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             expect_setequal(names(Check$Formulas$PA$bird1), c('PAresp', 'binommark'))
             expect_setequal(names(Check$Formulas$PA$bird2), c('PAresp', 'binommark'))
             
-            expect_equal(Check$Formulas$PO$fish1$coordinates, 
-                         coordinates ~ fish1_spatcovs + species_spatial + shared_spatial + fish1_intercept)
-            expect_equal(Check$Formulas$PO$fish1$numvar, 
-                         numvar ~ fish1_spatcovs + species_spatial + shared_spatial + fish1_intercept + numvar_spatial)
-            expect_equal(Check$Formulas$PO$fish1$factvar_response, 
-                         factvar_response ~ fish1_spatcovs + species_spatial + shared_spatial + 
-                           fish1_intercept + factvar_response_spatial + factvar + factvar_phi)
             
-            expect_equal(Check$Formulas$PA$bird1$PAresp, 
-                         PAresp ~ bird1_spatcovs + species_spatial + shared_spatial + bird1_intercept + pointcov)
-            expect_equal(Check$Formulas$PA$bird1$binommark, 
-                         binommark ~ bird1_spatcovs + species_spatial + shared_spatial + 
-                           bird1_intercept + binommark_spatial)
+            
+            expect_equal(deparse1(Check$Formulas$PO$fish1$coordinates$LHS), 
+                         'coordinates ~ .')
+            expect_equal(deparse1(Check$Formulas$PO$fish1$numvar$LHS), 
+                        'numvar ~ .')
+            expect_equal(deparse1(Check$Formulas$PO$fish1$factvar_response$LHS), 
+                         'factvar_response ~ .')
+            
+            expect_equal(deparse1(Check$Formulas$PA$bird1$PAresp$LHS), 
+                        'PAresp ~ .')
+            expect_equal(deparse1(Check$Formulas$PA$bird1$binommark$LHS), 
+                        'binommark ~ .')
+            
+            expect_setequal(Check$Formulas$PO$fish1$coordinates$RHS,
+                          c("fish1_spatcovs", "species_spatial", "shared_spatial", "fish1_intercept"))
+            expect_setequal(Check$Formulas$PO$fish1$numvar$RHS,
+                            c("fish1_spatcovs", "species_spatial", "shared_spatial", "fish1_intercept", "numvar_spatial"))
+            expect_setequal(Check$Formulas$PO$fish1$factvar_response$RHS,
+                            c("fish1_spatcovs", "species_spatial", "shared_spatial", "fish1_intercept",
+                              "factvar_spatial", "factvar", "factvar_phi"))
+            
+            expect_setequal(Check$Formulas$PA$bird1$PAresp$RHS,
+                           c("bird1_spatcovs", "species_spatial", "shared_spatial", "bird1_intercept", "pointcov"))
+            expect_setequal(Check$Formulas$PA$bird2$binommark$RHS,
+                            c("bird2_spatcovs", "species_spatial", "shared_spatial", "bird2_intercept", "binommark_spatial"))
             
             ##Change terms
              #Set spatial and intercept to FALSE
@@ -189,18 +202,19 @@ test_that('makeFormulas is able to make the correct formulas for the different p
                                paresp = 'PAresp', countresp = 'counts',
                                marks = c('numvar', 'factvar', 'binommark'),
                                spatial = FALSE, intercept = FALSE, pointcovs = 'pointcov')
+          
             
-            expect_equal(Check$Formulas$PO$fish1$coordinates, 
-                         coordinates ~ fish1_spatcovs)
-            expect_equal(Check$Formulas$PO$fish1$numvar, 
-                         numvar ~ fish1_spatcovs)
-            expect_equal(Check$Formulas$PO$fish1$factvar_response, 
-                         factvar_response ~ fish1_spatcovs + factvar + factvar_phi)
+            expect_setequal(Check$Formulas$PO$fish1$coordinates$RHS,
+                            c("fish1_spatcovs"))
+            expect_setequal(Check$Formulas$PO$fish1$numvar$RHS,
+                            c("fish1_spatcovs"))
+            expect_setequal(Check$Formulas$PO$fish1$factvar_response$RHS,
+                            c("fish1_spatcovs", "factvar", "factvar_phi"))
             
-            expect_equal(Check$Formulas$PA$bird1$PAresp, 
-                         PAresp ~ bird1_spatcovs + pointcov)
-            expect_equal(Check$Formulas$PA$bird1$binommark, 
-                         binommark ~ bird1_spatcovs)
+            expect_setequal(Check$Formulas$PA$bird1$PAresp$RHS,
+                            c("bird1_spatcovs", "pointcov"))
+            expect_setequal(Check$Formulas$PA$bird2$binommark$RHS,
+                            c("bird2_spatcovs"))
             
             ##Change terms
             #Set spatcovs to NULL
@@ -209,19 +223,18 @@ test_that('makeFormulas is able to make the correct formulas for the different p
                                marks = c('numvar', 'factvar', 'binommark'),
                                spatial = TRUE, intercept = TRUE, pointcovs = 'pointcov')
             
-            expect_equal(Check$Formulas$PO$fish1$coordinates, 
-                         coordinates ~ species_spatial + shared_spatial + fish1_intercept)
-            expect_equal(Check$Formulas$PO$fish1$numvar, 
-                         numvar ~ species_spatial + shared_spatial + fish1_intercept + numvar_spatial)
-            expect_equal(Check$Formulas$PO$fish1$factvar_response, 
-                         factvar_response ~ species_spatial + shared_spatial + 
-                           fish1_intercept + factvar_response_spatial + factvar + factvar_phi)
+            expect_setequal(Check$Formulas$PO$fish1$coordinates$RHS,
+                            c("species_spatial", "shared_spatial", "fish1_intercept"))
+            expect_setequal(Check$Formulas$PO$fish1$numvar$RHS,
+                            c("species_spatial", "shared_spatial", "fish1_intercept", "numvar_spatial"))
+            expect_setequal(Check$Formulas$PO$fish1$factvar_response$RHS,
+                            c("species_spatial", "shared_spatial", "fish1_intercept",
+                              "factvar_spatial", "factvar", "factvar_phi"))
             
-            expect_equal(Check$Formulas$PA$bird1$PAresp, 
-                         PAresp ~ species_spatial + shared_spatial + bird1_intercept + pointcov)
-            expect_equal(Check$Formulas$PA$bird1$binommark, 
-                         binommark ~ species_spatial + shared_spatial + 
-                           bird1_intercept + binommark_spatial)
+            expect_setequal(Check$Formulas$PA$bird1$PAresp$RHS,
+                            c("species_spatial", "shared_spatial", "bird1_intercept", "pointcov"))
+            expect_setequal(Check$Formulas$PA$bird2$binommark$RHS,
+                            c("species_spatial", "shared_spatial", "bird2_intercept", "binommark_spatial"))
             
             })
 
