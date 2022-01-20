@@ -41,6 +41,12 @@ datasetOut <- function(model, dataset,
       assign('spdeModel', model$bru_info$model$effects[[1]]$env[['spdeModel']])
       
     } else spdeModel <- NULL
+    
+    if (!is.null(model$bru_info$model$effects[[1]]$env[['biasField']])) {
+      ##Also assign the speciesModel and the marksModel
+      assign('biasField', model$bru_info$model$effects[[1]]$env[['biasField']])
+      
+    } else spdeModel <- NULL
 
     if (is.list(spdeModel[[1]])) {
       ##TODO if we are doing
@@ -76,6 +82,7 @@ datasetOut <- function(model, dataset,
     ##Need to add this later...
     reduced_components <- update(reduced_components, paste0(' ~ . - ',
                                                             dataname,'_spde(main = coordinates, model = spdemodel)'))
+    reduced_components <- update(reduced_components, paste0(' ~ . -', dataname,'_bias_field(main = coordinates, model = biasField)'))
     ##Also need to add biasField #pref something like spatia_datasets...
     
     #if (!is.null(model[['spatial_datasets']])) {
