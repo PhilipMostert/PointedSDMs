@@ -335,7 +335,12 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           
           }
        
-        formulas[[dataset]][[species]][[j]] <- formula(paste0(pointsResponse[[response]][j], ' ~ ', paste0(RHS, collapse = ' + ')))
+        #formulas[[dataset]][[species]][[j]] <- formula(paste0(pointsResponse[[response]][j], ' ~ ', paste0(RHS, collapse = ' + ')))
+        ##Test
+        formulas[[dataset]][[species]][[j]] <- vector(mode = 'list', length = 2)
+        names(formulas[[dataset]][[species]][[j]]) <- c('LHS', 'RHS')
+        formulas[[dataset]][[species]][[j]][[1]] <- formula(paste0(pointsResponse[[response]][j], ' ~ .'))
+        formulas[[dataset]][[species]][[j]][[2]] <- RHS
         names(formulas[[dataset]][[species]])[j] <- pointsResponse[[response]][j]
         
         }
@@ -491,7 +496,7 @@ dataOrganize$set('public', 'makeLhoods', function(mesh, ips,
   
   
   Likelihoods <- list()
-  formulas <- unlist(self$Formulas)
+  #formulas <- unlist(self$Formulas)
 
   for (dataset in 1:length(self$Data)) {
     
@@ -527,7 +532,7 @@ dataOrganize$set('public', 'makeLhoods', function(mesh, ips,
         
           if (!is.na(Ntrialsvar[[1]]) || !is.na(Ntrialsvar[[2]])) {
           
-            if (as.character(formulas[[Likindex]])[2] == paresp) Ntrials <- Ntrialsvar[[1]]
+            if (as.character(self$Formulas[[dataset]][[species]][[process]][['LHS']])[2] == paresp) Ntrials <- Ntrialsvar[[1]]
           
             else Ntrials <- Ntrialsvar[[2]]
         
@@ -549,8 +554,10 @@ dataOrganize$set('public', 'makeLhoods', function(mesh, ips,
 
         }
         else IPS <- ips
-
-        Likelihoods[[Likindex]] <- inlabru::like(formula = formulas[[Likindex]],
+##rm formulas for now
+       
+        Likelihoods[[Likindex]] <- inlabru::like(formula = self$Formulas[[dataset]][[species]][[process]][['LHS']],
+                                                 include = self$Formulas[[dataset]][[species]][[process]][['RHS']],
                                                  data = self$Data[[dataset]][[species]], 
                                                  Ntrials = Ntrials,
                                                  mesh = mesh,
@@ -560,7 +567,7 @@ dataOrganize$set('public', 'makeLhoods', function(mesh, ips,
       if (is.null(names(self$Data[[dataset]])[species])) nameGive <- names(self$Data)[[dataset]]
       else nameGive <- names(self$Data[[dataset]])[species]
       
-      names(Likelihoods)[[Likindex]] <- paste0(nameGive, '_', as.character(formulas[[Likindex]])[2])
+      names(Likelihoods)[[Likindex]] <- paste0(nameGive, '_', as.character(self$Formulas[[dataset]][[species]][[process]][['LHS']])[2])
       
       }
       
