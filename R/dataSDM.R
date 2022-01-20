@@ -222,7 +222,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
   
   if (length(dataPoints) == 0) stop('Please provide data in the ... argument.')
   
-  datasetClass <- lapply(dataPoints, class)
+  datasetClass <- unlist(lapply(dataPoints, class))
   
   if (length(datasetClass) == 1 && class(datasetClass) == "list") {
     
