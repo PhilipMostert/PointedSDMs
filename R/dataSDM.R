@@ -224,7 +224,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
   
   datasetClass <- unlist(lapply(dataPoints, class))
   
-  if (length(datasetClass) == 1 && class(datasetClass) == "list") {
+  if (length(datasetClass) == 1 && datasetClass == "list") {
     
     dataNames <- NULL
     dataPoints <- unlist(dataPoints)
