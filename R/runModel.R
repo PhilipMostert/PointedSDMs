@@ -1,10 +1,10 @@
 #' @title runModel: function used to run the integrated model.
 #' @param data A bruSDM data file to be used in the integrated model.
-#' @param options A list of INLA options used in the model.
+#' @param options A list of INLA options used in the model. Defaults to \code{list()}.
 #' 
 #' @export
 
-runModel <- function(data, options) {
+runModel <- function(data, options = list()) {
   
   if (!inherits(data, 'dataSDM')) stop('data needs to be a dataSDM object.')
 
