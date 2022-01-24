@@ -137,7 +137,7 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
         if (is.null(fun) | fun == 'linear') {fun <- ''}
   
         formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(formula_components, collapse = ' + '),')'))
-        stop(return(formula))
+
         int[[i]] <- predict(model, data = data, formula = formula, ...)
         
       }
