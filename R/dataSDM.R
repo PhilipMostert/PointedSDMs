@@ -391,6 +391,8 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
   if (missing(pointCovariates)) pointCovariates <- private$pointCovariates
   else private$pointCovariates <- pointCovariates <- unique(c(private$pointCovariates, pointCovariates))
   
+  if (!is.null(private$pointCovariates) && class(pointCovariates) != 'character') stop('pointCovariates is required to be a vector containing the names of the covariates found in the datasets.')
+  
   if (!missing(Coordinates) && Coordinates != private$Coordinates) {
     
     dataPoints <- changeCoords(data = dataPoints, oldcoords = Coordinates,
