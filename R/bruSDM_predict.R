@@ -141,6 +141,7 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
         #int[[i]] <- predict(model, data = data, formula = formula, ...)
         int <- predict(model, data = data, formula = formula, ...)
         int <- list(int)
+        names(int) <- 'predictions'
       }
       
       #names(int) <- datasetNames
@@ -156,6 +157,7 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
     class(model) <- c('bru','inla','iinla')
     int <- predict(model, data = data, formula = formula, ...)
     int <- list(int)
+    names(int) <- 'predictions'
     class(int) <- c('bruSDM_predict', class(int))
     
     return(int)
@@ -192,11 +194,11 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
                                 plot = TRUE,
                                 ...) {
   ## Add species plot::
-  if (!plotall & is.null(datasettoplot)) stop('Please provide a list of datasets to plot or set plotall to TRUE.')
+  #if (!plotall & is.null(datasettoplot)) stop('Please provide a list of datasets to plot or set plotall to TRUE.')
   
-  if (any(!datasettoplot%in%names(x))) stop('Dataset name to plot not provided in prediction object.')
+  #if (any(!datasettoplot%in%names(x))) stop('Dataset name to plot not provided in prediction object.')
   
-  if (plotall) datasettoplot <- names(x)
+  #if (plotall) datasettoplot <- names(x)
   
   if (any(!whattoplot%in%c("mean", "sd", "q0.025", "median","q0.975",
                            "smin", "smax", "cv", "var" ))) stop('Whattoplot is not a valid variable to plot')
@@ -227,14 +229,15 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
     all_plots <- list()
     prediction_list <- list()
   }
-  
+  datasettoplot <- 'predictions'
   for (plotname in datasettoplot) {
     
     plot_list <- list()
     
     for (stat in whattoplot) {
       
-      title <- ggtitle(paste('Plot of',stat,'for',plotname))
+      #title <- ggtitle(paste('Plot of',stat,'for',plotname))
+      title <- ggtitle('Plot of predictions')
       
       prediction <- gg(x[[plotname]], aes_string(fill = stat))
       
