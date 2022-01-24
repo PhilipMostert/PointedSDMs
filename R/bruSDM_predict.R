@@ -97,7 +97,7 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
     }
     else {  
       
-      for(i in 1:length(datasetNames)) {
+      #for(i in 1:length(datasetNames)) {
         
         if (spatial) {
           
@@ -147,7 +147,7 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
       class(int) <- c('bruSDM_predict', class(int))
       return(int)
       
-    }
+    #}
     
   }
   
