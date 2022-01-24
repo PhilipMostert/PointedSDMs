@@ -140,7 +140,7 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
 
         #int[[i]] <- predict(model, data = data, formula = formula, ...)
         int <- predict(model, data = data, formula = formula, ...)
-        
+        int <- list(int)
       }
       
       #names(int) <- datasetNames
@@ -155,6 +155,8 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
     
     class(model) <- c('bru','inla','iinla')
     int <- predict(model, data = data, formula = formula, ...)
+    int <- list(int)
+    class(int) <- c('bruSDM_predict', class(int))
     
     return(int)
     
