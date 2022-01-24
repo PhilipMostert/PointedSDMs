@@ -101,26 +101,9 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
         
         if (spatial) {
           
-          if(any(grepl('shared_spatial',model[['components']], fixed = TRUE))) {
-            
-            if (datasetNames[[i]]%in%model[['spatial_datasets']]) {
-              
-              spatial_obj <- 'shared_spatial'  
-              
-            }
-            else spatial_obj <- NULL
-            
-          }
-          else       
-            
-            if (!datasetNames[[i]]%in%model[['spatial_datasets']]) {
-              
-              stop('Either dataset name is incorrect or bru_sdm model run without spatial effects.')
-              
-            }
-          else spatial_obj <- paste0(datasetNames[[i]],'_spde')
-          
-        } 
+          if (!'shared_spatial' %in% names(model$summary.random)) stop('Model run without spatial effects. Please specify Spatial = TRUE in bruSDM.')
+          else spatial_obj <- 'shared_spatial'
+          } 
         else spatial_obj <- NULL
         
         if (intercept) {
