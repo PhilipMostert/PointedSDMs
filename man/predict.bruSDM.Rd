@@ -28,9 +28,9 @@
 
 \item{mask}{A mask of the study background. Defaults to \code{NULL}.}
 
-\item{datasetNames}{A vector of dataset names to predict.}
+\item{datasetNames}{A vector of dataset names to predict. For now the usage is strictly related to predicting with the bias field of the selected dataset.}
 
-\item{species}{Create plot of species. Note: \code{speciesname} in the \code{organize_data} function needs to be specidied first.}
+\item{species}{Create plot of species. Note: \code{speciesname} in the \code{organize_data} function needs to be specified first.}
 
 \item{covariates}{Name of covariates to predict.}
 

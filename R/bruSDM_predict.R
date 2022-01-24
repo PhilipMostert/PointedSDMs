@@ -10,8 +10,8 @@ setClass('bruSDM_predict')
 #' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercept} are not \code{NULL}.
 #' @param mesh An inla.mesh object
 #' @param mask A mask of the study background. Defaults to \code{NULL}.
-#' @param datasetNames A vector of dataset names to predict.
-#' @param species Create plot of species. Note: \code{speciesname} in the \code{organize_data} function needs to be specidied first.
+#' @param datasetNames A vector of dataset names to predict. For now the usage is strictly related to predicting with the bias field of the selected dataset.
+#' @param species Create plot of species. Note: \code{speciesname} in the \code{organize_data} function needs to be specified first.
 #' @param covariates Name of covariates to predict.
 #' @param spatial Include spatial effects in prediction.
 #' @param intercept Include intercept in prediction.
@@ -39,7 +39,7 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
   
   if (!species) {
     
-    if (is.null(formula) & is.null(datasetNames)) stop("Please provide either a formula, and species or a dataset included in the bruSDM model to be predicted.")
+    if (is.null(formula) && !intercept && !spatial && is.null(covariates)) stop("Please provide either a formula or components of a formula to be predicted.")
     
   }
   
@@ -101,8 +101,17 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
         
         if (spatial) {
           
-          if (!'shared_spatial' %in% names(model$summary.random)) stop('Model run without spatial effects. Please specify Spatial = TRUE in bruSDM.')
-          else spatial_obj <- 'shared_spatial'
+          if (!is.null(datasetNames)) {
+            
+            if (!paste0(datasetNames, '_bias_field') %in% names(model$summary.random)) stop('No bias field run for the datasets specified with datasetNames.')
+            
+          }
+          else {
+          
+            if (!'shared_spatial' %in% names(model$summary.random)) stop('Model run without spatial effects. Please specify Spatial = TRUE in bruSDM.')
+            else spatial_obj <- 'shared_spatial'
+            
+          }
           } 
         else spatial_obj <- NULL
         
@@ -119,7 +128,7 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
         
         if (!is.null(covariates)) {
           
-          if (speciesin) covariates <- as.vector(outer(paste0(unique(as.character(speciesin)),'_'), model[['spatCovs']][['name']], FUN = 'paste0'))
+          if (!identical(speciesin, 'factor(0)')) covariates <- as.vector(outer(paste0(unique(as.character(speciesin)),'_'), model[['spatCovs']][['name']], FUN = 'paste0'))
           
         }
         
