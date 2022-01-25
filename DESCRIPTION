@@ -15,7 +15,7 @@ Depends:
     dplyr,
     raster,
     sp (>= 1.4-5),
-    RANN,
+    ggplot2,
     stats
 Imports:
     R6,
