@@ -10,11 +10,14 @@ setClass('bruSDM_predict')
 #' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercept} are not \code{NULL}.
 #' @param mesh An inla.mesh object
 #' @param mask A mask of the study background. Defaults to \code{NULL}.
-#' @param datasetNames A vector of dataset names to predict. For now the usage is strictly related to predicting with the bias field of the selected dataset.
 #' @param species Create plot of species. Note: \code{speciesname} in the \code{organize_data} function needs to be specified first.
 #' @param covariates Name of covariates to predict.
 #' @param spatial Include spatial effects in prediction.
 #' @param intercept Include intercept in prediction.
+#' @param interceptnames Names of the datasets to include intercept term. Defaults to \code{NULL}.
+#' @param biasfield Include bias field in prediction.
+#' @param biasnames Names of the datasets to include bias term. Defaults to \code{NULL}.
+#' @param predictor Should all terms run in the linear predictor be included. Defaults to \code{FALSE}.
 #' @param fun Function used to predict. Set to \code{'linear'} if effects on the linear scale are desired.
 #' @param ... Additional arguments used by the inlabru \code{predict} function.
 #' 
@@ -23,10 +26,12 @@ setClass('bruSDM_predict')
 #' 
 
 predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL, 
-                           mask = NULL, datasetNames = NULL, species = FALSE,
+                           mask = NULL, species = FALSE,
                            covariates = NULL, spatial = TRUE,
-                           intercept = FALSE, fun = 'exp', ...) {
-  ##MASK IS NOW LOGICAL???
+                           intercept = FALSE, interceptnames = NULL,
+                           bisafield = FALSE, biasnames = NULL, linearpredictor = FALSE,
+                           fun = 'exp', ...) {
+
   if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
   
   speciesin <- factor((unlist(model[['species']][['speciesIn']])))
@@ -95,45 +100,49 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
       return(int)
       
     }
-    else {  
+    else {
       
-      #for(i in 1:length(datasetNames)) {
-        
+      if (predictor) formula_components <- c(row.names(model$summary.fixed), names(model$sumary.random))
+        else{
         if (spatial) {
           
-          if (!is.null(datasetNames)) {
+          if (!'shared_spatial' %in% names(model$summary.random)) stop('Model run without spatial effects. Please specify Spatial = TRUE in bruSDM.')
+          else spatial_obj <- 'shared_spatial'
             
-            if (!paste0(datasetNames, '_bias_field') %in% names(model$summary.random)) stop('No bias field run for the datasets specified with datasetNames.')
-            
-          }
-          else {
-          
-            if (!'shared_spatial' %in% names(model$summary.random)) stop('Model run without spatial effects. Please specify Spatial = TRUE in bruSDM.')
-            else spatial_obj <- 'shared_spatial'
-            
-          }
           } 
         else spatial_obj <- NULL
         
         if (intercept) {
           
-          if (!paste0(datasetNames[[i]],'_intercept')%in%row.names(model$summary.fixed) & !'intercept'%in%row.names(model$summary.fixed)) stop('Either dataset name is incorrect or bru_sdm model run without intercepts.')
+          if (is.null(interceptnames)) interceptnames <- unique(model$source)
           
-          else
-            if(paste0(datasetNames[[i]],'_intercept')%in%row.names(model$summary.fixed)) intercept_obj <- paste0(datasetNames[[i]],'_intercept')
+          if (!all(paste0(interceptnames,'_intercept')%in%row.names(model$summary.fixed))) stop('Either dataset name is incorrect or bru_sdm model run without intercepts.')
+          else intercept_obj <- paste0(interceptnames,'_intercept')
             
-            else intercept_obj <- NULL      
         } 
         else intercept_obj <- NULL
         
         if (!is.null(covariates)) {
-
+          
           if (!identical(as.character(speciesin), character(0))) covariates <- as.vector(outer(paste0(unique(as.character(speciesin)),'_'), model[['spatCovs']][['name']], FUN = 'paste0'))
           
         }
         
-        formula_components <- c(covariates, spatial_obj, intercept_obj)
-        if (all(is.null(formula_components))) stop('Please specify at least one of: covariates, spatial or intercept.')
+        if (biasfield) {
+          
+          if (is.null(biasnames)) bias_obj <- names(model$summary.random)[grepl('_bias_field$', names(model$summary.ramdom))]
+          else bias_obj <- paste0(biasnames, '_bias_field')
+          
+          if (!all(bis_obj %in% names(model$summary.random))) stop('Either no bias field has been used or an incorrect dataset name was given.')
+          
+        }
+        else bias_obj <- NULL
+        
+        formula_components <- c(covariates, spatial_obj, intercept_obj, bias_obj)
+        
+        }
+      
+        if (all(is.null(formula_components))) stop('Please specify at least one of: covariates, spatial, intercept or biasfield.')
         if (is.null(fun) | fun == 'linear') {fun <- ''}
   
         formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(formula_components, collapse = ' + '),')'))
@@ -147,8 +156,6 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
       #names(int) <- datasetNames
       class(int) <- c('bruSDM_predict', class(int))
       return(int)
-      
-    #}
     
   }
   
@@ -167,17 +174,13 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
 }
 
 print.bruSDM_predict <- function(x, ...) {
-  
-  
-  for(name in names(x)) {
+
     
-    cat('Summary of predicted data for', paste0(name,':'))
+    cat('Summary of predicted data:')
     cat('\n\n')
-    print(summary(x[[name]]@data))
+    print(summary(x[['predictions']]@data))
     cat('\n\n')
     
-    
-  }
   
 }
 

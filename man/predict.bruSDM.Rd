@@ -10,11 +10,14 @@
   formula = NULL,
   mesh = NULL,
   mask = NULL,
-  datasetNames = NULL,
   species = FALSE,
   covariates = NULL,
   spatial = TRUE,
   intercept = FALSE,
+  interceptnames = NULL,
+  bisafield = FALSE,
+  biasnames = NULL,
+  linearpredictor = FALSE,
   fun = "exp",
   ...
 )
@@ -28,8 +31,6 @@
 
 \item{mask}{A mask of the study background. Defaults to \code{NULL}.}
 
-\item{datasetNames}{A vector of dataset names to predict. For now the usage is strictly related to predicting with the bias field of the selected dataset.}
-
 \item{species}{Create plot of species. Note: \code{speciesname} in the \code{organize_data} function needs to be specified first.}
 
 \item{covariates}{Name of covariates to predict.}
@@ -38,11 +39,19 @@
 
 \item{intercept}{Include intercept in prediction.}
 
+\item{interceptnames}{Names of the datasets to include intercept term. Defaults to \code{NULL}.}
+
+\item{biasnames}{Names of the datasets to include bias term. Defaults to \code{NULL}.}
+
 \item{fun}{Function used to predict. Set to \code{'linear'} if effects on the linear scale are desired.}
 
 \item{...}{Additional arguments used by the inlabru \code{predict} function.}
 
 \item{object}{A \code{bru_sdm object}.}
+
+\item{biasfield}{Include bias field in prediction.}
+
+\item{predictor}{Should all terms run in the linear predictor be included. Defaults to \code{FALSE}.}
 }
 \description{
 Predict for bru_sdm
