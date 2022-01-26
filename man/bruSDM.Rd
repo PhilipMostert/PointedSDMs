@@ -10,7 +10,7 @@ bruSDM(
   Coordinates,
   Projection,
   Boundary = NULL,
-  INLAmesh,
+  Mesh,
   IPS = NULL,
   pointsField = NULL,
   speciesField = NULL,

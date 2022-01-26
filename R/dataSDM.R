@@ -71,9 +71,9 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
   
   if (missing(coordinates)) stop('Coordinates need to be given.')
   if (missing(projection)) stop('projection needs to be given.')
-  if (missing(Inlamesh)) stop('INLAmesh needs to be given.')
+  if (missing(Inlamesh)) stop('Mesh needs to be given.')
   
-  if (class(Inlamesh) != 'inla.mesh') stop('INLAmesh needs to be an inla.mesh object.')
+  if (class(Inlamesh) != 'inla.mesh') stop('Mesh needs to be an inla.mesh object.')
   
   if (class(projection)[1] != 'CRS') stop('Projection needs to be a CRS object.')
   

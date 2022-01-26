@@ -5,7 +5,7 @@
 #' @param Coordinates
 #' @param Projection
 #' @param Boundary
-#' @param INLAmesh
+#' @param Mesh
 #' @param pointsField
 #' @param speciesField
 #' @param markNames
@@ -21,7 +21,7 @@
 
 ##Is markFamily even being used??
 bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
-                   Projection, Boundary = NULL, INLAmesh, IPS = NULL,
+                   Projection, Boundary = NULL, Mesh, IPS = NULL,
                    pointsField = NULL, speciesField = NULL,
                    markNames = NULL, markFamily = NULL, marksField = NULL,
                    pointCovariates = NULL, Intercepts = TRUE, Spatial = TRUE, 
@@ -34,7 +34,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
   
   if (class(Projection) != 'CRS') stop('Projection needs to be a CRS object.')
   
-  if (class(INLAmesh) != 'inla.mesh') stop('INLAmesh needs to be a inla.mesh object.')
+  if (class(Mesh) != 'inla.mesh') stop('Mesh needs to be a inla.mesh object.')
   
   #if (length(list(...)) > 0)  
   dataPoints <- list(...)
@@ -86,7 +86,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
   } else initialnames <- NULL
   
   bruData <- dataSDM$new(coordinates = Coordinates, projection = Projection,
-                         Inlamesh = INLAmesh, initialnames = initialnames,
+                         Inlamesh = Mesh, initialnames = initialnames,
                          responsecounts = responseCounts,
                          responsepa = responsePA,
                          marksnames = markNames,
