@@ -25,7 +25,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                    pointsField = NULL, speciesField = NULL,
                    markNames = NULL, markFamily = NULL, marksField = NULL,
                    pointCovariates = NULL, Intercepts = TRUE, Spatial = TRUE, 
-                   responseCounts = NULL, responsePA = NULL, trialsPA = NULL,
+                   responseCounts = 'counts', responsePA = 'present', trialsPA = NULL,
                    trialsMarks = NULL, speciesName = NULL) {
   
   if (length(Coordinates) != 2) stop('Coordinates needs to be a vector of length 2 containing the coordinate names.')
