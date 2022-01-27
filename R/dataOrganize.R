@@ -324,9 +324,25 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             
           } else markspat <- NULL
           
-        } else markspat <- NULL
+          if (intercept) {
+            
+            if (pointsResponse[[response]][j] %in% c('coordinates', paresp, countresp)) marksint <- NULL
+            else
+              if (pointsResponse[[response]][j] %in% paste0(marks,'_response')) marksint <- paste0(marks[pointsResponse[[response]][j] == paste0(marks,'_response')],'intercept')
+              else marksint <- paste0(pointsResponse[[response]][j], 'intercept')
+            
+            
+          } marksint <- NULL
+          
+        } 
+        else {
+          
+          markspat <- NULL
+          marksint <- NULL
+          
+        }
  
-        RHS <- c(covs, spat, int, addcovs, markspat)
+        RHS <- c(covs, spat, int, addcovs, markspat, marksint)
      
         if (pointsResponse[[response]][j] %in% paste0(self$multinomVars,'_response')) { #paste multinomvar and phi # Need to convert multinomvar to numeric
           
@@ -420,8 +436,19 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     }
     else marksSpat <- NULL
     
+    if (intercepts) {
+      
+      marksInt <- paste0(marks, '_intercept(1)')
+      
+    } else marksInt <- NULL
+    
   }
-  else marksSpat <- NULL
+  else {
+   
+    marksSpat <- NULL
+    marksInt <- NULL
+    
+  }
   
   if (!is.null(covariatenames)) {
     
@@ -476,7 +503,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
   }
   
-  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi)
+  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt)
 
   RHS
   
