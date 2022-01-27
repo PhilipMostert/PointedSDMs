@@ -318,17 +318,21 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
         
         if (!is.null(marks)) {
           
+        if (pointsResponse[[response]][j] %in% c('coordinates', paresp, countresp)) {
+          
+          markspat <- NULL
+          marksint <- NULL
+          
+        }
+        else {
+          
           if (spatial) spat <- NULL
           
           if (marksspatial) {
             
-           if (pointsResponse[[response]][j] %in% c('coordinates', paresp, countresp)) markspat <- NULL
-           else {
-          
-           if (pointsResponse[[response]][j] %in% paste0(marks,'_response')) markspat <- paste0(marks[pointsResponse[[response]][j] == paste0(marks,'_response')],'_spatial')
-           else markspat <- paste0(pointsResponse[[response]][j], '_spatial')
-           
-           }
+          if (pointsResponse[[response]][j] %in% paste0(marks,'_response')) markspat <- paste0(marks[pointsResponse[[response]][j] == paste0(marks,'_response')],'_spatial')
+          else markspat <- paste0(pointsResponse[[response]][j], '_spatial')
+    
             
           } else markspat <- NULL
           
@@ -336,15 +340,14 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           
           if (markintercept) {
             
-            if (pointsResponse[[response]][j] %in% c('coordinates', paresp, countresp)) marksint <- NULL
-            else
-              if (pointsResponse[[response]][j] %in% paste0(marks,'_response')) marksint <- paste0(marks[pointsResponse[[response]][j] == paste0(marks,'_response')],'_intercept')
-              else marksint <- paste0(pointsResponse[[response]][j], '_intercept')
+          if (pointsResponse[[response]][j] %in% paste0(marks,'_response')) marksint <- paste0(marks[pointsResponse[[response]][j] == paste0(marks,'_response')],'_intercept')
+          else marksint <- paste0(pointsResponse[[response]][j], '_intercept')
             
-            
-          } else marksint <- NULL
+        } else marksint <- NULL
           
-        } 
+        }
+          
+        }
         else {
           
           markspat <- NULL
