@@ -20,6 +20,7 @@ bruSDM(
   pointCovariates = NULL,
   Intercepts = TRUE,
   pointsSpatial = TRUE,
+  marksSpatial = TRUE,
   responseCounts = "counts",
   responsePA = "present",
   trialsPA = NULL,

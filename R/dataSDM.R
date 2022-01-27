@@ -37,6 +37,7 @@ dataSDM$set('private', 'spatcovsClass', NULL)
 dataSDM$set('private', 'dataSource', NULL)
 
 dataSDM$set('private', 'Spatial', TRUE)
+dataSDM$set('private', 'marksSpatial', TRUE)
 dataSDM$set('private', 'Intercepts', TRUE)
 dataSDM$set('private', 'IPS', NULL)
 dataSDM$set('private', 'multinomVars', NULL)
@@ -65,7 +66,7 @@ dataSDM$set('private', 'optionsINLA', list())
 dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, initialnames,
                                              responsecounts, responsepa, 
                                              marksnames, marksfamily, pointcovariates,
-                                             trialspa, trialsmarks, speciesname,
+                                             trialspa, trialsmarks, speciesname, marksspatial,
                                              spatial, intercepts, spatialcovariates,
                                              boundary, ips) {
   
@@ -111,6 +112,7 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
   }
   
   private$Spatial <- spatial
+  private$marksSpatial <- marksspatial
   private$Intercepts <- intercepts
 
   #if (!private$Spatial && private$markSpatial) warning('Spatial has been set to FALSE but marksSpatial is TRUE. Spatial effects for the marks will still be run.')
@@ -483,7 +485,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
   ##Add here that if markSpatial then add mark_spatial
   #Also add markModel in the initial call.
   pointData$makeFormulas(spatcovs = private$spatcovsNames, speciesname = speciesName,
-                         paresp = responsePA, countresp = responseCounts,
+                         paresp = responsePA, countresp = responseCounts, marksspatial = private$marksSpatial,
                          marks = markNames, spatial = private$Spatial, intercept = private$Intercepts)
   
   if (is.null(private$multinomVars)) {
@@ -521,6 +523,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
                                                    multinomnames = multinomNames, pointcovariates = pointCovariates,
                                                    covariatenames = private$spatcovsNames, 
                                                    covariateclass = private$spatcovsClass,
+                                                   marksspatial = private$marksSpatial,
                                                    #speciesspatial = private$speciesField,
                                                    numspecies = length(unique(unlist(private$speciesIn))))
     

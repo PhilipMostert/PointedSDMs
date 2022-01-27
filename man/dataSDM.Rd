@@ -37,6 +37,7 @@ A data object containing the data and the relevant information about the integra
   trialspa,
   trialsmarks,
   speciesname,
+  marksspatial,
   spatial,
   intercepts,
   spatialcovariates,

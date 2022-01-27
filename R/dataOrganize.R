@@ -209,7 +209,7 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
 #' @param pointcovs Name of the point covariates.
 
 dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
-                                                    paresp, countresp, marks,
+                                                    paresp, countresp, marks, marksspatial,
                                                     spatial, intercept, pointcovs) {
 
   #if (length(self$multinomVars) != 0) marks[marks %in% self$multinomVars] <- paste0(marks[marks %in% self$multinomVars],'_response')
@@ -315,13 +315,13 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
         
         if (!is.null(marks)) {
           
-          if (spatial) {
+          if (spatial) spat <- NULL
+          
+          if (marksspatial) {
             
            if (pointsResponse[[response]][j] %in% c('coordinates', paresp, countresp)) markspat <- NULL
            else {
           
-           spat <- NULL
-           
            if (pointsResponse[[response]][j] %in% paste0(marks,'_response')) markspat <- paste0(marks[pointsResponse[[response]][j] == paste0(marks,'_response')],'_spatial')
            else markspat <- paste0(pointsResponse[[response]][j], '_spatial')
            
@@ -388,6 +388,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
                                                       datanames, marks, speciesname,
                                                       multinomnames, pointcovariates,
                                                       covariatenames,covariateclass,
+                                                      marksspatial,
                                                       #speciesspatial,
                                                       numspecies) {
   ##Copy for marks fields???
@@ -434,7 +435,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (!is.null(marks)) {
     
-    if (spatial) {
+    if (marksspatial) {
       
       marksSpat <- paste0(marks, '_spatial(main = coordinates, model = markModel)') ##Change this to marksModel
       
