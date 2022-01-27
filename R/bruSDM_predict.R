@@ -102,7 +102,7 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
     }
     else {
       
-      if (predictor) formula_components <- c(row.names(model$summary.fixed), names(model$sumary.random))
+      if (predictor) formula_components <- c(row.names(model$summary.fixed), names(model$summary.random))
         
       else{
         if (spatial) {
@@ -139,9 +139,9 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
         }
         else bias_obj <- NULL
         
-        }
-      
         formula_components <- c(covariates, spatial_obj, intercept_obj, bias_obj)
+        
+        }
       
         if (all(is.null(formula_components))) stop('Please specify at least one of: covariates, spatial, intercept or biasfield.')
         if (is.null(fun) | fun == 'linear') {fun <- ''}
