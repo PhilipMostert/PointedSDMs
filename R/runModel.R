@@ -85,7 +85,14 @@ runModel <- function(data, options = list()) {
    
   }
   
-  if (!is.null(data$.__enclos_env__$private$biasField)) assign('biasField', data$.__enclos_env__$private$biasField)
+  if (length(data$.__enclos_env__$private$biasField) != 0) {
+    
+    for (name in names(data$.__enclos_env__$private$biasField)) {
+    
+      assign(paste0(name,'_biasField'), data$.__enclos_env__$private$biasField[[name]])
+      
+    }
+  }
 
   ##Do the same for the species but run through a for loop and use assign.
 

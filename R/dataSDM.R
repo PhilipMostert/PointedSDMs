@@ -27,7 +27,7 @@ dataSDM$set('private', 'initialnames', NULL)
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'pointsField', list())
 dataSDM$set('private', 'speciesField', list())
-dataSDM$set('private', 'biasField', NULL)
+dataSDM$set('private', 'biasField', list())
 dataSDM$set('private', 'marksField', list())
 
 dataSDM$set('private', 'spatcovsObj', NULL)
@@ -728,17 +728,19 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
       private$modelData[[lik]]$include_components <- c(private$modelData[[lik]]$include_components, paste0(dat, '_bias_field'))
     }
     
+    if (is.null(biasField)) private$biasField[[dat]] <- inla.spde2.matern(mesh = private$INLAmesh)
+    else private$biasField[[dat]] <- biasField
+    
   }
   
-  if (is.null(biasField)) private$biasField <- inla.spde2.matern(mesh = private$INLAmesh)
-  else private$biasField <- biasField
+
   
   ##Add a way for separate Fields per dataset.
   #Shouldn't be too difficult -- have already done it before.
   
   
   #Should I copy the bias fields for the marks?
-  private$Components <- c(private$Components, paste0(datasetNames ,'_bias_field(main = coordinates, model = biasField)'))
+  private$Components <- c(private$Components, paste0(datasetNames ,'_bias_field(main = coordinates, model = ', datasetNames, '_biasField)'))
   ##Things to do here:
   #Go into the liks of PO datasets and add the biasfield
   #Go inth the components and add the bias field component
