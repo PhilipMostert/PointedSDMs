@@ -213,7 +213,7 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
 dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
                                                     paresp, countresp, marks, marksspatial,
                                                     spatial, intercept,
-                                                    markintercept, pointcovs) {
+                                                    marksintercept, pointcovs) {
 
   #if (length(self$multinomVars) != 0) marks[marks %in% self$multinomVars] <- paste0(marks[marks %in% self$multinomVars],'_response')
 
