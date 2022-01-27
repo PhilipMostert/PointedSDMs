@@ -318,9 +318,14 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           if (spatial) {
             
            if (pointsResponse[[response]][j] %in% c('coordinates', paresp, countresp)) markspat <- NULL
-           else
-             if (pointsResponse[[response]][j] %in% paste0(marks,'_response')) markspat <- paste0(marks[pointsResponse[[response]][j] == paste0(marks,'_response')],'_spatial')
+           else {
+          
+           spat <- NULL
+           
+           if (pointsResponse[[response]][j] %in% paste0(marks,'_response')) markspat <- paste0(marks[pointsResponse[[response]][j] == paste0(marks,'_response')],'_spatial')
            else markspat <- paste0(pointsResponse[[response]][j], '_spatial')
+           
+           }
             
           } else markspat <- NULL
           
