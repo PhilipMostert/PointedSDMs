@@ -180,10 +180,38 @@ dataSDM$set('public', 'print', function(...) {
   
   })
 
-#' @description Makes a plot of the region as well as the points. (DO FOR BOTH DATASETS AND SPECIES.)
+#' @description Makes a plot of the region as well as the points.
+#' @param Datasets Name of the datasets to plot.
+#' @param Species Should species be plotted as well? Defaults to \code{FALSE}.
 
-dataSDM$set('public', 'plot', function(...) {
+dataSDM$set('public', 'plot', function(Datasets, Species, ...) {
   
+  stop('TODO later')
+  
+  if (length(private$modelData) == 0) stop('Please provide data before running the plot function.')
+  
+  if (!all(Dataset %in% names(private$dataSource))) stop('Dataset provided not provided to the object.') 
+  
+  if (Species && is.null(private$speciesName)) stop('speciesName in bruSDM required before plotting species.')
+  
+  ##Get data
+  points <- vector(mode = 'list', length = length(Datasets))
+  
+  for (data in Datasets) {
+    
+    ##if species then dataset_species_response
+     # else paste dataset_response ## but also only need point response -- not marks
+    
+    #Probably want to create one df object with another variable called dataset placeholder or something
+     #Then colour by species or dataset or whatever
+    
+    #Also need to create a boundary of sorts... either if Boundary is non null; else can make from mesh...
+     #Maybe even allow maps if SpatialPolygon provided...
+    
+    points[[data]] <- private$modelData[[index]]$data ## which will have species if need be...
+    
+    
+  }
   
 })
 
@@ -676,6 +704,8 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
   if (allPO) datasetNames <- names(private$printSummary)[private$printSummary == 'Present Only']
   else
     if (is.null(datasetNames)) stop('Dataset names need to be given.')
+  
+  if (!all(datasetNames %in% private$dataSource)) stop('Dataset provided not available.')
   
   for (dat in datasetNames) {
     
