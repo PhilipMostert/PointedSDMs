@@ -75,10 +75,14 @@ runModel <- function(data, options = list()) {
     
     assign('spdeModel', data$.__enclos_env__$private$pointsField)
    
-    if (!is.null(data$.__enclos_env__$private$markNames)) assign('markModel', data$.__enclos_env__$private$marksField)
-     
     if (!is.null(data$.__enclos_env__$private$speciesName)) assign('speciesModel', data$.__enclos_env__$private$speciesField)
     
+  }
+  
+  if (!is.null(data$.__enclos_env__$private$markNames)) {
+    
+  if (data$.__enclos_env__$private$marksSpatial) assign('markModel', data$.__enclos_env__$private$marksField)
+   
   }
   
   if (!is.null(data$.__enclos_env__$private$biasField)) assign('biasField', data$.__enclos_env__$private$biasField)
