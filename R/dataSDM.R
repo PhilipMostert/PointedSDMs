@@ -39,6 +39,7 @@ dataSDM$set('private', 'dataSource', NULL)
 dataSDM$set('private', 'Spatial', TRUE)
 dataSDM$set('private', 'marksSpatial', TRUE)
 dataSDM$set('private', 'Intercepts', TRUE)
+dataSDM$set('private', 'marksIntercepts', TRUE)
 dataSDM$set('private', 'IPS', NULL)
 dataSDM$set('private', 'multinomVars', NULL)
 dataSDM$set('private', 'printSummary', NULL)
@@ -62,6 +63,7 @@ dataSDM$set('private', 'optionsINLA', list())
 #' @param spatial Logical argument describing if spatial effects should be included.
 #' @param intercepts Logical argument describing if intercepts should be included in the model.
 #' @param spatialcovariates Spatial covariates object used in the model.
+#' @param marksintercept Logical argument describing if the marks should have interceptes.
 #' @param boundary A polygon map of the study area.
 #' @param ips Integration points and their respective weights to be used in the model.
 
@@ -69,7 +71,7 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
                                              responsecounts, responsepa, 
                                              marksnames, marksfamily, pointcovariates,
                                              trialspa, trialsmarks, speciesname, marksspatial,
-                                             spatial, intercepts, spatialcovariates,
+                                             spatial, intercepts, spatialcovariates, marksintercepts,
                                              boundary, ips) {
   
   if (missing(coordinates)) stop('Coordinates need to be given.')
@@ -116,6 +118,7 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
   private$Spatial <- spatial
   private$marksSpatial <- marksspatial
   private$Intercepts <- intercepts
+  private$marksIntercepts <- marksintercepts
 
   #if (!private$Spatial && private$markSpatial) warning('Spatial has been set to FALSE but marksSpatial is TRUE. Spatial effects for the marks will still be run.')
   
@@ -488,7 +491,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
   #Also add markModel in the initial call.
   pointData$makeFormulas(spatcovs = private$spatcovsNames, speciesname = speciesName,
                          paresp = responsePA, countresp = responseCounts, marksspatial = private$marksSpatial,
-                         marks = markNames, spatial = private$Spatial, intercept = private$Intercepts)
+                         marks = markNames, spatial = private$Spatial, intercept = private$Intercepts, marksintercept = private$marksIntecepts)
   
   if (is.null(private$multinomVars)) {
     
@@ -526,6 +529,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
                                                    covariatenames = private$spatcovsNames, 
                                                    covariateclass = private$spatcovsClass,
                                                    marksspatial = private$marksSpatial,
+                                                   marksintercept = private$marksIntercepts,
                                                    #speciesspatial = private$speciesField,
                                                    numspecies = length(unique(unlist(private$speciesIn))))
     
@@ -545,6 +549,8 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
                                               multinomnames = multinomNames, pointcovariates = pointCovariates,
                                               covariatenames = private$spatcovsNames, 
                                               covariateclass = private$spatcovsClass,
+                                              marksspatial = private$marksSpatial,
+                                              marksintercept = private$marksIntercepts,
                                               #speciesspatial = private$speciesField,
                                               numspecies = length(unique(unlist(private$speciesIn))))
     

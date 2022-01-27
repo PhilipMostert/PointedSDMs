@@ -72,6 +72,7 @@ Internal functions used to temporarily store data and other information before a
   marksspatial,
   spatial,
   intercept,
+  markintercept,
   pointcovs
 )}\if{html}{\out{</div>}}
 }
@@ -93,6 +94,7 @@ Internal functions used to temporarily store data and other information before a
   covariatenames,
   covariateclass,
   marksspatial,
+  marksintercept,
   numspecies
 )}\if{html}{\out{</div>}}
 }

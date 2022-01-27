@@ -207,11 +207,13 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
 #' @param spatial Logical: are spatial effects run in the model.
 #' @param marksspatial Logical: should spatial fields be included for the marks.
 #' @param intercept Logical: are intercepts run in the model.
+#' @param markintercept Logical: are intercepts run for the marks in the model.
 #' @param pointcovs Name of the point covariates.
 
 dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
                                                     paresp, countresp, marks, marksspatial,
-                                                    spatial, intercept, pointcovs) {
+                                                    spatial, intercept,
+                                                    markintercept, pointcovs) {
 
   #if (length(self$multinomVars) != 0) marks[marks %in% self$multinomVars] <- paste0(marks[marks %in% self$multinomVars],'_response')
 
@@ -330,7 +332,9 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             
           } else markspat <- NULL
           
-          if (intercept) {
+          if (intercept) int <- NULL
+          
+          if (markintercept) {
             
             if (pointsResponse[[response]][j] %in% c('coordinates', paresp, countresp)) marksint <- NULL
             else
@@ -338,7 +342,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
               else marksint <- paste0(pointsResponse[[response]][j], '_intercept')
             
             
-          } else  marksint <- NULL
+          } else marksint <- NULL
           
         } 
         else {
@@ -384,6 +388,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
 #' @param covariatenames Names of the spatially varying covariates.
 #' @param covariateclass The classes of the spatially varying covariates.
 #' @param marksspatial Logical: should spatial fields be included for the marks.
+#' @param marksintercept Logical: should intercepts be included for the marks.
 #' @param numspecies Number of species included in the model.
 
 dataOrganize$set('public', 'makeComponents', function(spatial, intercepts, 
@@ -391,6 +396,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
                                                       multinomnames, pointcovariates,
                                                       covariatenames,covariateclass,
                                                       marksspatial,
+                                                      marksintercept,
                                                       #speciesspatial,
                                                       numspecies) {
   ##Copy for marks fields???
@@ -444,7 +450,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     }
     else marksSpat <- NULL
     
-    if (intercepts) {
+    if (marksintercept) {
       
       marksInt <- paste0(marks, '_intercept(1)')
       

@@ -41,6 +41,7 @@ A data object containing the data and the relevant information about the integra
   spatial,
   intercepts,
   spatialcovariates,
+  marksintercepts,
   boundary,
   ips
 )}\if{html}{\out{</div>}}
