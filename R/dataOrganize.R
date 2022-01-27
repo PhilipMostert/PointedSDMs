@@ -205,6 +205,7 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
 #' @param countresp Name of the count data response variable.
 #' @param marks Name of the marks used in the model.
 #' @param spatial Logical: are spatial effects run in the model.
+#' @param marksspatial Logical: should spatial fields be included for the marks.
 #' @param intercept Logical: are intercepts run in the model.
 #' @param pointcovs Name of the point covariates.
 
@@ -382,6 +383,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
 #' @param pointcovariates Names of the point covariates.
 #' @param covariatenames Names of the spatially varying covariates.
 #' @param covariateclass The classes of the spatially varying covariates.
+#' @param marksspatial Logical: should spatial fields be included for the marks.
 #' @param numspecies Number of species included in the model.
 
 dataOrganize$set('public', 'makeComponents', function(spatial, intercepts, 

@@ -57,6 +57,8 @@ dataSDM$set('private', 'optionsINLA', list())
 #' @param pointcovariates Names of the additional, non-spatial covariates describing the points.
 #' @param trialspa The name of the trials variable for the presence absence datasets.
 #' @param trialsmarks The name of the trials variable for the binomial marks datasets.
+#' @param speciesname Name of the species variable used in the data.
+#' @param marksspatial Should spatial fields be included for the marks
 #' @param spatial Logical argument describing if spatial effects should be included.
 #' @param intercepts Logical argument describing if intercepts should be included in the model.
 #' @param spatialcovariates Spatial covariates object used in the model.
