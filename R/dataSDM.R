@@ -491,7 +491,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
   #Also add markModel in the initial call.
   pointData$makeFormulas(spatcovs = private$spatcovsNames, speciesname = speciesName,
                          paresp = responsePA, countresp = responseCounts, marksspatial = private$marksSpatial,
-                         marks = markNames, spatial = private$Spatial, intercept = private$Intercepts, marksintercept = private$marksIntecepts)
+                         marks = markNames, spatial = private$Spatial, intercept = private$Intercepts, markintercept = private$marksIntecepts)
   
   if (is.null(private$multinomVars)) {
     
