@@ -60,7 +60,7 @@ A data object containing the data and the relevant information about the integra
 \if{latex}{\out{\hypertarget{method-plot}{}}}
 \subsection{Method \code{plot()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$plot(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$plot(Datasets, Species, ...)}\if{html}{\out{</div>}}
 }
 
 }
