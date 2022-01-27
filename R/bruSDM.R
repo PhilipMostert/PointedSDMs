@@ -10,6 +10,8 @@
 #' @param speciesField
 #' @param markNames
 #' @param pointCovariates
+#' @param Intercepts
+#' @param pointsSpatial
 #' @param responseCounts
 #' @param responsePA
 #' @param trialsPA
@@ -24,7 +26,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                    Projection, Boundary = NULL, Mesh, IPS = NULL,
                    pointsField = NULL, speciesField = NULL,
                    markNames = NULL, markFamily = NULL, marksField = NULL,
-                   pointCovariates = NULL, Intercepts = TRUE, Spatial = TRUE, 
+                   pointCovariates = NULL, Intercepts = TRUE, pointsSpatial = TRUE, 
                    responseCounts = 'counts', responsePA = 'present', trialsPA = NULL,
                    trialsMarks = NULL, speciesName = NULL) {
   
@@ -94,7 +96,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                          pointcovariates = pointCovariates,
                          trialspa = trialsPA,
                          trialsmarks = trialsMarks,
-                         spatial = Spatial,
+                         spatial = pointsSpatial,
                          speciesname = speciesName,
                          intercepts = Intercepts,
                          spatialcovariates = spatialCovariates,

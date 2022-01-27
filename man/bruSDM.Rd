@@ -19,9 +19,9 @@ bruSDM(
   marksField = NULL,
   pointCovariates = NULL,
   Intercepts = TRUE,
-  Spatial = TRUE,
-  responseCounts = NULL,
-  responsePA = NULL,
+  pointsSpatial = TRUE,
+  responseCounts = "counts",
+  responsePA = "present",
   trialsPA = NULL,
   trialsMarks = NULL,
   speciesName = NULL
