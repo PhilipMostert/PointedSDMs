@@ -332,7 +332,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
               else marksint <- paste0(pointsResponse[[response]][j], 'intercept')
             
             
-          } marksint <- NULL
+          } else  marksint <- NULL
           
         } 
         else {
