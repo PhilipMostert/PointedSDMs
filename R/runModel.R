@@ -134,6 +134,7 @@ runModel <- function(data, options = list()) {
                                na.omit(unlist(unname(data$.__enclos_env__$private$printSummary$marksType))))
   inlaModel[['marks']] <- list(marksIn = data$.__enclos_env__$private$printSummary$Marks,
                                       multinomVars = data$.__enclos_env__$private$multinomVars)
+  inlaModel[['biasData']] <- names(data$.__enclos_env__$private$biasField)
   
   class(inlaModel) <- c('bruSDM', class(inlaModel)) # ie I'm writing an s3 class for this?
   
