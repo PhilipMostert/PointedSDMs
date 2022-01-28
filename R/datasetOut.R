@@ -42,9 +42,13 @@ datasetOut <- function(model, dataset,
       
     } else spdeModel <- NULL
     
-    if (!is.null(model$bru_info$model$effects[[1]]$env[['biasField']])) {
-      ##Also assign the speciesModel and the marksModel
-      assign('biasField', model$bru_info$model$effects[[1]]$env[['biasField']])
+    if (!is.null(model$biasData)) {
+      
+      for (data in model$biasData) { 
+        
+      assign(paste0(data, '_biasField'), model$bru_info$model$effects[[1]]$env[[paste0(data,'_biasField')]])
+        
+      }
       
     } else spdeModel <- NULL
 
