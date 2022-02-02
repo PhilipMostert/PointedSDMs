@@ -46,7 +46,7 @@ datasetOut <- function(model, dataset,
       
       for (data in model$biasData) { 
         
-      assign(paste0(data, '_bias_field'), model$bru_info$model$effects[[1]]$env[[paste0(data,'_bias_field')]])
+      assign(paste0(data, '_bias_field'), model$bru_info$model$effects[[paste0(data,'_bias_field')]]$env[[paste0(data,'_bias_field')]])
         
       }
       
