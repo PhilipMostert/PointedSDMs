@@ -89,7 +89,7 @@ runModel <- function(data, options = list()) {
     
     for (name in names(data$.__enclos_env__$private$biasField)) {
     
-      assign(paste0(name,'_bias_field'), data$.__enclos_env__$private$biasField[[name]])
+      assign(paste0(name,'_biasField'), data$.__enclos_env__$private$biasField[[name]])
       
     }
   }

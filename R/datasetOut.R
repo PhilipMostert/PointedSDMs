@@ -46,7 +46,7 @@ datasetOut <- function(model, dataset,
       
       for (data in model$biasData) { 
         
-      assign(paste0(data, '_bias_field'), model$bru_info$model$effects[[paste0(data,'_bias_field')]]$env[[paste0(data,'_bias_field')]])
+      assign(paste0(data, '_biasField'), model$bru_info$model$effects[[paste0(data,'_biasField')]]$env[[paste0(data,'_biasField')]])
         
       }
       
@@ -86,7 +86,9 @@ datasetOut <- function(model, dataset,
     ##Need to add this later...
     reduced_components <- update(reduced_components, paste0(' ~ . - ',
                                                             dataname,'_spde(main = coordinates, model = spdemodel)'))
-    reduced_components <- update(reduced_components, paste0(' ~ . -', dataname,'_bias_field(main = coordinates, model = biasField)'))
+    #reduced_components <- update(reduced_components, paste0(' ~ . -', dataname,'_bias_field(main = coordinates, model = biasField)'))
+    reduced_components <- update(reduced_components, paste0(' ~ . -', dataname,'_bias_field(main = coordinates, model = ', paste0(dataname,'_biasField)')))
+    
     ##Also need to add biasField #pref something like spatia_datasets...
     
     #if (!is.null(model[['spatial_datasets']])) {
