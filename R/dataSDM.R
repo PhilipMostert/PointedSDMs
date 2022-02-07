@@ -762,7 +762,7 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
                                                  keepSpatial = TRUE, keepIntercepts = TRUE,
                                                  ...) {
   ##Do I need all species??
-  if (all(is.null(datasetName, speciesName, markName))) stop ('At least one of: datasetName, speciesName or markName needs to be specified.')
+  if (all(is.null(datasetName), is.null(speciesName), is.null(markName))) stop ('At least one of: datasetName, speciesName or markName needs to be specified.')
   
   if (!is.null(speciesName) && !private$speciesName) stop ('Species are given but none are present in the model. Please specify species in the model with "speciesName" in bruSDM.')
   
