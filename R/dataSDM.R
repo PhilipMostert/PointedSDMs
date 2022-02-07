@@ -483,8 +483,8 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     
   }
   
-  if (is.null(private$dataSource)) private$dataSource <- unlist(pointData$dataSource)
-  else private$dataSource <- c(private$dataSource, unlist(pointData$dataSource))
+  if (is.null(private$dataSource)) private$dataSource <- unlist(as.vector(pointData$dataSource))
+  else private$dataSource <- c(private$dataSource, unlist(as.vector(pointData$dataSource)))
   
   
   ##Add here that if markSpatial then add mark_spatial
@@ -749,19 +749,151 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
   
 })
 
-#' @description Function to add INLA options to the model.
-#' @param ... A list of INLA options.
-
-#Obsolete function? Maybe just add options in runModel
-#dataSDM$set('public', 'addOptions', function(...) {
-#  
-#  private$optionsINLA <- append(private$optionsINLA, ...)
-#  
-#})
-
-
-dataSDM$set('public', 'speciesFormula', function(...) {
+#' @description Function to change formulas for a given process.
+#' @param datasetName Name of the dataset wto change the formula for.
+#' @param speciesName Name of the species to change the formula for.
+#' @param markName Name of the mark to change the formula for.
+#' @param formula Formula given to the process specifies.
+#' @param allDataset Logical argument: if \code{TRUE} changes the formulas for all processes in a dataset.
+#' @param keepSpatial Logical argument: should the spatial effects remain in the formula. Defaults to \code{TRUE}.
+#' @param keepIntercepts Logical argument: should the intercepts remain in the formula. Defaults to \code{TRUE}.
+dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName = NULL,
+                                                 markName = NULL, formula, allDataset = FALSE,
+                                                 keepSpatial = TRUE, keepIntercepts = TRUE,
+                                                 ...) {
+  ##Do I need all species??
+  if (all(is.null(datasetName, speciesName, markName))) stop ('At least one of: datasetName, speciesName or markName needs to be specified.')
   
+  if (!is.null(speciesName) && !private$speciesName) stop ('Species are given but none are present in the model. Please specify species in the model with "speciesName" in bruSDM.')
+  
+  if (!datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
+  
+  if (!markName %in% private$markNames) stop ('Mark provided not in model.')
+  
+  if (keepSpatial) {
+    
+    if (!private$Spatial && is.null(private$markNames)) keepSpatial <- FALSE
+    else
+    if (!private$Spatial && !private$marksSpatial) keepSpatial <- FALSE
+    
+  }
+  
+  #Do allDataset later ...
+  
+  if (!is.null(speciesName)) species_index <- paste0('_', speciesName)
+  else species_index <- NULL
+  
+  if (!is.null(markName)) process_index <- paste0('_', markName)
+  else process_index <- paste0('_', c('coordinates', private$responsePA, private$responseCounts))
+  
+  name_index <- paste0(datasetName, species_index, process_index)
+  name_index <- name_index[name_index %in% names(private$modelData)]
+  
+  if (identical(name_index, character(0))) stop('Species name provided not in dataset given.')
+  
+  if (missing(formula)) {
+    
+    get_formulas <- lapply(private$modelData[[name_index]], function(x) list(formula = x$formula,
+                                                                             components = x$include_components))
+    
+    get_formulas <- lapply(get_formulas, function(x) {
+      
+      if (as.character(x$formula)[3] == '.') update(x$formula, paste('~', paste0(x$components, collapse = '+'))) 
+      else x$formula
+    
+      })
+    ##Does this return the names of the formulas??
+    return(get_formulas)
+    
+  }
+  else {
+    
+    formula_terms <- attributes(terms(formula))[['term.labels']]
+    
+    for (dataset in name_index) {
+      ##Get if marks process here...
+      if (!is.null(markName)) {
+        
+        if (dataset == paste0(datasetName, '_', markName, '_', speciesName)) mark_p <- TRUE
+        
+      }
+      else mark_p <- FALSE
+      formula_update <- formula_terms
+      
+      if (keepSpatial) {
+        
+        if (mark_p) {
+          
+          if (private$marksSpatial) formula_update <- c(formula_update, paste0(markName, '_spatial'))
+          
+        }
+        else {
+          
+          if (private$Spatial) formula_update <- c(formula_update, 'shared_spatial')
+          
+          if (any(paste0(datasetName, '_bias_field') %in% c(private$modelData[[dataset]]$include_components,
+                                                            attributes(terms(private$modelData[[dataset]]))[['term.labels']]))) formula_update <- c(formula_update, paste0(datasetName, 'bias_field'))
+          
+          if (!is.null(private$speciesName)) formula_update <- c(formula_update, paste0(private$speciesName,'_spatial'))
+          
+        }
+        
+      }
+      
+      if (keepIntercepts) {
+        
+        if (mark_p) {
+          
+          if (private$marksIntercepts) formula_update <- c(formula_update, paste0(markName, '_intercept'))
+          
+        }
+        
+        else {
+          
+          
+          if (!is.null(private$speciesName)) formula_update <- c(formula_update, paste0(speciesName, '_intercept'))
+          else formula_update <- c(formula_update, paste0(datasetName, '_intercept'))
+          
+        }
+        
+      }
+      
+      if (!is.null(speciesName)) {
+        
+        covs_in <- formula_update[formula_update %in% private$spatcovsNames]
+        
+        if (!identical(covs_in, character(0))) {
+          
+          formula_update <- c(formula_update, paste0(speciesName, '_', covs_in))
+          
+          formula_update <- formula_update[!formula_update %in% covs_in]
+          
+        }
+        
+      }
+      
+      formula_update <- unique(formula_update)
+    
+    if (all(formula_update %in% c(private$spatcovsNames, private$pointCovariates,
+                                 paste0(datasetName, c('_intercept','_bias_field'),
+                                 paste0(speciesName, '_', private$spatCovNames))))) {
+    
+      private$modelData[[dataset]]$include_components <- formula_update
+      
+      
+    }
+      
+    else {
+      
+      warning('Non linear term or spelling error included.')
+      
+      private$modelData[[dataset]] <- formula(paste(as.character(q)[2], '~', paste0(formula_update, collapse = ' + ')))
+      
+    }
+    
+    }
+    
+  }
   
 })
 
