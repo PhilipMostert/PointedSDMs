@@ -768,7 +768,11 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
   
   if (!datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
   
-  if (!markName %in% private$markNames) stop ('Mark provided not in model.')
+  if (!is.null(markName)) {
+  
+    if (!markName %in% private$markNames) stop ('Mark provided not in model.')
+  
+  }
   
   if (keepSpatial) {
     
