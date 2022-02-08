@@ -772,8 +772,10 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
   
   if (!missing(formula) && class(formula) != 'formula') stop ('formula must be of class "formula".')
   
-  if (!missing(formula) && length(as.character(formula)) == 3) stop("Please remove the response variable of the formula.")
+  if (!missing(formula) && length(as.character(formula)) == 3) stop ("Please remove the response variable of the formula.")
   
+  if (allDataset && is.null(datasetName)) stop ('Please provide a dataset name in conjunction with allDataset.')
+    
   if (!is.null(markName)) {
   
     if (!markName %in% private$markNames) stop ('Mark provided not in model.')
@@ -809,8 +811,10 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
     
   }
   
-  #Do allDataset later ...
+  if (allDataset) name_index <- names(private$modelData)[startsWith(private$modelData, paste0(datasetName, '_'))]
   
+  else{
+    
   if (!is.null(markName)) process_index <- paste0('_', markName)
   else process_index <- paste0('_', c('coordinates', private$responsePA, private$responseCounts))
   
@@ -831,6 +835,8 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
     
   name_index <-  apply(expand.grid(datasetName, process_index), MARGIN = 1, FUN = paste0,collapse='')  
   name_index <- name_index[name_index %in% names(private$modelData)]
+  
+  }
   
   }
   
