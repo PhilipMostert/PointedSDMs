@@ -15,7 +15,7 @@ A data object containing the data and the relevant information about the integra
 \item \href{#method-addData}{\code{dataSDM$addData()}}
 \item \href{#method-spatialCovariates}{\code{dataSDM$spatialCovariates()}}
 \item \href{#method-addBias}{\code{dataSDM$addBias()}}
-\item \href{#method-speciesFormula}{\code{dataSDM$speciesFormula()}}
+\item \href{#method-changeFormula}{\code{dataSDM$changeFormula()}}
 \item \href{#method-addComponents}{\code{dataSDM$addComponents()}}
 }
 }
@@ -108,11 +108,20 @@ A data object containing the data and the relevant information about the integra
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-speciesFormula"></a>}}
-\if{latex}{\out{\hypertarget{method-speciesFormula}{}}}
-\subsection{Method \code{speciesFormula()}}{
+\if{html}{\out{<a id="method-changeFormula"></a>}}
+\if{latex}{\out{\hypertarget{method-changeFormula}{}}}
+\subsection{Method \code{changeFormula()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$speciesFormula(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$changeFormula(
+  datasetName = NULL,
+  speciesName = NULL,
+  markName = NULL,
+  formula,
+  allDataset = FALSE,
+  keepSpatial = TRUE,
+  keepIntercepts = TRUE,
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 }

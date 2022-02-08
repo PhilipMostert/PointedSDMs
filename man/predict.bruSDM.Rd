@@ -15,9 +15,9 @@
   spatial = TRUE,
   intercept = FALSE,
   interceptnames = NULL,
-  bisafield = FALSE,
+  biasfield = FALSE,
   biasnames = NULL,
-  linearpredictor = FALSE,
+  predictor = FALSE,
   fun = "exp",
   ...
 )
@@ -41,17 +41,17 @@
 
 \item{interceptnames}{Names of the datasets to include intercept term. Defaults to \code{NULL}.}
 
+\item{biasfield}{Include bias field in prediction.}
+
 \item{biasnames}{Names of the datasets to include bias term. Defaults to \code{NULL}.}
+
+\item{predictor}{Should all terms run in the linear predictor be included. Defaults to \code{FALSE}.}
 
 \item{fun}{Function used to predict. Set to \code{'linear'} if effects on the linear scale are desired.}
 
 \item{...}{Additional arguments used by the inlabru \code{predict} function.}
 
 \item{object}{A \code{bru_sdm object}.}
-
-\item{biasfield}{Include bias field in prediction.}
-
-\item{predictor}{Should all terms run in the linear predictor be included. Defaults to \code{FALSE}.}
 }
 \description{
 Predict for bru_sdm

@@ -30,7 +30,45 @@ bruSDM(
 )
 }
 \arguments{
-\item{speciesName}{}
+\item{...}{The datasets to be used in the model. May come as either a \code{data.frame} or \code{SpatialPoints*}, or as a list of datasets inheriting the mentioned classes.}
+
+\item{spatialCovariates}{The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{Raster*} or \code{SpatialPixelsDataFrame} object.}
+
+\item{Coordinates}{A vector of length 2 containing the names of the coordinate variables used in the model.}
+
+\item{Projection}{Projection used for the data and spatial covariates. Must be of class \code{CRS}.}
+
+\item{Boundary}{##NOT USED YET.}
+
+\item{Mesh}{An \code{inla.mesh} object.}
+
+\item{pointsField}{Specification of the shared spatial field for the points. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).}
+
+\item{speciesField}{Specification of the shared spatial field for the species. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).}
+
+\item{markNames}{A vector with the mark names to be included in the integrated model. These marks must be in the same data objects as the points.}
+
+\item{markFamily}{A vector with the statistical families of the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".}
+
+\item{pointCovariates}{The non-spatial covariates to be included in the integrated model. These covariates must be included in the same data object as the points.}
+
+\item{pointsIntercept}{Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.}
+
+\item{marksIntercept}{Logical argument: should the marks be modeled with intercepts. Defaults to \code{TRUE}.}
+
+\item{pointsSpatial}{Logical argument: should the points have a shared spatial field. Defaults to \code{TRUE}.}
+
+\item{marksSpatial}{Logical argument: should the marks have their own spatial field. Defaults to \code{TRUE}.}
+
+\item{responseCounts}{Name of the response variable in the counts datasets. This variable name needs to be standardized across all counts datasets used in the integrated model. Defaults to \code{'counts}.}
+
+\item{responsePA}{Name of the response variable in the presence absence datasets. This variable name needs to be standardized across all present absence datasets. Defaults to \code{'present}.}
+
+\item{trialsPA}{Name of the trials response variable for the presence absence datasets. Defaults to \code{NULL}.}
+
+\item{trialsMarks}{Name of the trials response variable for the binomial marks. Defaults to \code{NULL}.}
+
+\item{speciesName}{Name of the species variable name. Specifying this argument calculates covariate values for the individual species, as well as including a spatial group model for the species. Defaults to \code{NULL}}
 }
 \description{
 bruSDM function to ...
