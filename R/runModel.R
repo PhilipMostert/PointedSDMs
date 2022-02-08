@@ -94,9 +94,22 @@ runModel <- function(data, options = list()) {
     }
   }
 
-  ##Do the same for the species but run through a for loop and use assign.
 
-  componentsJoint <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components, collapse = ' + ')))
+  ## Get all components in formula; get all components but without the ()
+   # if not in formulas then remove from components
+  
+  formula_terms <- unique(unlist(lapply(data$.__enclos_env__$private$modelData, function(x) {
+    
+    if (is.null(x$include_components))  attributes(terms(x$formula))[['term.labels']]
+    else x$include_components
+    
+  })))
+  
+  comp_terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)
+  
+  comp_keep <- comp_terms %in% formula_terms
+  
+  componentsJoint <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
 
   ##in case there are duplicates, will it cause an error??
   componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
