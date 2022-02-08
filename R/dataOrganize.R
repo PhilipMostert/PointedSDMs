@@ -64,7 +64,7 @@ dataOrganize$set('public', 'makeData', function(datapoints, datanames, coords, p
   self$marksType <- dataMade[['marksType']]
   self$numObs <- dataMade[['numObs']]
   self$multinomVars <- dataMade[['multinomVars']]
-  
+
   self$dataSource <- lapply(seq_along(dataMade[['Family']]), function(x, name, i) rep(name[i], each = length(x[[i]])),
                                    x = dataMade[['Family']], name = names(dataMade[['Family']]))
 
@@ -473,10 +473,10 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
       
       speciesCovs <- apply(expand.grid(paste0(species,'_'), covariatenames), MARGIN = 1, FUN = paste0,collapse='')
       speciesCovClass <- rep(covariateclass, each = length(covariatenames))
-      covs <- paste0(speciesCovs, '(main = ', speciesCovs, ', model = \"',speciesCovClass,'\")', collapse = ' + ')
+      covs <- paste0(speciesCovs, '(main = ', speciesCovs, ', model = \"',speciesCovClass,'\")') #, collapse = ' + '
       
     }
-    else covs <- paste0(covariatenames, '(main = ', covariatenames, ', model = \"',covariateclass,'\")', collapse = ' + ')
+    else covs <- paste0(covariatenames, '(main = ', covariatenames, ', model = \"',covariateclass,'\")') # , collapse = ' + '
     
     } 
   else covs <- NULL
