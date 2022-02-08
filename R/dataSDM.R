@@ -828,7 +828,8 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
   else {
     
   name_index <-  apply(expand.grid(datasetName, process_index), MARGIN = 1, FUN = paste0,collapse='')  
-    
+  name_index <- name_index[name_index %in% names(private$modelData)]
+  
   }
   
   if (missing(formula)) {
@@ -852,6 +853,7 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
     else formula_terms <- attributes(terms(formula))[['term.labels']]
     
     index_species <- 0
+    
     for (dataset in name_index) {
       
       index_species <- index_species + 1
@@ -884,7 +886,7 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
         else {
           
           if (private$Spatial) formula_update <- c(formula_update, 'shared_spatial')
-          
+
           if (as.character(private$modelData[[dataset]]$formula)[3] == '.') bias_obj <- private$modelData[[dataset]]$include_components
           else bias_obj <-  attributes(terms(private$modelData[[dataset]]$formula))[['term.labels']]
           
