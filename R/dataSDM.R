@@ -862,8 +862,8 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
         else {
           
           if (dataset == paste0(datasetName, '_', markName)) mark_p <- TRUE
-          
-        } else mark_p <- FALSE
+          else mark_p <- FALSE
+        } 
       }
       else mark_p <- FALSE
       
