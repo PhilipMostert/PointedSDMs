@@ -67,6 +67,11 @@ datasetOut <- function(model, dataset,
   }
   else validation_results <- list()
  
+  if (!is.null(model$species$speciesVar)) {
+    
+    assign('speciesModel', model$bru_info$model$effects[[paste0(model$species$speciesVar,'_spatial')]]$env$speciesModel)
+  }
+  
   for (dataname in dataset) {
     
     index <- !model[['source']]%in%dataname
@@ -92,14 +97,14 @@ datasetOut <- function(model, dataset,
     ##Also need to add biasField #pref something like spatia_datasets...
     
     #if (!is.null(model[['spatial_datasets']])) {
-      
+    
     #  if (!dataname%in%model[['spatial_datasets']]) {
-        
+    
     #    reduced_components <- update(reduced_components, paste0(' ~ . -','shared_spatial(main = coordinates, model = spdemodel)'))    
-        
+    
     #  }  
-      
-  #  }
+    
+    #  }
     ##Add a new marks used
     
     ##Redo
@@ -127,7 +132,7 @@ datasetOut <- function(model, dataset,
       
       
     }
-
+    
     if (!is.null(model[['species']][['speciesIn']])) {
       ##Species in all but left out data
       reduced_species <- unlist(unique(model[['species']][['speciesIn']][!names(model[['species']][['speciesIn']])%in%dataname]))
@@ -136,23 +141,23 @@ datasetOut <- function(model, dataset,
       #Need diff ## REDO
       #species_rm <- intersect(reduced_species, species_dataset)
       species_rm <- species_dataset[!species_dataset %in% reduced_species]
-
+      
       if (!identical(species_rm, 'character(0)')) {
         
         if (any(!species_dataset%in%reduced_species)) {
-
-          for (species in unique(species_dataset[!species_dataset%in%reduced_species])) {
           
+          for (species in unique(species_dataset[!species_dataset%in%reduced_species])) {
+            
             species_covs <- as.vector(outer(paste0(species,'_'), model[['spatCovs']][['name']], FUN = 'paste0'))
-
+            
             for (i in 1:length(species_covs)) {
-   
+              
               reduced_components <- update(reduced_components, paste('~ . -',  paste0(species_covs[i],'(main = ', species_covs[i], ', model = "linear")')))  
               reduced_components <- update(reduced_components, paste('~ . -',  paste0(species_covs[i],'(main = ', species_covs[i], ', model = "factor_full")')))  
               reduced_components <- update(reduced_components, paste('~ . -',  paste0(species_covs[i],'(main = ', species_covs, ', model = "factor_contrast")')))  
+              
+            }
             
-              }
-     
             reduced_components <- update(reduced_components, paste('~ . -', paste0(species,'_intercept(1)')))
             
           }
@@ -167,7 +172,7 @@ datasetOut <- function(model, dataset,
       }
       
     }
-
+    
     model_reduced <- inlabru::bru(components = formula(reduced_components),
                                   model$bru_info$lhoods[index],
                                   options = reduced_options)
