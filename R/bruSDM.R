@@ -8,6 +8,7 @@
 #' @param Mesh An \code{inla.mesh} object.
 #' @param pointsField Specification of the shared spatial field for the points. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).
 #' @param speciesField Specification of the shared spatial field for the species. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).
+#' @param marksField  Specification of the fields for the marks. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).
 #' @param markNames A vector with the mark names to be included in the integrated model. These marks must be in the same data objects as the points.
 #' @param markFamily A vector with the statistical families of the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".
 #' @param pointCovariates The non-spatial covariates to be included in the integrated model. These covariates must be included in the same data object as the points.

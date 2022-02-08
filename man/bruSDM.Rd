@@ -50,6 +50,8 @@ bruSDM(
 
 \item{markFamily}{A vector with the statistical families of the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".}
 
+\item{marksField}{Specification of the fields for the marks. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).}
+
 \item{pointCovariates}{The non-spatial covariates to be included in the integrated model. These covariates must be included in the same data object as the points.}
 
 \item{pointsIntercept}{Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.}
