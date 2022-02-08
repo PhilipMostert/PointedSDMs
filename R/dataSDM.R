@@ -812,6 +812,8 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
   if (!is.null(markName)) process_index <- paste0('_', markName)
   else process_index <- paste0('_', c('coordinates', private$responsePA, private$responseCounts))
   
+  if (!is.null(private$speciesName)) {
+  
   if (!is.null(speciesName)) species_index <- paste0('_', speciesName)
   else species_index <- NULL
   
@@ -821,6 +823,8 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
   name_index <- name_index[name_index %in% names(private$modelData)]
   
   if (identical(name_index, character(0))) stop('Species name provided not in dataset given.')
+  
+  }
   
   if (missing(formula)) {
 
@@ -849,8 +853,17 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
       
       if (!is.null(markName)) {
         
-        if (dataset == paste0(datasetName, '_', markName, '_', speciesInd[index_species])) mark_p <- TRUE
+        if (!is.null(private$speciesName)) {
         
+        if (dataset == paste0(datasetName, '_', markName, '_', speciesInd[index_species])) mark_p <- TRUE
+        else mark_p <- FALSE
+        
+        }
+        else {
+          
+          if (dataset == paste0(datasetName, '_', markName)) mark_p <- TRUE
+          
+        } else mark_p <- FALSE
       }
       else mark_p <- FALSE
       
