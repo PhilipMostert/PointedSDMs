@@ -757,10 +757,10 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
 #' @param allDataset Logical argument: if \code{TRUE} changes the formulas for all processes in a dataset.
 #' @param keepSpatial Logical argument: should the spatial effects remain in the formula. Defaults to \code{TRUE}.
 #' @param keepIntercepts Logical argument: should the intercepts remain in the formula. Defaults to \code{TRUE}.
-dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName = NULL,
-                                                 markName = NULL, formula, allDataset = FALSE,
-                                                 keepSpatial = TRUE, keepIntercepts = TRUE,
-                                                 ...) {
+dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName = NULL,
+                                                markName = NULL, formula, allDataset = FALSE,
+                                                keepSpatial = TRUE, keepIntercepts = TRUE,
+                                                ...) {
   ##Do I need all species??
   if (all(is.null(datasetName), is.null(speciesName), is.null(markName))) stop ('At least one of: datasetName, speciesName or markName needs to be specified.')
   
