@@ -772,12 +772,14 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
   
   if (!missing(formula) && class(formula) != 'formula') stop ('formula must be of class "formula".')
   
+  if (!missing(formula) && length(as.character(formula)) == 3) stop("Please remove the response variable of the formula.")
+  
   if (!is.null(markName)) {
   
     if (!markName %in% private$markNames) stop ('Mark provided not in model.')
     
   }
-  
+
   if (!is.null(speciesName) && !is.null(markName)) {
     
     speciesName <- list()
@@ -849,11 +851,11 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
   }
   else {
 
-    if (length(as.character(formula)) == 2 || as.character(formula)[2] == '.') formula_terms <- c()
+    if (length(as.character(formula)) == 2 && as.character(formula)[2] == '.') formula_terms <- c()
     else formula_terms <- attributes(terms(formula))[['term.labels']]
-    
+   
     index_species <- 0
-    
+  
     for (dataset in name_index) {
       
       index_species <- index_species + 1
@@ -936,7 +938,7 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
                                    private$spatcovsNames, private$pointCovariates,
                                   'shared_spatial', paste0(private$speciesName, '_spatial'),
                                  paste0(datasetName, c('_intercept','_bias_field'))))) {
-    
+      
       private$modelData[[dataset]]$include_components <- formula_update
       
       
