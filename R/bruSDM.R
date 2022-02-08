@@ -1,29 +1,28 @@
 #' bruSDM function to ...
 #' 
-#' @param ...
-#' @param spatialCovariates
-#' @param Coordinates
-#' @param Projection
-#' @param Boundary
-#' @param Mesh
-#' @param pointsField
-#' @param speciesField
-#' @param markNames
-#' @param pointCovariates
-#' @param pointsIntercept
-#' @param marksIntercept
-#' @param pointsSpatial
-#' @param marksSpatial
-#' @param responseCounts
-#' @param responsePA
-#' @param trialsPA
-#' @param trialsMarks
-#' @param speciesName
+#' @param ... The datasets to be used in the model. May come as either a \code{data.frame} or \code{SpatialPoints*}, or as a list of datasets inheriting the mentioned classes.
+#' @param spatialCovariates The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{Raster*} or \code{SpatialPixelsDataFrame} object.
+#' @param Coordinates A vector of length 2 containing the names of the coordinate variables used in the model.
+#' @param Projection Projection used for the data and spatial covariates. Must be of class \code{CRS}.
+#' @param Boundary ##NOT USED YET.
+#' @param Mesh An \code{inla.mesh} object.
+#' @param pointsField Specification of the shared spatial field for the points. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).
+#' @param speciesField Specification of the shared spatial field for the species. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).
+#' @param markNames A vector with the mark names to be included in the integrated model. These marks must be in the same data objects as the points.
+#' @param markFamily A vector with the statistical families of the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".
+#' @param pointCovariates The non-spatial covariates to be included in the integrated model. These covariates must be included in the same data object as the points.
+#' @param pointsIntercept Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.
+#' @param marksIntercept Logical argument: should the marks be modeled with intercepts. Defaults to \code{TRUE}.
+#' @param pointsSpatial Logical argument: should the points have a shared spatial field. Defaults to \code{TRUE}.
+#' @param marksSpatial Logical argument: should the marks have their own spatial field. Defaults to \code{TRUE}.
+#' @param responseCounts Name of the response variable in the counts datasets. This variable name needs to be standardized across all counts datasets used in the integrated model. Defaults to \code{'counts}.
+#' @param responsePA Name of the response variable in the presence absence datasets. This variable name needs to be standardized across all present absence datasets. Defaults to \code{'present}.
+#' @param trialsPA Name of the trials response variable for the presence absence datasets. Defaults to \code{NULL}.
+#' @param trialsMarks Name of the trials response variable for the binomial marks. Defaults to \code{NULL}.
+#' @param speciesName Name of the species variable name. Specifying this argument calculates covariate values for the individual species, as well as including a spatial group model for the species. Defaults to \code{NULL}
 #' 
 #' @export
 
-
-##Is markFamily even being used??
 bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                    Projection, Boundary = NULL, Mesh, IPS = NULL,
                    pointsField = NULL, speciesField = NULL,
