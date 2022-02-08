@@ -42,6 +42,8 @@ markTrial = 'marktrial'
 pointCovs <- 'pointcov'
 spatCovs <- NULL #for now
 speciesName <- 'species'
+markSpatial <- TRUE
+marksIntercept <- TRUE
 
 test_that('dataSDMs initialize works as expected.', {
   
@@ -55,6 +57,8 @@ test_that('dataSDMs initialize works as expected.', {
                        trialsmarks = markTrial,
                        marksfamily = marksFamily,
                        pointcovariates = pointCovs,
+                       marksspatial = markSpatial,
+                       marksintercept = marksIntercept,
                        spatialcovariates = spatCovs,
                        speciesname = speciesName,
                        ips = iPoints,
@@ -245,3 +249,16 @@ test_that('addBias is able to add bias fields to the model as well as succesfull
   
 })
 
+test_that('changeFormula is able to change the formula of a dataset', {
+  
+  ##remove the covariate from the PO dataset
+  check$changeFormula('PO', formula = ~ ., keepSpatial = TRUE, keepIntercepts = TRUE)
+  
+  expect_setequal(check$.__enclos_env__$private$modelData$PO_fish_coordinates$include_components, c("shared_spatial", "species_spatial", "fish_intercept" ))
+  expect_setequal(check$.__enclos_env__$private$modelData$PA_bird_PAresp$include_components, c("species_spatial", "shared_spatial", "bird_intercept", "pointcov", "covariate"))
+  
+  #remove covariate for the numvar mark
+  check$changeFormula('PO', markName = 'numvar', formula = ~ ., keepSpatial = TRUE, keepIntercepts = TRUE)
+  expect_setequal(check$.__enclos_env__$private$modelData$PO_fish_numvar$include_components, c("shared_spatial", "species_spatial", "fish_intercept"))
+  
+})
