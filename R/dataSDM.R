@@ -764,15 +764,40 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
   ##Do I need all species??
   if (all(is.null(datasetName), is.null(speciesName), is.null(markName))) stop ('At least one of: datasetName, speciesName or markName needs to be specified.')
   
-  if (!is.null(speciesName) && !private$speciesName) stop ('Species are given but none are present in the model. Please specify species in the model with "speciesName" in bruSDM.')
+  if (!is.null(speciesName) && is.null(private$speciesName)) stop ('Species are given but none are present in the model. Please specify species in the model with "speciesName" in bruSDM.')
+  
+  if (is.null(speciesName) && !is.null(private$speciesName)) speciesName <- unlist(private$speciesIn[datasetName])
   
   if (!datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
+  
+  if (!missing(formula) && class(formula) != 'formula') stop ('formula must be of class "formula".')
   
   if (!is.null(markName)) {
   
     if (!markName %in% private$markNames) stop ('Mark provided not in model.')
-  
+    
   }
+  
+  if (!is.null(speciesName) && !is.null(markName)) {
+    
+    speciesName <- list()
+    
+   for (dataset in datasetName) {
+     
+     if (!is.na(private$printSummary$Marks[dataset])) {
+     
+     if (any(markName %in% private$printSummary$Marks[dataset])) speciesName[dataset] <- rep(private$speciesIn[datasetName], each = length(sum(markName %in% private$printSummary$Marks[dataset])))
+     else speciesName[dataset] <- private$speciesIn[dataset]
+     
+     } else speciesName[dataset] <- private$speciesIn[dataset]
+     
+     
+     
+   } 
+  
+    speciesInd <- unlist(speciesName)  
+   
+  } else speciesInd <- speciesName
   
   if (keepSpatial) {
     
@@ -784,20 +809,22 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
   
   #Do allDataset later ...
   
-  if (!is.null(speciesName)) species_index <- paste0('_', speciesName)
-  else species_index <- NULL
-  
   if (!is.null(markName)) process_index <- paste0('_', markName)
   else process_index <- paste0('_', c('coordinates', private$responsePA, private$responseCounts))
   
-  name_index <- paste0(datasetName, species_index, process_index)
+  if (!is.null(speciesName)) species_index <- paste0('_', speciesName)
+  else species_index <- NULL
+  
+  name_index <- apply(expand.grid(datasetName, species_index), MARGIN = 1, FUN = paste0,collapse='')
+  name_index <-apply(expand.grid(name_index, process_index), MARGIN = 1, FUN = paste0,collapse='')
+
   name_index <- name_index[name_index %in% names(private$modelData)]
   
   if (identical(name_index, character(0))) stop('Species name provided not in dataset given.')
   
   if (missing(formula)) {
-    
-    get_formulas <- lapply(private$modelData[[name_index]], function(x) list(formula = x$formula,
+
+    get_formulas <- lapply(private$modelData[name_index], function(x) list(formula = x$formula,
                                                                              components = x$include_components))
     
     get_formulas <- lapply(get_formulas, function(x) {
@@ -811,17 +838,22 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
     
   }
   else {
+
+    if (length(as.character(formula)) == 2 || as.character(formula)[2] == '.') formula_terms <- c()
+    else formula_terms <- attributes(terms(formula))[['term.labels']]
     
-    formula_terms <- attributes(terms(formula))[['term.labels']]
-    
+    index_species <- 0
     for (dataset in name_index) {
-      ##Get if marks process here...
+      
+      index_species <- index_species + 1
+      
       if (!is.null(markName)) {
         
-        if (dataset == paste0(datasetName, '_', markName, '_', speciesName)) mark_p <- TRUE
+        if (dataset == paste0(datasetName, '_', markName, '_', speciesInd[index_species])) mark_p <- TRUE
         
       }
       else mark_p <- FALSE
+      
       formula_update <- formula_terms
       
       if (keepSpatial) {
@@ -835,8 +867,10 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
           
           if (private$Spatial) formula_update <- c(formula_update, 'shared_spatial')
           
-          if (any(paste0(datasetName, '_bias_field') %in% c(private$modelData[[dataset]]$include_components,
-                                                            attributes(terms(private$modelData[[dataset]]))[['term.labels']]))) formula_update <- c(formula_update, paste0(datasetName, 'bias_field'))
+          if (as.character(private$modelData[[dataset]]$formula)[3] == '.') bias_obj <- private$modelData[[dataset]]$include_components
+          else bias_obj <-  attributes(terms(private$modelData[[dataset]]$formula))[['term.labels']]
+          
+          if (any(paste0(datasetName, '_bias_field') %in% bias_obj)) formula_update <- c(formula_update, paste0(datasetName, 'bias_field'))
           
           if (!is.null(private$speciesName)) formula_update <- c(formula_update, paste0(private$speciesName,'_spatial'))
           
@@ -855,7 +889,7 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
         else {
           
           
-          if (!is.null(private$speciesName)) formula_update <- c(formula_update, paste0(speciesName, '_intercept'))
+          if (!is.null(private$speciesName)) formula_update <- c(formula_update, paste0(speciesInd[index_species], '_intercept'))
           else formula_update <- c(formula_update, paste0(datasetName, '_intercept'))
           
         }
@@ -865,10 +899,10 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
       if (!is.null(speciesName)) {
         
         covs_in <- formula_update[formula_update %in% private$spatcovsNames]
-        
+     
         if (!identical(covs_in, character(0))) {
           
-          formula_update <- c(formula_update, paste0(speciesName, '_', covs_in))
+          formula_update <- c(formula_update, paste0(speciesInd[index_species], '_', covs_in))
           
           formula_update <- formula_update[!formula_update %in% covs_in]
           
@@ -877,10 +911,11 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
       }
       
       formula_update <- unique(formula_update)
-    
-    if (all(formula_update %in% c(private$spatcovsNames, private$pointCovariates,
-                                 paste0(datasetName, c('_intercept','_bias_field'),
-                                 paste0(speciesName, '_', private$spatCovNames))))) {
+
+      if (all(formula_update %in% c(paste0(speciesInd[index_species], '_', c('intercept',private$spatcovsNames)),
+                                   private$spatcovsNames, private$pointCovariates,
+                                  'shared_spatial', paste0(private$speciesName, '_spatial'),
+                                 paste0(datasetName, c('_intercept','_bias_field'))))) {
     
       private$modelData[[dataset]]$include_components <- formula_update
       
@@ -891,7 +926,8 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
       
       warning('Non linear term or spelling error included.')
       
-      private$modelData[[dataset]] <- formula(paste(as.character(q)[2], '~', paste0(formula_update, collapse = ' + ')))
+      private$modelData[[dataset]]$formula <- formula(paste(as.character(private$modelData[[dataset]]$formula)[2], '~', paste0(formula_update, collapse = ' + ')))
+      private$modelData[[dataset]]$include_components <- NULL
       
     }
     
