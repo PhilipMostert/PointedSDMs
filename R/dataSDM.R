@@ -818,12 +818,17 @@ dataSDM$set('public', 'speciesFormula', function(datasetName = NULL, speciesName
   else species_index <- NULL
   
   name_index <- apply(expand.grid(datasetName, species_index), MARGIN = 1, FUN = paste0,collapse='')
-  name_index <-apply(expand.grid(name_index, process_index), MARGIN = 1, FUN = paste0,collapse='')
+  name_index <- apply(expand.grid(name_index, process_index), MARGIN = 1, FUN = paste0,collapse='')
 
   name_index <- name_index[name_index %in% names(private$modelData)]
   
   if (identical(name_index, character(0))) stop('Species name provided not in dataset given.')
   
+  }
+  else {
+    
+  name_index <-  apply(expand.grid(datasetName, process_index), MARGIN = 1, FUN = paste0,collapse='')  
+    
   }
   
   if (missing(formula)) {
