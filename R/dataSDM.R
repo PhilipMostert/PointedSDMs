@@ -662,7 +662,7 @@ dataSDM$set('public', 'spatialCovariates', function(spatialCovariates) {
       
       for (form in 1:length(private$modelData)) {
         
-        private$modelData[[form]][['include_components']] <- c(private$modelData[[form]][['include']], spatcovsIncl)
+        private$modelData[[form]][['include_components']] <- c(private$modelData[[form]][['include_components']], spatcovsIncl)
         
       }
       
