@@ -192,9 +192,7 @@ dataSDM$set('public', 'print', function(...) {
 #' @param Species Should species be plotted as well? Defaults to \code{FALSE}.
 
 dataSDM$set('public', 'plot', function(Datasets, Species, ...) {
-  
-  stop('TODO later')
-  
+
   if (length(private$modelData) == 0) stop('Please provide data before running the plot function.')
   
   if (!all(Dataset %in% names(private$dataSource))) stop('Dataset provided not provided to the object.') 
@@ -206,6 +204,8 @@ dataSDM$set('public', 'plot', function(Datasets, Species, ...) {
   
   for (data in Datasets) {
     
+    index <- DO
+
     ##if species then dataset_species_response
      # else paste dataset_response ## but also only need point response -- not marks
     
@@ -217,8 +217,14 @@ dataSDM$set('public', 'plot', function(Datasets, Species, ...) {
     
     points[[data]] <- private$modelData[[index]]$data ## which will have species if need be...
     
+    if (!Species) points[[data]]@data[,'..Dataset_placeholder_var..'] <- rep(data, nrow(private$modelData[[index]]$data))
     
   }
+  
+  plotData <- do.call(rbind.SpatialPointsDataFrame, points)
+  
+  
+
   
 })
 
@@ -952,7 +958,7 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
       
     else {
       
-      warning('Non linear term or spelling error included.')
+      message('Non linear term or spelling error included.')
       
       private$modelData[[dataset]]$formula <- formula(paste(as.character(private$modelData[[dataset]]$formula)[2], '~', paste0(formula_update, collapse = ' + ')))
       private$modelData[[dataset]]$include_components <- NULL
@@ -965,7 +971,22 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
   
 })
 
-dataSDM$set('public', 'addComponents', function(...) {
+#' @description Function to add custom components to the integrated modeling.
+#' @param component Component to add to the integtated model.
+#' @param datasetName Names of the dataset to add the component to.
+#' @param speciesName Name of the species to add the component to.
+#' @param markName Name of the mark to add the component to.
+#' @param allDatasets Add the component to all the datasets.
+#' @param ... Any additional objects associated with the component, such as an inla.mesh.
+#' 
+
+dataSDM$set('public', 'addComponents', function(component, datasetName, speciesName,
+                                                markName, allDatasets, ...) {
+  
+  ##Need to ensure that the data for the component is in ie like an index
+   # If the dataset is cp, then we also need to add the data to the ipoints?
+    #This will be difficult; especially given that this function is called after like -- so raw data gone.
+     # Do later ...
   
   
 })
