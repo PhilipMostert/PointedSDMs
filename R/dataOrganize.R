@@ -49,12 +49,12 @@ dataOrganize$set('public', 'dataSource', list())
 dataOrganize$set('public', 'makeData', function(datapoints, datanames, coords, proj, marktrialname,
                                                 paresp, countsresp, trialname, speciesname, marks,
                                                 pointcovnames, markfamily) {
- 
+  
   dataMade <- dataSet(datapoints = datapoints, datanames = datanames,
-                       coords = coords, proj = proj, marks = marks,
-                       paresp = paresp, countsresp = countsresp, pointcovnames = pointcovnames,
-                       trialname = trialname, speciesname = speciesname,
-                       marktrialname = marktrialname, markfamily = markfamily)
+                      coords = coords, proj = proj, marks = marks,
+                      paresp = paresp, countsresp = countsresp, pointcovnames = pointcovnames,
+                      trialname = trialname, speciesname = speciesname,
+                      marktrialname = marktrialname, markfamily = markfamily)
   
   self$Data <- dataMade[['Data']]
   self$Family <- dataMade[['Family']]
@@ -64,18 +64,18 @@ dataOrganize$set('public', 'makeData', function(datapoints, datanames, coords, p
   self$marksType <- dataMade[['marksType']]
   self$numObs <- dataMade[['numObs']]
   self$multinomVars <- dataMade[['multinomVars']]
-
+  
   self$dataSource <- lapply(seq_along(dataMade[['Family']]), function(x, name, i) rep(name[i], each = length(x[[i]])),
-                                   x = dataMade[['Family']], name = names(dataMade[['Family']]))
-
-
-  })
+                            x = dataMade[['Family']], name = names(dataMade[['Family']]))
+  
+  
+})
 
 #' @description Function used to separate the datasets by species.
 #' @param speciesname The name of the species variable.
 
 dataOrganize$set('public', 'makeSpecies', function(speciesname) {
- 
+  
   self$SpeciesInData <- vector(mode = 'list', length = length(self$Data))
   
   ##Need #unique species in each
@@ -90,17 +90,17 @@ dataOrganize$set('public', 'makeSpecies', function(speciesname) {
     speciesList <- list()
     
     for (species in uniqueSpecies) {
-    
+      
       speciesList[[species]] <- self$Data[[dataset]][[1]][self$Data[[dataset]][[1]]@data[,speciesname] == species,]
       
     }
     
     self$Data[[dataset]] <- speciesList
-
+    
     names(self$Data[[dataset]]) <- paste0(datasetName,'_',uniqueSpecies)
-
+    
   }
-
+  
   self$dataSource <- mapply(rep, self$dataSource, each = numUnique)
   
   #With this unblocked we are assuming an INLA grouped model for the species...
@@ -118,40 +118,40 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
   
   #if (return %in% c('marks','species')) stop('Something went wrong.')
   #Need to change the multinomial vars into numeric
-   # so create a generic index across datasets.
+  # so create a generic index across datasets.
   multinomIndex <- vector(mode = 'list', length = length(multinomVars))
   names(multinomIndex) <- multinomVars
   multinomNumeric <- vector(mode = 'list', length(multinomVars))
   names(multinomNumeric) <- multinomVars
   
   for (var in multinomVars) {
-  
+    
     multinomIndex[[var]] <- vector(mode = 'list', length(self$Data))
     names(multinomIndex[[var]]) <- names(self$Data)
     multinomNumeric[[var]] <- vector(mode = 'list', length(self$Data))
     names(multinomNumeric[[var]]) <- names(self$Data)
-
+    
     for (dataset in names(self$Data)) {
       
       #multinomIndex[[var]][[dataset]] <- vector(mode = 'list', length(self$Data[[dataset]]))
       #multinomNumeric[[var]][[dataset]] <- vector(mode = 'list', length(self$Data[[dataset]]))
       if (is.null(names(self$Data[[dataset]]))) spIndex <- 1
       else spIndex <- length(names(self$Data[[dataset]]))
-  
+      
       for (species in 1:spIndex) {
-
-      if (var %in% names(self$Data[[dataset]][[species]]@data)) {
-     
-        multinomIndex[[var]][[dataset]][[species]] <- as.character(self$Data[[dataset]][[species]]@data[, var])
-
+        
+        if (var %in% names(self$Data[[dataset]][[species]]@data)) {
+          
+          multinomIndex[[var]][[dataset]][[species]] <- as.character(self$Data[[dataset]][[species]]@data[, var])
+          
         }
-      else multinomIndex[[var]][[dataset]][[species]] <- NA 
-    
+        else multinomIndex[[var]][[dataset]][[species]] <- NA 
+        
       }
       #
       
     }
-
+    
     if (!is.null(oldVars)) {
       
       if (var %in% names(oldVars)) {
@@ -171,20 +171,20 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
     
     ##Now need to create index back in
     for (x in names(multinomNumeric[[var]])) {
-
+      
       for (y in 1:length((multinomNumeric[[var]][[x]]))) {
-
-       if (!all(is.na((multinomNumeric[[var]][[x]][[y]])))) {
-         
-        self$Data[[x]][[y]]@data[,var] <- multinomNumeric[[var]][[x]][[y]]
-
+        
+        if (!all(is.na((multinomNumeric[[var]][[x]][[y]])))) {
+          
+          self$Data[[x]][[y]]@data[,var] <- multinomNumeric[[var]][[x]][[y]]
+          
+        }
       }
     }
   }
-  }
-
+  
   if (return == 'species') {
-
+    
     self$speciesNumeric <- multinomNumeric
     self$speciesIndex <- multinomIndex
     
@@ -193,9 +193,9 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
     
     self$multinomNumeric <- multinomNumeric
     self$multinomIndex <- multinomIndex
-
+    
   }
-
+  
 })
 
 #' @description Function used to create formulas for the processes.
@@ -214,20 +214,20 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
                                                     paresp, countresp, marks, marksspatial,
                                                     spatial, intercept,
                                                     markintercept, pointcovs) {
-
+  
   #if (length(self$multinomVars) != 0) marks[marks %in% self$multinomVars] <- paste0(marks[marks %in% self$multinomVars],'_response')
-
+  
   if (!is.null(marks)) {
-   
+    
     if (length(self$multinomVars) != 0) marksResps <- c(paste0(marks[marks %in% self$multinomVars],'_response'), marks[!marks %in% self$multinomVars])
     else marksResps <- marks
     
   }
   else marksResps <- NULL
-
+  
   formulas <- vector(mode = 'list', length = length(self$Data))
   names(formulas) <- names(self$Data)
-
+  
   for (dataset in 1:length(self$Data)) {
     
     pointsResponse <- lapply(unlist(self$Data[[dataset]]), function(x) {
@@ -240,25 +240,25 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
         marksIn <- names(x)[names(x) %in% marksResps]
         responses <- c('coordinates', marksIn)
         responses      
-
+        
       }
       
     })
-  
+    
     datasetCovs <- self$varsIn[[dataset]] 
     formulas[[dataset]] <- vector(mode = 'list', length = length(self$Data[[dataset]]))
-
+    
     for (species in 1:length(self$Data[[dataset]])) {
-
+      
       if (!is.null(speciesname)) {
         
         ##Fix this later depending on weather we are running INLA grouped model for the species or not...
-       if (length(self$speciesIndex[[speciesname]][[dataset]][[species]]) != 0) speciesIn <- unique(self$speciesIndex[[speciesname]][[dataset]][[species]])   
-       else speciesIn <- unique(self$Data[[dataset]][[species]]@data[,speciesname])
-      names(formulas[[dataset]])[species] <- speciesIn
-      #length_index <- length(pointsResponse[[species]])
-      length_index <- length(speciesIn)
-
+        if (length(self$speciesIndex[[speciesname]][[dataset]][[species]]) != 0) speciesIn <- unique(self$speciesIndex[[speciesname]][[dataset]][[species]])   
+        else speciesIn <- unique(self$Data[[dataset]][[species]]@data[,speciesname])
+        names(formulas[[dataset]])[species] <- speciesIn
+        #length_index <- length(pointsResponse[[species]])
+        length_index <- length(speciesIn)
+        
       } 
       else {
         
@@ -268,10 +268,10 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
       }
       
       formulas[[dataset]][[species]] <- vector(mode = 'list', length = length(pointsResponse[[species]]))
-  
+      
       for (response in 1:length_index) {
-
-      for (j in 1:length(pointsResponse[[response]])) {
+        
+        for (j in 1:length(pointsResponse[[response]])) {
           
           if (!is.null(speciesIn)) {
             
@@ -280,105 +280,105 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
               if (spatial) spat <- c(paste0(speciesname,'_spatial'), 'shared_spatial')
               else spat <- NULL
             } 
-          else {  
-          
-          if (spatial) spat <- c(paste0(speciesIn,'_spatial'), 'shared_spatial')
-          else spat <- NULL
-          
+            else {  
+              
+              if (spatial) spat <- c(paste0(speciesIn,'_spatial'), 'shared_spatial')
+              else spat <- NULL
+              
+            }
+            
+            if (intercept) int <- paste0(speciesIn,'_intercept') 
+            else int <- NULL
+            
+          }
+          else {
+            
+            if (spatial) spat <- 'shared_spatial'
+            else spat <- NULL
+            
+            if (intercept) int <- paste0(names(self$Data)[[dataset]], '_intercept')
+            else int <- NULL
           }
           
-          if (intercept) int <- paste0(speciesIn,'_intercept') 
-          else int <- NULL
-          
-        }
-        else {
-          
-          if (spatial) spat <- 'shared_spatial'
-          else spat <- NULL
-          
-          if (intercept) int <- paste0(names(self$Data)[[dataset]], '_intercept')
-          else int <- NULL
-        }
-      
-        if (!is.na(datasetCovs)) {
-          #Species specific? dataset specific?
-          if (pointsResponse[[response]][j] %in% c(paresp, countresp, 'coordinates')) addcovs <- unlist(datasetCovs)
+          if (!is.na(datasetCovs)) {
+            #Species specific? dataset specific?
+            if (pointsResponse[[response]][j] %in% c(paresp, countresp, 'coordinates')) addcovs <- unlist(datasetCovs)
+            else addcovs <- NULL
+            
+          }
           else addcovs <- NULL
           
+          if (!is.null(spatcovs)) {
+            
+            if (!is.null(speciesname)) covs <- paste0(speciesIn, '_', spatcovs)
+            else covs <- spatcovs
+            
           }
-        else addcovs <- NULL
-
-        if (!is.null(spatcovs)) {
+          else covs <- NULL
           
-          if (!is.null(speciesname)) covs <- paste0(speciesIn, '_', spatcovs)
-          else covs <- spatcovs
-        
-        }
-        else covs <- NULL
-        
-        if (!is.null(marks)) {
-          
-        if (pointsResponse[[response]][j] %in% c('coordinates', paresp, countresp)) {
-          
-          markspat <- NULL
-          marksint <- NULL
-          
-        }
-        else {
-          
-          if (spatial) spat <- NULL
-          
-          if (marksspatial) {
+          if (!is.null(marks)) {
             
-          if (pointsResponse[[response]][j] %in% paste0(marks,'_response')) markspat <- paste0(marks[pointsResponse[[response]][j] == paste0(marks,'_response')],'_spatial')
-          else markspat <- paste0(pointsResponse[[response]][j], '_spatial')
-    
+            if (pointsResponse[[response]][j] %in% c('coordinates', paresp, countresp)) {
+              
+              markspat <- NULL
+              marksint <- NULL
+              
+            }
+            else {
+              
+              if (spatial) spat <- NULL
+              
+              if (marksspatial) {
+                
+                if (pointsResponse[[response]][j] %in% paste0(marks,'_response')) markspat <- paste0(marks[pointsResponse[[response]][j] == paste0(marks,'_response')],'_spatial')
+                else markspat <- paste0(pointsResponse[[response]][j], '_spatial')
+                
+                
+              } else markspat <- NULL
+              
+              if (intercept) int <- NULL
+              
+              if (markintercept) {
+                
+                if (pointsResponse[[response]][j] %in% paste0(marks,'_response')) marksint <- paste0(marks[pointsResponse[[response]][j] == paste0(marks,'_response')],'_intercept')
+                else marksint <- paste0(pointsResponse[[response]][j], '_intercept')
+                
+              } else marksint <- NULL
+              
+            }
             
-          } else markspat <- NULL
-          
-          if (intercept) int <- NULL
-          
-          if (markintercept) {
-            
-          if (pointsResponse[[response]][j] %in% paste0(marks,'_response')) marksint <- paste0(marks[pointsResponse[[response]][j] == paste0(marks,'_response')],'_intercept')
-          else marksint <- paste0(pointsResponse[[response]][j], '_intercept')
-            
-        } else marksint <- NULL
-          
-        }
-          
-        }
-        else {
-          
-          markspat <- NULL
-          marksint <- NULL
-          
-        }
- 
-        RHS <- c(covs, spat, int, addcovs, markspat, marksint)
-     
-        if (pointsResponse[[response]][j] %in% paste0(self$multinomVars,'_response')) { #paste multinomvar and phi # Need to convert multinomvar to numeric
-          
-          mnVar <- self$multinomVars[pointsResponse[[response]][j] %in% paste0(self$multinomVars,'_response')]
-          RHS <- c(RHS, mnVar, paste0(mnVar, '_phi'))
-          
           }
-       
-        #formulas[[dataset]][[species]][[j]] <- formula(paste0(pointsResponse[[response]][j], ' ~ ', paste0(RHS, collapse = ' + ')))
-        ##Test
-        formulas[[dataset]][[species]][[j]] <- vector(mode = 'list', length = 2)
-        names(formulas[[dataset]][[species]][[j]]) <- c('LHS', 'RHS')
-        formulas[[dataset]][[species]][[j]][[1]] <- formula(paste0(pointsResponse[[response]][j], ' ~ .'))
-        formulas[[dataset]][[species]][[j]][[2]] <- RHS
-        names(formulas[[dataset]][[species]])[j] <- pointsResponse[[response]][j]
-        
+          else {
+            
+            markspat <- NULL
+            marksint <- NULL
+            
+          }
+          
+          RHS <- c(covs, spat, int, addcovs, markspat, marksint)
+          
+          if (pointsResponse[[response]][j] %in% paste0(self$multinomVars,'_response')) { #paste multinomvar and phi # Need to convert multinomvar to numeric
+            
+            mnVar <- self$multinomVars[pointsResponse[[response]][j] %in% paste0(self$multinomVars,'_response')]
+            RHS <- c(RHS, mnVar, paste0(mnVar, '_phi'))
+            
+          }
+          
+          #formulas[[dataset]][[species]][[j]] <- formula(paste0(pointsResponse[[response]][j], ' ~ ', paste0(RHS, collapse = ' + ')))
+          ##Test
+          formulas[[dataset]][[species]][[j]] <- vector(mode = 'list', length = 2)
+          names(formulas[[dataset]][[species]][[j]]) <- c('LHS', 'RHS')
+          formulas[[dataset]][[species]][[j]][[1]] <- formula(paste0(pointsResponse[[response]][j], ' ~ .'))
+          formulas[[dataset]][[species]][[j]][[2]] <- RHS
+          names(formulas[[dataset]][[species]])[j] <- pointsResponse[[response]][j]
+          
         }
-       }
       }
-     }
+    }
+  }
   self$Formulas <- formulas
-
-  })
+  
+})
 
 #' @description Function used to make components for the model.
 #' @param spatial Logical: are spatial effects run in the model.
@@ -405,7 +405,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   ##Copy for marks fields???
   if (length(self$SpeciesInData) != 0) species <- unique(unlist(self$SpeciesInData))
   else species = NULL
-
+  
   if (spatial) {
     
     spat <- paste0('shared_spatial(main = coordinates, model = spdeModel)')
@@ -415,13 +415,13 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   if (!is.null(species)) {
     
     if (spatial) {
-     
+      
       #if (length(speciesspatial) > 0) {
-        
+      
       #speciesSpat <- paste0(species,'_spatial(main = coordinates, model = ',paste0(species,'_spdeModel'),')', collapse = ' + ')
       
-    #} 
-    #else {
+      #} 
+      #else {
       
       #ie we are assuming and INLA grouped model
       if (length(self$speciesIndex) != 0) {
@@ -431,8 +431,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
       }
       else speciesSpat <- paste0(species,'_spatial(main = coordinates, model = speciesModel)', collapse = ' + ') #change this to speciesModel
       
-    #}
-    
+      #}
+      
     }
     else speciesSpat <- NULL
     
@@ -461,7 +461,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
   }
   else {
-   
+    
     marksSpat <- NULL
     marksInt <- NULL
     
@@ -478,7 +478,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     }
     else covs <- paste0(covariatenames, '(main = ', covariatenames, ', model = \"',covariateclass,'\")') # , collapse = ' + '
     
-    } 
+  } 
   else covs <- NULL
   
   if (!is.null(pointcovariates)) {
@@ -498,14 +498,14 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
     if (!is.null(marks)) intMarks <- paste0(marks, '_intercept(1)')
     else intMarks <- NULL
-  
-    } 
-    else {
-      
-      int <- NULL
-      intMarks <- NULL
-      
-    } 
+    
+  } 
+  else {
+    
+    int <- NULL
+    intMarks <- NULL
+    
+  } 
   
   if (!is.null(multinomnames)) {
     
@@ -521,10 +521,10 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   }
   
   RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt)
-
+  
   RHS
   
-  })
+})
 
 #' @description Function to make the datasets into likelihoods.
 #' @param mesh An inla.mesh object.
@@ -541,7 +541,7 @@ dataOrganize$set('public', 'makeLhoods', function(mesh, ips,
   
   Likelihoods <- list()
   #formulas <- unlist(self$Formulas)
-
+  
   for (dataset in 1:length(self$Data)) {
     
     for (species in 1:length(self$Data[[dataset]])) {
@@ -549,57 +549,57 @@ dataOrganize$set('public', 'makeLhoods', function(mesh, ips,
       Ntrialsvar <- list()
       
       if (!is.null(ntrialsvar)) {
-       
-      if (ntrialsvar %in% names(self$Data[[dataset]][[species]]@data)) {
-   
-       Ntrialsvar[[1]] <- self$Data[[dataset]][[species]]@data[,ntrialsvar]
+        
+        if (ntrialsvar %in% names(self$Data[[dataset]][[species]]@data)) {
           
+          Ntrialsvar[[1]] <- self$Data[[dataset]][[species]]@data[,ntrialsvar]
+          
+        } else Ntrialsvar[[1]] <- NA
+        
       } else Ntrialsvar[[1]] <- NA
-       
-       } else Ntrialsvar[[1]] <- NA
-     
+      
       if (!is.null(markstrialsvar)) {
-       
+        
         if (markstrialsvar %in% names(self$Data[[dataset]][[species]]@data)) {
-        
-        Ntrialsvar[[2]] <- self$Data[[dataset]][[species]]@data[,markstrialsvar]
-        
-       } else Ntrialsvar[[2]] <- NA
-        
+          
+          Ntrialsvar[[2]] <- self$Data[[dataset]][[species]]@data[,markstrialsvar]
+          
         } else Ntrialsvar[[2]] <- NA
+        
+      } else Ntrialsvar[[2]] <- NA
       
       for (process in 1:length(self$Family[[dataset]])) {
-
+        
         Likindex <- length(Likelihoods) + 1
         
         if (self$Family[[dataset]][process] == 'binomial') {
-        
+          
           if (!is.na(Ntrialsvar[[1]]) || !is.na(Ntrialsvar[[2]])) {
-          
+            
             if (as.character(self$Formulas[[dataset]][[species]][[process]][['LHS']])[2] == paresp) Ntrials <- Ntrialsvar[[1]]
-          
+            
             else Ntrials <- Ntrialsvar[[2]]
-        
-            } else Ntrials <- 1
+            
+          } else Ntrials <- 1
         } 
         else Ntrials <- 1
         
         if (!is.null(speciesname)) {
-        
+          
           if (length(self$speciesIndex) != 0) {
-  
-          speciesRep <- data.frame(rep(unique(self$Data[[dataset]][[species]]@data[,speciesname]), nrow(ips@coords)))
-          names(speciesRep) <- speciesname
-
-          IPS <- ips
-          IPS@data <- cbind(ips@data, speciesRep)
-  
+            
+            speciesRep <- data.frame(rep(unique(self$Data[[dataset]][[species]]@data[,speciesname]), nrow(ips@coords)))
+            names(speciesRep) <- speciesname
+            
+            IPS <- ips
+            IPS@data <- cbind(ips@data, speciesRep)
+            
           }
-
+          
         }
         else IPS <- ips
-##rm formulas for now
-       
+        ##rm formulas for now
+        
         Likelihoods[[Likindex]] <- inlabru::like(formula = self$Formulas[[dataset]][[species]][[process]][['LHS']],
                                                  include = self$Formulas[[dataset]][[species]][[process]][['RHS']],
                                                  data = self$Data[[dataset]][[species]], 
@@ -607,12 +607,12 @@ dataOrganize$set('public', 'makeLhoods', function(mesh, ips,
                                                  mesh = mesh,
                                                  ips = IPS,
                                                  family = self$Family[[dataset]][process])
-      
-      if (is.null(names(self$Data[[dataset]])[species])) nameGive <- names(self$Data)[[dataset]]
-      else nameGive <- names(self$Data[[dataset]])[species]
-      
-      names(Likelihoods)[[Likindex]] <- paste0(nameGive, '_', as.character(self$Formulas[[dataset]][[species]][[process]][['LHS']])[2])
-      
+        
+        if (is.null(names(self$Data[[dataset]])[species])) nameGive <- names(self$Data)[[dataset]]
+        else nameGive <- names(self$Data[[dataset]])[species]
+        
+        names(Likelihoods)[[Likindex]] <- paste0(nameGive, '_', as.character(self$Formulas[[dataset]][[species]][[process]][['LHS']])[2])
+        
       }
       
     }
@@ -620,6 +620,6 @@ dataOrganize$set('public', 'makeLhoods', function(mesh, ips,
   }
   
   self$Data <- Likelihoods
-
-  })
+  
+})
 
