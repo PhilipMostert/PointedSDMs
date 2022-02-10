@@ -99,14 +99,14 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
   
   if (!missing(initialnames)) private$initialnames <- initialnames
   if (!missing(boundary)) private$Boundary <- boundary
-
+  
   private$markNames <- marksnames
   private$markFamily <- marksfamily
-
+  
   private$pointCovariates <- pointcovariates
-
+  
   if (!is.null(spatialcovariates)) self$spatialCovariates(spatialcovariates)
-
+  
   if (!is.null(ips)) private$IPS <- ips
   else {
     
@@ -119,14 +119,14 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
   private$marksSpatial <- marksspatial
   private$Intercepts <- intercepts
   private$marksIntercepts <- marksintercepts
-
+  
   #if (!private$Spatial && private$markSpatial) warning('Spatial has been set to FALSE but marksSpatial is TRUE. Spatial effects for the marks will still be run.')
   
   private$Coordinates <- coordinates
   private$Projection <- projection
   private$INLAmesh <- Inlamesh
   invisible(self)
-
+  
 })
 
 #' @description Prints the datasets, their data type and the number of observations, as well as the marks and their respective families.
@@ -135,64 +135,64 @@ dataSDM$set('public', 'print', function(...) {
   
   if (length(private$modelData) == 0) cat('No data found. Please add data using the `$.addData` function.')
   else {
-  cat('Summary of dataSDM data file:\n\n')
-  ## Find present absence dataset
-  if (length(names(private$printSummary$Type)[private$printSummary$Type == 'Present absence']) > 0) {
-  cat('Summary of present absence datasets:\n\n')
-  dataIn <- data.frame(c('-----', names(private$printSummary$Type)[private$printSummary$Type == 'Present absence']),
-                        c('',rep('|  ---  |', length(private$printSummary$Type[private$printSummary$Type == 'Present absence']))),
-                        c('------------------', private$printSummary$numObs[private$printSummary$Type == 'Present absence']))
-  names(dataIn) <- c('Name:','','# of observations:')
-  print.data.frame(dataIn[,1:3], row.names = FALSE, right = FALSE)
-  cat('\n')
-  
-  }
-  
-  if (length(names(private$printSummary$Type)[private$printSummary$Type == 'Present only']) > 0) {
-  cat('Summary of present only datasets:\n\n')
-  dataIn <- data.frame(c('-----', names(private$printSummary$Type)[private$printSummary$Type == 'Present only']),
-                       c('',rep('|  ---  |', length(private$printSummary$Type[private$printSummary$Type == 'Present only']))),
-                       c('------------------', private$printSummary$numObs[private$printSummary$Type == 'Present only']))
-  names(dataIn) <- c('Name:','','# of observations:')
-  print.data.frame(dataIn[,1:3], row.names = FALSE, right = FALSE)
-  cat('\n')
-  
-  }
-  
-  if (length(names(private$printSummary$Type)[private$printSummary$Type == 'Count data']) > 0)  {
-  cat('Summary of count datasets:\n\n')
-  dataIn <- data.frame(c('-----', names(private$printSummary$Type)[private$printSummary$Type == 'Count data']),
-                       c('',rep('|  ---  |', length(private$printSummary$Type[private$printSummary$Type == 'Count data']))),
-                       c('------------------', private$printSummary$numObs[private$printSummary$Type == 'Count data']))
-  names(dataIn) <- c('Name:','','# of observations:')
-  print.data.frame(dataIn[,1:3], row.names = FALSE, right = FALSE)
-  cat('\n')
-  
-  }
-  
-  if (!is.null(private$markNames)) {
+    cat('Summary of dataSDM data file:\n\n')
+    ## Find present absence dataset
+    if (length(names(private$printSummary$Type)[private$printSummary$Type == 'Present absence']) > 0) {
+      cat('Summary of present absence datasets:\n\n')
+      dataIn <- data.frame(c('-----', names(private$printSummary$Type)[private$printSummary$Type == 'Present absence']),
+                           c('',rep('|  ---  |', length(private$printSummary$Type[private$printSummary$Type == 'Present absence']))),
+                           c('------------------', private$printSummary$numObs[private$printSummary$Type == 'Present absence']))
+      names(dataIn) <- c('Name:','','# of observations:')
+      print.data.frame(dataIn[,1:3], row.names = FALSE, right = FALSE)
+      cat('\n')
+      
+    }
     
-    cat('Marks included:\n\n')
-    mark_data <- na.omit(data.frame(c('-----',unlist(private$printSummary$Marks)),
-                                    c('',rep('|  ---  |', length(unlist(private$printSummary$Marks)))),
-                                    c('-----',unlist(private$printSummary$marksType))))
-    #mark_data <- mark_data[!duplicated(lapply(x@Mark_data, function(dat) attributes(dat)$mark_name)),]
-    mark_data <- unique(mark_data)
-    names(mark_data) <- c('Name:','', 'Type:')
-    print.data.frame(mark_data[,1:3], row.names = FALSE, right = FALSE)
-    cat('\n')
+    if (length(names(private$printSummary$Type)[private$printSummary$Type == 'Present only']) > 0) {
+      cat('Summary of present only datasets:\n\n')
+      dataIn <- data.frame(c('-----', names(private$printSummary$Type)[private$printSummary$Type == 'Present only']),
+                           c('',rep('|  ---  |', length(private$printSummary$Type[private$printSummary$Type == 'Present only']))),
+                           c('------------------', private$printSummary$numObs[private$printSummary$Type == 'Present only']))
+      names(dataIn) <- c('Name:','','# of observations:')
+      print.data.frame(dataIn[,1:3], row.names = FALSE, right = FALSE)
+      cat('\n')
+      
+    }
     
-  }
+    if (length(names(private$printSummary$Type)[private$printSummary$Type == 'Count data']) > 0)  {
+      cat('Summary of count datasets:\n\n')
+      dataIn <- data.frame(c('-----', names(private$printSummary$Type)[private$printSummary$Type == 'Count data']),
+                           c('',rep('|  ---  |', length(private$printSummary$Type[private$printSummary$Type == 'Count data']))),
+                           c('------------------', private$printSummary$numObs[private$printSummary$Type == 'Count data']))
+      names(dataIn) <- c('Name:','','# of observations:')
+      print.data.frame(dataIn[,1:3], row.names = FALSE, right = FALSE)
+      cat('\n')
+      
+    }
+    
+    if (!is.null(private$markNames)) {
+      
+      cat('Marks included:\n\n')
+      mark_data <- na.omit(data.frame(c('-----',unlist(private$printSummary$Marks)),
+                                      c('',rep('|  ---  |', length(unlist(private$printSummary$Marks)))),
+                                      c('-----',unlist(private$printSummary$marksType))))
+      #mark_data <- mark_data[!duplicated(lapply(x@Mark_data, function(dat) attributes(dat)$mark_name)),]
+      mark_data <- unique(mark_data)
+      names(mark_data) <- c('Name:','', 'Type:')
+      print.data.frame(mark_data[,1:3], row.names = FALSE, right = FALSE)
+      cat('\n')
+      
+    }
   }
   
-  })
+})
 
 #' @description Makes a plot of the region as well as the points.
 #' @param Datasets Name of the datasets to plot.
 #' @param Species Should species be plotted as well? Defaults to \code{FALSE}.
 
 dataSDM$set('public', 'plot', function(Datasets, Species, ...) {
-
+  
   if (length(private$modelData) == 0) stop('Please provide data before running the plot function.')
   
   if (!all(Dataset %in% names(private$dataSource))) stop('Dataset provided not provided to the object.') 
@@ -205,15 +205,15 @@ dataSDM$set('public', 'plot', function(Datasets, Species, ...) {
   for (data in Datasets) {
     
     index <- DO
-
+    
     ##if species then dataset_species_response
-     # else paste dataset_response ## but also only need point response -- not marks
+    # else paste dataset_response ## but also only need point response -- not marks
     
     #Probably want to create one df object with another variable called dataset placeholder or something
-     #Then colour by species or dataset or whatever
+    #Then colour by species or dataset or whatever
     
     #Also need to create a boundary of sorts... either if Boundary is non null; else can make from mesh...
-     #Maybe even allow maps if SpatialPolygon provided...
+    #Maybe even allow maps if SpatialPolygon provided...
     
     points[[data]] <- private$modelData[[index]]$data ## which will have species if need be...
     
@@ -224,7 +224,7 @@ dataSDM$set('public', 'plot', function(Datasets, Species, ...) {
   plotData <- do.call(rbind.SpatialPointsDataFrame, points)
   
   
-
+  
   
 })
 
@@ -369,7 +369,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     }
     
   }
- 
+  
   if (!is.null(private$speciesName)) {
     
     if (missing(speciesName)) speciesName <- private$speciesName
@@ -648,7 +648,7 @@ dataSDM$set('public', 'spatialCovariates', function(spatialCovariates) {
     #This won't work... will have to convert in runModel
     objSpat <- as(spatialCovariates, 'SpatialPixelsDataFrame')
     covsClass <- sapply(objSpat@data, class)
-   
+    
   } else covsClass <- sapply(spatialCovariates@data, class)
   
   if (is.null(private$ptcovsClass))   private$ptcovsClass <- covsClass
@@ -660,11 +660,11 @@ dataSDM$set('public', 'spatialCovariates', function(spatialCovariates) {
     
     if (is.null(private$spatcovsObj)) {
       
-    #  newForms <- sapply(private$modelData, function(x) {
-        
-    #    update(x$formula, paste('~ . +', paste(spatcovsIncl, collapse = ' + ')))
-        
-    #  })
+      #  newForms <- sapply(private$modelData, function(x) {
+      
+      #    update(x$formula, paste('~ . +', paste(spatcovsIncl, collapse = ' + ')))
+      
+      #  })
       
       for (form in 1:length(private$modelData)) {
         
@@ -681,7 +681,7 @@ dataSDM$set('public', 'spatialCovariates', function(spatialCovariates) {
       else newComps <- paste0(spatcovsIncl, '(main = ', spatcovsIncl, ', model = \"',covsClass,'\")', collapse = ' + ')
       
       private$Components <- c(private$Components, newComps)
-    
+      
       ## Add all the new spat covs names to formulas ie update func can I sapply it all?
       ## Add all new spat covs to components ... 
     }
@@ -739,7 +739,7 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
     
   }
   
-
+  
   
   ##Add a way for separate Fields per dataset.
   #Shouldn't be too difficult -- have already done it before.
@@ -770,7 +770,7 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
                                                 keepSpatial = TRUE, keepIntercepts = TRUE,
                                                 ...) {
   #REWRITE THE LAST PART OF THE FUNCTION SUCH THAT IT WORKS LIKE THE UPDATE.FORMULA FUNCTION.
-
+  
   if (all(is.null(datasetName), is.null(speciesName), is.null(markName))) stop ('At least one of: datasetName, speciesName or markName needs to be specified.')
   
   if (!is.null(speciesName) && is.null(private$speciesName)) stop ('Species are given but none are present in the model. Please specify species in the model with "speciesName" in bruSDM.')
@@ -784,94 +784,94 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
   if (!missing(Formula) && length(as.character(Formula)) == 3) stop ("Please remove the response variable of the formula.")
   
   if (allDataset && is.null(datasetName)) stop ('Please provide a dataset name in conjunction with allDataset.')
-    
-  if (!is.null(markName)) {
   
+  if (!is.null(markName)) {
+    
     if (!markName %in% private$markNames) stop ('Mark provided not in model.')
     
   }
-
+  
   if (!is.null(speciesName) && !is.null(markName)) {
     
     speciesName <- list()
     
-   for (dataset in datasetName) {
-     
-     if (!is.na(private$printSummary$Marks[dataset])) {
-     
-     if (any(markName %in% private$printSummary$Marks[dataset])) speciesName[dataset] <- rep(private$speciesIn[datasetName], each = length(sum(markName %in% private$printSummary$Marks[dataset])))
-     else speciesName[dataset] <- private$speciesIn[dataset]
-     
-     } else speciesName[dataset] <- private$speciesIn[dataset]
-     
+    for (dataset in datasetName) {
+      
+      if (!is.na(private$printSummary$Marks[dataset])) {
+        
+        if (any(markName %in% private$printSummary$Marks[dataset])) speciesName[dataset] <- rep(private$speciesIn[datasetName], each = length(sum(markName %in% private$printSummary$Marks[dataset])))
+        else speciesName[dataset] <- private$speciesIn[dataset]
+        
+      } else speciesName[dataset] <- private$speciesIn[dataset]
+      
     } 
-  
+    
     speciesInd <- unlist(speciesName)  
-   
+    
   } else speciesInd <- speciesName
   
   if (keepSpatial) {
     
     if (!private$Spatial && is.null(private$markNames)) keepSpatial <- FALSE
     else
-    if (!private$Spatial && !private$marksSpatial) keepSpatial <- FALSE
-    
+      if (!private$Spatial && !private$marksSpatial) keepSpatial <- FALSE
+      
   }
   
   if (allDataset) name_index <- names(private$modelData)[startsWith(private$modelData, paste0(datasetName, '_'))]
   
   else{
     
-  if (!is.null(markName)) process_index <- paste0('_', markName)
-  else process_index <- paste0('_', c('coordinates', private$responsePA, private$responseCounts))
-  
-  if (!is.null(private$speciesName)) {
-  
-  if (!is.null(speciesName)) species_index <- paste0('_', speciesName)
-  else species_index <- NULL
-  
-  name_index <- apply(expand.grid(datasetName, species_index), MARGIN = 1, FUN = paste0,collapse='')
-  name_index <- apply(expand.grid(name_index, process_index), MARGIN = 1, FUN = paste0,collapse='')
-
-  name_index <- name_index[name_index %in% names(private$modelData)]
-  
-  if (identical(name_index, character(0))) stop('Species name provided not in dataset given.')
-  
-  }
-  else {
+    if (!is.null(markName)) process_index <- paste0('_', markName)
+    else process_index <- paste0('_', c('coordinates', private$responsePA, private$responseCounts))
     
-  name_index <-  apply(expand.grid(datasetName, process_index), MARGIN = 1, FUN = paste0,collapse='')  
-  name_index <- name_index[name_index %in% names(private$modelData)]
-  
-  }
-  
+    if (!is.null(private$speciesName)) {
+      
+      if (!is.null(speciesName)) species_index <- paste0('_', speciesName)
+      else species_index <- NULL
+      
+      name_index <- apply(expand.grid(datasetName, species_index), MARGIN = 1, FUN = paste0,collapse='')
+      name_index <- apply(expand.grid(name_index, process_index), MARGIN = 1, FUN = paste0,collapse='')
+      
+      name_index <- name_index[name_index %in% names(private$modelData)]
+      
+      if (identical(name_index, character(0))) stop('Species name provided not in dataset given.')
+      
+    }
+    else {
+      
+      name_index <-  apply(expand.grid(datasetName, process_index), MARGIN = 1, FUN = paste0,collapse='')  
+      name_index <- name_index[name_index %in% names(private$modelData)]
+      
+    }
+    
   }
   
   if (missing(Formula)) {
-
+    
     get_formulas <- lapply(private$modelData[name_index], function(x) list(formula = x$formula,
-                                                                             components = x$include_components))
+                                                                           components = x$include_components))
     
     get_formulas <- lapply(get_formulas, function(x) {
       
       if (as.character(x$formula)[3] == '.') update(x$formula, paste('~', paste0(x$components, collapse = '+'))) 
       else x$formula
-    
-      })
+      
+    })
     ##Does this return the names of the formulas??
     return(get_formulas)
     
   }
   else {
-
+    
     #if (length(as.character(Formula)) == 2 && as.character(Formula)[2] == '.') formula_terms <- c()
     #else formula_terms <- attributes(terms(formula))[['term.labels']]
-   
+    
     index_species <- 0
-  
+    
     
     for (dataset in name_index) {
-    
+      
       index_species <- index_species + 1
       
       if (!is.null(markName)) {
@@ -931,12 +931,12 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
         
         if (!identical(covs_in, character(0))) {
           #Change this to an update formula side
-           # but this is more difficult since what if there is a plus?
-           # need to do a strsplit; get all the covariate terms; and change them to species_cov
+          # but this is more difficult since what if there is a plus?
+          # need to do a strsplit; get all the covariate terms; and change them to species_cov
           char_formula <- unlist(strsplit(as.character(Formula), split = ' '))
           
           char_formula[char_formula == covs_in] <- paste0(speciesInd[index_species], '_', covs_in)
-   
+          
           formula_update <- formula(paste(char_formula, collapse = ' '))
           
         }
@@ -948,7 +948,7 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
       ##This will be removed once we move the like construction to runModel.
       private$modelData[[dataset]]$include_components <- updated_formula
       
-      }
+    }
     
   }
   
@@ -967,9 +967,9 @@ dataSDM$set('public', 'addComponents', function(component, datasetName, speciesN
                                                 markName, allDatasets, ...) {
   
   ##Need to ensure that the data for the component is in ie like an index
-   # If the dataset is cp, then we also need to add the data to the ipoints?
-    #This will be difficult; especially given that this function is called after like -- so raw data gone.
-     # Do later ...
+  # If the dataset is cp, then we also need to add the data to the ipoints?
+  #This will be difficult; especially given that this function is called after like -- so raw data gone.
+  # Do later ...
   
   
 })
