@@ -755,19 +755,22 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
   
 })
 
-#' @description Function to change formulas for a given process.
-#' @param datasetName Name of the dataset wto change the formula for.
+#' @description Function to update formulas for a given process.
+#' @param datasetName Name of the dataset to change the formula for.
 #' @param speciesName Name of the species to change the formula for.
 #' @param markName Name of the mark to change the formula for.
-#' @param formula Formula given to the process specifies.
+#' @param Formula An updated formula to give to the process.
 #' @param allDataset Logical argument: if \code{TRUE} changes the formulas for all processes in a dataset.
 #' @param keepSpatial Logical argument: should the spatial effects remain in the formula. Defaults to \code{TRUE}.
 #' @param keepIntercepts Logical argument: should the intercepts remain in the formula. Defaults to \code{TRUE}.
-dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName = NULL,
-                                                markName = NULL, formula, allDataset = FALSE,
+#' @param newFormula Completely change the formula for a process. Note: all terms need to be correctly specified here. ## TO ADD
+
+dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName = NULL,
+                                                markName = NULL, Formula, allDataset = FALSE,
                                                 keepSpatial = TRUE, keepIntercepts = TRUE,
                                                 ...) {
-  ##Do I need all species??
+  #REWRITE THE LAST PART OF THE FUNCTION SUCH THAT IT WORKS LIKE THE UPDATE.FORMULA FUNCTION.
+
   if (all(is.null(datasetName), is.null(speciesName), is.null(markName))) stop ('At least one of: datasetName, speciesName or markName needs to be specified.')
   
   if (!is.null(speciesName) && is.null(private$speciesName)) stop ('Species are given but none are present in the model. Please specify species in the model with "speciesName" in bruSDM.')
@@ -776,9 +779,9 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
   
   if (!datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
   
-  if (!missing(formula) && class(formula) != 'formula') stop ('formula must be of class "formula".')
+  if (!missing(Formula) && class(Formula) != 'formula') stop ('formula must be of class "formula".')
   
-  if (!missing(formula) && length(as.character(formula)) == 3) stop ("Please remove the response variable of the formula.")
+  if (!missing(Formula) && length(as.character(Formula)) == 3) stop ("Please remove the response variable of the formula.")
   
   if (allDataset && is.null(datasetName)) stop ('Please provide a dataset name in conjunction with allDataset.')
     
@@ -801,9 +804,7 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
      
      } else speciesName[dataset] <- private$speciesIn[dataset]
      
-     
-     
-   } 
+    } 
   
     speciesInd <- unlist(speciesName)  
    
@@ -846,7 +847,7 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
   
   }
   
-  if (missing(formula)) {
+  if (missing(Formula)) {
 
     get_formulas <- lapply(private$modelData[name_index], function(x) list(formula = x$formula,
                                                                              components = x$include_components))
@@ -863,22 +864,23 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
   }
   else {
 
-    if (length(as.character(formula)) == 2 && as.character(formula)[2] == '.') formula_terms <- c()
-    else formula_terms <- attributes(terms(formula))[['term.labels']]
+    #if (length(as.character(Formula)) == 2 && as.character(Formula)[2] == '.') formula_terms <- c()
+    #else formula_terms <- attributes(terms(formula))[['term.labels']]
    
     index_species <- 0
   
+    
     for (dataset in name_index) {
-      
+    
       index_species <- index_species + 1
       
       if (!is.null(markName)) {
         
         if (!is.null(private$speciesName)) {
-        
-        if (dataset == paste0(datasetName, '_', markName, '_', speciesInd[index_species])) mark_p <- TRUE
-        else mark_p <- FALSE
-        
+          
+          if (dataset == paste0(datasetName, '_', markName, '_', speciesInd[index_species])) mark_p <- TRUE
+          else mark_p <- FALSE
+          
         }
         else {
           
@@ -888,43 +890,36 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
       }
       else mark_p <- FALSE
       
-      formula_update <- formula_terms
+      formula_update <- Formula ## This needs to be the formula
       
-      if (keepSpatial) {
-        
+      if (!keepSpatial) {
+        ##Here update formula_update to - shared_spatial or mark_spatial or whatever
         if (mark_p) {
           
-          if (private$marksSpatial) formula_update <- c(formula_update, paste0(markName, '_spatial'))
+          if (private$marksSpatial) formula_update <- update(formula_update, formula(paste('~ . -', paste0(markName, '_spatial'))))
           
         }
         else {
           
-          if (private$Spatial) formula_update <- c(formula_update, 'shared_spatial')
-
-          if (as.character(private$modelData[[dataset]]$formula)[3] == '.') bias_obj <- private$modelData[[dataset]]$include_components
-          else bias_obj <-  attributes(terms(private$modelData[[dataset]]$formula))[['term.labels']]
-          
-          if (any(paste0(datasetName, '_bias_field') %in% bias_obj)) formula_update <- c(formula_update, paste0(datasetName, 'bias_field'))
-          
-          if (!is.null(private$speciesName)) formula_update <- c(formula_update, paste0(private$speciesName,'_spatial'))
+          if (private$Spatial) formula_update <- update(formula_update, formula(~ . - shared_spatial))
           
         }
         
       }
       
-      if (keepIntercepts) {
-        
+      if (!keepIntercepts) {
+        ##Here update formula update to - intercepts of whatever
         if (mark_p) {
           
-          if (private$marksIntercepts) formula_update <- c(formula_update, paste0(markName, '_intercept'))
+          if (private$marksIntercepts) formula_update <- update(formula_update, formula(paste('~ . -', paste0(markName, '_intercept'))))
           
         }
         
         else {
           
+          if (!is.null(private$speciesName)) formula_update <- update(formula_update, formula(paste('~ . -', paste0(speciesInd[index_species], '_intercept'))))
+          else formula_update <-update(formula_update, formula(paste('~ . -', paste0(datasetName, '_intercept'))))
           
-          if (!is.null(private$speciesName)) formula_update <- c(formula_update, paste0(speciesInd[index_species], '_intercept'))
-          else formula_update <- c(formula_update, paste0(datasetName, '_intercept'))
           
         }
         
@@ -932,40 +927,28 @@ dataSDM$set('public', 'changeFormula', function(datasetName = NULL, speciesName 
       
       if (!is.null(speciesName)) {
         
-        covs_in <- formula_update[formula_update %in% private$spatcovsNames]
-     
+        covs_in <- all.vars(Formula)[all.vars(Formula) %in% private$spatcovsNames]
+        
         if (!identical(covs_in, character(0))) {
+          #Change this to an update formula side
+           # but this is more difficult since what if there is a plus?
+           # need to do a strsplit; get all the covariate terms; and change them to species_cov
+          char_formula <- unlist(strsplit(as.character(Formula), split = ' '))
           
-          formula_update <- c(formula_update, paste0(speciesInd[index_species], '_', covs_in))
+          char_formula[char_formula == covs_in] <- paste0(speciesInd[index_species], '_', covs_in)
           
-          formula_update <- formula_update[!formula_update %in% covs_in]
+          formula_update <- formula(paste0(char_formula))
           
         }
         
       }
       
-      formula_update <- unique(formula_update)
-
-      if (all(formula_update %in% c(paste0(speciesInd[index_species], '_', c('intercept',private$spatcovsNames)),
-                                   private$spatcovsNames, private$pointCovariates,
-                                  'shared_spatial', paste0(private$speciesName, '_spatial'),
-                                 paste0(datasetName, c('_intercept','_bias_field'))))) {
+      updated_formula <- update(formula(paste('~ ', paste0(private$modelData[[dataset]]$include_components, collapse = ' + '))), formula_update)
+      updated_formula <- all.vars(updated_formula)[all.vars(updated_formula) != '.']
+      ##This will be removed once we move the like construction to runModel.
+      private$modelData[[dataset]]$include_components <- updated_formula
       
-      private$modelData[[dataset]]$include_components <- formula_update
-      
-      
-    }
-      
-    else {
-      
-      message('Non linear term or spelling error included.')
-      
-      private$modelData[[dataset]]$formula <- formula(paste(as.character(private$modelData[[dataset]]$formula)[2], '~', paste0(formula_update, collapse = ' + ')))
-      private$modelData[[dataset]]$include_components <- NULL
-      
-    }
-    
-    }
+      }
     
   }
   
