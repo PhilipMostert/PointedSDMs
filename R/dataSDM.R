@@ -936,8 +936,8 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
           char_formula <- unlist(strsplit(as.character(Formula), split = ' '))
           
           char_formula[char_formula == covs_in] <- paste0(speciesInd[index_species], '_', covs_in)
-          
-          formula_update <- formula(paste0(char_formula))
+   
+          formula_update <- formula(paste(char_formula, collapse = ' '))
           
         }
         
@@ -955,7 +955,7 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
 })
 
 #' @description Function to add custom components to the integrated modeling.
-#' @param component Component to add to the integtated model.
+#' @param component Component to add to the integrated model.
 #' @param datasetName Names of the dataset to add the component to.
 #' @param speciesName Name of the species to add the component to.
 #' @param markName Name of the mark to add the component to.
