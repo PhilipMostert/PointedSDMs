@@ -964,14 +964,14 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
       
       
       ## Get old formula:
-      print('Old formula: ')
+      cat('Old formula: ')
       if (length(all.vars(private$modelData[[dataset]]$formula)) == 2) {
         
         oldForm <- update(private$modelData[[dataset]]$formula, paste(' ~ ', paste(private$modelData[[dataset]]$include_components, collapse = ' + ')))
         
         print(oldForm)
-        print('\n')
-        print('New formula: ')
+        cat('\n')
+        cat('New formula: ')
         ## Maybe I should do a check: if cov in newFormula then paste0(species, _ , covariate) ## how else does it work within a for loop
         newForm <- update(private$modelData[[dataset]]$formula, newFormula)
         print(newFormula)
@@ -981,8 +981,8 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
       else {
         
         print(private$modelData[[dataset]]$formula)
-        print('\n')
-        print('New formula: ')
+        cat('\n')
+        cat('New formula: ')
         newForm <- update(paste(as.character(private$modelData[[dataset]]$formula), '~ '), newFormula)
       }
       
