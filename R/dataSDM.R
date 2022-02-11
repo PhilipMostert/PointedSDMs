@@ -964,7 +964,7 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
       
       
       ## Get old formula:
-      cat('Old formula: ')
+      cat('Old formula for ', dataset,':')
       if (length(all.vars(private$modelData[[dataset]]$formula)) == 2) {
         
         oldForm <- update(private$modelData[[dataset]]$formula, paste(' ~ ', paste(private$modelData[[dataset]]$include_components, collapse = ' + ')))
