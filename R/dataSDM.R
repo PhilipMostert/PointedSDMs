@@ -768,7 +768,7 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
 dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName = NULL,
                                                 markName = NULL, Formula, allDataset = FALSE,
                                                 keepSpatial = TRUE, keepIntercepts = TRUE,
-                                                ...) {
+                                                newFormula, ...) {
   #REWRITE THE LAST PART OF THE FUNCTION SUCH THAT IT WORKS LIKE THE UPDATE.FORMULA FUNCTION.
   
   if (all(is.null(datasetName), is.null(speciesName), is.null(markName))) stop ('At least one of: datasetName, speciesName or markName needs to be specified.')
@@ -779,9 +779,15 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
   
   if (!datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
   
-  if (!missing(Formula) && class(Formula) != 'formula') stop ('formula must be of class "formula".')
+  if (!missing(Formula) && !missing(newFormula)) stop ('Please provide only one of Formula and newFormula. \n Use Formula to update the current formula; use newFormula to make a completely new formula.')
+  
+  if (!missing(Formula) && class(Formula) != 'formula') stop ('Formula must be of class "formula".')
+  
+  if (!missing(newFormula) && class(newFormula) != 'formula') stop('newFormula must be of class "formula".')
   
   if (!missing(Formula) && length(as.character(Formula)) == 3) stop ("Please remove the response variable of the formula.")
+  
+  if (!missing(newFormula) && length(as.character(newFormula)) == 3) stop ("Please remove the response variable of the formula.")
   
   if (allDataset && is.null(datasetName)) stop ('Please provide a dataset name in conjunction with allDataset.')
   
@@ -847,7 +853,7 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
     
   }
   
-  if (missing(Formula)) {
+  if (missing(Formula) && missing(newFormula)) {
     
     get_formulas <- lapply(private$modelData[name_index], function(x) list(formula = x$formula,
                                                                            components = x$include_components))
@@ -862,7 +868,8 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
     return(get_formulas)
     
   }
-  else {
+  else
+    if (!missing(Formula)) {
     
     #if (length(as.character(Formula)) == 2 && as.character(Formula)[2] == '.') formula_terms <- c()
     #else formula_terms <- attributes(terms(formula))[['term.labels']]
@@ -950,6 +957,41 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
       
     }
     
+    }
+  else {
+    
+    for (dataset in name_index) { 
+      
+      
+      ## Get old formula:
+      print('Old formula: ')
+      if (length(all.vars(private$modelData[[dataset]]$formula)) == 2) {
+        
+        oldForm <- update(private$modelData[[dataset]]$formula, paste(' ~ ', paste(private$modelData[[dataset]]$include_components, collapse = ' + ')))
+        
+        print(oldForm)
+        print('\n')
+        print('New formula: ')
+        ## Maybe I should do a check: if cov in newFormula then paste0(species, _ , covariate) ## how else does it work within a for loop
+        newForm <- update(private$modelData[[dataset]]$formula, newFormula)
+        print(newFormula)
+
+        
+      }
+      else {
+        
+        print(private$modelData[[dataset]]$formula)
+        print('\n')
+        print('New formula: ')
+        newForm <- update(paste(as.character(private$modelData[[dataset]]$formula), '~ '), newFormula)
+      }
+      
+      private$modelData[[dataset]]$formula <- newForm
+      private$modelData[[dataset]]$include_components <- c()
+      
+    }
+      
+
   }
   
 })
