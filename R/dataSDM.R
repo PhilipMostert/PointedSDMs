@@ -310,30 +310,20 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
   
   if (!missing(pointsField)) {
     
-    if (!is.null(pointsField)) private$pointsField <- pointsField
-    else private$pointsField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+    if (!is.null(pointsField)) self$spatialFields$sharedField <- pointsField #private$pointsField <- pointsField
+    else self$spatialFields$sharedField <- INLA::inla.spde2.matern(mesh = private$INLAmesh) #private$pointsField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
     
-  }
-  
-  if (!is.null(private$speciesName)) {
-    
-    if (!missing(speciesField)) {
-      ## Change something here: we need the names of species first
-       # Maybe even add option to do this later? 
-        # Best way to do this would be to create another R6 objects for spatial ...
-        ## Might even just remove this...
-      if (!is.null(speciesField)) private$speciesField <- speciesField
-      else private$speciesField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
-      
-    }
   }
   
   if (!is.null(markNames)) {
     
-    if (!missing(marksField)) {
+    if (private$marksSpatial) {
       
-      if (!is.null(marksField)) private$marksField <- marksField
-      else private$marksField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+      self$spatialFields$marksField <- vector(mode = 'list', length = length(markNames))
+      names(self$spatialFields$marksField) <- paste0(markNames,'Spatial')
+      
+      if (!is.null(marksField)) self$spatialFields$marksField <- marksField
+      else self$spatialFields$marksField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
       
     }
   }
@@ -492,9 +482,9 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     if (is.null(private$speciesIn)) private$speciesIn <- pointData$SpeciesInData
     else private$speciesIn <- c(private$speciesIn, pointData$SpeciesInData)
     
-    private$speciesField <- vector(mode = 'list', length = length(unique(private$speciesIn)))
-    names(private$speciesField) <- unique(private$speciesIn)
-    private$speciesField[1:length(private$speciesField)] <- list(speciesField)
+    self$spatialFields$speciesField <- vector(mode = 'list', length = length(unique(private$speciesIn)))
+    names(self$spatialFields$speciesField ) <- unique(private$speciesIn)
+    self$spatialFields$speciesField [1:length(self$spatialFields$speciesField)] <- list(speciesField)
     
   }
   
@@ -745,8 +735,8 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
       private$modelData[[lik]]$include_components <- c(private$modelData[[lik]]$include_components, paste0(dat, '_bias_field'))
     }
     
-    if (is.null(biasField)) private$biasField[[dat]] <- inla.spde2.matern(mesh = private$INLAmesh)
-    else private$biasField[[dat]] <- biasField
+    if (is.null(biasField)) self$spatialFields$biasField[[dat]] <- inla.spde2.matern(mesh = private$INLAmesh)
+    else self$spatialFields$biasField[[dat]] <- biasField
     
   }
   
