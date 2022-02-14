@@ -319,11 +319,11 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     
     if (private$marksSpatial) {
       
-      self$spatialFields$marksField <- vector(mode = 'list', length = length(markNames))
-      names(self$spatialFields$marksField) <- paste0(markNames,'Spatial')
+      self$spatialFields$markFields <- vector(mode = 'list', length = length(markNames))
+      names(self$spatialFields$markFields) <- paste0(markNames,'Spatial')
       
-      if (!is.null(marksField)) self$spatialFields$marksField <- marksField
-      else self$spatialFields$marksField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+      if (!is.null(marksField)) self$spatialFields$markFields <- marksField
+      else self$spatialFields$markFields <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
       
     }
   }
@@ -482,9 +482,11 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     if (is.null(private$speciesIn)) private$speciesIn <- pointData$SpeciesInData
     else private$speciesIn <- c(private$speciesIn, pointData$SpeciesInData)
     
-    self$spatialFields$speciesField <- vector(mode = 'list', length = length(unique(private$speciesIn)))
-    names(self$spatialFields$speciesField ) <- unique(private$speciesIn)
-    self$spatialFields$speciesField [1:length(self$spatialFields$speciesField)] <- list(speciesField)
+    self$spatialFields$speciesFields <- vector(mode = 'list', length = length(unique(unlist(private$speciesIn))))
+    names(self$spatialFields$speciesFields) <- unique(unlist(private$speciesIn))
+    
+    if (!is.null(speciesField)) self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(speciesField)
+    else self$spatialFields$speciesFeilds[1:length(self$spatialFields$speciesField)] <- list(INLA::inla.spde2.matern(mesh = private$Mesh))
     
   }
   
@@ -1018,7 +1020,7 @@ dataSDM$set('public', 'addComponents', function(component, datasetName, speciesN
 
 ## Need to change all the spatialFields to self$spatialFields and then the relevent sublist?
 dataSDM$set('public', 'spatialFields', list(sharedField = list(),
-                                            speciesField = list(),
-                                            marksField = list(),
+                                            speciesFields = list(),
+                                            markFields = list(),
                                             biasFields = list()))
 
