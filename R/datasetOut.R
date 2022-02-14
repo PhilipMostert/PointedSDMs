@@ -125,7 +125,7 @@ datasetOut <- function(model, dataset,
         reduced_components <- update(reduced_components, paste0(' ~ . -', marksRM,
                                                                 '_intercept(1)'))
         reduced_components <- update(reduced_components, paste0(' ~ . -', marksRM,
-                                                                '_spatial(main = coordinates, model = markModel)'))
+                                                                '_spatial(main = coordinates, model =', paste0(marksRM,'_field)')))
         reduced_components <- update(reduced_components, paste0(' ~ . -', marksRM,
                                                                 paste0('_phi(main =', marksRM, '_phi, model = "iid", initial = -10, fixed = TRUE)')))
         reduced_components <- update(reduced_components, paste0(' ~ . -', marksRM,
@@ -162,15 +162,11 @@ datasetOut <- function(model, dataset,
               
             }
             
+            reduced_components <- update(reduced_components, paste('~ . -', paste0(species,'_spatial(main = coordinates, model = ', paste0(species,'_field)'))))
             reduced_components <- update(reduced_components, paste('~ . -', paste0(species,'_intercept(1)')))
             
           }
-          n_species <- as.character(max(as.numeric(unlist(model[['species']][['speciesIn']]))))
-          n_species_reduced <- as.character(max(as.numeric(reduced_species)))
-          
-          #reduced_components <- update(reduced_components, paste('~ . -', paste0(attributes(model)$Species,'_spde(main = coordinates, model = spdeModel, group = ',attributes(model)$Species, ', ngroup = ', n_species,', control.group = ', list(attributes(model)$Speciesmodel), ')')))
-          #reduced_components <- update(reduced_components, paste('~ . +', paste0(attributes(model)$Species,'_spde(main = coordinates, model = spdeModel, group = ',attributes(model)$Species, ', ngroup = ', n_species_reduced,', control.group = ', list(attributes(model)$Speciesmodel), ')')))
-          
+
         }
         
       }
