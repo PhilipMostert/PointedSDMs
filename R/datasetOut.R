@@ -29,6 +29,8 @@ datasetOut <- function(model, dataset,
        
         assign(paste0(species,'_',names), model$bru_info$model$effects[[paste0(species,'_',names)]]$env[[paste0(species,'_',names)]])
         
+      if (model$spatial$species) assign(paste0(species,'_field'), model$bru_info$model$effects[[paste0(species,'_field')]]$env[[paste0(species,'_field')]])  
+        
       }
         
       }
@@ -36,7 +38,10 @@ datasetOut <- function(model, dataset,
       
     }
     
-    if (!is.null(model$bru_info$model$effects[[1]]$env[['spdeModel']])) {
+  }
+    
+  
+  if (model$spatial$points) {
       ##Also assign the speciesModel and the marksModel
       assign('spdeModel', model$bru_info$model$effects[[1]]$env[['spdeModel']])
       
@@ -50,25 +55,24 @@ datasetOut <- function(model, dataset,
         
       }
       
-    } else spdeModel <- NULL
-
-    if (is.list(spdeModel[[1]])) {
-      ##TODO if we are doing
-      for (name in model[['spatial_datasets']]) {
-        
-        assign(paste0(name,'_spde'),spdemodel[[name]])  
-        
-      }
+    }
+  
+  if (model$spatial$marks) {
+    
+    for (mark in unlist(unique(model$marks$marksIn))) {
       
-    }    
-    ##Why do I have two validation results
-    validation_results <- list()  
+      assign(paste0(mark,'_field'), model$bru_info$model$effects[[paste0(mark,'_field')]]$env[[paste0(mark,'_field')]])  
+      
+    }
     
   }
-  else validation_results <- list()
+
+    validation_results <- list()  
+    
+  
  
   if (!is.null(model$species$speciesVar)) {
-    
+    ##Change this to the individual speciesSPDE models
     assign('speciesModel', model$bru_info$model$effects[[paste0(model$species$speciesVar,'_spatial')]]$env$speciesModel)
   }
   
