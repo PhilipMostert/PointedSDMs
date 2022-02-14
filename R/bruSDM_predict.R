@@ -168,8 +168,7 @@ time <- FALSE
         }
       
         if (all(is.null(formula_components))) stop('Please specify at least one of: covariates, spatial, intercept or biasfield.')
-        if (is.null(fun) | fun == 'linear') {fun <- ''}
-  
+
         formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(formula_components, collapse = ' + '),')'))
 
         #int[[i]] <- predict(model, data = data, formula = formula, ...)
