@@ -486,7 +486,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     names(self$spatialFields$speciesFields) <- unique(unlist(private$speciesIn))
     
     if (!is.null(speciesField)) self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(speciesField)
-    else self$spatialFields$speciesFeilds[1:length(self$spatialFields$speciesField)] <- list(INLA::inla.spde2.matern(mesh = private$Mesh))
+    else self$spatialFields$speciesFeilds[1:length(self$spatialFields$speciesField)] <- list(INLA::inla.spde2.matern(mesh = private$INLAmesh))
     
   }
   
