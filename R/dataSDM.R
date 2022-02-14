@@ -26,6 +26,8 @@ dataSDM$set('private', 'initialnames', NULL)
 
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'pointsField', list())
+##Make speciesField a named list for each species
+ # if no field given for a specific species: then inla.spde2.matern()
 dataSDM$set('private', 'speciesField', list())
 dataSDM$set('private', 'biasField', list())
 dataSDM$set('private', 'marksField', list())
@@ -250,7 +252,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
                                           speciesField,
                                           marksField) {
   pointData <- dataOrganize$new()
-  
+
   dataPoints <- list(...)
   
   if (missing(markNames)) markNames <- private$markNames
@@ -316,7 +318,10 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
   if (!is.null(private$speciesName)) {
     
     if (!missing(speciesField)) {
-      
+      ## Change something here: we need the names of species first
+       # Maybe even add option to do this later? 
+        # Best way to do this would be to create another R6 objects for spatial ...
+        ## Might even just remove this...
       if (!is.null(speciesField)) private$speciesField <- speciesField
       else private$speciesField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
       
@@ -482,10 +487,14 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
   
   if (!is.null(speciesName)) {
     
-    pointData$makeSpecies(speciesname = speciesName) ## update here is wll
+    pointData$makeSpecies(speciesname = speciesName) 
     
     if (is.null(private$speciesIn)) private$speciesIn <- pointData$SpeciesInData
-    else private$speciesIn <- c(private$speciesIn, pointData$SpeciesInData) 
+    else private$speciesIn <- c(private$speciesIn, pointData$SpeciesInData)
+    
+    private$speciesField <- vector(mode = 'list', length = length(unique(private$speciesIn)))
+    names(private$speciesField) <- unique(private$speciesIn)
+    private$speciesField[1:length(private$speciesField)] <- list(speciesField)
     
   }
   
@@ -714,6 +723,8 @@ dataSDM$set('public', 'spatialCovariates', function(spatialCovariates) {
 #' @param allPO Should the bias fields be added to all the presence only datasets. Defaults to \code{NULL}.
 #' @param biasField An inla.spde model descrbing the random bias field.
 
+
+## if we are doing spatial fields in a public list, then don't need biasField?
 dataSDM$set('public', 'addBias', function(datasetNames = NULL,
                                           allPO = FALSE,
                                           biasField = NULL) {
@@ -769,7 +780,7 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
                                                 markName = NULL, Formula, allDataset = FALSE,
                                                 keepSpatial = TRUE, keepIntercepts = TRUE,
                                                 newFormula, ...) {
-  #REWRITE THE LAST PART OF THE FUNCTION SUCH THAT IT WORKS LIKE THE UPDATE.FORMULA FUNCTION.
+  ## Will need to update this such that if keepSpatial & species then paste0(species,_spatial)
   
   if (all(is.null(datasetName), is.null(speciesName), is.null(markName))) stop ('At least one of: datasetName, speciesName or markName needs to be specified.')
   
@@ -1015,4 +1026,9 @@ dataSDM$set('public', 'addComponents', function(component, datasetName, speciesN
   
 })
 
+## Need to change all the spatialFields to self$spatialFields and then the relevent sublist?
+dataSDM$set('public', 'spatialFields', list(sharedField = list(),
+                                            speciesField = list(),
+                                            marksField = list(),
+                                            biasFields = list()))
 
