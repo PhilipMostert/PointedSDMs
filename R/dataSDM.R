@@ -482,6 +482,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     if (is.null(private$speciesIn)) private$speciesIn <- pointData$SpeciesInData
     else private$speciesIn <- c(private$speciesIn, pointData$SpeciesInData)
     
+    #ADD argument common field for species
     self$spatialFields$speciesFields <- vector(mode = 'list', length = length(unique(unlist(private$speciesIn))))
     names(self$spatialFields$speciesFields) <- unique(unlist(private$speciesIn))
     
