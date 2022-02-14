@@ -60,11 +60,11 @@ runModel <- function(data, options = list()) {
     }
   }
 
-  if (!is.null(data$.__enclose_env__$private$speciesIn)) {
-
-   for (species in data$spatialFields$speciesFields) {
-     
-     assign(paste0(species,'_field', data$spatialFields$speciesFields[[species]]))
+  if (!is.null(data$.__enclos_env__$private$speciesIn)) {
+   
+   for (species in names(data$spatialFields$speciesFields)) {
+ 
+     assign(paste0(species,'_field'), data$spatialFields$speciesFields[[species]])
      
    }
     
@@ -83,19 +83,21 @@ runModel <- function(data, options = list()) {
     
     if (data$.__enclos_env__$private$marksSpatial) {
       
-      for (mark in data$spatialFields$markFields)
+      for (mark in names(data$spatialFields$markFields)) {
         
-        assign(paste0(mark,'_field', data$spatialFields$markFields[[mark]]))
+        assign(paste0(mark,'_field'), data$spatialFields$markFields[[mark]])
       
     }    
 
+    }
+    
   }
   
-  if (length(data$.__enclos_env__$private$biasField) != 0) {
+  if (length(data$spatialFields$biasFields) != 0) {
     
-    for (name in names(data$.__enclos_env__$private$biasField)) {
+    for (name in names(data$spatialFields$biasFields)) {
     
-      assign(paste0(name,'_biasField'), data$.__enclos_env__$private$biasField[[name]])
+      assign(paste0(name,'_biasField'), data$spatialFields$biasFields[[name]])
       
     }
   }
