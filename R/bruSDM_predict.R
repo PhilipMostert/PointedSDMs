@@ -80,11 +80,12 @@ time <- FALSE
         if (spatial) species_spat <- paste0(spec,'_spatial')
         else species_spat <- NULL
         
-       species_formula <- paste0('~', fun, '(', paste0(c(species_covs, species_int, species_spat), collapse = ' + '),')')
-
+       species_formula <- formula(paste0('~', fun, '(', paste0(c(species_covs, species_int, species_spat), collapse = ' + '),')'))
+       
+       
        int[[1]][[spec]] <- predict(model, data, formula = species_formula, ...)
       }
-     
+      class(int) <- c('bruSDM_predict', class(int))
       return(int) 
       
     }
