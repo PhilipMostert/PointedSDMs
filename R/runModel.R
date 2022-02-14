@@ -77,7 +77,7 @@ runModel <- function(data, options = list()) {
   assign('spdeModel', data$spatialFields$sharedField)
   pointsSpatial <- TRUE
   
-  } pointsSpatial <- FALSE
+  } else pointsSpatial <- FALSE
   
   if (!is.null(data$.__enclos_env__$private$markNames)) {
     
