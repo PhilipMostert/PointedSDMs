@@ -320,10 +320,10 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     if (private$marksSpatial) {
       
       self$spatialFields$markFields <- vector(mode = 'list', length = length(markNames))
-      names(self$spatialFields$markFields) <- paste0(markNames,'Spatial')
+      names(self$spatialFields$markFields) <- markNames
       
-      if (!is.null(marksField)) self$spatialFields$markFields <- marksField
-      else self$spatialFields$markFields <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+      if (!is.null(marksField)) self$spatialFields$markFields[1:length(self$spatialFields$markFields)] <- list(marksField)
+      else self$spatialFields$markFields[1:length(self$spatialFields$markFields)] <- list(INLA::inla.spde2.matern(mesh = private$INLAmesh))
       
     }
   }
