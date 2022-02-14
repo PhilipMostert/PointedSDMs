@@ -62,27 +62,33 @@ runModel <- function(data, options = list()) {
 
   if (!is.null(data$.__enclose_env__$private$speciesIn)) {
 
-    #if species model is non null
-    #for (species in unique(unlist(data$.__enclose_env__$private$speciesIn))) {
-      
-    #  assign(paste0(species,'_spatial'), the spde model)
+   for (species in data$spatialFields$speciesFields) {
      
-    #}
+     assign(paste0(species,'_field', data$spatialFields$speciesFields[[species]]))
+     
+   }
     
   }
   
   if (data$.__enclos_env__$private$Spatial) {
     
-    assign('spdeModel', data$.__enclos_env__$private$pointsField)
-   
-    if (!is.null(data$.__enclos_env__$private$speciesName)) assign('speciesModel', data$.__enclos_env__$private$speciesField)
+    #assign('spdeModel', data$.__enclos_env__$private$pointsField)
+    assign('spdeModel', data$spatialFields$sharedField)
+   ##Change this to the individual speciesSPDE models
+    #if (!is.null(data$.__enclos_env__$private$speciesName)) assign('speciesModel', data$.__enclos_env__$private$speciesField)
     
   }
   
   if (!is.null(data$.__enclos_env__$private$markNames)) {
     
-  if (data$.__enclos_env__$private$marksSpatial) assign('markModel', data$.__enclos_env__$private$marksField)
-   
+    if (data$.__enclos_env__$private$marksSpatial) {
+      
+      for (mark in data$spatialFields$markFields)
+        
+        assign(paste0(mark,'_field', data$spatialFields$markFields[[mark]]))
+      
+    }    
+
   }
   
   if (length(data$.__enclos_env__$private$biasField) != 0) {
