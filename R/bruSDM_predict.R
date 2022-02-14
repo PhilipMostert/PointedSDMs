@@ -202,7 +202,18 @@ print.bruSDM_predict <- function(x, ...) {
     
     cat('Summary of predicted data:')
     cat('\n\n')
-    print(summary(x[['predictions']]@data))
+    if (names(x)[[1]] == 'speciesPredictions') {
+      
+      for (species in names(x[[1]])) {
+        
+        cat('Predictions for', paste0(species,':'))
+        print(summary(x[[1]][[species]]@data))
+        cat('\n')
+         
+        }
+      
+    }
+    else print(summary(x[['predictions']]@data))
     cat('\n\n')
     
   
