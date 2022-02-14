@@ -61,23 +61,23 @@ runModel <- function(data, options = list()) {
   }
 
   if (!is.null(data$.__enclos_env__$private$speciesIn)) {
-   
+   ## if speciesSPatial TRUE
    for (species in names(data$spatialFields$speciesFields)) {
  
      assign(paste0(species,'_field'), data$spatialFields$speciesFields[[species]])
      
    }
     
-  }
+    speciesSpatial <- TRUE
+    
+  } else speciesSpatial <- FALSE
   
   if (data$.__enclos_env__$private$Spatial) {
     
-    #assign('spdeModel', data$.__enclos_env__$private$pointsField)
-    assign('spdeModel', data$spatialFields$sharedField)
-   ##Change this to the individual speciesSPDE models
-    #if (!is.null(data$.__enclos_env__$private$speciesName)) assign('speciesModel', data$.__enclos_env__$private$speciesField)
-    
-  }
+  assign('spdeModel', data$spatialFields$sharedField)
+  pointsSpatial <- TRUE
+  
+  } pointsSpatial <- FALSE
   
   if (!is.null(data$.__enclos_env__$private$markNames)) {
     
@@ -87,11 +87,13 @@ runModel <- function(data, options = list()) {
         
         assign(paste0(mark,'_field'), data$spatialFields$markFields[[mark]])
       
-    }    
-
-    }
+      }
+      
+    marksSpatial <- TRUE  
+ 
+    } else marksSpatial <- FALSE  
     
-  }
+  } else marksSpatial <- FALSE  
   
   if (length(data$spatialFields$biasFields) != 0) {
     
@@ -156,8 +158,11 @@ runModel <- function(data, options = list()) {
   inlaModel[['marks']] <- list(marksIn = data$.__enclos_env__$private$printSummary$Marks,
                                       multinomVars = data$.__enclos_env__$private$multinomVars)
   inlaModel[['biasData']] <- names(data$.__enclos_env__$private$biasField)
+  inlaModel[['spatial']] <- list(points = pointsSpatial,
+                                 species = speciesSpatial,
+                                 marks = marksSpatial)
   
-  class(inlaModel) <- c('bruSDM', class(inlaModel)) # ie I'm writing an s3 class for this?
+  class(inlaModel) <- c('bruSDM', class(inlaModel))
   
   inlaModel
   
