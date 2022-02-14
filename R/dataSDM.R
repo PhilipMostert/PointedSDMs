@@ -486,7 +486,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     names(self$spatialFields$speciesFields) <- unique(unlist(private$speciesIn))
     
     if (!is.null(speciesField)) self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(speciesField)
-    else self$spatialFields$speciesFeilds[1:length(self$spatialFields$speciesField)] <- list(INLA::inla.spde2.matern(mesh = private$INLAmesh))
+    else self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(INLA::inla.spde2.matern(mesh = private$INLAmesh))
     
   }
   
@@ -737,8 +737,8 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
       private$modelData[[lik]]$include_components <- c(private$modelData[[lik]]$include_components, paste0(dat, '_bias_field'))
     }
     
-    if (is.null(biasField)) self$spatialFields$biasField[[dat]] <- inla.spde2.matern(mesh = private$INLAmesh)
-    else self$spatialFields$biasField[[dat]] <- biasField
+    if (is.null(biasField)) self$spatialFields$biasFields[[dat]] <- inla.spde2.matern(mesh = private$INLAmesh)
+    else self$spatialFields$biasFields[[dat]] <- biasField
     
   }
   
