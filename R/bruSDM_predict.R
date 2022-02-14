@@ -74,14 +74,14 @@ time <- FALSE
         if (!is.null(covariates)) species_covs <- paste0(spec, '_', covariates)
         else species_covs <- NULL
         
-        if (intercepts) species_int <- paste0(spec,'_intercept')
+        if (intercept) species_int <- paste0(spec,'_intercept')
         else species_int <- NULL
         
         if (spatial) species_spat <- paste0(spec,'_spatial')
         else species_spat <- NULL
         
-       species_formula <- paste0('~', fun, '(', species_covs, species_int, species_spat,')', sep = ' + ')
-        
+       species_formula <- paste0('~', fun, '(', paste0(c(species_covs, species_int, species_spat), collapse = ' + '),')')
+
        int[[1]][[spec]] <- predict(model, data, formula = species_formula, ...)
       }
      
