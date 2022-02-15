@@ -48,12 +48,12 @@ dataOrganize$set('public', 'dataSource', list())
 
 dataOrganize$set('public', 'makeData', function(datapoints, datanames, coords, proj, marktrialname,
                                                 paresp, countsresp, trialname, speciesname, marks,
-                                                pointcovnames, markfamily) {
+                                                pointcovnames, markfamily, temporalvar) {
   
   dataMade <- dataSet(datapoints = datapoints, datanames = datanames,
                       coords = coords, proj = proj, marks = marks,
                       paresp = paresp, countsresp = countsresp, pointcovnames = pointcovnames,
-                      trialname = trialname, speciesname = speciesname,
+                      trialname = trialname, speciesname = speciesname, temporalvar = temporalvar,
                       marktrialname = marktrialname, markfamily = markfamily)
   
   self$Data <- dataMade[['Data']]
@@ -103,7 +103,8 @@ dataOrganize$set('public', 'makeSpecies', function(speciesname) {
   
   self$dataSource <- mapply(rep, self$dataSource, each = numUnique)
   
-  #With this unblocked we are assuming an INLA grouped model for the species...
+  ##Make species index here ...
+  
   self$makeMultinom(multinomVars = speciesname,
                     return = 'species', oldVars = NULL)
   
@@ -189,6 +190,13 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
     self$speciesIndex <- multinomIndex
     
   }
+  else 
+    if (return == 'time') {
+      
+      self$timeNumeric <- multinomNumeric
+      self$timeIndex <- multinomIndex
+      
+    }
   else {
     
     self$multinomNumeric <- multinomNumeric
@@ -204,6 +212,7 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
 #' @param paresp Name of the presence absence response variable.
 #' @param countresp Name of the count data response variable.
 #' @param marks Name of the marks used in the model.
+#' @param temporalname Name of the temporal variable used in the model.
 #' @param spatial Logical: are spatial effects run in the model.
 #' @param marksspatial Logical: should spatial fields be included for the marks.
 #' @param intercept Logical: are intercepts run in the model.
@@ -212,7 +221,7 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
 
 dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
                                                     paresp, countresp, marks, marksspatial,
-                                                    spatial, intercept,
+                                                    spatial, intercept, temporalname,
                                                     markintercept, pointcovs) {
   
   #if (length(self$multinomVars) != 0) marks[marks %in% self$multinomVars] <- paste0(marks[marks %in% self$multinomVars],'_response')
@@ -272,6 +281,9 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
       for (response in 1:length_index) {
         
         for (j in 1:length(pointsResponse[[response]])) {
+          
+          if (!is.null(temporalname)) temp <- temporalname
+          else temp <- NULL
           
           if (!is.null(speciesIn)) {
             
@@ -355,7 +367,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             
           }
           
-          RHS <- c(covs, spat, int, addcovs, markspat, marksint)
+          RHS <- c(covs, spat, int, addcovs, markspat, marksint, temp)
           
           if (pointsResponse[[response]][j] %in% paste0(self$multinomVars,'_response')) { #paste multinomvar and phi # Need to convert multinomvar to numeric
             
@@ -390,9 +402,10 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
 #' @param pointcovariates Names of the point covariates.
 #' @param covariatenames Names of the spatially varying covariates.
 #' @param covariateclass The classes of the spatially varying covariates.
+#' @param temporalname Name of the temporal variable used in the model.
 #' @param marksspatial Logical: should spatial fields be included for the marks.
 #' @param marksintercept Logical: should intercepts be included for the marks.
-#' @param numspecies Number of species included in the model.
+#' @param numtime Number of time increments included in the model.
 
 dataOrganize$set('public', 'makeComponents', function(spatial, intercepts, 
                                                       datanames, marks, speciesname,
@@ -400,8 +413,9 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
                                                       covariatenames,covariateclass,
                                                       marksspatial,
                                                       marksintercept,
+                                                      temporalname,
                                                       #speciesspatial,
-                                                      numspecies) {
+                                                      numtime) {
   ##Copy for marks fields???
   if (length(self$SpeciesInData) != 0) species <- unique(unlist(self$SpeciesInData))
   else species = NULL
@@ -440,6 +454,12 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
   } 
   else speciesSpat <- NULL
+  
+  if (!is.null(temporalname)) {
+    
+    tempSpat <- paste0(temporalname,'_effect(main = coordinates, model = temporalModel, group = ', temporalname, ', ngroup = ', numtime,')')
+    
+  } else tempSpat <- NULL
   
   #Covariates: Dataset covariates #Done
   #            Species covariates #Done
@@ -522,7 +542,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
   }
   
-  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt)
+  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt, tempSpat)
   
   RHS
   

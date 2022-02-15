@@ -24,6 +24,9 @@ dataSDM$set('private', 'pointCovariates', NULL)
 dataSDM$set('private', 'ptcovsClass', NULL)
 dataSDM$set('private', 'initialnames', NULL)
 
+dataSDM$set('private', 'temporalName', NULL)
+dataSDM$set('private', 'temporalVars', NULL)
+
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'pointsField', list())
 ##Make speciesField a named list for each species
@@ -68,13 +71,14 @@ dataSDM$set('private', 'optionsINLA', list())
 #' @param marksintercept Logical argument describing if the marks should have interceptes.
 #' @param boundary A polygon map of the study area.
 #' @param ips Integration points and their respective weights to be used in the model.
+#' @param temporal Name of the temporal variable used in the model.
 
 dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, initialnames,
                                              responsecounts, responsepa, 
                                              marksnames, marksfamily, pointcovariates,
                                              trialspa, trialsmarks, speciesname, marksspatial,
                                              spatial, intercepts, spatialcovariates, marksintercepts,
-                                             boundary, ips) {
+                                             boundary, ips, temporal) {
   
   if (missing(coordinates)) stop('Coordinates need to be given.')
   if (missing(projection)) stop('projection needs to be given.')
@@ -98,6 +102,8 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
   if (!missing(trialsmarks)) private$trialsMarks <- trialsmarks
   
   if (!missing(speciesname)) private$speciesName <- speciesname
+  
+  if (!missing(temporal)) private$temporalName <- temporal
   
   if (!missing(initialnames)) private$initialnames <- initialnames
   if (!missing(boundary)) private$Boundary <- boundary
@@ -247,7 +253,7 @@ dataSDM$set('public', 'plot', function(Datasets, Species, ...) {
 
 dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trialsPA,
                                           markNames, markFamily, pointCovariates,
-                                          trialsMarks, speciesName,
+                                          trialsMarks, speciesName, temporalName,
                                           Coordinates, pointsField,
                                           speciesField,
                                           marksField) {
@@ -382,6 +388,23 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     
   } else speciesName <- NULL
   
+  if (!is.null(private$temporalName)) {
+    
+    if (missing(temporalName)) temporalName <- private$temporalName
+    else {
+      
+      if (temporalName != private$temporalName) {
+        
+        dataPoints <- nameChanger(data = dataPoints, oldName = temporalName,
+                                  newName = private$temporalName)
+        temporalName <-  private$temporalName
+        
+      }
+      
+    }
+    
+  } else temporalName <- NULL
+  
   
   if (missing(trialsMarks)) trialsMarks <- private$trialsMarks
   else {
@@ -453,11 +476,20 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     
   }
   
+  if (!is.null(private$temporalName)) {
+    
+    timeOK <- checkVar(data = dataPoints,
+                          var = private$temporalName)
+    
+    if (!timeOK) stop('The temporal variable name is required to be present in all the datasets.')
+    
+  }
+  
   pointData$makeData(datapoints = dataPoints, datanames = dataNames,
                      coords = private$Coordinates, proj = private$Projection,
                      countsresp = responseCounts, paresp = responsePA,
                      trialname = trialsPA, speciesname = speciesName,
-                     marktrialname = trialsMarks,
+                     marktrialname = trialsMarks, temporalvar = temporalvar,
                      marks = markNames, markfamily = markFamily,
                      pointcovnames = pointCovariates)
   
@@ -497,9 +529,18 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
   
   ##Add here that if markSpatial then add mark_spatial
   #Also add markModel in the initial call.
-  pointData$makeFormulas(spatcovs = private$spatcovsNames, speciesname = speciesName,
+  pointData$makeFormulas(spatcovs = private$spatcovsNames, speciesname = speciesName, temporalname = private$temporalName,
                          paresp = responsePA, countresp = responseCounts, marksspatial = private$marksSpatial,
                          marks = markNames, spatial = private$Spatial, intercept = private$Intercepts, markintercept = private$marksIntercepts)
+  
+  if (!is.null(private$temporalName)) {
+    
+    pointData$makeMultinom(multinomVars = private$temporalName,
+                           return = 'time', oldVars = NULL)
+    
+    private$temporalVars <- pointData$timeIndex #??
+    
+  }
   
   if (is.null(private$multinomVars)) {
     
@@ -538,8 +579,9 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
                                                    covariateclass = private$spatcovsClass,
                                                    marksspatial = private$marksSpatial,
                                                    marksintercept = private$marksIntercepts,
+                                                   temporalname = private$temporalName,
                                                    #speciesspatial = private$speciesField,
-                                                   numspecies = length(unique(unlist(private$speciesIn))))
+                                                   numtime = length(unique(unlist(private$temporalVas))))
     
   }
   else {

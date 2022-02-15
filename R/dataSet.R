@@ -8,13 +8,14 @@
 #' @param countsresp Name of the response variable used by the counts data.
 #' @param trialname Name of the trial variable used by the presence absence datasets.
 #' @param speciesname Name of the species name variable.
+#' @param temporalvar Name of the temporal variable.
 #' @param marks Name of the marks considered in the model.
 #' @param pointcovnames Name of the point covariates used in the model.
 #' @param markfamily A vector describing the distribution of the marks.
 
 dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
                     paresp, countsresp, trialname, speciesname,
-                    marks, marktrialname, markfamily) {
+                    marks, marktrialname, markfamily, temporalvar) {
   
   if (paresp != 'poresp' || countsresp != 'poresp') poresp <- 'poresp'
   else
@@ -144,7 +145,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
       else subtrialname <- NULL
       
         datSP <- sp::SpatialPointsDataFrame(coords = data[,coords], 
-                                            data = data.frame(data[, c(paresp, subtrialname,
+                                            data = data.frame(data[, c(paresp, subtrialname, temporalvar,
                                                                        marksin, MTrialssub, speciesname,
                                                                        phiVars, responseVars,varsin)]),
                                             proj4string = proj)
@@ -170,7 +171,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         if (countsresp %in% data_vars) {
           
           datSP <- sp::SpatialPointsDataFrame(coords = data[, coords],
-                                              data = data.frame(data[, c(countsresp, marksin,
+                                              data = data.frame(data[, c(countsresp, marksin, temporalvar,
                                                                          speciesname, MTrialssub,
                                                                          phiVars, responseVars, varsin)]),
                                               proj4string = proj)
@@ -193,7 +194,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         data_vars <- c(data_vars, poresp)
     
         datSP <- sp::SpatialPointsDataFrame(coords = data[, coords], 
-                                            data = data.frame(data[, c(poresp, marksin,
+                                            data = data.frame(data[, c(poresp, marksin, temporalvar,
                                                                        speciesname, MTrialssub,
                                                                        phiVars, responseVars, varsin)]),
                                             proj4string = proj)
