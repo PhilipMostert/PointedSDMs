@@ -243,11 +243,9 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
                            "smin", "smax", "cv", "var" ))) stop('Whattoplot is not a valid variable to plot')
   
   
-  if (length(x) == 1 & names(x) == 'Species predictions') {
+  if (length(x) == 1 & names(x) == 'speciesPredictions') {
     
     if (length(whattoplot) > 1) stop('Please only plot one variable at a time for species plots.')
-    
-    species_name_var <- names(x[[1]]@data)[sapply(x[[1]]@data, class) == 'character']
     
     species_title <- ggtitle('Plot of the species predictions')
     
@@ -259,8 +257,22 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
     }
     else plot_colours <- NULL
     
-    plot_grid <- ggplot() + gg(x[[1]], aes_string(fill = whattoplot)) + facet_grid(~ eval(parse(text = species_name_var))) + plot_colours + species_title
-    return(plot_grid)
+    all_plots <- list()
+    
+    for (species in names(x$speciesPredictions)) {
+      
+      all_plots[[species]] <- ggplot() + gg(x$speciesPredictions[[species]], aes_string(fill = whattoplot)) + ggtitle(paste('Plot of predictions for', species)) + plot_colours
+      
+    }
+
+    if (plot) {
+      
+      plots <- inlabru::multiplot(plotlist = all_plots, cols = length(all_plots), layout = layout)
+      return(plots)
+      
+      }
+    else return(all_plots)
+    
   }
   
   if (!plot) {
