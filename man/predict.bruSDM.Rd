@@ -10,10 +10,9 @@
   formula = NULL,
   mesh = NULL,
   mask = NULL,
-  species = FALSE,
   covariates = NULL,
   spatial = TRUE,
-  intercept = FALSE,
+  intercept = TRUE,
   interceptnames = NULL,
   biasfield = FALSE,
   biasnames = NULL,
@@ -30,8 +29,6 @@
 \item{mesh}{An inla.mesh object}
 
 \item{mask}{A mask of the study background. Defaults to \code{NULL}.}
-
-\item{species}{Create plot of species. Note: \code{speciesname} in the \code{organize_data} function needs to be specified first.}
 
 \item{covariates}{Name of covariates to predict.}
 

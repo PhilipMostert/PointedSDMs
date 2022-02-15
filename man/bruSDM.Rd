@@ -26,7 +26,8 @@ bruSDM(
   responsePA = "present",
   trialsPA = NULL,
   trialsMarks = NULL,
-  speciesName = NULL
+  speciesName = NULL,
+  temporalName = NULL
 )
 }
 \arguments{
@@ -71,6 +72,8 @@ bruSDM(
 \item{trialsMarks}{Name of the trials response variable for the binomial marks. Defaults to \code{NULL}.}
 
 \item{speciesName}{Name of the species variable name. Specifying this argument calculates covariate values for the individual species, as well as including a spatial group model for the species. Defaults to \code{NULL}}
+
+\item{temporalName}{Name of the temporal variable in the model. This variable is required to be in all the datasets. Defaults to \code{NULL}.}
 }
 \description{
 bruSDM function to ...

@@ -15,7 +15,7 @@ A data object containing the data and the relevant information about the integra
 \item \href{#method-addData}{\code{dataSDM$addData()}}
 \item \href{#method-spatialCovariates}{\code{dataSDM$spatialCovariates()}}
 \item \href{#method-addBias}{\code{dataSDM$addBias()}}
-\item \href{#method-changeFormula}{\code{dataSDM$changeFormula()}}
+\item \href{#method-updateFormula}{\code{dataSDM$updateFormula()}}
 \item \href{#method-addComponents}{\code{dataSDM$addComponents()}}
 }
 }
@@ -43,7 +43,8 @@ A data object containing the data and the relevant information about the integra
   spatialcovariates,
   marksintercepts,
   boundary,
-  ips
+  ips,
+  temporal
 )}\if{html}{\out{</div>}}
 }
 
@@ -81,6 +82,7 @@ A data object containing the data and the relevant information about the integra
   pointCovariates,
   trialsMarks,
   speciesName,
+  temporalName,
   Coordinates,
   pointsField,
   speciesField,
@@ -108,18 +110,19 @@ A data object containing the data and the relevant information about the integra
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-changeFormula"></a>}}
-\if{latex}{\out{\hypertarget{method-changeFormula}{}}}
-\subsection{Method \code{changeFormula()}}{
+\if{html}{\out{<a id="method-updateFormula"></a>}}
+\if{latex}{\out{\hypertarget{method-updateFormula}{}}}
+\subsection{Method \code{updateFormula()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$changeFormula(
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$updateFormula(
   datasetName = NULL,
   speciesName = NULL,
   markName = NULL,
-  formula,
+  Formula,
   allDataset = FALSE,
   keepSpatial = TRUE,
   keepIntercepts = TRUE,
+  newFormula,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -130,7 +133,14 @@ A data object containing the data and the relevant information about the integra
 \if{latex}{\out{\hypertarget{method-addComponents}{}}}
 \subsection{Method \code{addComponents()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$addComponents(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$addComponents(
+  component,
+  datasetName,
+  speciesName,
+  markName,
+  allDatasets,
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 }

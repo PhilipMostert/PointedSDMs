@@ -35,7 +35,8 @@ Internal functions used to temporarily store data and other information before a
   speciesname,
   marks,
   pointcovnames,
-  markfamily
+  markfamily,
+  temporalvar
 )}\if{html}{\out{</div>}}
 }
 
@@ -72,6 +73,7 @@ Internal functions used to temporarily store data and other information before a
   marksspatial,
   spatial,
   intercept,
+  temporalname,
   markintercept,
   pointcovs
 )}\if{html}{\out{</div>}}
@@ -95,7 +97,8 @@ Internal functions used to temporarily store data and other information before a
   covariateclass,
   marksspatial,
   marksintercept,
-  numspecies
+  temporalname,
+  numtime
 )}\if{html}{\out{</div>}}
 }
 
