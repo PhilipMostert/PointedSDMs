@@ -92,8 +92,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
   
   } else initialnames <- NULL
   
-  if (is.null(temporalName)) timeModel <- NULL
-  else timeModel <- deparse(timeModel)
+  if (!is.null(temporalName)) temporalName <- deparse(temporalName)
   
   bruData <- dataSDM$new(coordinates = Coordinates, projection = Projection,
                          Inlamesh = Mesh, initialnames = initialnames,
