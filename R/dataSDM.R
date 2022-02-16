@@ -485,7 +485,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     
     if (!timeOK) stop('The temporal variable name is required to be present in all the datasets.')
     
-    self$spatialFields$temporalField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+    #self$spatialFields$temporalField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
     
   }
   
@@ -1070,6 +1070,5 @@ dataSDM$set('public', 'addComponents', function(component, datasetName, speciesN
 dataSDM$set('public', 'spatialFields', list(sharedField = list(),
                                             speciesFields = list(),
                                             markFields = list(),
-                                            biasFields = list(),
-                                            temporalField = list()))
+                                            biasFields = list()))
 

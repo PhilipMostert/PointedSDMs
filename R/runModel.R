@@ -104,12 +104,12 @@ runModel <- function(data, options = list()) {
     }
   }
   
-  if (length(data$spatialFields$temporalField > 0)) {
+  #if (length(data$spatialFields$temporalField) > 0) {
+  #  
+  #  assign('temporal_field', data$spatialFields$temporalField)
+  #  temporalSpatial <- TRUE
     
-    assign('temporal_field', data$spatialFields$temporalField)
-    temporalSpatial <- TRUE
-    
-  } else temporalSpatial <- FALSE 
+  #} else temporalSpatial <- FALSE 
 
 
   ## Get all components in formula; get all components but without the ()
@@ -167,8 +167,7 @@ runModel <- function(data, options = list()) {
   inlaModel[['biasData']] <- names(data$.__enclos_env__$private$biasField)
   inlaModel[['spatial']] <- list(points = pointsSpatial,
                                  species = speciesSpatial,
-                                 marks = marksSpatial,
-                                 temporal = temporalSpatial)
+                                 marks = marksSpatial)
   
   class(inlaModel) <- c('bruSDM', class(inlaModel))
   

@@ -422,7 +422,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (spatial) {
     
-    spat <- paste0('shared_spatial(main = coordinates, model = shared_field)')
+    if (!is.null(temporalname)) spat <- paste0('shared_spatial(main = coordinates, model = shared_field, group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
+    else spat <- paste0('shared_spatial(main = coordinates, model = shared_field)')
     
   } else spat <- NULL
   
@@ -455,11 +456,11 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   } 
   else speciesSpat <- NULL
   
-  if (!is.null(temporalname)) {
+  #if (!is.null(temporalname)) {
+  #  
+  #  tempSpat <- paste0(temporalname,'_effect(main = coordinates, model = temporal_field, group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
     
-    tempSpat <- paste0(temporalname,'_effect(main = coordinates, model = temporal_field, group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
-    
-  } else tempSpat <- NULL
+  # } else tempSpat <- NULL
   
   #Covariates: Dataset covariates #Done
   #            Species covariates #Done

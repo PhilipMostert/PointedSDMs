@@ -82,7 +82,7 @@ datasetOut <- function(model, dataset,
     #assign('speciesModel', model$bru_info$model$effects[[paste0(model$species$speciesVar,'_spatial')]]$env$speciesModel)
   }
     
-  if (model$spatial$temporalSpatial) assign('temporal_field', model$bru_info$model$effects$temporal_field$env$temporal_field)
+  #if (model$spatial$temporalSpatial) assign('temporal_field', model$bru_info$model$effects$temporal_field$env$temporal_field)
   
   for (dataname in dataset) {
     
