@@ -6,9 +6,9 @@
 #' @param Projection Projection used for the data and spatial covariates. Must be of class \code{CRS}.
 #' @param Boundary ##NOT USED YET.
 #' @param Mesh An \code{inla.mesh} object.
-#' @param pointsField Specification of the shared spatial field for the points. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).
-#' @param speciesField Specification of the shared spatial field for the species. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).
-#' @param marksField  Specification of the fields for the marks. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).
+#' @param pointsField Specification of the shared spatial field for the points. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.
+#' @param speciesField Specification of the shared spatial field for the species. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.
+#' @param marksField  Specification of the fields for the marks. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.
 #' @param markNames A vector with the mark names to be included in the integrated model. These marks must be in the same data objects as the points.
 #' @param markFamily A vector with the statistical families of the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".
 #' @param pointCovariates The non-spatial covariates to be included in the integrated model. These covariates must be included in the same data object as the points.
@@ -16,8 +16,8 @@
 #' @param marksIntercept Logical argument: should the marks be modeled with intercepts. Defaults to \code{TRUE}.
 #' @param pointsSpatial Logical argument: should the points have a shared spatial field. Defaults to \code{TRUE}.
 #' @param marksSpatial Logical argument: should the marks have their own spatial field. Defaults to \code{TRUE}.
-#' @param responseCounts Name of the response variable in the counts datasets. This variable name needs to be standardized across all counts datasets used in the integrated model. Defaults to \code{'counts}.
-#' @param responsePA Name of the response variable in the presence absence datasets. This variable name needs to be standardized across all present absence datasets. Defaults to \code{'present}.
+#' @param responseCounts Name of the response variable in the counts datasets. This variable name needs to be standardized across all counts datasets used in the integrated model. Defaults to \code{'counts'}.
+#' @param responsePA Name of the response variable in the presence absence datasets. This variable name needs to be standardized across all present absence datasets. Defaults to \code{'present'}.
 #' @param trialsPA Name of the trials response variable for the presence absence datasets. Defaults to \code{NULL}.
 #' @param trialsMarks Name of the trials response variable for the binomial marks. Defaults to \code{NULL}.
 #' @param speciesName Name of the species variable name. Specifying this argument calculates covariate values for the individual species, as well as including a spatial group model for the species. Defaults to \code{NULL}

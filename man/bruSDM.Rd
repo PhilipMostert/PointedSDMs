@@ -43,15 +43,15 @@ bruSDM(
 
 \item{Mesh}{An \code{inla.mesh} object.}
 
-\item{pointsField}{Specification of the shared spatial field for the points. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).}
+\item{pointsField}{Specification of the shared spatial field for the points. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.}
 
-\item{speciesField}{Specification of the shared spatial field for the species. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).}
+\item{speciesField}{Specification of the shared spatial field for the species. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.}
 
 \item{markNames}{A vector with the mark names to be included in the integrated model. These marks must be in the same data objects as the points.}
 
 \item{markFamily}{A vector with the statistical families of the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".}
 
-\item{marksField}{Specification of the fields for the marks. Defaults to \code{NULL}, which will use \code(inla::inla.spde2.matern(mesh = mesh)).}
+\item{marksField}{Specification of the fields for the marks. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.}
 
 \item{pointCovariates}{The non-spatial covariates to be included in the integrated model. These covariates must be included in the same data object as the points.}
 
@@ -63,9 +63,9 @@ bruSDM(
 
 \item{marksSpatial}{Logical argument: should the marks have their own spatial field. Defaults to \code{TRUE}.}
 
-\item{responseCounts}{Name of the response variable in the counts datasets. This variable name needs to be standardized across all counts datasets used in the integrated model. Defaults to \code{'counts}.}
+\item{responseCounts}{Name of the response variable in the counts datasets. This variable name needs to be standardized across all counts datasets used in the integrated model. Defaults to \code{'counts'}.}
 
-\item{responsePA}{Name of the response variable in the presence absence datasets. This variable name needs to be standardized across all present absence datasets. Defaults to \code{'present}.}
+\item{responsePA}{Name of the response variable in the presence absence datasets. This variable name needs to be standardized across all present absence datasets. Defaults to \code{'present'}.}
 
 \item{trialsPA}{Name of the trials response variable for the presence absence datasets. Defaults to \code{NULL}.}
 
