@@ -112,7 +112,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                          boundary = Boundary,
                          ips = IPS,
                          temporal = temporalName,
-                         timemodel = temporalModel)
+                         temporalmodel = temporalModel)
   
   if (length(list(...)) == 0) warning('No point data added. You can add data to this object with `$.addData()`.')
  
