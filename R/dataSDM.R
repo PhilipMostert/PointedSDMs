@@ -489,7 +489,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
                      coords = private$Coordinates, proj = private$Projection,
                      countsresp = responseCounts, paresp = responsePA,
                      trialname = trialsPA, speciesname = speciesName,
-                     marktrialname = trialsMarks, temporalvar = temporalvar,
+                     marktrialname = trialsMarks, temporalvar = private$temporalName,
                      marks = markNames, markfamily = markFamily,
                      pointcovnames = pointCovariates)
   
