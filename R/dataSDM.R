@@ -581,7 +581,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
                                                    marksintercept = private$marksIntercepts,
                                                    temporalname = private$temporalName,
                                                    #speciesspatial = private$speciesField,
-                                                   numtime = length(unique(unlist(private$temporalVas))))
+                                                   numtime = length(unique(unlist(private$temporalVars))))
     
   }
   else {
