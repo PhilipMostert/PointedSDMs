@@ -33,7 +33,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                    pointCovariates = NULL, pointsIntercept = TRUE, marksIntercept = TRUE,
                    pointsSpatial = TRUE, marksSpatial = TRUE,
                    responseCounts = 'counts', responsePA = 'present', trialsPA = NULL,
-                   trialsMarks = NULL, speciesName = NULL, temporalName = NULL, timeModel = list(model = 'ar1')) {
+                   trialsMarks = NULL, speciesName = NULL, temporalName = NULL, temporalModel = list(model = 'ar1')) {
   
   if (length(Coordinates) != 2) stop('Coordinates needs to be a vector of length 2 containing the coordinate names.')
   
