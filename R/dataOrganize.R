@@ -282,7 +282,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
         
         for (j in 1:length(pointsResponse[[response]])) {
           
-          if (!is.null(temporalname)) temp <- temporalname
+          if (!is.null(temporalname)) temp <- paste0(temporalname,'_effect')
           else temp <- NULL
           
           if (!is.null(speciesIn)) {
