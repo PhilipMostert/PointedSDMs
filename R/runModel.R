@@ -74,7 +74,7 @@ runModel <- function(data, options = list()) {
   
   if (data$.__enclos_env__$private$Spatial) {
     
-  assign('spdeModel', data$spatialFields$sharedField)
+  assign('shared_field', data$spatialFields$sharedField)
   pointsSpatial <- TRUE
   
   } else pointsSpatial <- FALSE
@@ -99,10 +99,12 @@ runModel <- function(data, options = list()) {
     
     for (name in names(data$spatialFields$biasFields)) {
     
-      assign(paste0(name,'_biasField'), data$spatialFields$biasFields[[name]])
+      assign(paste0(name,'_bias_field'), data$spatialFields$biasFields[[name]])
       
     }
   }
+  
+  ## Add time field here...
 
 
   ## Get all components in formula; get all components but without the ()

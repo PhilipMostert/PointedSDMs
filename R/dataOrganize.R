@@ -422,7 +422,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (spatial) {
     
-    spat <- paste0('shared_spatial(main = coordinates, model = spdeModel)')
+    spat <- paste0('shared_spatial(main = coordinates, model = shared_field)')
     
   } else spat <- NULL
   
@@ -457,7 +457,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (!is.null(temporalname)) {
     
-    tempSpat <- paste0(temporalname,'_effect(main = coordinates, model = temporalModel, group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
+    tempSpat <- paste0(temporalname,'_effect(main = coordinates, model = temporal_field, group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
     
   } else tempSpat <- NULL
   

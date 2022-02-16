@@ -43,7 +43,7 @@ datasetOut <- function(model, dataset,
   
   if (model$spatial$points) {
       ##Also assign the speciesModel and the marksModel
-      assign('spdeModel', model$bru_info$model$effects[[1]]$env[['spdeModel']])
+      assign('shared_field', model$bru_info$model$effects[[1]]$env[['spdeModel']])
       
     } else spdeModel <- NULL
     
@@ -51,7 +51,7 @@ datasetOut <- function(model, dataset,
       
       for (data in model$biasData) { 
         
-      assign(paste0(data, '_biasField'), model$bru_info$model$effects[[paste0(data,'_biasField')]]$env[[paste0(data,'_biasField')]])
+      assign(paste0(data, '_bias_field'), model$bru_info$model$effects[[paste0(data,'_bias_field')]]$env[[paste0(data,'_bias_field')]])
         
       }
       
@@ -72,9 +72,17 @@ datasetOut <- function(model, dataset,
   
  
   if (!is.null(model$species$speciesVar)) {
-    ##Change this to the individual speciesSPDE models
-    assign('speciesModel', model$bru_info$model$effects[[paste0(model$species$speciesVar,'_spatial')]]$env$speciesModel)
+    # if species spatial ...
+    for (species in unique(unlist(model$species$speciesIn))) {
+      
+      assign(paste0(species,'_field'), model$bru_info$model$effects[[paste0(species,'_field')]]$env[[paste0(species,'_field')]])
+      
+    }
+    
+    #assign('speciesModel', model$bru_info$model$effects[[paste0(model$species$speciesVar,'_spatial')]]$env$speciesModel)
   }
+    
+    ##Add temporal field here ...
   
   for (dataname in dataset) {
     
@@ -96,7 +104,7 @@ datasetOut <- function(model, dataset,
     reduced_components <- update(reduced_components, paste0(' ~ . - ',
                                                             dataname,'_spde(main = coordinates, model = spdemodel)'))
     #reduced_components <- update(reduced_components, paste0(' ~ . -', dataname,'_bias_field(main = coordinates, model = biasField)'))
-    reduced_components <- update(reduced_components, paste0(' ~ . -', dataname,'_bias_field(main = coordinates, model = ', paste0(dataname,'_biasField)')))
+    reduced_components <- update(reduced_components, paste0(' ~ . -', dataname,'_biasField(main = coordinates, model = ', paste0(dataname,'_bias_field)')))
     
     ##Also need to add biasField #pref something like spatia_datasets...
     

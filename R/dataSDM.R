@@ -780,7 +780,7 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
     for (lik in index) {
       
       #private$modelData[[lik]]$formula <- update(private$modelData[[lik]]$formula, paste0(' ~ . + ', dat,'_bias_field'))
-      private$modelData[[lik]]$include_components <- c(private$modelData[[lik]]$include_components, paste0(dat, '_bias_field'))
+      private$modelData[[lik]]$include_components <- c(private$modelData[[lik]]$include_components, paste0(dat, '_biasField'))
     }
     
     if (is.null(biasField)) self$spatialFields$biasFields[[dat]] <- inla.spde2.matern(mesh = private$INLAmesh)
@@ -795,7 +795,7 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
   
   
   #Should I copy the bias fields for the marks?
-  private$Components <- c(private$Components, paste0(datasetNames ,'_bias_field(main = coordinates, model = ', datasetNames, '_biasField)'))
+  private$Components <- c(private$Components, paste0(datasetNames ,'_biasField(main = coordinates, model = ', datasetNames, '_bias_field)'))
   ##Things to do here:
   #Go into the liks of PO datasets and add the biasfield
   #Go inth the components and add the bias field component
@@ -1068,5 +1068,6 @@ dataSDM$set('public', 'addComponents', function(component, datasetName, speciesN
 dataSDM$set('public', 'spatialFields', list(sharedField = list(),
                                             speciesFields = list(),
                                             markFields = list(),
-                                            biasFields = list()))
+                                            biasFields = list(),
+                                            timeField = list()))
 
