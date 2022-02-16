@@ -457,7 +457,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (!is.null(temporalname)) {
     
-    tempSpat <- paste0(temporalname,'_effect(main = coordinates, model = temporalModel, group = ', temporalname, ', ngroup = ', numtime,', control.group = ,', temporalmodel,')')
+    tempSpat <- paste0(temporalname,'_effect(main = coordinates, model = temporalModel, group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
     
   } else tempSpat <- NULL
   
