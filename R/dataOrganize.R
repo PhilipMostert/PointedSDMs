@@ -282,8 +282,8 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
         
         for (j in 1:length(pointsResponse[[response]])) {
           
-          if (!is.null(temporalname)) temp <- paste0(temporalname,'_effect')
-          else temp <- NULL
+          #if (!is.null(temporalname)) temp <- paste0(temporalname,'_effect')
+          #else temp <- NULL
           
           if (!is.null(speciesIn)) {
             
@@ -543,7 +543,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
   }
   
-  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt, tempSpat)
+  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt)
   
   RHS
   
