@@ -415,7 +415,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
                                                       marksintercept,
                                                       temporalname,
                                                       #speciesspatial,
-                                                      numtime) {
+                                                      numtime,temporalmodel) {
   ##Copy for marks fields???
   if (length(self$SpeciesInData) != 0) species <- unique(unlist(self$SpeciesInData))
   else species = NULL
@@ -457,7 +457,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (!is.null(temporalname)) {
     
-    tempSpat <- paste0(temporalname,'_effect(main = coordinates, model = temporalModel, group = ', temporalname, ', ngroup = ', numtime,')')
+    tempSpat <- paste0(temporalname,'_effect(main = coordinates, model = temporalModel, group = ', temporalname, ', ngroup = ', numtime,', control.group = ,', temporalmodel ,')')
     
   } else tempSpat <- NULL
   

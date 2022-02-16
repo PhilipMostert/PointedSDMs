@@ -26,6 +26,7 @@ dataSDM$set('private', 'initialnames', NULL)
 
 dataSDM$set('private', 'temporalName', NULL)
 dataSDM$set('private', 'temporalVars', NULL)
+dataSDM$set('private', 'temporalModel', NULL)
 
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'pointsField', list())
@@ -78,7 +79,7 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
                                              marksnames, marksfamily, pointcovariates,
                                              trialspa, trialsmarks, speciesname, marksspatial,
                                              spatial, intercepts, spatialcovariates, marksintercepts,
-                                             boundary, ips, temporal) {
+                                             boundary, ips, temporal, temporalmodel) {
   
   if (missing(coordinates)) stop('Coordinates need to be given.')
   if (missing(projection)) stop('projection needs to be given.')
@@ -104,6 +105,7 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
   if (!missing(speciesname)) private$speciesName <- speciesname
   
   if (!missing(temporal)) private$temporalName <- temporal
+  private$temporalModel <- temporalmodel
   
   if (!missing(initialnames)) private$initialnames <- initialnames
   if (!missing(boundary)) private$Boundary <- boundary
@@ -581,7 +583,8 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
                                                    marksintercept = private$marksIntercepts,
                                                    temporalname = private$temporalName,
                                                    #speciesspatial = private$speciesField,
-                                                   numtime = length(unique(unlist(private$temporalVars))))
+                                                   numtime = length(unique(unlist(private$temporalVars))),
+                                                   temporalmodel = private$temporalModel)
     
   }
   else {

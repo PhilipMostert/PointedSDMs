@@ -22,6 +22,7 @@
 #' @param trialsMarks Name of the trials response variable for the binomial marks. Defaults to \code{NULL}.
 #' @param speciesName Name of the species variable name. Specifying this argument calculates covariate values for the individual species, as well as including a spatial group model for the species. Defaults to \code{NULL}
 #' @param temporalName Name of the temporal variable in the model. This variable is required to be in all the datasets. Defaults to \code{NULL}.
+#' @param temporalModel List of model specifications given to the control.group argument in the time effect component.
 #' 
 #' @export
 
@@ -32,7 +33,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                    pointCovariates = NULL, pointsIntercept = TRUE, marksIntercept = TRUE,
                    pointsSpatial = TRUE, marksSpatial = TRUE,
                    responseCounts = 'counts', responsePA = 'present', trialsPA = NULL,
-                   trialsMarks = NULL, speciesName = NULL, temporalName = NULL) {
+                   trialsMarks = NULL, speciesName = NULL, temporalName = NULL, timeModel = list(model = 'ar1')) {
   
   if (length(Coordinates) != 2) stop('Coordinates needs to be a vector of length 2 containing the coordinate names.')
   
@@ -91,6 +92,8 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
   
   } else initialnames <- NULL
   
+  if (is.null(temporalName)) timeModel <- NULL
+  
   bruData <- dataSDM$new(coordinates = Coordinates, projection = Projection,
                          Inlamesh = Mesh, initialnames = initialnames,
                          responsecounts = responseCounts,
@@ -108,7 +111,8 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                          spatialcovariates = spatialCovariates,
                          boundary = Boundary,
                          ips = IPS,
-                         temporal = temporalName)
+                         temporal = temporalName,
+                         timemodel = temporalModel)
   
   if (length(list(...)) == 0) warning('No point data added. You can add data to this object with `$.addData()`.')
  
