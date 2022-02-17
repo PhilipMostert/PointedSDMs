@@ -20,6 +20,7 @@ PO <- spsample(SpatialPoly, n = 100, 'random', CRSobs = projection)
 PO$numvar <- runif(n = nrow(PO@coords))
 PO$factvar <- sample(x = c('a','b'), size = nrow(PO@coords), replace = TRUE)
 PO$species <- sample(x = c('fish1', 'fish2'), size = nrow(PO@coords), replace = TRUE)
+PO$temp <- sample(x = c(1,2), nrow(PO@data), replace = TRUE)
 #Random presence absence dataset
 PA <- spsample(SpatialPoly, n = 100, 'random', CRSobs = projection)
 PA$PAresp <- sample(x = c(0,1), size = nrow(PA@coords), replace = TRUE)
@@ -29,6 +30,8 @@ PA$pointcov <- runif(n = nrow(PA@coords))
 PA$binommark <- sample(x = 2:5, size = nrow(PA@data), replace = TRUE)
 PA$marktrial <- sample(x = 0:1, size = nrow(PA@data), replace = TRUE)
 PA$species <- sample(x = c('bird1', 'bird2'), nrow(PA@data), replace = TRUE)
+PA$temp <- sample(x = c(1,2), nrow(PA@data), replace = TRUE)
+
 ##Make PA a data.frame object
 PA <- data.frame(PA)
 
@@ -40,7 +43,7 @@ test_that('The internal function makeData returns a list of SpatialPointDataFram
     Check$makeData(datapoints = spData, datanames = c('PO', 'PA'),
                    coords = colnames(PO@coords), proj = projection,
                    pointcovnames = 'pointcov', paresp = 'PAresp', countsresp = 'counts', trialname = 'trial',
-                   speciesname = 'species', marks = c('numvar', 'factvar', 'binommark'),
+                   speciesname = 'species', marks = c('numvar', 'factvar', 'binommark'), temporalvar = 'temp',
                    marktrialname = 'marktrial', markfamily = c('uniform', 'multinomial', 'binomial'))
             
     expect_setequal(names(Check$Data), c('PO','PA'))
@@ -50,13 +53,13 @@ test_that('The internal function makeData returns a list of SpatialPointDataFram
     ##Should create a placeholder variable for the poresp + 
     #should keep marks +
     #should create new variables for the multinomial marks.
-    expect_setequal(names(Check$Data$PO[[1]]@data), c("poresp", "numvar", "factvar",
+    expect_setequal(names(Check$Data$PO[[1]]@data), c("poresp", "numvar", "factvar", 'temp',
                                                     "species", "factvar_phi", "factvar_response"))
     expect_true((all(Check$Data$PO[[1]]@data$factvar_phi == 1)))
     expect_true((all(Check$Data$PO[[1]]@data$factvar_response == 1)))
     expect_true(class(Check$Data$PO[[1]]@data$factvar) == 'character')
     
-    expect_setequal(names(Check$Data$PA[[1]]@data), c("PAresp", "trial", "binommark", 
+    expect_setequal(names(Check$Data$PA[[1]]@data), c("PAresp", "trial", "binommark", 'temp',
                                                     "marktrial", "species", "pointcov"))
     #Family for PO should be:
     # cp for the points;
@@ -156,9 +159,9 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             
             #Spatcovs is the names of the spatial covariates
             #specnesname is the name of the species variable
-            Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species',
-                               paresp = 'PAresp', countresp = 'counts',
-                               marks = c('numvar', 'factvar', 'binommark'),
+            Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', markintercept = TRUE,
+                               paresp = 'PAresp', countresp = 'counts', marksspatial = TRUE,
+                               marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                                spatial = TRUE, intercept = TRUE, pointcovs = 'pointcov')
             
             expect_setequal(names(Check$Formulas), c('PO', 'PA'))
@@ -184,23 +187,23 @@ test_that('makeFormulas is able to make the correct formulas for the different p
                         'binommark ~ .')
             
             expect_setequal(Check$Formulas$PO$fish1$coordinates$RHS,
-                          c("fish1_spatcovs", "species_spatial", "shared_spatial", "fish1_intercept"))
+                          c("fish1_spatcovs", "fish1_spatial", "shared_spatial", "fish1_intercept"))
             expect_setequal(Check$Formulas$PO$fish1$numvar$RHS,
-                            c("fish1_spatcovs", "species_spatial", "shared_spatial", "fish1_intercept", "numvar_spatial"))
+                            c("fish1_spatcovs", "numvar_intercept", "numvar_spatial"))
             expect_setequal(Check$Formulas$PO$fish1$factvar_response$RHS,
-                            c("fish1_spatcovs", "species_spatial", "shared_spatial", "fish1_intercept",
+                            c("fish1_spatcovs", "factvar_intercept",
                               "factvar_spatial", "factvar", "factvar_phi"))
             
             expect_setequal(Check$Formulas$PA$bird1$PAresp$RHS,
-                           c("bird1_spatcovs", "species_spatial", "shared_spatial", "bird1_intercept", "pointcov"))
+                           c("bird1_spatcovs", "bird1_spatial", "shared_spatial", "bird1_intercept", "pointcov"))
             expect_setequal(Check$Formulas$PA$bird2$binommark$RHS,
-                            c("bird2_spatcovs", "species_spatial", "shared_spatial", "bird2_intercept", "binommark_spatial"))
+                            c("bird2_spatcovs", "binommark_spatial", "binommark_intercept"))
             
             ##Change terms
              #Set spatial and intercept to FALSE
-            Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species',
-                               paresp = 'PAresp', countresp = 'counts',
-                               marks = c('numvar', 'factvar', 'binommark'),
+            Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', temporalname = 'temp',
+                               paresp = 'PAresp', countresp = 'counts', marksspatial = FALSE,
+                               marks = c('numvar', 'factvar', 'binommark'), markintercept = FALSE,
                                spatial = FALSE, intercept = FALSE, pointcovs = 'pointcov')
           
             
@@ -218,69 +221,74 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             
             ##Change terms
             #Set spatcovs to NULL
-            Check$makeFormulas(spatcovs = NULL, speciesname = 'species',
-                               paresp = 'PAresp', countresp = 'counts',
-                               marks = c('numvar', 'factvar', 'binommark'),
+            Check$makeFormulas(spatcovs = NULL, speciesname = 'species', marksspatial = TRUE,
+                               paresp = 'PAresp', countresp = 'counts', markintercept = FALSE,
+                               marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                                spatial = TRUE, intercept = TRUE, pointcovs = 'pointcov')
             
             expect_setequal(Check$Formulas$PO$fish1$coordinates$RHS,
-                            c("species_spatial", "shared_spatial", "fish1_intercept"))
+                            c("fish1_spatial", "shared_spatial", "fish1_intercept"))
             expect_setequal(Check$Formulas$PO$fish1$numvar$RHS,
-                            c("species_spatial", "shared_spatial", "fish1_intercept", "numvar_spatial"))
+                            c("numvar_spatial"))
             expect_setequal(Check$Formulas$PO$fish1$factvar_response$RHS,
-                            c("species_spatial", "shared_spatial", "fish1_intercept",
-                              "factvar_spatial", "factvar", "factvar_phi"))
+                            c("factvar_spatial", "factvar", "factvar_phi"))
             
             expect_setequal(Check$Formulas$PA$bird1$PAresp$RHS,
-                            c("species_spatial", "shared_spatial", "bird1_intercept", "pointcov"))
+                            c("bird1_spatial", "shared_spatial", "bird1_intercept", "pointcov"))
             expect_setequal(Check$Formulas$PA$bird2$binommark$RHS,
-                            c("species_spatial", "shared_spatial", "bird2_intercept", "binommark_spatial"))
+                            c("binommark_spatial"))
             
             })
 
 #Change back to original
-Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species',
-                   paresp = 'PAresp', countresp = 'counts',
-                   marks = c('numvar', 'factvar', 'binommark'),
+Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', marksspatial = TRUE,
+                   paresp = 'PAresp', countresp = 'counts', markintercept = TRUE,
+                   marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                    spatial = TRUE, intercept = TRUE, pointcovs = 'pointcov')
 
 test_that('makeComponents is able to make the correct components for all the processes
           based on the predictors and spatial effects available.', {
             
-    comps <- Check$makeComponents(spatial = TRUE, intercepts = TRUE, datanames = c('PO','PA'),
-                         marks = c('numvar', 'factvar', 'binommark'),
-                         multinomnames = 'factvar', pointcovariates = 'pointcov',
-                         speciesname = 'species', covariatenames = 'spatcovs',
-                         covariateclass = 'numeric', numspecies = 4)
+    comps <- Check$makeComponents(spatial = TRUE, intercepts = TRUE, datanames = c('PO','PA'), marksintercept = TRUE,
+                         marks = c('numvar', 'factvar', 'binommark'), temporalmodel = deparse(list(model = "ar1")),
+                         multinomnames = 'factvar', pointcovariates = 'pointcov', marksspatial = TRUE,
+                         speciesname = 'species', covariatenames = 'spatcovs', temporalname = 'temp',
+                         covariateclass = 'numeric', numtime = 2)
     
     expect_identical(formula(paste(' ~ -1 +', paste0(comps, collapse = ' + '))),
-                     ~-1 + shared_spatial(main = coordinates, model = spdeModel) + 
-                       species_spatial(main = coordinates, model = speciesModel, group = species, ngroup = 4) +
-                       numvar_spatial(main = coordinates, model = markModel) +
-                       factvar_spatial(main = coordinates, model = markModel) + 
-                       binommark_spatial(main = coordinates, model = markModel) +
-                       fish1_spatcovs(main = fish1_spatcovs, model = "numeric") +
-                       fish2_spatcovs(main = fish2_spatcovs, model = "numeric") +
+                     ~-1 + shared_spatial(main = coordinates, model = shared_field, 
+                                          group = temp, ngroup = 2, control.group = list(model = "ar1")) + 
+                       fish1_spatial(main = coordinates, model = fish1_field) + 
+                       fish2_spatial(main = coordinates, model = fish2_field) + 
+                       bird2_spatial(main = coordinates, model = bird2_field) + 
+                       bird1_spatial(main = coordinates, model = bird1_field) + 
+                       numvar_spatial(main = coordinates, model = numvar_field) + 
+                       factvar_spatial(main = coordinates, model = factvar_field) + 
+                       binommark_spatial(main = coordinates, model = binommark_field) + 
+                       fish1_spatcovs(main = fish1_spatcovs, model = "numeric") + 
+                       fish2_spatcovs(main = fish2_spatcovs, model = "numeric") + 
+                       bird2_spatcovs(main = bird2_spatcovs, model = "numeric") + 
                        bird1_spatcovs(main = bird1_spatcovs, model = "numeric") + 
-                       bird2_spatcovs(main = bird2_spatcovs, model = "numeric") +
-                       pointcov + fish1_intercept(1) + fish2_intercept(1) + 
-                       bird1_intercept(1) + bird2_intercept(1) + 
-                       factvar(main = factvar, model = "iid", constr = FALSE, fixed = TRUE) +
-                       factvar_phi(main = factvar_phi, model = "iid", initial = -10, fixed = TRUE))
+                       pointcov + fish1_intercept(1) + fish2_intercept(1) + bird2_intercept(1) + 
+                       bird1_intercept(1) + factvar(main = factvar, model = "iid", 
+                                                    constr = FALSE, fixed = TRUE) +
+                       factvar_phi(main = factvar_phi, model = "iid", initial = -10, fixed = TRUE) +
+                       numvar_intercept(1) + 
+                       factvar_intercept(1) + binommark_intercept(1))
     
     ## Change arguments
     #spatial and intercepts == FALSE
     comps2 <- Check$makeComponents(spatial = FALSE, intercepts = FALSE, datanames = c('PO','PA'),
-                                  marks = c('numvar', 'factvar', 'binommark'),
-                                  multinomnames = 'factvar', pointcovariates = 'pointcov',
+                                  marks = c('numvar', 'factvar', 'binommark'), marksspatial = FALSE,
+                                  multinomnames = 'factvar', pointcovariates = 'pointcov', marksintercept = FALSE,
                                   speciesname = 'species', covariatenames = 'spatcovs',
-                                  covariateclass = 'numeric', numspecies = 4)
+                                  covariateclass = 'numeric', numtime =  2)
     
     expect_identical(formula(paste(' ~ -1 +', paste0(comps2, collapse = ' + '))),
                      ~-1 + fish1_spatcovs(main = fish1_spatcovs, model = "numeric") + 
                        fish2_spatcovs(main = fish2_spatcovs, model = "numeric") + 
-                       bird1_spatcovs(main = bird1_spatcovs, model = "numeric") + 
                        bird2_spatcovs(main = bird2_spatcovs, model = "numeric") + 
+                       bird1_spatcovs(main = bird1_spatcovs, model = "numeric") + 
                        pointcov + factvar(main = factvar, model = "iid", constr = FALSE, 
                                           fixed = TRUE) + factvar_phi(main = factvar_phi, model = "iid", 
                                                                       initial = -10, fixed = TRUE))
@@ -310,12 +318,8 @@ test_that('makeLhoods is able to make the construct the relevant bru_like object
                                          "PA_bird1_binommark" , "PA_bird2_PAresp", "PA_bird2_binommark"))
     
     expect_equal(Check$Data$PA_bird1_PAresp$Ntrials, PA$trial[PA$species == 'bird1'])
-    expect_eqeual(Check$Data$PA_bird2_PAresp$Ntrials, PA$trial[PA$species == 'bird2'])
+    expect_equal(Check$Data$PA_bird2_PAresp$Ntrials, PA$trial[PA$species == 'bird2'])
     expect_equal(Check$Data$PA_bird1_binommark$Ntrials, PA$marktrial[PA$species == 'bird1'])
     expect_equal(Check$Data$PA_bird2_binommark$Ntrials, PA$marktrial[PA$species == 'bird2'])        
-    
-    expect_equal(Check$Data$PO_fish1_coordinates$formula, coordinates ~ species_spatial + shared_spatial + fish1_intercept)
-    expect_equal(Check$Data$PA_bird2_binommark$formula, binommark ~ species_spatial + shared_spatial + bird2_intercept + 
-                   binommark_spatial)
     
         })
