@@ -44,7 +44,7 @@ test_that('bruSDM is able to initialize a dataSDM object as well as correctly ad
   speciesName <- 'species'
 
   
-  obj <- bruSDM(PO, PA, Coordinates = coordnames, Projection = projection, INLAmesh = mesh,
+  obj <- bruSDM(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
                 IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                 responsePA = responsePA, markNames = markNames, markFamily = marksFamily,
                 speciesName = speciesName)
@@ -54,31 +54,31 @@ test_that('bruSDM is able to initialize a dataSDM object as well as correctly ad
                                                                   "PA_bird_binommark"))
   
   ##Test warnings: No data added
-  expect_warning(bruSDM(Coordinates = coordnames, Projection = projection, INLAmesh = mesh,
+  expect_warning(bruSDM(Coordinates = coordnames, Projection = projection, Mesh = mesh,
                         IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                         responsePA = responsePA, markNames = markNames, markFamily = marksFamily,
                         speciesName = speciesName))
   
   ##Test error: Coordinates length > 2
-  expect_error(bruSDM(PO, PA, Coordinates = c('x','y','z'), Projection = projection, INLAmesh = mesh,
+  expect_error(bruSDM(PO, PA, Coordinates = c('x','y','z'), Projection = projection, Mesh = mesh,
                         IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                         responsePA = responsePA, markNames = markNames, markFamily = marksFamily,
                         speciesName = speciesName))
   
   ##Test error: Coordinates[1] == Coordinates[2]
-  expect_error(bruSDM(PO, PA, Coordinates = c('x','x'), Projection = projection, INLAmesh = mesh,
+  expect_error(bruSDM(PO, PA, Coordinates = c('x','x'), Projection = projection, Mesh = mesh,
                       IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                       responsePA = responsePA, markNames = markNames, markFamily = marksFamily,
                       speciesName = speciesName))
   
   ##Test error: proj not CRS
-  expect_error(bruSDM(PO, PA, Coordinates = coordnames, Projection = list(), INLAmesh = mesh,
+  expect_error(bruSDM(PO, PA, Coordinates = coordnames, Projection = list(), Mesh = mesh,
                       IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                       responsePA = responsePA, markNames = markNames, markFamily = marksFamily,
                       speciesName = speciesName))
   
   ##Test error: INLAmesh not an inla.mesh object
-  expect_error(bruSDM(PO, PA, Coordinates = coordnames, Projection = Projection, INLAmesh = list(),
+  expect_error(bruSDM(PO, PA, Coordinates = coordnames, Projection = Projection, Mesh = list(),
                       IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                       responsePA = responsePA, markNames = markNames, markFamily = marksFamily,
                       speciesName = speciesName))
