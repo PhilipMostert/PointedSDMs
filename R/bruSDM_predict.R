@@ -11,6 +11,7 @@ setClass('bruSDM_predict')
 #' @param mesh An inla.mesh object
 #' @param mask A mask of the study background. Defaults to \code{NULL}.
 #' @param covariates Name of covariates to predict.
+#' @param temporal Make predictions for the temporal component of the model.
 #' @param spatial Include spatial effects in prediction.
 #' @param intercept Include intercept in prediction.
 #' @param interceptnames Names of the datasets to include intercept term. Defaults to \code{NULL}.
@@ -25,11 +26,11 @@ setClass('bruSDM_predict')
 #' 
 
 predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL, 
-                           mask = NULL, covariates = NULL, spatial = TRUE,
+                           mask = NULL, temporal = FALSE, covariates = NULL, spatial = TRUE,
                            intercept = TRUE, interceptnames = NULL,
                            biasfield = FALSE, biasnames = NULL, predictor = FALSE,
                            fun = 'exp', ...) {
-time <- FALSE
+
   if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
   
    if(!is.null(unlist(model[['species']][['speciesIn']]))) species <- TRUE
@@ -44,6 +45,8 @@ time <- FALSE
     if (is.null(formula) && !intercept && !spatial && is.null(covariates)) stop("Please provide either a formula or components of a formula to be predicted.")
     
   }
+   
+  if (temporal && is.null(model$temporal$temporalVar)) stop('Temporal is set to TRUE but no temporal component found in the model.')
   
   if (is.null(data)) {
     
@@ -64,66 +67,72 @@ time <- FALSE
     
     if (is.null(fun) | fun == 'linear') {fun <- ''}
     
-    if (species) {
+    
+    ##What if both species and temporal ??? Will need something to account for this ... 
+    
+    if (temporal) {
       
-      int[['speciesPredictions']] <- vector(mode = 'list', length(unlist(unique(model$species$speciesIn))))
-      names(int[['speciesPredictions']]) <- unlist(unique(model$species$speciesIn))
+      #do later
+      #numeric_species <- as.numeric(speciesin)
       
-      for (spec in unlist(unique(model$species$speciesIn))) {
-        
-        if (!is.null(covariates)) species_covs <- paste0(spec, '_', covariates)
-        else species_covs <- NULL
-        
-        if (intercept) species_int <- paste0(spec,'_intercept')
-        else species_int <- NULL
-        
-        if (spatial) species_spat <- paste0(spec,'_spatial')
-        else species_spat <- NULL
-        
-       species_formula <- formula(paste0('~', fun, '(', paste0(c(species_covs, species_int, species_spat), collapse = ' + '),')'))
-       
-       
-       int[[1]][[spec]] <- predict(model, data, formula = species_formula, ...)
-      }
-      class(int) <- c('bruSDM_predict', class(int))
-      return(int) 
+      #species_variable <- model[['species']][['speciesVar']]
+      
+      #species_data <- data.frame(seq_len(max(numeric_species)))
+      #names(species_data) <- species_variable
+      
+      #speciesData <- inlabru::cprod(data, data.frame(species_data))
+      #names(speciesData@data) <- c(species_variable, 'weight')
+      
+      #if (is.null(fun) | fun == 'linear') {fun <- ''}
+      
+      ##How do we do this?? species covs are now: speciesname_covariatename??
+      #if (!is.null(covariates)) {
+      
+      #  speciescovs <- as.vector(outer(paste0(unique(as.character(speciesin)),'_'), model[['spatCovs']][['name']], FUN = 'paste0'))
+      
+      #  species_formula <- paste0(fun,'(',paste(paste0(species_variable,'_spatial'), paste(speciescovs, collapse = ' + '), sep = ' + '),')')
+      
+      #}
+      #else  species_formula <- paste0(fun,'(',paste(paste0(species_variable,'_spatial')),')')
+      
+      #int <- predict(model, speciesData, ~ data.frame(species_variable = eval(parse(text = species_variable)), formula = eval(parse(text = species_formula))))
+      
+      #int[[species_variable]] <- as.character(rep(unique(speciesin[order(speciesin)])), length(data)) ##order?
+      
+      #int <- list(int)
+      #names(int) <- 'Species predictions'
+      #class(int) <- c('bruSDM_predict', class(int))
+      
+      #return(int)
+    
       
     }
     else
-      if (time) {
+      if (species) {
         
-        #do later
-        #numeric_species <- as.numeric(speciesin)
         
-        #species_variable <- model[['species']][['speciesVar']]
+        int[['speciesPredictions']] <- vector(mode = 'list', length(unlist(unique(model$species$speciesIn))))
+        names(int[['speciesPredictions']]) <- unlist(unique(model$species$speciesIn))
         
-        #species_data <- data.frame(seq_len(max(numeric_species)))
-        #names(species_data) <- species_variable
-        
-        #speciesData <- inlabru::cprod(data, data.frame(species_data))
-        #names(speciesData@data) <- c(species_variable, 'weight')
-        
-        #if (is.null(fun) | fun == 'linear') {fun <- ''}
-        
-        ##How do we do this?? species covs are now: speciesname_covariatename??
-        #if (!is.null(covariates)) {
+        for (spec in unlist(unique(model$species$speciesIn))) {
           
-        #  speciescovs <- as.vector(outer(paste0(unique(as.character(speciesin)),'_'), model[['spatCovs']][['name']], FUN = 'paste0'))
+          if (!is.null(covariates)) species_covs <- paste0(spec, '_', covariates)
+          else species_covs <- NULL
           
-        #  species_formula <- paste0(fun,'(',paste(paste0(species_variable,'_spatial'), paste(speciescovs, collapse = ' + '), sep = ' + '),')')
+          if (intercept) species_int <- paste0(spec,'_intercept')
+          else species_int <- NULL
           
-        #}
-        #else  species_formula <- paste0(fun,'(',paste(paste0(species_variable,'_spatial')),')')
-        
-        #int <- predict(model, speciesData, ~ data.frame(species_variable = eval(parse(text = species_variable)), formula = eval(parse(text = species_formula))))
-        
-        #int[[species_variable]] <- as.character(rep(unique(speciesin[order(speciesin)])), length(data)) ##order?
-        
-        #int <- list(int)
-        #names(int) <- 'Species predictions'
-        #class(int) <- c('bruSDM_predict', class(int))
-        
-        #return(int)
+          if (spatial) species_spat <- paste0(spec,'_spatial')
+          else species_spat <- NULL
+          
+          species_formula <- formula(paste0('~', fun, '(', paste0(c(species_covs, species_int, species_spat), collapse = ' + '),')'))
+          
+          
+          int[[1]][[spec]] <- predict(model, data, formula = species_formula, ...)
+        }
+        class(int) <- c('bruSDM_predict', class(int))
+        return(int) 
+
       }
     
     else {
