@@ -53,10 +53,10 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
                                     tolerance = 0.585235)
   cov <- raster(cov)
   
-  obj <- bruSDM(PO, PA, Coordinates = coordnames, Projection = projection, INLAmesh = mesh,
+  obj <- bruSDM(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
                  IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                  responsePA = responsePA, markNames = c('factvar'), markFamily = c('multinomial'),
-                 speciesName = speciesName, spatialCovariates = cov, Spatial = FALSE)
+                 speciesName = speciesName, spatialCovariates = cov, pointsSpatial= FALSE)
   
   spatMod <- runModel(data = obj,
                       options  = list(control.inla=list(int.strategy='eb')))
