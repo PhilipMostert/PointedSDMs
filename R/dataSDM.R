@@ -522,7 +522,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     self$spatialFields$speciesFields <- vector(mode = 'list', length = length(unique(unlist(private$speciesIn))))
     names(self$spatialFields$speciesFields) <- unique(unlist(private$speciesIn))
     
-    if (!is.null(speciesField)) self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(speciesField)
+    if (!missing(speciesField)) self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(speciesField)
     else self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(INLA::inla.spde2.matern(mesh = private$INLAmesh))
     
   }
