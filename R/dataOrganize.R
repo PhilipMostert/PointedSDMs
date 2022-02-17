@@ -367,7 +367,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             
           }
           
-          RHS <- c(covs, spat, int, addcovs, markspat, marksint, temp)
+          RHS <- c(covs, spat, int, addcovs, markspat, marksint) # temp
           
           if (pointsResponse[[response]][j] %in% paste0(self$multinomVars,'_response')) { #paste multinomvar and phi # Need to convert multinomvar to numeric
             
