@@ -53,7 +53,7 @@ test_that('runModel runs a dataSDM object, and produces an INLA model with extra
   cov <- raster(cov)
   
   
-  obj <- bruSDM(PO, PA, Coordinates = coordnames, Projection = projection, INLAmesh = mesh,
+  obj <- bruSDM(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
                 IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                 responsePA = responsePA, markNames = NULL, markFamily = NULL,
                 speciesName = speciesName, spatialCovariates = cov)
@@ -67,7 +67,7 @@ test_that('runModel runs a dataSDM object, and produces an INLA model with extra
   expect_equal(spatMod[['species']][['speciesIn']][['PO']], 'fish')
   expect_equal(spatMod[['species']][['speciesIn']][['PA']], 'bird')
   
-  expect_equal(deparse1(spatMod[['componentsJoint']]), "~-1 + shared_spatial(main = coordinates, model = spdeModel) + species_spatial(main = coordinates, model = speciesModel, group = species, ngroup = 2) + fish_covariate(main = fish_covariate, model = \"linear\") + bird_covariate(main = bird_covariate, model = \"linear\") + fish_intercept(1) + bird_intercept(1)")
+  expect_equal(deparse1(spatMod[['componentsJoint']]), "~-1 + shared_spatial(main = coordinates, model = shared_field) + fish_spatial(main = coordinates, model = fish_field) + bird_spatial(main = coordinates, model = bird_field) + fish_covariate(main = fish_covariate, model = \"linear\") + bird_covariate(main = bird_covariate, model = \"linear\") + fish_intercept(1) + bird_intercept(1)")
   
   
   expect_output(summary(spatMod), 'Summary for fish:')
@@ -77,7 +77,7 @@ test_that('runModel runs a dataSDM object, and produces an INLA model with extra
   expect_equal(spatMod[['spatCovs']][['class']], c(covariate = 'numeric'))
   
   ##Run with marks
-  obj2 <- bruSDM(PO, PA, Coordinates = coordnames, Projection = projection, INLAmesh = mesh,
+  obj2 <- bruSDM(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
                 IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                 responsePA = responsePA, markNames = c('factvar', 'binommark'), markFamily = c('multinomial', 'binomial'),
                 speciesName = speciesName, spatialCovariates = cov, trialsMarks = 'marktrial')
@@ -85,7 +85,6 @@ test_that('runModel runs a dataSDM object, and produces an INLA model with extra
   spatMod2 <- runModel(data = obj2,
                        options  = list(control.inla=list(int.strategy='eb')))
   
-  expect_output(summary(spatMod2), 'Summary of multinomial variables:')
   expect_setequal(spatMod2[['source']], c('PO', 'PO', 'PA', 'PA'))
   expect_setequal(sapply(spatMod2$.args$control.family, function(x) x$link), c('log', 'log', 'cloglog', 'cloglog'))
   
