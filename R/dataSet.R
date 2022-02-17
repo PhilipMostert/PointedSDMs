@@ -12,6 +12,8 @@
 #' @param marks Name of the marks considered in the model.
 #' @param pointcovnames Name of the point covariates used in the model.
 #' @param markfamily A vector describing the distribution of the marks.
+#' 
+#' @export
 
 dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
                     paresp, countsresp, trialname, speciesname,
