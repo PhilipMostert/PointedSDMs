@@ -21,6 +21,7 @@ test_that('dataSet transforms the data to SpatialPointsDataFrames, and produces 
   PO$numvar <- runif(n = nrow(PO@coords))
   PO$factvar <- sample(x = c('a','b'), size = nrow(PO@coords), replace = TRUE)
   PO$species <- sample(x = c('fish1', 'fish2'), size = nrow(PO@coords), replace = TRUE)
+  PO$temp <- rpois(n = nrow(PO@coords), lambda = 5)
   #Random presence absence dataset
   PA <- spsample(SpatialPoly, n = 100, 'random', CRSobs = projection)
   PA$PAresp <- sample(x = c(0,1), size = nrow(PA@coords), replace = TRUE)
@@ -30,6 +31,7 @@ test_that('dataSet transforms the data to SpatialPointsDataFrames, and produces 
   PA$binommark <- sample(x = 2:5, size = nrow(PA@data), replace = TRUE)
   PA$marktrial <- sample(x = 0:1, size = nrow(PA@data), replace = TRUE)
   PA$species <- sample(x = c('bird1', 'bird2'), nrow(PA@data), replace = TRUE)
+  PA$temp <- rpois(n = nrow(PA@coords), lambda = 5)
   ##Make PA a data.frame object
   PA <- data.frame(PA)
   
@@ -39,7 +41,8 @@ test_that('dataSet transforms the data to SpatialPointsDataFrames, and produces 
                  coords = colnames(PO@coords), proj = projection,
                  pointcovnames = 'pointcov', paresp = 'PAresp', countsresp = 'counts', trialname = 'trial',
                  speciesname = 'species', marks = c('numvar', 'factvar', 'binommark'),
-                 marktrialname = 'marktrial', markfamily = c('uniform', 'multinomial', 'binomial'))
+                 marktrialname = 'marktrial', markfamily = c('uniform', 'multinomial', 'binomial'),
+                 temporalvar = 'temp')
   
   expect_setequal(names(mod), c("Data", "Family", "dataType", "varsIn", "Marks",
                                 "marksType", "multinomVars", 'numObs'))
@@ -50,13 +53,13 @@ test_that('dataSet transforms the data to SpatialPointsDataFrames, and produces 
   ##Should create a placeholder variable for the poresp + 
   #should keep marks +
   #should create new variables for the multinomial marks.
-  expect_setequal(names(mod$Data$PO[[1]]@data), c("poresp", "numvar", "factvar",
+  expect_setequal(names(mod$Data$PO[[1]]@data), c("poresp", "numvar", "factvar", 'temp',
                                                   "species", "factvar_phi", "factvar_response"))
   expect_true((all(mod$Data$PO[[1]]@data$factvar_phi == 1)))
   expect_true((all(mod$Data$PO[[1]]@data$factvar_response == 1)))
   expect_true(class(mod$Data$PO[[1]]@data$factvar) == 'character')
   
-  expect_setequal(names(mod$Data$PA[[1]]@data), c("PAresp", "trial", "binommark", 
+  expect_setequal(names(mod$Data$PA[[1]]@data), c("PAresp", "trial", "binommark", 'temp',
                                                   "marktrial", "species", "pointcov"))
   
   #Family for PO should be:
