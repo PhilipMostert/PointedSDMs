@@ -98,7 +98,8 @@ Internal functions used to temporarily store data and other information before a
   marksspatial,
   marksintercept,
   temporalname,
-  numtime
+  numtime,
+  temporalmodel
 )}\if{html}{\out{</div>}}
 }
 

@@ -44,7 +44,8 @@ A data object containing the data and the relevant information about the integra
   marksintercepts,
   boundary,
   ips,
-  temporal
+  temporal,
+  temporalmodel
 )}\if{html}{\out{</div>}}
 }
 

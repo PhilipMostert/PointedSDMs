@@ -10,6 +10,7 @@
   formula = NULL,
   mesh = NULL,
   mask = NULL,
+  temporal = FALSE,
   covariates = NULL,
   spatial = TRUE,
   intercept = TRUE,
@@ -29,6 +30,8 @@
 \item{mesh}{An inla.mesh object}
 
 \item{mask}{A mask of the study background. Defaults to \code{NULL}.}
+
+\item{temporal}{Make predictions for the temporal component of the model.}
 
 \item{covariates}{Name of covariates to predict.}
 

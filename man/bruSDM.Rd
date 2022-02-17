@@ -27,7 +27,8 @@ bruSDM(
   trialsPA = NULL,
   trialsMarks = NULL,
   speciesName = NULL,
-  temporalName = NULL
+  temporalName = NULL,
+  temporalModel = list(model = "ar1")
 )
 }
 \arguments{
@@ -74,6 +75,8 @@ bruSDM(
 \item{speciesName}{Name of the species variable name. Specifying this argument calculates covariate values for the individual species, as well as including a spatial group model for the species. Defaults to \code{NULL}}
 
 \item{temporalName}{Name of the temporal variable in the model. This variable is required to be in all the datasets. Defaults to \code{NULL}.}
+
+\item{temporalModel}{List of model specifications given to the control.group argument in the time effect component.}
 }
 \description{
 bruSDM function to ...
