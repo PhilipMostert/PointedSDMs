@@ -607,7 +607,9 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
                                               marksspatial = private$marksSpatial,
                                               marksintercept = private$marksIntercepts,
                                               #speciesspatial = private$speciesField,
-                                              numspecies = length(unique(unlist(private$speciesIn))))
+                                              numtime = length(unique(unlist(private$temporalVars))),
+                                              temporalmodel = private$temporalModel,
+                                              temporalname = private$temporalName)
     
     
     private$Components <- union(private$Components, newComponents)
