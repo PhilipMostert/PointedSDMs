@@ -115,7 +115,7 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
   
   private$pointCovariates <- pointcovariates
   
-  if (!is.null(spatialcovariates)) self$spatialCovariates(spatialcovariates)
+  if (!is.null(spatialcovariates)) private$spatialCovariates(spatialcovariates)
   
   if (!is.null(ips)) private$IPS <- ips
   else {
@@ -675,7 +675,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
 #' @description Function used to add or change spatial covariates in the model.
 #' @param spatialCovariates A SpatialPixelsDataFrame or Raster* object describing covariates at each spatial point.
 
-dataSDM$set('public', 'spatialCovariates', function(spatialCovariates) {
+dataSDM$set('private', 'spatialCovariates', function(spatialCovariates) {
   
   if (missing(spatialCovariates)) stop('Please add spatialCovariates as a Raster* or SpatialPixelsDataFrame object.')
   
@@ -718,18 +718,10 @@ dataSDM$set('public', 'spatialCovariates', function(spatialCovariates) {
       #  })
       
       for (form in 1:length(private$modelData)) {
-        
+        ##If is.null(private$speciesName) ...
         private$modelData[[form]][['include_components']] <- c(private$modelData[[form]][['include_components']], spatcovsIncl)
         
       }
-      
-      if (!is.null(private$speciesName)) {
-        
-        speciesCovs <- apply(expand.grid(paste0(unique(unlist(private$speciesIn)),'_'), spatcovsIncl), MARGIN = 1, FUN = paste0,collapse='')
-        newComps <- paste0(speciesCovs, '(main = ', spatcovsIncl, ', model = \"',covsClass,'\")', collapse = ' + ')
-        
-      }
-      else newComps <- paste0(spatcovsIncl, '(main = ', spatcovsIncl, ', model = \"',covsClass,'\")', collapse = ' + ')
       
       private$Components <- c(private$Components, newComps)
       
@@ -850,6 +842,14 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
     
   }
   
+  if (keepSpatial) {
+    
+    if (!private$Spatial && is.null(private$markNames)) keepSpatial <- FALSE
+    else
+      if (!private$Spatial && !private$marksSpatial) keepSpatial <- FALSE
+      
+  }
+  
   if (!is.null(speciesName) && !is.null(markName)) {
     
     speciesName <- list()
@@ -868,14 +868,6 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
     speciesInd <- unlist(speciesName)  
     
   } else speciesInd <- speciesName
-  
-  if (keepSpatial) {
-    
-    if (!private$Spatial && is.null(private$markNames)) keepSpatial <- FALSE
-    else
-      if (!private$Spatial && !private$marksSpatial) keepSpatial <- FALSE
-      
-  }
   
   if (allDataset) name_index <- names(private$modelData)[startsWith(private$modelData, paste0(datasetName, '_'))]
   
