@@ -42,12 +42,19 @@ markNames <- c('numvar', 'factvar', 'binommark')
 marksFamily <- c('gaussian', 'multinomial', 'binomial')
 markTrial = 'marktrial'
 pointCovs <- 'pointcov'
-spatCovs <- NULL #for now
 speciesName <- 'species'
 markSpatial <- TRUE
 marksIntercept <- TRUE
 temporalName <- 'temp'
 temporalModel <- deparse(list(model = 'ar1'))
+
+cov <- sp::spsample(x = SpatialPoly, n = 100000, type = 'random')
+cov$covariate <- rgamma(n = 100000, shape = 2)
+cov <- sp::SpatialPixelsDataFrame(points = cov@coords,
+                                  data = data.frame(covariate = cov$covariate),
+                                  proj4string = projection,
+                                  tolerance = 0.898631)
+
 
 test_that('dataSDMs initialize works as expected.', {
   
@@ -63,7 +70,7 @@ test_that('dataSDMs initialize works as expected.', {
                        pointcovariates = pointCovs,
                        marksspatial = markSpatial,
                        marksintercept = marksIntercept,
-                       spatialcovariates = spatCovs,
+                       spatialcovariates = cov,
                        speciesname = speciesName,
                        ips = iPoints,
                        spatial = TRUE, temporal = temporalName, 
@@ -236,12 +243,12 @@ test_that('updateFormula is able to change the formula of a dataset', {
   ##remove the covariate from the PO dataset
   check$updateFormula(datasetName = 'PO', Formula = ~ . - covariate)
   
-  expect_setequal(check$.__enclos_env__$private$modelData$PO_fish_coordinates$include_components, c("shared_spatial", "species_spatial", "fish_intercept" ))
-  expect_setequal(check$.__enclos_env__$private$modelData$PA_bird_PAresp$include_components, c("species_spatial", "shared_spatial", "bird_intercept", "pointcov", "covariate"))
+  expect_setequal(check$.__enclos_env__$private$modelData$PO_fish_coordinates$include_components, c("fish_spatial", "shared_spatial", "fish_intercept", "PO_biasField"))
+  expect_setequal(check$.__enclos_env__$private$modelData$PA_bird_PAresp$include_components, c("bird_covariate", "bird_spatial", "shared_spatial", "bird_intercept", "pointcov"))
   
   #remove covariate for the numvar mark
-  check$updateFormula('PO', markName = 'numvar', formula = ~ ., keepSpatial = TRUE, keepIntercepts = TRUE)
-  expect_setequal(check$.__enclos_env__$private$modelData$PO_fish_numvar$include_components, c("shared_spatial", "species_spatial", "fish_intercept"))
+  check$updateFormula('PO', markName = 'numvar', Formula = ~ . - covariate, keepSpatial = TRUE, keepIntercepts = TRUE)
+  expect_setequal(check$.__enclos_env__$private$modelData$PO_fish_numvar$include_components, c("numvar_spatial", "numvar_intercept", "PO_biasField"))
   
 })
 
