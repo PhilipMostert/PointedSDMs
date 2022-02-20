@@ -191,7 +191,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             expect_setequal(Check$Formulas$PO$fish1$numvar$RHS,
                             c("fish1_spatcovs", "numvar_intercept", "numvar_spatial"))
             expect_setequal(Check$Formulas$PO$fish1$factvar_response$RHS,
-                            c("fish1_spatcovs", "factvar_intercept",
+                            c("fish1_spatcovs",
                               "factvar_spatial", "factvar", "factvar_phi"))
             
             expect_setequal(Check$Formulas$PA$bird1$PAresp$RHS,
@@ -273,8 +273,8 @@ test_that('makeComponents is able to make the correct components for all the pro
                        bird1_intercept(1) + factvar(main = factvar, model = "iid", 
                                                     constr = FALSE, fixed = TRUE) +
                        factvar_phi(main = factvar_phi, model = "iid", initial = -10, fixed = TRUE) +
-                       numvar_intercept(1) + 
-                       factvar_intercept(1) + binommark_intercept(1))
+                       numvar_intercept(1) 
+                        + binommark_intercept(1))
     
     ## Change arguments
     #spatial and intercepts == FALSE
