@@ -354,8 +354,8 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
                 
                 if (length(self$multinomVars) != 0) marks_intercepts <- marks[!marks %in% self$multinomVars]
                 else marks_intercepts <- marks
-                print(marks_intercepts[pointsResponse[[response]][j] == paste0(marks_intercepts,'_response')])
-                if (pointsResponse[[response]][j] %in% paste0(marks_intercepts,'_response')) marksint <- paste0(marks_intercepts[pointsResponse[[response]][j] == paste0(marks_intercepts,'_response')],'_intercept')
+                
+                if (pointsResponse[[response]][j] %in% paste0(marks_intercepts,'_response')) marksint <- paste0(marks[pointsResponse[[response]][j] == paste0(marks,'_response')],'_intercept')
                 #else marksint <- paste0(pointsResponse[[response]][j], '_intercept')
                 else marksint <- NULL
                 
