@@ -289,7 +289,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           if (!is.null(speciesIn)) {
             
               ##Change this part ot the speciesIn: not sure what the one below does...
-              if (speciesspatial) speciesspat <- c(paste0(speciesIn,'_spatial'), 'shared_spatial') ## new argument called speciesSpatial??
+              if (speciesspatial) speciesspat <- paste0(speciesIn,'_spatial') ## new argument called speciesSpatial??
               else speciesspat <- NULL
 
             
