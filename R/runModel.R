@@ -61,7 +61,9 @@ runModel <- function(data, options = list()) {
   }
 
   if (!is.null(data$.__enclos_env__$private$speciesIn)) {
-   ## if speciesSPatial TRUE
+   
+    if (data$.__enclos_env__$private$speciesSpatial) {
+    
    for (species in names(data$spatialFields$speciesFields)) {
  
      assign(paste0(species,'_field'), data$spatialFields$speciesFields[[species]])
@@ -69,6 +71,8 @@ runModel <- function(data, options = list()) {
    }
     
     speciesSpatial <- TRUE
+    
+    }
     
   } else speciesSpatial <- FALSE
   
