@@ -1064,16 +1064,22 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
 
 dataSDM$set('public', 'changeComponents', function(addComponent, removeComponent) {
   
-  if (missing(addComponent) && missing(removeComponent)) {
+  if (!missing(addComponent)) private$Components <- c(private$Components, addComponent)
+  
+  if (!missing(removeComponent)) {
     
-    componentsJoint <- formula(paste('~ - 1 +', paste(private$Components, collapse = ' + ')))
     
-    ##in case there are duplicates, will it cause an error??
-    componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
-    
-    return(print(componentsJoint))
+    terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)
+    private$Components <- private$Components[!terms%in%removeComponent]
     
   }
+  
+  print('Components:')
+  
+  componentsJoint <- formula(paste('~ - 1 +', paste(private$Components, collapse = ' + ')))
+  componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
+  
+  print(componentsJoint)
   
   
 })
