@@ -1062,7 +1062,7 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
 #' @param ... Any additional objects associated with the component, such as an inla.mesh.
 #' 
 
-dataSDM$set('public', 'Components', function(addComponent, removeComponent) {
+dataSDM$set('public', 'changeComponents', function(addComponent, removeComponent) {
   
   if (missing(addComponent) && missing(removeComponent)) {
     
