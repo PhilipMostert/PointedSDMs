@@ -1069,12 +1069,12 @@ dataSDM$set('public', 'changeComponents', function(addComponent, removeComponent
   if (!missing(removeComponent)) {
     
     
-    terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)
+    terms <- gsub('\\(.*$', '', private$Components)
     private$Components <- private$Components[!terms%in%removeComponent]
     
   }
   
-  print('Components:')
+  cat('Components:')
   
   componentsJoint <- formula(paste('~ - 1 +', paste(private$Components, collapse = ' + ')))
   componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
