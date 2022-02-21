@@ -1075,7 +1075,7 @@ dataSDM$set('public', 'changeComponents', function(addComponent, removeComponent
   }
   
   cat('Components:')
-  
+  cat('\n')
   componentsJoint <- formula(paste('~ - 1 +', paste(private$Components, collapse = ' + ')))
   componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
   
