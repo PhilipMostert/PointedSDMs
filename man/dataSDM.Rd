@@ -13,7 +13,6 @@ A data object containing the data and the relevant information about the integra
 \item \href{#method-print}{\code{dataSDM$print()}}
 \item \href{#method-plot}{\code{dataSDM$plot()}}
 \item \href{#method-addData}{\code{dataSDM$addData()}}
-\item \href{#method-spatialCovariates}{\code{dataSDM$spatialCovariates()}}
 \item \href{#method-addBias}{\code{dataSDM$addBias()}}
 \item \href{#method-updateFormula}{\code{dataSDM$updateFormula()}}
 \item \href{#method-addComponents}{\code{dataSDM$addComponents()}}
@@ -89,15 +88,6 @@ A data object containing the data and the relevant information about the integra
   speciesField,
   marksField
 )}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-spatialCovariates"></a>}}
-\if{latex}{\out{\hypertarget{method-spatialCovariates}{}}}
-\subsection{Method \code{spatialCovariates()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$spatialCovariates(spatialCovariates)}\if{html}{\out{</div>}}
 }
 
 }
