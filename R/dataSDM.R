@@ -1062,13 +1062,18 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
 #' @param ... Any additional objects associated with the component, such as an inla.mesh.
 #' 
 
-dataSDM$set('public', 'addComponents', function(component, datasetName, speciesName,
-                                                markName, allDatasets, ...) {
+dataSDM$set('public', 'Components', function(addComponent, removeComponent) {
   
-  ##Need to ensure that the data for the component is in ie like an index
-  # If the dataset is cp, then we also need to add the data to the ipoints?
-  #This will be difficult; especially given that this function is called after like -- so raw data gone.
-  # Do later ...
+  if (missing(addComponent) && missing(removeComponent)) {
+    
+    componentsJoint <- formula(paste('~ - 1 +', paste(private$Components, collapse = ' + ')))
+    
+    ##in case there are duplicates, will it cause an error??
+    componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
+    
+    return(print(componentsJoint))
+    
+  }
   
   
 })
