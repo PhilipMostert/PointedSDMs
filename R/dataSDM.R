@@ -27,6 +27,7 @@ dataSDM$set('private', 'initialnames', NULL)
 dataSDM$set('private', 'temporalName', NULL)
 dataSDM$set('private', 'temporalVars', NULL)
 dataSDM$set('private', 'temporalModel', NULL)
+dataSDM$set('private', 'speciesSpatial', TRUE)
 
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'pointsField', list())
@@ -52,7 +53,7 @@ dataSDM$set('private', 'printSummary', NULL)
 dataSDM$set('private', 'multinomIndex', list())
 dataSDM$set('private', 'optionsINLA', list())
 
-#' @description Initialize function for dataSDM: used to store some compulsoury arguments.
+#' @description Initialize function for dataSDM: used to store some compulsory arguments.
 #' @param coordinates A vector of length 2 containing the names of the coordinates.
 #' @param projection The projection of the data.
 #' @param Inlamesh An inla.mesh object.
@@ -79,7 +80,7 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
                                              marksnames, marksfamily, pointcovariates,
                                              trialspa, trialsmarks, speciesname, marksspatial,
                                              spatial, intercepts, spatialcovariates, marksintercepts,
-                                             boundary, ips, temporal, temporalmodel) {
+                                             boundary, ips, temporal, temporalmodel, speciesspatial) {
   
   if (missing(coordinates)) stop('Coordinates need to be given.')
   if (missing(projection)) stop('projection needs to be given.')
@@ -129,6 +130,8 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
   private$marksSpatial <- marksspatial
   private$Intercepts <- intercepts
   private$marksIntercepts <- marksintercepts
+  
+  private$speciesSpatial <- speciesspatial
   
   #if (!private$Spatial && private$markSpatial) warning('Spatial has been set to FALSE but marksSpatial is TRUE. Spatial effects for the marks will still be run.')
   
@@ -522,9 +525,12 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     self$spatialFields$speciesFields <- vector(mode = 'list', length = length(unique(unlist(private$speciesIn))))
     names(self$spatialFields$speciesFields) <- unique(unlist(private$speciesIn))
     
+    if (private$speciesSpatial) {
+    
     if (!missing(speciesField)) self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(speciesField)
     else self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(INLA::inla.spde2.matern(mesh = private$INLAmesh))
     
+    }
   }
   
   if (is.null(private$dataSource)) private$dataSource <- unlist(as.vector(pointData$dataSource))
@@ -535,7 +541,8 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
   #Also add markModel in the initial call.
   pointData$makeFormulas(spatcovs = private$spatcovsNames, speciesname = speciesName, temporalname = private$temporalName,
                          paresp = responsePA, countresp = responseCounts, marksspatial = private$marksSpatial,
-                         marks = markNames, spatial = private$Spatial, intercept = private$Intercepts, markintercept = private$marksIntercepts)
+                         marks = markNames, spatial = private$Spatial, 
+                         intercept = private$Intercepts, markintercept = private$marksIntercepts, speciesspatial = private$speciesSpatial)
   
   if (!is.null(private$temporalName)) {
     
@@ -586,7 +593,8 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
                                                    temporalname = private$temporalName,
                                                    #speciesspatial = private$speciesField,
                                                    numtime = length(unique(unlist(private$temporalVars))),
-                                                   temporalmodel = private$temporalModel)
+                                                   temporalmodel = private$temporalModel,
+                                                   speciesspatial = private$speciesSpatial)
     
   }
   else {
@@ -609,7 +617,8 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
                                               #speciesspatial = private$speciesField,
                                               numtime = length(unique(unlist(private$temporalVars))),
                                               temporalmodel = private$temporalModel,
-                                              temporalname = private$temporalName)
+                                              temporalname = private$temporalName,
+                                              speciesspatial = private$speciesSpatial)
     
     
     private$Components <- union(private$Components, newComponents)

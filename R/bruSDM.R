@@ -8,6 +8,7 @@
 #' @param Mesh An \code{inla.mesh} object.
 #' @param pointsField Specification of the shared spatial field for the points. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.
 #' @param speciesField Specification of the shared spatial field for the species. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.
+#' @param speciesSpatial Logical argument: should the species have their own spatial fields. Defaults to \code{TRUE}.
 #' @param marksField  Specification of the fields for the marks. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.
 #' @param markNames A vector with the mark names to be included in the integrated model. These marks must be in the same data objects as the points.
 #' @param markFamily A vector with the statistical families of the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".
@@ -28,7 +29,7 @@
 
 bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                    Projection, Boundary = NULL, Mesh, IPS = NULL,
-                   pointsField = NULL, speciesField = NULL,
+                   pointsField = NULL, speciesField = NULL, speciesSpatial = TRUE,
                    markNames = NULL, markFamily = NULL, marksField = NULL,
                    pointCovariates = NULL, pointsIntercept = TRUE, marksIntercept = TRUE,
                    pointsSpatial = TRUE, marksSpatial = TRUE,
@@ -112,7 +113,8 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                          boundary = Boundary,
                          ips = IPS,
                          temporal = temporalName,
-                         temporalmodel = temporalModel)
+                         temporalmodel = temporalModel,
+                         speciesspatial = speciesSpatial)
   
   if (length(list(...)) == 0) warning('No point data added. You can add data to this object with `$.addData()`.')
  

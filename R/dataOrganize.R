@@ -218,11 +218,12 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
 #' @param intercept Logical: are intercepts run in the model.
 #' @param markintercept Logical: are intercepts run for the marks in the model.
 #' @param pointcovs Name of the point covariates.
+#' @param speciesspatial Logical: should the species have spatial fields.
 
 dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
                                                     paresp, countresp, marks, marksspatial,
                                                     spatial, intercept, temporalname,
-                                                    markintercept, pointcovs) {
+                                                    markintercept, pointcovs, speciesspatial) {
   
   #if (length(self$multinomVars) != 0) marks[marks %in% self$multinomVars] <- paste0(marks[marks %in% self$multinomVars],'_response')
   
@@ -289,8 +290,8 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             
             if (length(self$speciesIndex[[speciesname]][[dataset]][[species]]) != 0) {
               ##Change this part ot the speciesIn: not sure what the one below does...
-              if (spatial) spat <- c(paste0(speciesIn,'_spatial'), 'shared_spatial') ## new argument called speciesSpatial??
-              else spat <- NULL
+              if (speciesspatial) speciesspat <- c(paste0(speciesIn,'_spatial'), 'shared_spatial') ## new argument called speciesSpatial??
+              else speciesspat <- NULL
             } 
             #else {  
             #  
@@ -303,14 +304,12 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             else int <- NULL
             
           }
-          else {
-            
+        
             if (spatial) spat <- 'shared_spatial'
             else spat <- NULL
             
             if (intercept) int <- paste0(names(self$Data)[[dataset]], '_intercept')
             else int <- NULL
-          }
           
           if (!is.na(datasetCovs)) {
             #Species specific? dataset specific?
@@ -374,7 +373,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             
           }
           
-          RHS <- c(covs, spat, int, addcovs, markspat, marksint) # temp
+          RHS <- c(covs, spat, int, addcovs, markspat, marksint, speciesspat) # temp
           
           if (pointsResponse[[response]][j] %in% paste0(self$multinomVars,'_response')) { #paste multinomvar and phi # Need to convert multinomvar to numeric
             
@@ -404,8 +403,8 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
 #' @param intercepts Logical: are intercepts run in the model.
 #' @param datanames Names of the datasets used in the model.
 #' @param marks Names of the marks used in the model.
-#' @param speciesname Name of the speciesvariable.
-#' @param multinomnames Names of the multinomialmarks.
+#' @param speciesname Name of the species variable.
+#' @param multinomnames Names of the multinomial marks.
 #' @param pointcovariates Names of the point covariates.
 #' @param covariatenames Names of the spatially varying covariates.
 #' @param covariateclass The classes of the spatially varying covariates.
@@ -413,6 +412,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
 #' @param marksspatial Logical: should spatial fields be included for the marks.
 #' @param marksintercept Logical: should intercepts be included for the marks.
 #' @param numtime Number of time increments included in the model.
+#' @param speciesspatial Logical: Should the species be run with spatial fields.
 
 dataOrganize$set('public', 'makeComponents', function(spatial, intercepts, 
                                                       datanames, marks, speciesname,
@@ -436,7 +436,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (!is.null(species)) {
     
-    if (spatial) {
+    if (speciesspatial) {
       
       #if (length(speciesspatial) > 0) {
       
