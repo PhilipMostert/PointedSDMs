@@ -336,7 +336,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
       if (!missing(marksField)) self$spatialFields$markFields[1:length(self$spatialFields$markFields)] <- list(marksField)
       else {
         
-        if (length(self$spatialFields$markFields) == 1) self$spatialFields$markFields[[1]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+        if (length(markNames) == 1) self$spatialFields$markFields[[markNames]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
         else self$spatialFields$markFields[1:length(self$spatialFields$markFields)] <- list(INLA::inla.spde2.matern(mesh = private$INLAmesh))
         
       }
@@ -535,7 +535,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     if (!missing(speciesField)) self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(speciesField)
     else {
 
-      if (length(self$spatialFields$speciesFields) == 1)  self$spatialFields$speciesFields[[1]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+      if (length(unique(unlist(private$speciesIn))) == 1)  self$spatialFields$speciesFields[[unique(unlist(private$speciesIn))]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
       else self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(INLA::inla.spde2.matern(mesh = private$INLAmesh))
       
     }
