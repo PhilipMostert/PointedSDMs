@@ -421,7 +421,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
                                                       marksspatial,
                                                       marksintercept,
                                                       temporalname,
-                                                      #speciesspatial,
+                                                      speciesspatial,
                                                       numtime,temporalmodel) {
   ##Copy for marks fields???
   if (length(self$SpeciesInData) != 0) species <- unique(unlist(self$SpeciesInData))
