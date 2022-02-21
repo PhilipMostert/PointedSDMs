@@ -288,11 +288,11 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           
           if (!is.null(speciesIn)) {
             
-            if (length(self$speciesIndex[[speciesname]][[dataset]][[species]]) != 0) {
               ##Change this part ot the speciesIn: not sure what the one below does...
               if (speciesspatial) speciesspat <- c(paste0(speciesIn,'_spatial'), 'shared_spatial') ## new argument called speciesSpatial??
               else speciesspat <- NULL
-            } 
+
+            
             #else {  
             #  
             #  if (spatial) spat <- c(paste0(speciesIn,'_spatial'), 'shared_spatial')
@@ -303,13 +303,21 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             if (intercept) int <- paste0(speciesIn,'_intercept') 
             else int <- NULL
             
+          } 
+          else {
+            
+            speciesspat <- NULL
+            
+            if (intercept) int <- paste0(names(self$Data)[[dataset]], '_intercept')
+            else int <- NULL
+            
           }
         
             if (spatial) spat <- 'shared_spatial'
             else spat <- NULL
             
-            if (intercept) int <- paste0(names(self$Data)[[dataset]], '_intercept')
-            else int <- NULL
+          
+
           
           if (!is.na(datasetCovs)) {
             #Species specific? dataset specific?
