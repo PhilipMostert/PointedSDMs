@@ -173,7 +173,7 @@ runModel <- function(data, options = list()) {
                                  species = speciesSpatial,
                                  marks = marksSpatial)
   inlaModel[['temporal']] <- list(temporalIn = data$.__enclos_env__$private$temporalVars, # I think ... do we need all these vars??? Can we just use unique unlist( ... )
-                                  temporalVar = data$.__enclos_env$private$temporalName)
+                                  temporalVar = data$.__enclos_env__$private$temporalName)
   
   class(inlaModel) <- c('bruSDM', class(inlaModel))
   
