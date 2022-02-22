@@ -1,7 +1,7 @@
 #' Predict for bru_sdm
 #' @param object A \code{bru_sdm object}.
 #' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
-#' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercept} are not \code{NULL}.
+#' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.
 #' @param mesh An inla.mesh object
 #' @param mask A mask of the study background. Defaults to \code{NULL}.
 #' @param covariates Name of covariates to predict.
@@ -50,9 +50,11 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
     
   }
   
-  if (!all(covariates%in%row.names(model$summary.fixed)) || !all(as.vector(outer(paste0(unlist(model[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))%in%row.names(model$summary.fixed))) stop("Covariates provided not in model.")
+  if (!intercepts) intercept_terms <- NULL
   
-  if (is.null(formula) && !intercept && !spatial && is.null(covariates)) stop("Please provide either a formula or components of a formula to be predicted.")
+  if (!all(covariates%in%row.names(model$summary.fixed)) && !all(as.vector(outer(paste0(unlist(model[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))%in%row.names(model$summary.fixed))) stop("Covariates provided not in model.")
+  
+  if (is.null(formula) && !intercepts && !spatial && is.null(covariates) && !temporal && !biasfield) stop("Please provide either a formula or components of a formula to be predicted.")
   
   if (temporal && is.null(model$temporal$temporalVar)) stop('Temporal is set to TRUE but no temporal component found in the model.')
   
@@ -81,21 +83,18 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
       time_variable <- model$temporal$temporalVar
       
       time_data <- data.frame(seq_len(max(numeric_time)))
-      name(time_data) <- time_variable
+      names(time_data) <- time_variable
       
       timeData <- inlabru::cprod(data, data.frame(time_data))
-      name(timeData@data) <- c(time_variable, 'weight')  
+      names(timeData@data) <- c(time_variable, 'weight')  
       
       if (!is.null(covariates)) covariates <- as.vector(outer(paste0(unlist(model[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))
       if (intercepts) intercept_terms <- paste0(unlist(model[['species']][['speciesIn']]), '_intercept')
       
-      time_formula <- paste0(fun,'(',paste(covariates, intercept_terms, paste0(time_variable,'_spatial'), collapse = ' + '),')')
-      
-      int <- predict(model, timeData, ~ data.frame(time_variable = eval(parse(text = time_variable)), formula = eval(parse(text = time_formula))))
-      int[[time_variable]] <- as.character(rep(numeric_time), length(data)) ## order?
-      
-      int <- list(int)
-      names(int) <- 'temporalPredictions'
+      time_formula <- paste0(fun,'(',paste(covariates, intercept_terms, 'shared_spatial', collapse = ' + '),')')
+
+      int[['temporalPredictions']] <- predict(model, timeData, ~ data.frame(time_variable = eval(parse(text = time_variable)), formula = eval(parse(text = time_formula))))
+      int[['temporalPredictions']] <- int[['temporalPredictions']][,!names(int[['temporalPredictions']]@data) %in% time_variable]
       class(int) <- c('bruSDM_predict', class(int))
       
       return(int)  
@@ -134,7 +133,7 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
         if (!is.null(covariates)) species_covs <- paste0(spec, '_', covariates)
         else species_covs <- NULL
         
-        if (intercept) species_int <- paste0(spec,'_intercept')
+        if (intercepts) species_int <- paste0(spec,'_intercept')
         else species_int <- NULL
         
         if (spatial) species_spat <- paste0(spec,'_spatial')
@@ -208,6 +207,14 @@ print.bruSDM_predict <- function(x, ...) {
         }
       
     }
+    else
+      if (names(x)[[1]] == 'temporalPredictions') {
+        
+        cat('Predictions for the temporal variable:')
+        cat('\n\n')
+        print(summary(x[[1]]@data))
+        
+      }
     else print(summary(x[['predictions']]@data))
     cat('\n\n')
     
