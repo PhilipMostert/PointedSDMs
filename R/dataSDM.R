@@ -1064,15 +1064,19 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
 
 dataSDM$set('public', 'changeComponents', function(addComponent, removeComponent) {
   
-  if (!missing(addComponent)) private$Components <- c(private$Components, addComponent)
+  terms <- gsub('\\(.*$', '', private$Components)
   
-  if (!missing(removeComponent)) {
+  if (!missing(addComponent)) {
+   
+   if (gsub('\\(.*$', '', addComponent) %in% terms) private$Components <- private$Components[!gsub('\\(.*$', '', addComponent) %in% terms]
+   
+   private$Components <- c(private$Components, addComponent)
     
+  } 
+  
+  if (!missing(removeComponent)) private$Components <- private$Components[!terms%in%removeComponent]
     
-    terms <- gsub('\\(.*$', '', private$Components)
-    private$Components <- private$Components[!terms%in%removeComponent]
-    
-  }
+  
   
   cat('Components:')
   cat('\n')
