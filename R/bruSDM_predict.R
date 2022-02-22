@@ -107,16 +107,12 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
       
       if (!all(paste0(biasnames,'_biasField') %in% names(model$summary.random))) stop('Either no bias field has been used or an incorrect dataset name was given.')
       
-      int[['biasFields']] <- vector(mode = 'list', length = length(biasnames))
-      
       for (bias in biasnames) {
         
         formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(paste0(bias,'_biasField'),')')))
-        int[[1]][[bias]] <- predict(model, data = data, formula = formula, ...)
+        int[['biasFields']][[bias]] <- predict(model, data = data, formula = formula, ...)
         
       }
-      
-      names(int[[1]]) <- paste0(biasnames, '_biasField')
       
       class(int) <- c('bruSDM_predict', class(int))
       return(int) 
@@ -201,6 +197,7 @@ print.bruSDM_predict <- function(x, ...) {
       for (species in names(x[[1]])) {
         
         cat('Predictions for', paste0(species,':'))
+        cat('\n')
         print(summary(x[[1]][[species]]@data))
         cat('\n')
          
@@ -211,8 +208,21 @@ print.bruSDM_predict <- function(x, ...) {
       if (names(x)[[1]] == 'temporalPredictions') {
         
         cat('Predictions for the temporal variable:')
-        cat('\n\n')
+        cat('\n')
         print(summary(x[[1]]@data))
+        
+      }
+    else
+      if (names(x)[[1]] == 'biasFields') {
+        
+        for(bias in names(x[['biasFields']])) {
+          
+          cat('Predictions of the bias field for', paste0(bias,':'))
+          cat('\n')
+          print(summary(x[[1]][[bias]]@data))
+          cat('\n')
+          
+        }
         
       }
     else print(summary(x[['predictions']]@data))
