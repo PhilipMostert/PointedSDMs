@@ -143,7 +143,7 @@ runModel <- function(data, options = list()) {
   
   ##For now set bru_max_iter to 1
   optionsJoint$bru_max_iter <- 1
-
+  
   inlaModel <- inlabru::bru(components = componentsJoint,
                             allLiks, options = optionsJoint)
 
@@ -168,7 +168,7 @@ runModel <- function(data, options = list()) {
                                na.omit(unlist(unname(data$.__enclos_env__$private$printSummary$marksType))))
   inlaModel[['marks']] <- list(marksIn = data$.__enclos_env__$private$printSummary$Marks,
                                       multinomVars = data$.__enclos_env__$private$multinomVars)
-  inlaModel[['biasData']] <- names(data$.__enclos_env__$private$biasField)
+  inlaModel[['biasData']] <- names(data$spatialFields$biasField)
   inlaModel[['spatial']] <- list(points = pointsSpatial,
                                  species = speciesSpatial,
                                  marks = marksSpatial)
