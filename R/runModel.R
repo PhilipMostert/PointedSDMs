@@ -72,7 +72,7 @@ runModel <- function(data, options = list()) {
     
     speciesSpatial <- TRUE
     
-    }
+    } speciesSpatial <- FALSE
     
   } else speciesSpatial <- FALSE
   
