@@ -100,8 +100,9 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
       
       time_formula <- paste0(fun,'(',paste(covariates, intercept_terms, 'shared_spatial', collapse = ' + '),')')
 
-      int[['temporalPredictions']] <- predict(model, timeData, ~ data.frame(time_variable = eval(parse(text = time_variable)), formula = eval(parse(text = time_formula))))
+      int[['temporalPredictions']] <- predict(model, timeData, ~ data.frame(..temporal_variable_index.. = eval(parse(text = time_variable)), formula = eval(parse(text = time_formula))))
       int[['temporalPredictions']] <- int[['temporalPredictions']][,!names(int[['temporalPredictions']]@data) %in% time_variable]
+    
       class(int) <- c('bruSDM_predict', class(int))
       
       return(int)  
@@ -260,8 +261,26 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
   if (any(!whattoplot%in%c("mean", "sd", "q0.025", "median","q0.975",
                            "smin", "smax", "cv", "var" ))) stop('Whattoplot is not a valid variable to plot')
   
-  
-  if (length(x) == 1 && names(x) %in% c('speciesPredictions', 'biasFields', 'temporalPredictions')) {
+  if (length(x) == 1 && names(x) %in% 'temporalPredictions') {
+    
+    if (length(whattoplot) > 1) stop('Please only plot one variable at a time for species plots.')
+    
+    if (!is.null(colours)) {
+      
+      plot_colours <- scale_fill_gradientn(colours = rev(brewer.pal(9,colours)),
+                                           limits = range(x[[nameObj]]@data[,stat]))
+      
+    }
+    else plot_colours <- NULL
+    
+    class(x[[1]]@data[, '..temporal_variable_index..']) <- 'character'
+    
+    plot_grid <- ggplot() + gg(x[[1]], aes_string(fill = whattoplot)) + facet_grid(~ 'temporal_variable') + plot_colours + ggtitle('Plot of the temporal predictions')
+    return(plot_grid)
+    
+  }
+  else 
+    if (length(x) == 1 && names(x) %in% c('speciesPredictions', 'biasFields')) {
     
     nameObj <- names(x)
     
@@ -280,10 +299,8 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
     for (object in names(x[[nameObj]])) {
       
       if (nameObj ==  'speciesPredictions') title <- ggtitle(paste('Plot of predictions for', object))
-      else
-        if (nameObj == 'biasFields') title <- ggtitle(paste('Plot of bias field for', object))
-        else title <- ggtitle(paste('Plot of predictions for time period', object))
-      
+      else title <- ggtitle(paste('Plot of bias field for', object))
+
       all_plots[[object]] <- ggplot() + gg(x[[nameObj]][[object]], aes_string(fill = whattoplot)) + title + plot_colours
       
     }
