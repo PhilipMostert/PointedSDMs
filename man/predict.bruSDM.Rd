@@ -12,9 +12,10 @@
   mask = NULL,
   temporal = FALSE,
   covariates = NULL,
-  spatial = TRUE,
-  intercept = TRUE,
-  interceptnames = NULL,
+  spatial = FALSE,
+  intercepts = FALSE,
+  datasets = NULL,
+  species = NULL,
   biasfield = FALSE,
   biasnames = NULL,
   predictor = FALSE,
@@ -25,7 +26,7 @@
 \arguments{
 \item{data}{Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.}
 
-\item{formula}{Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercept} are not \code{NULL}.}
+\item{formula}{Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.}
 
 \item{mesh}{An inla.mesh object}
 
@@ -37,9 +38,11 @@
 
 \item{spatial}{Include spatial effects in prediction.}
 
-\item{intercept}{Include intercept in prediction.}
+\item{intercepts}{Include intercept in prediction.}
 
-\item{interceptnames}{Names of the datasets to include intercept term. Defaults to \code{NULL}.}
+\item{datasets}{Names of the datasets to include intercept term. Default of \code{NULL} results in all datasets being predicted.}
+
+\item{species}{Names of the species to predict. Default of \code{NULL} results in all species being predicted.}
 
 \item{biasfield}{Include bias field in prediction.}
 

@@ -14,6 +14,7 @@ bruSDM(
   IPS = NULL,
   pointsField = NULL,
   speciesField = NULL,
+  speciesSpatial = TRUE,
   markNames = NULL,
   markFamily = NULL,
   marksField = NULL,
@@ -47,6 +48,8 @@ bruSDM(
 \item{pointsField}{Specification of the shared spatial field for the points. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.}
 
 \item{speciesField}{Specification of the shared spatial field for the species. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.}
+
+\item{speciesSpatial}{Logical argument: should the species have their own spatial fields. Defaults to \code{TRUE}.}
 
 \item{markNames}{A vector with the mark names to be included in the integrated model. These marks must be in the same data objects as the points.}
 

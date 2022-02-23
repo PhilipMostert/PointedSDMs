@@ -15,7 +15,7 @@ A data object containing the data and the relevant information about the integra
 \item \href{#method-addData}{\code{dataSDM$addData()}}
 \item \href{#method-addBias}{\code{dataSDM$addBias()}}
 \item \href{#method-updateFormula}{\code{dataSDM$updateFormula()}}
-\item \href{#method-addComponents}{\code{dataSDM$addComponents()}}
+\item \href{#method-changeComponents}{\code{dataSDM$changeComponents()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -44,7 +44,8 @@ A data object containing the data and the relevant information about the integra
   boundary,
   ips,
   temporal,
-  temporalmodel
+  temporalmodel,
+  speciesspatial
 )}\if{html}{\out{</div>}}
 }
 
@@ -120,18 +121,11 @@ A data object containing the data and the relevant information about the integra
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addComponents"></a>}}
-\if{latex}{\out{\hypertarget{method-addComponents}{}}}
-\subsection{Method \code{addComponents()}}{
+\if{html}{\out{<a id="method-changeComponents"></a>}}
+\if{latex}{\out{\hypertarget{method-changeComponents}{}}}
+\subsection{Method \code{changeComponents()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$addComponents(
-  component,
-  datasetName,
-  speciesName,
-  markName,
-  allDatasets,
-  ...
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$changeComponents(addComponent, removeComponent)}\if{html}{\out{</div>}}
 }
 
 }
