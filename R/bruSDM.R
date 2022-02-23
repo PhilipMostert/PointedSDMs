@@ -47,7 +47,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
   if (!pointsSpatial && !is.null(temporalName)) {
     
     pointsSpatial <- TRUE
-    warning('Setting pointsSpatial to TRUE since it is required for the temporalModel.')
+    message('Setting pointsSpatial to TRUE since it is required for the temporalModel.')
     
   }
   
