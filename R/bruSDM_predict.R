@@ -63,7 +63,7 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
   
   if (is.null(formula) && !intercepts && !spatial && is.null(covariates) && !temporal && !biasfield) stop("Please provide either a formula or components of a formula to be predicted.")
   
-  if (temporal && is.null(model$temporal$temporalVar)) stop('Temporal is set to TRUE but no temporal component found in the model.')
+  if (temporal && is.null(model$temporal$temporalVar)) stop('temporal is set to TRUE but no temporal component found in the model.')
   
   if (is.null(data)) {
     
