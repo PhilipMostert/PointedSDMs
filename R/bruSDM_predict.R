@@ -274,8 +274,8 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
     else plot_colours <- NULL
     
     class(x[[1]]@data[, '..temporal_variable_index..']) <- 'character'
-    
-    plot_grid <- ggplot() + gg(x[[1]], aes_string(fill = whattoplot)) + facet_grid(~ 'temporal_variable') + plot_colours + ggtitle('Plot of the temporal predictions')
+    ##Would be nice to get full temporal variable names in here ...
+    plot_grid <- ggplot() + gg(x[[1]], aes_string(fill = whattoplot)) + facet_grid(~ ..temporal_variable_index..) + plot_colours + ggtitle('Plot of the temporal predictions')
     return(plot_grid)
     
   }
