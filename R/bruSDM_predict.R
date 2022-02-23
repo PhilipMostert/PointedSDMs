@@ -254,25 +254,30 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
                            "smin", "smax", "cv", "var" ))) stop('Whattoplot is not a valid variable to plot')
   
   
-  if (length(x) == 1 & names(x) == 'speciesPredictions') {
+  if (length(x) == 1 && names(x) %in% c('speciesPredictions', 'biasFields', 'temporalPredictions')) {
+    
+    nameObj <- names(x)
     
     if (length(whattoplot) > 1) stop('Please only plot one variable at a time for species plots.')
-    
-    species_title <- ggtitle('Plot of the species predictions')
     
     if (!is.null(colours)) {
       
       plot_colours <- scale_fill_gradientn(colours = rev(brewer.pal(9,colours)),
-                                           limits = range(x[['Species predictions']]@data[,stat]))
+                                           limits = range(x[[nameObj]]@data[,stat]))
       
     }
     else plot_colours <- NULL
     
     all_plots <- list()
     
-    for (species in names(x$speciesPredictions)) {
+    for (object in names(x[[nameObj]])) {
       
-      all_plots[[species]] <- ggplot() + gg(x$speciesPredictions[[species]], aes_string(fill = whattoplot)) + ggtitle(paste('Plot of predictions for', species)) + plot_colours
+      if (nameObj ==  'speciesPredictions') title <- ggtitle(paste('Plot of predictions for', object))
+      else
+        if (nameObj == 'biasFields') title <- ggtitle(paste('Plot of bias field for', object))
+        else title <- ggtitle(paste('Plot of predictions for time period', object))
+      
+      all_plots[[object]] <- ggplot() + gg(x[[nameObj]][[object]], aes_string(fill = whattoplot)) + title + plot_colours
       
     }
 
