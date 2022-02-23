@@ -1,3 +1,10 @@
+
+#' Export class predict_bru_sdm
+#' 
+#' @export 
+
+setClass('bruSDM_predict')
+
 #' Predict for bru_sdm
 #' @param object A \code{bru_sdm object}.
 #' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
