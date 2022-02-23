@@ -1068,7 +1068,7 @@ dataSDM$set('public', 'changeComponents', function(addComponent, removeComponent
   
   if (!missing(addComponent)) {
    
-   if (gsub('\\(.*$', '', addComponent) %in% terms) private$Components <- private$Components[!gsub('\\(.*$', '', addComponent) %in% terms]
+   if (gsub('\\(.*$', '', addComponent) %in% terms) private$Components <- private$Components[! terms %in% gsub('\\(.*$', '', addComponent)]
    
    private$Components <- c(private$Components, addComponent)
     
