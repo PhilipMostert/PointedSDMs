@@ -8,4 +8,4 @@ You can install the development version of this package from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("PhilipMostert/NorwaySDMs")
+devtools::install_github("PhilipMostert/inlabruSDMs")
