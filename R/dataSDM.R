@@ -204,11 +204,13 @@ dataSDM$set('public', 'print', function(...) {
 #' @param Datasets Name of the datasets to plot.
 #' @param Species Should species be plotted as well? Defaults to \code{FALSE}.
 
-dataSDM$set('public', 'plot', function(Datasets, Species, ...) {
+dataSDM$set('public', 'plot', function(Datasets, Species = FALSE, ...) {
   
   if (length(private$modelData) == 0) stop('Please provide data before running the plot function.')
   
-  if (!all(Dataset %in% names(private$dataSource))) stop('Dataset provided not provided to the object.') 
+  if (missing(Datasets)) Datasets <- names(private$dataSource)
+  
+  if (!all(Datasets %in% names(private$dataSource))) stop('Dataset provided not provided to the object.') 
   
   if (Species && is.null(private$speciesName)) stop('speciesName in bruSDM required before plotting species.')
   
@@ -217,10 +219,11 @@ dataSDM$set('public', 'plot', function(Datasets, Species, ...) {
   
   for (data in Datasets) {
     
-    index <- DO
+    index <- which(private$dataSource == data)
     
+    if (!is.null(private$markNames)) index <- index[!endsWith(names(private$modelData[index]), paste0('_', private$markNames))]
     ##if species then dataset_species_response
-    # else paste dataset_response ## but also only need point response -- not marks
+    # else paste dataset_response ## but also only need point response -- NOT MARKS
     
     #Probably want to create one df object with another variable called dataset placeholder or something
     #Then colour by species or dataset or whatever
@@ -228,14 +231,21 @@ dataSDM$set('public', 'plot', function(Datasets, Species, ...) {
     #Also need to create a boundary of sorts... either if Boundary is non null; else can make from mesh...
     #Maybe even allow maps if SpatialPolygon provided...
     
-    points[[data]] <- private$modelData[[index]]$data ## which will have species if need be...
+    for (i in 1:length(index)) {
+    
+    idx <- index[i]  
+    points[[data]][[i]] <- private$modelData[[idx]]$data ## which will have species if need be...
     
     if (!Species) points[[data]]@data[,'..Dataset_placeholder_var..'] <- rep(data, nrow(private$modelData[[index]]$data))
     
+    }
+    
+  points[[data]] <- do.call(rbind.SpatialPointsDataFrame, points[[data]])
+      
   }
-  
+
   plotData <- do.call(rbind.SpatialPointsDataFrame, points)
-  
+  ## Make boundary
   
   
   
