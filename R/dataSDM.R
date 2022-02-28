@@ -85,7 +85,7 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
   if (missing(coordinates)) stop('Coordinates need to be given.')
   if (missing(projection)) stop('projection needs to be given.')
   if (missing(Inlamesh)) stop('Mesh needs to be given.')
-initnames <<- initialnames
+
   if (class(Inlamesh) != 'inla.mesh') stop('Mesh needs to be an inla.mesh object.')
   
   if (class(projection)[1] != 'CRS') stop('Projection needs to be a CRS object.')
@@ -494,7 +494,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     #self$spatialFields$temporalField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
     
   }
-  
+  print(dataNames); print(private$initialnames)
   pointData$makeData(datapoints = dataPoints, datanames = dataNames,
                      coords = private$Coordinates, proj = private$Projection,
                      countsresp = responseCounts, paresp = responsePA,
