@@ -494,7 +494,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     #self$spatialFields$temporalField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
     
   }
-  print(dataNames); print(private$initialnames)
+  
   pointData$makeData(datapoints = dataPoints, datanames = dataNames,
                      coords = private$Coordinates, proj = private$Projection,
                      countsresp = responseCounts, paresp = responsePA,
