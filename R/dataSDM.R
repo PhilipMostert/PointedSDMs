@@ -85,7 +85,7 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
   if (missing(coordinates)) stop('Coordinates need to be given.')
   if (missing(projection)) stop('projection needs to be given.')
   if (missing(Inlamesh)) stop('Mesh needs to be given.')
-  
+  initnames <<- initialnames
   if (class(Inlamesh) != 'inla.mesh') stop('Mesh needs to be an inla.mesh object.')
   
   if (class(projection)[1] != 'CRS') stop('Projection needs to be a CRS object.')
@@ -1086,6 +1086,24 @@ dataSDM$set('public', 'changeComponents', function(addComponent, removeComponent
   print(componentsJoint)
   
   
+})
+
+#' @description Function used to account for preferential sampling in the modeling framework.
+#' 
+#' 
+#' 
+
+dataSDM$set('public', 'samplingBias', function(...) {
+  
+  stop('Do later...')
+  
+  # Things to consider::
+   # Do we treat every point as a sampling location???
+   # If all we have are points of species 
+    # ie reflecting only the location of the species
+    # then we are essentially just duplicating the data?
+     # Can we just use "expert maps"
+      # ie use PA data to infer where the sampling locations are?  
 })
 
 ## Need to change all the spatialFields to self$spatialFields and then the relevent sublist?
