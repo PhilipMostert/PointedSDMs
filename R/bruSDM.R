@@ -57,8 +57,8 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
   #if (length(dataPoints) == 0) stop('Please provide data in the ... argument.')
   if (length(dataPoints) > 0) {
     
-  datasetClass <- unlist(lapply(unlist(dataPoints, recursive = TRUE), class))
-
+  datasetClass <- unlist(dataPoints, class)
+##Need something more here if object is list: get names from list
   if (length(datasetClass) == 1 && datasetClass == "list") {
 
     dataNames <- NULL
@@ -81,16 +81,21 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
       
       if (length(initialnames) != length(dataPoints)) {
         
-        warning("Issues with naming the datasets from a list. Will create generic dataset names.", 
+        initialnames <- names(x[[1]])
+        
+        if (any(is.null(initialnames))) {
+        
+          warning("Issues with naming the datasets from a list. Will create generic dataset names.", 
                 immediate. = FALSE)
         
         cat("\n")
-        initialnames <- paste0("dataset_", seq_len(length(datasets)))
+        initialnames <- paste0("dataset_", seq_len(length(datasetClass)))
         
       }
       
     }
     
+    }
   }
   else {
     
