@@ -306,7 +306,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
                   immediate. = FALSE)
           
           cat("\n")
-          dataNames <- paste0("dataset_", seq_len(length(datasets)))
+          dataNames <- paste0("dataset_", seq_len(length(dataList)))
           
         }
         
