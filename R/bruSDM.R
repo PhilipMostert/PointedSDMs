@@ -81,7 +81,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
       
       if (length(initialnames) != length(dataPoints)) {
         
-        initialnames <- names(dataPoints[[1]])
+        initialnames <- names(list(...)[[1]])
         
         if (any(is.null(initialnames))) {
         
@@ -91,7 +91,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
         cat("\n")
         initialnames <- paste0("dataset_", seq_len(length(datasetClass)))
         
-      }
+      
       
     }
     
