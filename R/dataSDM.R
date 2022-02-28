@@ -85,7 +85,7 @@ dataSDM$set('public', 'initialize', function(coordinates, projection, Inlamesh, 
   if (missing(coordinates)) stop('Coordinates need to be given.')
   if (missing(projection)) stop('projection needs to be given.')
   if (missing(Inlamesh)) stop('Mesh needs to be given.')
-  initnames <<- initialnames
+
   if (class(Inlamesh) != 'inla.mesh') stop('Mesh needs to be an inla.mesh object.')
   
   if (class(projection)[1] != 'CRS') stop('Projection needs to be a CRS object.')
@@ -290,7 +290,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
   
   if (any(!unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame"))) stop("Datasets need to be either a SpatialPoints* object or a data frame.")
   
-  if (!is.null(private$initialnames) && length(private$modelData) == 0) dataNames <- private$initialnames
+  if (!is.null(private$initialnames)) dataNames <- private$initialnames
   else
     if (dataList) {
       
