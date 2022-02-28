@@ -57,7 +57,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
   #if (length(dataPoints) == 0) stop('Please provide data in the ... argument.')
   if (length(dataPoints) > 0) {
     
-  datasetClass <- unlist(dataPoints, class)
+  datasetClass <- unlist(lapply(dataPoints, class))
 ##Need something more here if object is list: get names from list
   if (length(datasetClass) == 1 && datasetClass == "list") {
 
