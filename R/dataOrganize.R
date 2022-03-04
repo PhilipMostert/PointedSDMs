@@ -524,7 +524,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (!is.null(pointcovariates)) {
     
-    covsPoints <- paste0(pointcovariates, collapse = ' + ')
+    covsPoints <- pointcovariates#paste0(pointcovariates, collapse = ' + ')
     
   } else covsPoints <- NULL
   
