@@ -101,7 +101,7 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
       time_formula <- paste0(fun,'(',paste(covariates, intercept_terms, 'shared_spatial', collapse = ' + '),')')
 
       int[['temporalPredictions']] <- predict(model, timeData, ~ data.frame(..temporal_variable_index.. = eval(parse(text = time_variable)), formula = eval(parse(text = time_formula))))
-      int[['temporalPredictions']] <- int[['temporalPredictions']][,!names(int[['temporalPredictions']]@data) %in% time_variable]
+      #int[['temporalPredictions']] <- int[['temporalPredictions']][,!names(int[['temporalPredictions']]@data) %in% time_variable]
     
       class(int) <- c('bruSDM_predict', class(int))
       
