@@ -95,13 +95,17 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
       timeData <- inlabru::cprod(data, data.frame(time_data))
       names(timeData@data) <- c(time_variable, 'weight')  
       
-      if (!is.null(covariates)) covariates <- as.vector(outer(paste0(unlist(model[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))
+      if (!is.null(covariates) && speciespreds) covariates <- as.vector(outer(paste0(unlist(model[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))
       if (intercepts) intercept_terms <- paste0(unlist(model[['species']][['speciesIn']]), '_intercept')
       
-      time_formula <- paste0(fun,'(',paste(covariates, intercept_terms, 'shared_spatial', collapse = ' + '),')')
+      time_formula <- paste0(fun,'(',paste0(c(covariates, intercept_terms, 'shared_spatial'), collapse = ' + '),')')
 
-      int[['temporalPredictions']] <- predict(model, timeData, ~ data.frame(..temporal_variable_index.. = eval(parse(text = time_variable)), formula = eval(parse(text = time_formula))))
-      int[['temporalPredictions']] <- int[['temporalPredictions']][,!names(int[['temporalPredictions']]@data) %in% time_variable]
+      formula = formula(paste('~',paste0('data.frame(', time_variable,' = ', time_variable, ',formula =', time_formula,')')))
+
+      #int[['temporalPredictions']] <- predict(model, timeData, ~ data.frame(..temporal_variable_index.. = eval(parse(text = time_variable)), formula = eval(parse(text = time_formula))))
+      int[['temporalPredictions']] <- predict(model, timeData, formula)
+      
+      #int[['temporalPredictions']] <- int[['temporalPredictions']][,!names(int[['temporalPredictions']]@data) %in% time_variable]
     
       class(int) <- c('bruSDM_predict', class(int))
       
@@ -273,7 +277,10 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
     }
     else plot_colours <- NULL
     
-    class(x[[1]]@data[, '..temporal_variable_index..']) <- 'character'
+    temporalName <- names(x[[1]]@data)[!names(x[[1]]@data) %in% c('weight',  'mean', 'sd', 'q0.025', 'median', 'q0.975', 'smin', 'smax', 'cv','var')]
+    class(x[[1]]@data[,temporalName]) <- 'character'
+    names(x[[1]]@data)[names(x[[1]]@data) == temporalName] <- '..temporal_variable_index..'
+
     ##Would be nice to get full temporal variable names in here ...
     plot_grid <- ggplot() + gg(x[[1]], aes_string(fill = whattoplot)) + facet_grid(~ ..temporal_variable_index..) + plot_colours + ggtitle('Plot of the temporal predictions')
     return(plot_grid)
