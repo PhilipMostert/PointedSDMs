@@ -16,6 +16,7 @@ A data object containing the data and the relevant information about the integra
 \item \href{#method-addBias}{\code{dataSDM$addBias()}}
 \item \href{#method-updateFormula}{\code{dataSDM$updateFormula()}}
 \item \href{#method-changeComponents}{\code{dataSDM$changeComponents()}}
+\item \href{#method-samplingBias}{\code{dataSDM$samplingBias()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -64,7 +65,7 @@ A data object containing the data and the relevant information about the integra
 \if{latex}{\out{\hypertarget{method-plot}{}}}
 \subsection{Method \code{plot()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$plot(Datasets, Species, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$plot(Datasets, Species = FALSE, ...)}\if{html}{\out{</div>}}
 }
 
 }
@@ -126,6 +127,15 @@ A data object containing the data and the relevant information about the integra
 \subsection{Method \code{changeComponents()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$changeComponents(addComponent, removeComponent)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-samplingBias"></a>}}
+\if{latex}{\out{\hypertarget{method-samplingBias}{}}}
+\subsection{Method \code{samplingBias()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$samplingBias(...)}\if{html}{\out{</div>}}
 }
 
 }
