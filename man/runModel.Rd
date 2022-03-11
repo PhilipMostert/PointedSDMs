@@ -12,5 +12,5 @@ runModel(data, options = list())
 \item{options}{A list of INLA options used in the model. Defaults to \code{list()}.}
 }
 \description{
-runModel: function used to run the integrated model.
+This function takes a \code{bruSDM} object and produces an \code{inlabru} model object with additional lists and meta-data added.
 }

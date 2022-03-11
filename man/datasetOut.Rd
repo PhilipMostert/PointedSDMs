@@ -2,7 +2,7 @@
 % Please edit documentation in R/datasetOut.R
 \name{datasetOut}
 \alias{datasetOut}
-\title{Function which calculate the difference in covariate values between a full bru_sdm model and a model with one dataset left out}
+\title{FdatasetOut: Function that removes a dataset out of the main model, and calculates some cross-validation score.}
 \usage{
 datasetOut(model, dataset, predictions = FALSE)
 }
@@ -14,5 +14,5 @@ datasetOut(model, dataset, predictions = FALSE)
 \item{predictions}{Will new models be used for predictions. If \code{TRUE} returns marginals and bru_info in model. Defaults to \code{FALSE}.}
 }
 \description{
-Function which calculate the difference in covariate values between a full bru_sdm model and a model with one dataset left out
+This function calculates the difference in covariate values between a full bru_sdm model and a model with one dataset left out, as well as some cross-validation score based on the effect of leaving out the dataset.
 }
