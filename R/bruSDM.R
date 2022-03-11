@@ -1,4 +1,4 @@
-#' bruSDM function to ...
+#' This function is used to create a \code{bruSDM} object containing all the relevant data and meta-data to be used in the integrated distribution model.
 #' 
 #' @param ... The datasets to be used in the model. May come as either a \code{data.frame} or \code{SpatialPoints*}, or as a list of datasets inheriting the mentioned classes.
 #' @param spatialCovariates The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{Raster*} or \code{SpatialPixelsDataFrame} object.

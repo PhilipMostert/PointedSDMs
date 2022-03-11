@@ -2,7 +2,7 @@
 % Please edit documentation in R/bruSDM.R
 \name{bruSDM}
 \alias{bruSDM}
-\title{bruSDM function to ...}
+\title{This function is used to create a \code{bruSDM} object containing all the relevant data and meta-data to be used in the integrated distribution model.}
 \usage{
 bruSDM(
   ...,
@@ -82,5 +82,5 @@ bruSDM(
 \item{temporalModel}{List of model specifications given to the control.group argument in the time effect component.}
 }
 \description{
-bruSDM function to ...
+This function is used to create a \code{bruSDM} object containing all the relevant data and meta-data to be used in the integrated distribution model.
 }
