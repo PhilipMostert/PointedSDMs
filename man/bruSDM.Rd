@@ -2,7 +2,7 @@
 % Please edit documentation in R/bruSDM.R
 \name{bruSDM}
 \alias{bruSDM}
-\title{This function is used to create a \code{bruSDM} object containing all the relevant data and meta-data to be used in the integrated distribution model.}
+\title{bruSDM: integrated model data object.}
 \usage{
 bruSDM(
   ...,
