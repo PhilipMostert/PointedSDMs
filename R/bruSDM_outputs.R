@@ -18,11 +18,12 @@ print.bruSDM <- function(x, ...) {
 }
 
 #' Summary for bru_sdm
-#' @param x bruSDM object.
+#' @param object bruSDM object.
+#' @param ... Un used argument
 #' @rdname summary
 #' @exportS3Method 
 
-summary.bruSDM <- function(x) {
+summary.bruSDM <- function(object, ...) {
   #cat('----bru_sdm summary STILL IN DEVELOPMENT----\n\n')
   
   cat("Summary of 'bruSDM' object:\n\n")
