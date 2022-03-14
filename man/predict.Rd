@@ -5,7 +5,7 @@
 \title{Predict for bru_sdm}
 \usage{
 \method{predict}{bruSDM}(
-  model,
+  object,
   data = NULL,
   formula = NULL,
   mesh = NULL,
@@ -24,7 +24,7 @@
 )
 }
 \arguments{
-\item{model}{A \code{bru_sdm object}.}
+\item{object}{A \code{bru_sdm object}.}
 
 \item{data}{Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.}
 

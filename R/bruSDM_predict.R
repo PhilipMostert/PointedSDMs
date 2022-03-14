@@ -6,7 +6,7 @@
 setClass('bruSDM_predict')
 
 #' Predict for bru_sdm
-#' @param model A \code{bru_sdm object}.
+#' @param object A \code{bru_sdm object}.
 #' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
 #' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.
 #' @param mesh An inla.mesh object
@@ -28,7 +28,7 @@ setClass('bruSDM_predict')
 #' @export
 #' 
 
-predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL, 
+predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL, 
                            mask = NULL, temporal = FALSE, covariates = NULL, spatial = FALSE,
                            intercepts = FALSE, datasets = NULL, species = NULL,
                            biasfield = FALSE, biasnames = NULL, predictor = FALSE,
