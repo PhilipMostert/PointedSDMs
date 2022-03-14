@@ -23,7 +23,7 @@ print.bruSDM <- function(x, ...) {
 #' @rdname summary.bruSDM
 #' @exportS3Method 
 
-summary.bruSDM <- function(x,...) {
+summary.bruSDM <- function(x, ...) {
   #cat('----bru_sdm summary STILL IN DEVELOPMENT----\n\n')
   
   cat("Summary of 'bruSDM' object:\n\n")
@@ -73,7 +73,7 @@ summary.bruSDM <- function(x,...) {
       class(x) = 'inla'
       x$call = NULL
       x$summary.fixed = NULL
-      summary(x)
+      summary(x, ...)
       
   }
   
@@ -81,7 +81,7 @@ summary.bruSDM <- function(x,...) {
     
     class(x) = 'inla'
     x$call = NULL
-    summary(x)
+    summary(x, ...)
     
   }
   
