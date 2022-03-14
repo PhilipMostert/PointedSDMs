@@ -4,3 +4,5 @@
 ^appveyor\.yml$
 ^LICENSE\.md$
 ^\.github$
+^Makefile$
+^Jenkinsfile$
