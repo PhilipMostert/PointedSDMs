@@ -6,6 +6,11 @@
 \usage{
 \method{print}{bruSDM}(x, ...)
 }
+\arguments{
+\item{x}{bruSDM object.}
+
+\item{...}{Un used argument.}
+}
 \description{
 Print method for bru_sdm
 }

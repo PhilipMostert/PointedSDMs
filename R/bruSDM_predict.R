@@ -6,7 +6,7 @@
 setClass('bruSDM_predict')
 
 #' Predict for bru_sdm
-#' @param object A \code{bru_sdm object}.
+#' @param model A \code{bru_sdm object}.
 #' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
 #' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.
 #' @param mesh An inla.mesh object
@@ -199,6 +199,9 @@ predict.bruSDM <- function(model, data = NULL, formula = NULL, mesh = NULL,
   
 }
 
+#' @param x bruSDM_predict object
+#' @param ... Not used.
+
 print.bruSDM_predict <- function(x, ...) {
 
     
@@ -244,6 +247,16 @@ print.bruSDM_predict <- function(x, ...) {
 }
 
 #' Plot for preduct_bru_sdm
+#' 
+#' @param x A bruSDM_predict object.
+#' @param plotall Plot all predictions of the datasets.
+#' @param datasettoplot Plot a specific dataset.
+#' @param whattoplot One of the following statistics to plot: "mean", "sd", "q0.025", "median","q0.975", "smin", "smax", "cv", "var" 
+#' @param colours Custom colours of the plot provided by the function, scale_fill_gradientn.
+#' @param cols Number of columns required for the plotting. Used by inlabru's multiplot function.
+#' @param layout Layout of the plots. Used by inlabru's multiplot function.
+#' @param plot Should the plots be printed, defaults to \code{TRUE}. If \code{FALSE} will  produce a list of ggplot objects.
+#' @param ... Argument not used
 #' 
 #' @exportS3Method 
 

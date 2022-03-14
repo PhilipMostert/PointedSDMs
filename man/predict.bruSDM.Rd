@@ -24,6 +24,8 @@
 )
 }
 \arguments{
+\item{model}{A \code{bru_sdm object}.}
+
 \item{data}{Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.}
 
 \item{formula}{Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.}
@@ -53,8 +55,6 @@
 \item{fun}{Function used to predict. Set to \code{'linear'} if effects on the linear scale are desired.}
 
 \item{...}{Additional arguments used by the inlabru \code{predict} function.}
-
-\item{object}{A \code{bru_sdm object}.}
 }
 \description{
 Predict for bru_sdm

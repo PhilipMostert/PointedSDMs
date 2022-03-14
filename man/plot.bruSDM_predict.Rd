@@ -16,6 +16,25 @@
   ...
 )
 }
+\arguments{
+\item{x}{A bruSDM_predict object.}
+
+\item{plotall}{Plot all predictions of the datasets.}
+
+\item{datasettoplot}{Plot a specific dataset.}
+
+\item{whattoplot}{One of the following statistics to plot: "mean", "sd", "q0.025", "median","q0.975", "smin", "smax", "cv", "var"}
+
+\item{colours}{Custom colours of the plot provided by the function, scale_fill_gradientn.}
+
+\item{cols}{Number of columns required for the plotting. Used by inlabru's multiplot function.}
+
+\item{layout}{Layout of the plots. Used by inlabru's multiplot function.}
+
+\item{plot}{Should the plots be printed, defaults to \code{TRUE}. If \code{FALSE} will  produce a list of ggplot objects.}
+
+\item{...}{Argument not used}
+}
 \description{
 Plot for preduct_bru_sdm
 }

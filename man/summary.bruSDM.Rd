@@ -6,6 +6,11 @@
 \usage{
 \method{summary}{bruSDM}(x, ...)
 }
+\arguments{
+\item{x}{bruSDM object.}
+
+\item{...}{Un used argument.}
+}
 \description{
 Summary for bru_sdm
 }

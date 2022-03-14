@@ -6,6 +6,8 @@
 setClass('bruSDM')
 
 #' Print method for bru_sdm
+#' @param x bruSDM object.
+#' @param ... Un used argument.
 #' 
 #' @exportS3Method 
 
@@ -16,6 +18,8 @@ print.bruSDM <- function(x, ...) {
 }
 
 #' Summary for bru_sdm
+#' @param x bruSDM object.
+#' @param ... Un used argument.
 #' 
 #' @exportS3Method 
 
