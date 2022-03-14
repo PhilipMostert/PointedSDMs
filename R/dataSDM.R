@@ -208,14 +208,14 @@ dataSDM$set('public', 'plot', function(Datasets, Species = FALSE, ...) {
   
   if (length(private$modelData) == 0) stop('Please provide data before running the plot function.')
   
-  if (missing(Datasets)) Datasets <- names(private$dataSource)
+  if (missing(Datasets)) Datasets <- unique(private$dataSource)
   
-  if (!all(Datasets %in% names(private$dataSource))) stop('Dataset provided not provided to the object.') 
+  if (!all(Datasets %in% private$dataSource)) stop('Dataset provided not provided to the object.') 
   
   if (Species && is.null(private$speciesName)) stop('speciesName in bruSDM required before plotting species.')
   
   ##Get data
-  points <- vector(mode = 'list', length = length(Datasets))
+  points <- list()
   
   for (data in Datasets) {
     
@@ -230,23 +230,24 @@ dataSDM$set('public', 'plot', function(Datasets, Species = FALSE, ...) {
     
     #Also need to create a boundary of sorts... either if Boundary is non null; else can make from mesh...
     #Maybe even allow maps if SpatialPolygon provided...
-    
+
     for (i in 1:length(index)) {
-    
+  
     idx <- index[i]  
-    points[[data]][[i]] <- private$modelData[[idx]]$data ## which will have species if need be...
-    
-    if (!Species) points[[data]]@data[,'..Dataset_placeholder_var..'] <- rep(data, nrow(private$modelData[[index]]$data))
+    points[[data]][[i]] <- private$modelData[[idx]]$data[, names(private$modelData[[idx]]$data) %in% c(private$speciesName, private$responseCounts,
+                                                                                                       private$responsePA,'BRU_aggregate')]
+
+   if (!Species) points[[data]][[i]]@data[,'..Dataset_placeholder_var..'] <- rep(data, nrow( points[[data]][[i]]@data))
     
     }
     
-  points[[data]] <- do.call(rbind.SpatialPointsDataFrame, points[[data]])
+  #points[[data]] <- do.call(rbind.SpatialPointsDataFrame, points[[data]])
       
   }
 
-  plotData <- do.call(rbind.SpatialPointsDataFrame, points)
+  plotData <- do.call(rbind.SpatialPointsDataFrame, unlist(points))
   ## Make boundary
-  
+  stop(return(plotData))
   
   
 })
