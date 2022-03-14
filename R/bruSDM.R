@@ -8,6 +8,7 @@
 #' @param Projection Projection used for the data and spatial covariates. Must be of class \code{CRS}.
 #' @param Boundary ##NOT USED YET.
 #' @param Mesh An \code{inla.mesh} object.
+#' @param IPS Integration points to be used in the model. Defaults to \code{NULL} which will create integration points from the \code{inla.mesh} object.
 #' @param pointsField Specification of the shared spatial field for the points. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.
 #' @param speciesField Specification of the shared spatial field for the species. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.
 #' @param speciesSpatial Logical argument: should the species have their own spatial fields. Defaults to \code{TRUE}.

@@ -45,6 +45,8 @@ bruSDM(
 
 \item{Mesh}{An \code{inla.mesh} object.}
 
+\item{IPS}{Integration points to be used in the model. Defaults to \code{NULL} which will create integration points from the \code{inla.mesh} object.}
+
 \item{pointsField}{Specification of the shared spatial field for the points. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.}
 
 \item{speciesField}{Specification of the shared spatial field for the species. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.}
