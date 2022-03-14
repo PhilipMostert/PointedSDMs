@@ -24,7 +24,7 @@ setClass('bruSDM_predict')
 #' @param ... Additional arguments used by the inlabru \code{predict} function.
 #' 
 #' @method predict bruSDM
-#' @rdname predict.bruSDM
+#' @rdname predict
 #' @export
 #' 
 
