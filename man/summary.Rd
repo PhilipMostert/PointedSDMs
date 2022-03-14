@@ -4,12 +4,10 @@
 \alias{summary.bruSDM}
 \title{Summary for bru_sdm}
 \usage{
-\method{summary}{bruSDM}(x, ...)
+\method{summary}{bruSDM}(x)
 }
 \arguments{
 \item{x}{bruSDM object.}
-
-\item{...}{Un used argument.}
 }
 \description{
 Summary for bru_sdm
