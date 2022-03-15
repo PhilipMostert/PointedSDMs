@@ -1160,7 +1160,7 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
     # if boundary is.null
     
     loc <- private$INLAmesh$loc
-    segm <- private$INLAmesh$segm$bnd
+    segm <- private$INLAmesh$segm$int
     
     coords <- na.omit(data.frame(loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 1],
                                  loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 2]))
@@ -1168,7 +1168,7 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
     Polys <- Polygon(coords = coords)
     Polys <- Polygons(srl = list(Polys), ID = 'id')
     SpatPolys <- SpatialPolygons(list(Polys), proj4string = private$Projection)
-    xxx <<- SpatPolys
+
     all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) x$data))
     
     ggplot() + gg(blocks$blocks) + blocks$plot$layers[[2]] +
