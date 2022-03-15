@@ -27,20 +27,20 @@ summary.bruSDM <- function(object, ...) {
   #cat('----bru_sdm summary STILL IN DEVELOPMENT----\n\n')
   
   cat("Summary of 'bruSDM' object:\n\n")
-  cat(paste0("inlabru version: ", x$bru_info$inlabru_version, "\n"))
-  cat(paste0("INLA version: ", x$bru_info$INLA_version, "\n\n"))
+  cat(paste0("inlabru version: ", object$bru_info$inlabru_version, "\n"))
+  cat(paste0("INLA version: ", object$bru_info$INLA_version, "\n\n"))
   
   cat('Types of data modelled:\n')
-  names_data = data.frame(x[['dataType']][!duplicated(names(x[['dataType']]))])
+  names_data = data.frame(object[['dataType']][!duplicated(names(x[['dataType']]))])
   names(names_data) = c('                              ')
   print(names_data)
   cat('\n')
   
-  if(!is.null(x[['multinomVars']])){
+  if(!is.null(object[['multinomVars']])){
     cat('Summary of multinomial variables:\n\n')
     for (i in x[['multinomVars']][order(x[['multinomVars']])]) {
-      if (i%in%names(x$summary.random)) { 
-        variable <- x$summary.random[[i]]
+      if (i%in%names(object$summary.random)) { 
+        variable <- object$summary.random[[i]]
         names(variable)[1] <- i
         print(variable[,1:7], row.names = FALSE, digits = 3)
         cat('\n\n')
@@ -54,34 +54,34 @@ summary.bruSDM <- function(object, ...) {
     }
   }
   
-  if (!is.null(x[['species']][['speciesIn']])) {
+  if (!is.null(object[['species']][['speciesIn']])) {
       
       cat('Summary of the fixed effects for the species:')
       cat('\n\n')
       
-      for (species in as.character(unique(unlist(x[['species']]['speciesIn'])))) {
+      for (species in as.character(unique(unlist(object[['species']]['speciesIn'])))) {
         
         cat('Summary for', paste0(species,':'))
         cat('\n')
-        print.data.frame(x[['summary.fixed']][grepl(paste0('\\<',species,'_'), row.names(x[['summary.fixed']])),])    
+        print.data.frame(x[['summary.fixed']][grepl(paste0('\\<',species,'_'), row.names(object[['summary.fixed']])),])    
         
         cat('\n')
         
         
       }
       
-      class(x) = 'inla'
-      x$call = NULL
-      x$summary.fixed = NULL
-      summary(x)
+      class(object) = 'inla'
+      object$call = NULL
+      object$summary.fixed = NULL
+      summary(object)
       
   }
   
   else {
     
-    class(x) = 'inla'
-    x$call = NULL
-    summary(x)
+    class(object) = 'inla'
+    object$call = NULL
+    summary(object)
     
   }
   
