@@ -1171,7 +1171,13 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
     
     all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) x$data))
     
-    ggplot() + gg(blocks$blocks) + blocks$plot$layers[[2]] + gg(all_data, aes(col = block_index)) + gg(blocks$blocks) + ggtitle('Plot of the blocked data')
+    ggplot() + gg(blocks$blocks) + blocks$plot$layers[[2]] +
+      gg(all_data, aes(col = block_index)) +
+      gg(blocks$blocks) +
+      gg(SpatPolys) +
+      ggtitle('Plot of the blocked data') +
+      theme(plot.title = element_text(hjust = 0.5))
+     
     ## Need block block$plots + gg(species_data) + gg(boundary), which we need to get from the mesh
     
     
