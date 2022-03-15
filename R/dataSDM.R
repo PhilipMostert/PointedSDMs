@@ -1126,8 +1126,6 @@ dataSDM$set('public', 'samplingBias', function(...) {
 #' 
 dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...) {
   
-  if (!is.integer(k) || !is.integer(rows) || !is.integer(cols)) stop('k, rows and cols all need to be intergers.')
-  
   ##Replace datasets
   blocks <- blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) x$data)),
                                   k = k, rows = rows, cols = cols, selection = 'random',
