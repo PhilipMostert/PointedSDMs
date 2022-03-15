@@ -1160,11 +1160,11 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
     # if boundary is.null
     
     loc <- private$INLAmesh$loc
-    segm = private$INLAmesh$segm$int
+    segm <- private$INLAmesh$segm$bnd
     
-    coords = na.omit(data.frame(first = loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 1],
-                                second = loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 2]))
-    
+    coords <- na.omit(data.frame(loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 1],
+                                 loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 2]))
+
     Polys <- Polygon(coords = coords)
     Polys <- Polygons(srl = list(Polys), ID = 'id')
     SpatPolys <- SpatialPolygons(list(Polys), proj4string = private$Projection)
