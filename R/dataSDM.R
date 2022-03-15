@@ -1118,13 +1118,20 @@ dataSDM$set('public', 'samplingBias', function(...) {
 })
 
 #' @description Function to spatially block the datasets
+#' @param k Number of cross-validation folds.
+#' @param rows Integer value by which the area is divided into latitudinal bins.
+#' @param cols Integer value by which the area is divided into longitudinal bins.
+#' @param plot Plot the cross-validation folds. Defaults to \code{FALSE}.
 #' 
 #' 
-#' 
-dataSDM$set('public', 'spatialBlock', function(k, rows, cols, ...) {
+dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...) {
+  
+  if (!is.integer(k) || !is.integer(rows) || !is.integer(cols)) stop('k, rows and cols all need to be intergers.')
   
   ##Replace datasets
-  blocks <- blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) x$data)), k = k, rows = rows, cols = cols, selection = 'random')
+  blocks <- blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) x$data)),
+                                  k = k, rows = rows, cols = cols, selection = 'random',
+                                  verbose = FALSE)
 
   folds <- blocks$blocks$folds
   
@@ -1150,7 +1157,27 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, ...) {
     
   }
   
-  ## Add plotting function
+  if (plot) {
+    
+    # if boundary is.null
+    
+    loc <- private$INLAmesh$loc
+    segm = private$INLAmesh$segm$int
+    
+    coords = na.omit(data.frame(first = loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 1],
+                                second = loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 2]))
+    
+    Polys <- Polygon(coords = coords)
+    Polys <- Polygons(srl = list(Polys), ID = 'id')
+    SpatPolys <- SpatialPolygons(list(Polys), proj4string = private$Projection)
+    
+    all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) x$data))
+    
+    block$plots + gg(all_data, aes(col = block_index) + gg(SpatPolys))
+    ## Need block block$plots + gg(species_data) + gg(boundary), which we need to get from the mesh
+    
+    
+  }
   
 })
 
