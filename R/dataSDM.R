@@ -1137,7 +1137,7 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, ...) {
   
   for (data in names(private$modelData)) {
     
-    in_where[[data]] <- lapply(1:9, function(i) !is.na(over(private$modelData[[data]]$data, blocksPoly[[1]][[i]])))
+    in_where[[data]] <- lapply(1:(rows * cols), function(i) !is.na(over(private$modelData[[data]]$data, blocksPoly[[1]][[i]])))
     
     for (i in 1:(rows * cols)) {
       
