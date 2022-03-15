@@ -43,12 +43,12 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   ## if non-null biasfields ## if no bias fields in stop: if biasnames not in biasfields stop
   if (biasfield && spatial) stop('Please choose one of biasfield and spatial.')
   
-  if (!is.null(unlist(model[['species']][['speciesIn']]))) {
+  if (!is.null(unlist(object[['species']][['speciesIn']]))) {
     
     speciespreds <- TRUE
     
-    if (is.null(species)) speciesin <- unique(unlist(model[['species']][['speciesIn']]))
-    if (!all(species %in% unique(unlist(model[['species']][['speciesIn']])))) stop('Species provided not in model.')
+    if (is.null(species)) speciesin <- unique(unlist(object[['species']][['speciesIn']]))
+    if (!all(species %in% unique(unlist(object[['species']][['speciesIn']])))) stop('Species provided not in model.')
     
   }
   else {
@@ -60,11 +60,11 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   
   if (!intercepts) intercept_terms <- NULL
   
-  if (!all(covariates%in%row.names(model$summary.fixed)) && !all(as.vector(outer(paste0(unlist(model[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))%in%row.names(model$summary.fixed))) stop("Covariates provided not in model.")
+  if (!all(covariates%in%row.names(object$summary.fixed)) && !all(as.vector(outer(paste0(unlist(object[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))%in%row.names(object$summary.fixed))) stop("Covariates provided not in model.")
   
   if (is.null(formula) && !intercepts && !spatial && is.null(covariates) && !temporal && !biasfield) stop("Please provide either a formula or components of a formula to be predicted.")
   
-  if (temporal && is.null(model$temporal$temporalVar)) stop('temporal is set to TRUE but no temporal component found in the model.')
+  if (temporal && is.null(object$temporal$temporalVar)) stop('temporal is set to TRUE but no temporal component found in the model.')
   
   if (is.null(data)) {
     
@@ -81,14 +81,14 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     int <- list()
     
-    class(model) <- c('bru','inla','iinla')
+    class(object) <- c('bru','inla','iinla')
     
     if (is.null(fun) | fun == 'linear') fun <- ''
     
     if (temporal) {
       
-      numeric_time <- order(as.numeric(unique(unlist(model$temporal$temporalIn))))
-      time_variable <- model$temporal$temporalVar
+      numeric_time <- order(as.numeric(unique(unlist(object$temporal$temporalIn))))
+      time_variable <- object$temporal$temporalVar
       
       time_data <- data.frame(seq_len(max(numeric_time)))
       names(time_data) <- time_variable
@@ -96,15 +96,15 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       timeData <- inlabru::cprod(data, data.frame(time_data))
       names(timeData@data) <- c(time_variable, 'weight')  
       
-      if (!is.null(covariates) && speciespreds) covariates <- as.vector(outer(paste0(unlist(model[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))
-      if (intercepts) intercept_terms <- paste0(unlist(model[['species']][['speciesIn']]), '_intercept')
+      if (!is.null(covariates) && speciespreds) covariates <- as.vector(outer(paste0(unlist(object[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))
+      if (intercepts) intercept_terms <- paste0(unlist(object[['species']][['speciesIn']]), '_intercept')
       
       time_formula <- paste0(fun,'(',paste0(c(covariates, intercept_terms, 'shared_spatial'), collapse = ' + '),')')
 
       formula = formula(paste('~',paste0('data.frame(', time_variable,' = ', time_variable, ',formula =', time_formula,')')))
 
-      #int[['temporalPredictions']] <- predict(model, timeData, ~ data.frame(..temporal_variable_index.. = eval(parse(text = time_variable)), formula = eval(parse(text = time_formula))))
-      int[['temporalPredictions']] <- predict(model, timeData, formula)
+      #int[['temporalPredictions']] <- predict(object, timeData, ~ data.frame(..temporal_variable_index.. = eval(parse(text = time_variable)), formula = eval(parse(text = time_formula))))
+      int[['temporalPredictions']] <- predict(object, timeData, formula)
       
       #int[['temporalPredictions']] <- int[['temporalPredictions']][,!names(int[['temporalPredictions']]@data) %in% time_variable]
     
@@ -116,14 +116,14 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (biasfield) {
       
-      if (is.null(biasnames)) biasnames <- model$biasData
+      if (is.null(biasnames)) biasnames <- object$biasData
       
-      if (!all(paste0(biasnames,'_biasField') %in% names(model$summary.random))) stop('Either no bias field has been used or an incorrect dataset name was given.')
+      if (!all(paste0(biasnames,'_biasField') %in% names(object$summary.random))) stop('Either no bias field has been used or an incorrect dataset name was given.')
       
       for (bias in biasnames) {
         
         formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(paste0(bias,'_biasField'),')')))
-        int[['biasFields']][[bias]] <- predict(model, data = data, formula = formula, ...)
+        int[['biasFields']][[bias]] <- predict(object, data = data, formula = formula, ...)
         
       }
       
@@ -134,7 +134,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (speciespreds && ! predictor) {
       
-      int[['speciesPredictions']] <- vector(mode = 'list', length(unlist(unique(model$species$speciesIn))))
+      int[['speciesPredictions']] <- vector(mode = 'list', length(unlist(unique(object$species$speciesIn))))
       names(int[['speciesPredictions']]) <- speciesin
       
       for (spec in speciesin) {
@@ -150,7 +150,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
         
         species_formula <- formula(paste0('~', fun, '(', paste0(c(species_covs, species_int, species_spat), collapse = ' + '),')'))
         
-        int[[1]][[spec]] <- predict(model, data, formula = species_formula, ...)
+        int[[1]][[spec]] <- predict(object, data, formula = species_formula, ...)
       
         }
       
@@ -162,21 +162,21 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (spatial) {
       
-      if (!'shared_spatial' %in% names(model$summary.random)) stop('Model run without spatial effects. Please specify Spatial = TRUE in bruSDM.')
+      if (!'shared_spatial' %in% names(object$summary.random)) stop('Model run without spatial effects. Please specify Spatial = TRUE in bruSDM.')
       else spatial_obj <- 'shared_spatial'
       
     } 
     else spatial_obj <- NULL
     
-    if (predictor) formula_components <- c(row.names(model$summary.fixed), names(model$summary.random))
+    if (predictor) formula_components <- c(row.names(object$summary.fixed), names(object$summary.random))
     else formula_components <- c(covariates, intercept_terms, spatial_obj)
     
     if (all(is.null(formula_components))) stop('Please specify at least one of: covariates, spatial, intercepts or biasfield.')
     
     formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(formula_components, collapse = ' + '),')'))
     
-    #int[[i]] <- predict(model, data = data, formula = formula, ...)
-    int <- predict(model, data = data, formula = formula, ...)
+    #int[[i]] <- predict(object, data = data, formula = formula, ...)
+    int <- predict(object, data = data, formula = formula, ...)
     int <- list(int)
     names(int) <- 'predictions'
     
@@ -186,8 +186,8 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   }
   else {
     
-    class(model) <- c('bru','inla','iinla')
-    int <- predict(model, data = data, formula = formula, ...)
+    class(object) <- c('bru','inla','iinla')
+    int <- predict(object, data = data, formula = formula, ...)
     int <- list(int)
     names(int) <- 'predictions'
     class(int) <- c('bruSDM_predict', class(int))
