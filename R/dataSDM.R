@@ -1117,6 +1117,43 @@ dataSDM$set('public', 'samplingBias', function(...) {
       # ie use PA data to infer where the sampling locations are?  
 })
 
+#' @description Function to spatially block the datasets
+#' 
+#' 
+#' 
+dataSDM$set('public', 'spatialBlock', function(k, rows, cols, ...) {
+  
+  ##Replace datasets
+  blocks <- blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) x$data)), k = k, rows = rows, cols = cols, selection = 'random')
+
+  folds <- blocks$blocks$folds
+  
+  blocksPoly <- list(sapply(1:(rows * cols), function(s) SpatialPolygons(blocks$blocks@polygons[s], proj4string = private$Projection)))
+  
+  blocked_data <- list()
+  in_where <- list()
+  
+  ##Integration points?
+  
+  for (data in names(private$modelData)) {
+    
+    in_where[[data]] <- lapply(1:9, function(i) !is.na(over(private$modelData[[data]]$data, blocksPoly[[1]][[i]])))
+    
+    for (i in 1:(rows * cols)) {
+      
+      blocked_data[[data]][[i]] <- private$modelData[[data]]$data[in_where[[data]][[i]], ]
+      blocked_data[[data]][[i]]$block_index <- as.character(folds[i])
+      
+    }
+    
+    private$modelData[[data]]$data <- do.call(rbind.SpatialPointsDataFrame, blocked_data[[data]])
+    
+  }
+  
+  ## Add plotting function
+  
+})
+
 ## Need to change all the spatialFields to self$spatialFields and then the relevent sublist?
 dataSDM$set('public', 'spatialFields', list(sharedField = list(),
                                             speciesFields = list(),
