@@ -1126,9 +1126,9 @@ dataSDM$set('public', 'samplingBias', function(...) {
 #' 
 dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...) {
   
-  blocks <- suppressMessages(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) x$data)),
-                                  k = k, rows = rows, cols = cols, selection = 'random',
-                                  verbose = FALSE, progress = FALSE))
+  blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) x$data)),
+                                        k = k, rows = rows, cols = cols, selection = 'random',
+                                        verbose = FALSE, progress = FALSE))
 
   folds <- blocks$blocks$folds
   
