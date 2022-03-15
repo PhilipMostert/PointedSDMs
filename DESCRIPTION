@@ -13,6 +13,7 @@ Depends:
     inlabru (>= 2.3.1),
     dplyr,
     raster,
+    R.devices,
     sp (>= 1.4-5),
     ggplot2,
     stats
