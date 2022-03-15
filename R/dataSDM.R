@@ -1168,7 +1168,7 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
     Polys <- Polygon(coords = coords)
     Polys <- Polygons(srl = list(Polys), ID = 'id')
     SpatPolys <- SpatialPolygons(list(Polys), proj4string = private$Projection)
-    
+    xxx <<- SpatPolys
     all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) x$data))
     
     ggplot() + gg(blocks$blocks) + blocks$plot$layers[[2]] +
