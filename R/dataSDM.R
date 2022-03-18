@@ -54,6 +54,22 @@ dataSDM$set('private', 'printSummary', NULL)
 dataSDM$set('private', 'multinomIndex', list())
 dataSDM$set('private', 'optionsINLA', list())
 
+dataSDM$set('private', 'polyfromMesh', function(...) {
+  
+  loc <- private$INLAmesh$loc
+  segm <- private$INLAmesh$segm$int
+  
+  coords <- na.omit(data.frame(loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 1],
+                               loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 2]))
+  
+  Polys <- Polygon(coords = coords)
+  Polys <- Polygons(srl = list(Polys), ID = 'id')
+  SpatPolys <- SpatialPolygons(list(Polys), proj4string = private$Projection)
+  SpatPolys
+  
+})   
+
+
 #' @description Initialize function for dataSDM: used to store some compulsory arguments.
 #' @param coordinates A vector of length 2 containing the names of the coordinates.
 #' @param projection The projection of the data.
@@ -248,10 +264,26 @@ dataSDM$set('public', 'plot', function(Datasets, Species = FALSE, ...) {
   #points[[data]] <- do.call(rbind.SpatialPointsDataFrame, points[[data]])
       
   }
+  
+  plotData <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(points), function(x) x[, c('..Dataset_placeholder_var..', private$speciesName)]))
+  
+  bound <- private$polyfromMesh()
+  
+  if (Species) {
+    
+    colOption <- gg(plotData, aes(col = eval(parse(text = private$speciesName))))
+    
+    ggplot() + colOption + gg(bound)
+    
+  }
+  else { 
+    
+    colOption <- gg(plotData, aes(col = eval(parse(text = '..Dataset_placeholder_var..'))))
+    ggplot() + colOption + gg(bound) + guides(col = guide_legend(title = 'Dataset Name')) 
+    
+  }
+  
 
-  plotData <- do.call(rbind.SpatialPointsDataFrame, unlist(points))
-  ## Make boundary
-  stop(return(plotData))
   
   
 })
@@ -1164,17 +1196,7 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
     
   if (plot) {
     
-    # if boundary is.null
-    
-    loc <- private$INLAmesh$loc
-    segm <- private$INLAmesh$segm$int
-    
-    coords <- na.omit(data.frame(loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 1],
-                                 loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 2]))
-
-    Polys <- Polygon(coords = coords)
-    Polys <- Polygons(srl = list(Polys), ID = 'id')
-    SpatPolys <- SpatialPolygons(list(Polys), proj4string = private$Projection)
+    spatPolys <- private$polyfromMesh()
 
     all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) {
       
@@ -1210,5 +1232,4 @@ dataSDM$set('public', 'addPriors', function(...) {
   #For fixed: used control.fixed read: https://www.ucl.ac.uk/population-health-sciences/sites/population_health_sciences/files/inla_baio.pdf
   #read inla.doc("linear")
 })
-            
-  
+        
