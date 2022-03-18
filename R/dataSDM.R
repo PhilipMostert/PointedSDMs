@@ -31,6 +31,7 @@ dataSDM$set('private', 'speciesSpatial', TRUE)
 
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'pointsField', list())
+dataSDM$set('private', 'blockedCV', FALSE)
 ##Make speciesField a named list for each species
  # if no field given for a specific species: then inla.spde2.matern()
 #dataSDM$set('private', 'speciesField', list())
@@ -237,7 +238,10 @@ dataSDM$set('public', 'plot', function(Datasets, Species = FALSE, ...) {
     points[[data]][[i]] <- private$modelData[[idx]]$data[, names(private$modelData[[idx]]$data) %in% c(private$speciesName, private$responseCounts,
                                                                                                        private$responsePA,'BRU_aggregate')]
 
+   if ('BRU_aggregate' %in% names(points[[data]][[i]])) points[[data]][[i]] <- points[[data]][[i]][points[[data]][[i]]$BRU_aggregate,]
+    
    if (!Species) points[[data]][[i]]@data[,'..Dataset_placeholder_var..'] <- rep(data, nrow( points[[data]][[i]]@data))
+    
     
     }
     
@@ -1122,13 +1126,14 @@ dataSDM$set('public', 'samplingBias', function(...) {
 #' @param rows Integer value by which the area is divided into latitudinal bins.
 #' @param cols Integer value by which the area is divided into longitudinal bins.
 #' @param plot Plot the cross-validation folds. Defaults to \code{FALSE}.
+#' @param ... Extra arguments used by blockCV's spatialBlock
 #' 
 #' 
 dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...) {
   
-  blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) x$data)),
+  blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, lapply(private$modelData, function(x) x$data)),
                                         k = k, rows = rows, cols = cols, selection = 'random',
-                                        verbose = FALSE, progress = FALSE))
+                                        verbose = FALSE, progress = FALSE, ...))
 
   folds <- blocks$blocks$folds
   
@@ -1146,14 +1151,17 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
     for (i in 1:(rows * cols)) {
       
       blocked_data[[data]][[i]] <- private$modelData[[data]]$data[in_where[[data]][[i]], ]
-      blocked_data[[data]][[i]]$block_index <- as.character(folds[i])
       
-    }
+      if (nrow(blocked_data[[data]][[i]]) !=0) blocked_data[[data]][[i]]$block_index <- as.character(folds[i])
+    
+      }
     
     private$modelData[[data]]$data <- do.call(rbind.SpatialPointsDataFrame, blocked_data[[data]])
     
   }
-  
+
+  private$blockedCV <- TRUE 
+    
   if (plot) {
     
     # if boundary is.null
@@ -1168,7 +1176,14 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
     Polys <- Polygons(srl = list(Polys), ID = 'id')
     SpatPolys <- SpatialPolygons(list(Polys), proj4string = private$Projection)
 
-    all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) x$data))
+    all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) {
+      
+      if ('BRU_aggregate' %in% names(x$data)) ob <- x$data[x$data$BRU_aggregate, 'block_index']
+      else ob <- x$data[,'block_index']
+      
+      ob
+      
+      }))
     
     ggplot() + gg(blocks$blocks) + blocks$plot$layers[[2]] +
       gg(all_data, aes(col = block_index)) +
@@ -1178,7 +1193,6 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
       theme(plot.title = element_text(hjust = 0.5))
      
     ## Need block block$plots + gg(species_data) + gg(boundary), which we need to get from the mesh
-    
     
   }
   
@@ -1190,3 +1204,11 @@ dataSDM$set('public', 'spatialFields', list(sharedField = list(),
                                             markFields = list(),
                                             biasFields = list()))
 
+dataSDM$set('public', 'addPriors', function(...) {
+  
+  #Priors of the hyperparameters control with hyper within control.family
+  #For fixed: used control.fixed read: https://www.ucl.ac.uk/population-health-sciences/sites/population_health_sciences/files/inla_baio.pdf
+  #read inla.doc("linear")
+})
+            
+  
