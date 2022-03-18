@@ -264,16 +264,20 @@ dataSDM$set('public', 'plot', function(Datasets, Species = FALSE, ...) {
   #points[[data]] <- do.call(rbind.SpatialPointsDataFrame, points[[data]])
       
   }
-  
-  plotData <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(points), function(x) x[, c('..Dataset_placeholder_var..', private$speciesName)]))
+
+  plotData <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(points), function(x) x[, names(x) %in% c('..Dataset_placeholder_var..', private$speciesName)]))
   
   bound <- private$polyfromMesh()
   
   if (Species) {
     
+    ## Need to add the species in here
+    
+    plotData@data[, private$speciesName] <- unlist(lapply(1:length(plotData[,private$speciesName]), function(x,y,z) y[z[x]], y = unlist(private$speciesIn), z= plotData@data[,private$speciesName]))
+    
     colOption <- gg(plotData, aes(col = eval(parse(text = private$speciesName))))
     
-    ggplot() + colOption + gg(bound)
+    ggplot() + colOption + gg(bound) + guides(col = guide_legend(title = 'Species Name')) 
     
   }
   else { 
