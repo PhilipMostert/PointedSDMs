@@ -1105,13 +1105,8 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
 })
 
 #' @description Function to add custom components to the integrated modeling.
-#' @param component Component to add to the integrated model.
-#' @param datasetName Names of the dataset to add the component to.
-#' @param speciesName Name of the species to add the component to.
-#' @param markName Name of the mark to add the component to.
-#' @param allDatasets Add the component to all the datasets.
-#' @param ... Any additional objects associated with the component, such as an inla.mesh.
-#' 
+#' @param addComponent Component to add to the model.
+#' @param removeComponent Component (or name of a component) present in the model which should be removed.
 
 dataSDM$set('public', 'changeComponents', function(addComponent, removeComponent) {
   
@@ -1119,7 +1114,7 @@ dataSDM$set('public', 'changeComponents', function(addComponent, removeComponent
   
   if (!missing(addComponent)) {
    
-   if (gsub('\\(.*$', '', addComponent) %in% terms) private$Components <- private$Components[! terms %in% gsub('\\(.*$', '', addComponent)]
+   if (any(gsub('\\(.*$', '', addComponent) %in% terms)) private$Components <- private$Components[! terms %in% gsub('\\(.*$', '', addComponent)]
    
    private$Components <- c(private$Components, addComponent)
     
@@ -1230,7 +1225,71 @@ dataSDM$set('public', 'spatialFields', list(sharedField = list(),
                                             markFields = list(),
                                             biasFields = list()))
 
-dataSDM$set('public', 'addPriors', function(...) {
+#' @description Function to change priors for the fixed (and possibly random) effects of the model.
+#' @param effect Name of the fixed effect covariate to change the prior for.
+#' @param species Name of the species for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.
+#' @param dataset Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercet'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.
+#' @param mean.linear Mean value for the prior of the fixed effect. Defaults to \code{0}.
+#' @param prec.linear Precision value for the prior of the fixed effect. Defaults to \code{0.001}.
+
+dataSDM$set('public', 'priorFixed', function(effect, species = NULL, dataset = NULL,
+                                             mean.linear = 0, prec.linear = 0.001) {
+  
+
+  if (!missing(effect)) {
+
+    if (effect == 'intercept') {
+      
+      intTRUE <- TRUE
+      
+      if (is.null(private$speciesName)) {
+        
+        if (!private$Intercepts) stop('Fixed effect is given as "intercept", but intercepts have been turned off in bruSDM.')
+        
+        if (is.null(dataset)) effect <- paste0(unique(private$dataSource),'_intercept')
+        
+      } 
+      else {
+        
+        if (is.null(species)) effect <- paste0(unique(unlist(private$speciesIn)), '_intercept')  #this won't work, unless we run a for loop...
+        else effect <- paste0(species, '_intercept')
+        
+        
+      }
+      
+    }
+    else {
+      
+      intTRUE <- FALSE
+     
+      if (!effect %in% c(private$spatcovsNames, private$pointCovariates)) stop('Fixed effect provided not present in the model. Please add covariates using the "spatialCovariates" or "pointCovariates" argument in bruSDM.')
+      
+      
+    } 
+
+    if (effect %in% private$spatcovsNames) cov_class <- private$spatcovsClass[effect]
+    else cov_class <- 'linear'
+    
+    if (!is.null(private$speciesName)) {
+      
+      if (!is.null(species)) {
+        
+        if (!species %in% unlist(private$speciesIn)) stop('Species given is not available in the model.')
+        
+        effect <- paste0(species, '_', effect) #this won't work, unless we run a for loop...
+        
+      }
+      else effect <- paste0(unique(unlist(private$speciesIn)), '_', effect)
+      
+    }
+    
+    if (intTRUE) newComponent <- paste0(effect, '(1, mean.linear = ', mean.linear, ', prec.linear = ', prec.linear,' )')
+    else newComponent <- paste0(effect,'(main = \"', effect, '\", model = ', cov_class, ', mean.linear = ', mean.linear, ',prec.linear = ', prec.linear, ')')
+    
+    self$changeComponents(addComponent = newComponent)
+    
+  }
+  
   
   #Priors of the hyperparameters control with hyper within control.family
   #For fixed: used control.fixed read: https://www.ucl.ac.uk/population-health-sciences/sites/population_health_sciences/files/inla_baio.pdf
