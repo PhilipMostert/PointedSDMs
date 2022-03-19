@@ -1290,9 +1290,5 @@ dataSDM$set('public', 'priorFixed', function(effect, species = NULL, dataset = N
     
   }
   
-  
-  #Priors of the hyperparameters control with hyper within control.family
-  #For fixed: used control.fixed read: https://www.ucl.ac.uk/population-health-sciences/sites/population_health_sciences/files/inla_baio.pdf
-  #read inla.doc("linear")
 })
         
