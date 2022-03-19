@@ -458,7 +458,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
         ##Change the species part to model = paste0(speciesname) ##where speciesname = species
          # but keep the speciesSpat framework for the temporal part of the model
         #speciesSpat <- paste0(speciesname, '_spatial(main = coordinates, model = speciesModel, group = ',speciesname,', ngroup = ', numspecies,')')
-        speciesSpat <- paste0(species,'_spatial(main = coordinates, model = ',paste0(species,'_field)'), collapse = ' + ')
+        speciesSpat <- paste0(species,'_spatial(main = coordinates, model = ',paste0(species,'_field)'))
         
       }
       #else speciesSpat <- paste0(species,'_spatial(main = coordinates, model = speciesModel)', collapse = ' + ') #change this to speciesModel
