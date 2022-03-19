@@ -1284,7 +1284,7 @@ dataSDM$set('public', 'priorsFixed', function(effect, species = NULL, dataset = 
     }
     
     if (intTRUE) newComponent <- paste0(effect, '(1, mean.linear = ', mean.linear, ', prec.linear = ', prec.linear,' )')
-    else newComponent <- paste0(effect,'(main = \"', effect, '\", model = ', cov_class, ', mean.linear = ', mean.linear, ',prec.linear = ', prec.linear, ')')
+    else newComponent <- paste0(effect,'(main = ', effect, ', model = ', cov_class, ', mean.linear = ', mean.linear, ',prec.linear = ', prec.linear, ')')
     
     self$changeComponents(addComponent = newComponent)
     
