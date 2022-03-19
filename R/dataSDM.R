@@ -1232,7 +1232,7 @@ dataSDM$set('public', 'spatialFields', list(sharedField = list(),
 #' @param mean.linear Mean value for the prior of the fixed effect. Defaults to \code{0}.
 #' @param prec.linear Precision value for the prior of the fixed effect. Defaults to \code{0.001}.
 
-dataSDM$set('public', 'priorFixed', function(effect, species = NULL, dataset = NULL,
+dataSDM$set('public', 'priorsFixed', function(effect, species = NULL, dataset = NULL,
                                              mean.linear = 0, prec.linear = 0.001) {
   
 
