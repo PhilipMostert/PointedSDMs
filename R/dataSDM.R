@@ -32,7 +32,6 @@ dataSDM$set('private', 'speciesSpatial', TRUE)
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'pointsField', list())
 dataSDM$set('private', 'blockedCV', FALSE)
-dataSDM$set('private', 'Folds', NULL)
 ##Make speciesField a named list for each species
  # if no field given for a specific species: then inla.spde2.matern()
 #dataSDM$set('private', 'speciesField', list())
@@ -1162,11 +1161,13 @@ dataSDM$set('public', 'samplingBias', function(...) {
 #' 
 #' 
 dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...) {
+   
+  stop('Need to completely re do')
   
   blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, lapply(private$modelData, function(x) x$data)),
-                                        k = k, rows = rows, cols = cols, selection = 'random',
-                                        verbose = FALSE, progress = FALSE, ...))
-
+                                                              k = k, rows = rows, cols = cols, selection = 'random',
+                                                              verbose = FALSE, progress = FALSE, ...))
+  
   folds <- blocks$blocks$folds
   
   blocksPoly <- list(sapply(1:(rows * cols), function(s) SpatialPolygons(blocks$blocks@polygons[s], proj4string = private$Projection)))
@@ -1185,20 +1186,19 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
       blocked_data[[data]][[i]] <- private$modelData[[data]]$data[in_where[[data]][[i]], ]
       
       if (nrow(blocked_data[[data]][[i]]) !=0) blocked_data[[data]][[i]]$block_index <- as.character(folds[i])
-    
-      }
+      
+    }
     
     private$modelData[[data]]$data <- do.call(rbind.SpatialPointsDataFrame, blocked_data[[data]])
     
   }
-
+  
   private$blockedCV <- TRUE 
-  private$Folds <- k
-    
+  
   if (plot) {
     
     spatPolys <- private$polyfromMesh()
-
+    
     all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) {
       
       if ('BRU_aggregate' %in% names(x$data)) ob <- x$data[x$data$BRU_aggregate, 'block_index']
@@ -1206,15 +1206,15 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
       
       ob
       
-      }))
+    }))
     
     ggplot() + gg(blocks$blocks) + blocks$plot$layers[[2]] +
       gg(all_data, aes(col = block_index)) +
       gg(blocks$blocks) +
-      gg(spatPolys) +
+      gg(SpatPolys) +
       ggtitle('Plot of the blocked data') +
       theme(plot.title = element_text(hjust = 0.5))
-     
+    
     ## Need block block$plots + gg(species_data) + gg(boundary), which we need to get from the mesh
     
   }
