@@ -24,101 +24,8 @@ runModel <- function(data, options = list()) {
    # Assign all relevant variables to this environment
     # Most notably the spatial covariates: get each covariate as its own SPpixeldataframe
 
-  
-  if (!is.null(data$.__enclos_env__$private$spatcovsNames)) {
-    
-    spatCovs <- get(data$.__enclos_env__$private$spatcovsObj, 
-                    envir = data$.__enclos_env__$private$spatcovsEnv)
-    
-    if (!inherits(spatCovs, 'Spatial')) spatCovs <- as(spatCovs, 'SpatialPixelsDataFrame')
-    
-    if (is.null(data$.__enclos_env__$private$speciesIn)) {
-    
-    for (name in data$.__enclos_env__$private$spatcovsNames) {
-
-    pixelsDF <- sp::SpatialPixelsDataFrame(points = spatCovs@coords,
-                                           data = data.frame(spatCovs@data[,name]),
-                                           proj4string = data$.__enclos_env__$private$Projection)
-    names(pixelsDF@data) <- name
-    #Note that if species is non-null we would also need to paste the species name to this.
-    assign(name, pixelsDF)
-    
-    }
-  }
-  else {
-    
-    for (species in unique(unlist(data$.__enclos_env__$private$speciesIn))) {
-      
-      for (name in data$.__enclos_env__$private$spatcovsNames) {
-
-          pixelsDF <- sp::SpatialPixelsDataFrame(points = spatCovs@coords,
-                                                 data = data.frame(spatCovs@data[,name]),
-                                                 proj4string = data$.__enclos_env__$private$Projection)
-          names(pixelsDF@data) <- paste0(species,'_',name)
-          #Note that if species is non-null we would also need to paste the species name to this.
-          assign(paste0(species,'_',name), pixelsDF)
-
-        }
-      }
-    }
-  }
-
-  if (!is.null(data$.__enclos_env__$private$speciesIn)) {
-   
-    if (data$.__enclos_env__$private$speciesSpatial) {
-    
-   for (species in names(data$spatialFields$speciesFields)) {
- 
-     assign(paste0(species,'_field'), data$spatialFields$speciesFields[[species]])
-     
-   }
-    
-    speciesSpatial <- TRUE
-    
-    }  else speciesSpatial <- FALSE
-    
-  } else speciesSpatial <- FALSE
-  
-  if (data$.__enclos_env__$private$Spatial) {
-    
-  assign('shared_field', data$spatialFields$sharedField)
-  pointsSpatial <- TRUE
-  
-  } else pointsSpatial <- FALSE
-  
-  if (!is.null(data$.__enclos_env__$private$markNames)) {
-    
-    if (data$.__enclos_env__$private$marksSpatial) {
-      
-      for (mark in names(data$spatialFields$markFields)) {
-        
-        assign(paste0(mark,'_field'), data$spatialFields$markFields[[mark]])
-      
-      }
-      
-    marksSpatial <- TRUE  
- 
-    } else marksSpatial <- FALSE  
-    
-  } else marksSpatial <- FALSE  
-  
-  if (length(data$spatialFields$biasFields) != 0) {
-    
-    for (name in names(data$spatialFields$biasFields)) {
-    
-      assign(paste0(name,'_bias_field'), data$spatialFields$biasFields[[name]])
-      
-    }
-  }
-  
-  #if (length(data$spatialFields$temporalField) > 0) {
-  #  
-  #  assign('temporal_field', data$spatialFields$temporalField)
-  #  temporalSpatial <- TRUE
-    
-  #} else temporalSpatial <- FALSE 
-
-
+  data2ENV(data = data, env = environment())
+  #stop(return(ls()))
   ## Get all components in formula; get all components but without the ()
    # if not in formulas then remove from components
   
@@ -146,9 +53,9 @@ runModel <- function(data, options = list()) {
   
   ##For now set bru_max_iter to 1
   optionsJoint$bru_max_iter <- 1
-  
+
   inlaModel <- inlabru::bru(components = componentsJoint,
-                            allLiks, options = optionsJoint)
+                                 allLiks, options = optionsJoint)
 
   if (length(data$.__enclos_env__$private$multinomVars) != 0) {
     
