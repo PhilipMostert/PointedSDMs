@@ -32,6 +32,7 @@ dataSDM$set('private', 'speciesSpatial', TRUE)
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'pointsField', list())
 dataSDM$set('private', 'blockedCV', FALSE)
+dataSDM$set('private', 'Folds', NULL)
 ##Make speciesField a named list for each species
  # if no field given for a specific species: then inla.spde2.matern()
 #dataSDM$set('private', 'speciesField', list())
@@ -1192,6 +1193,7 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
   }
 
   private$blockedCV <- TRUE 
+  private$Folds <- k
     
   if (plot) {
     
