@@ -1367,7 +1367,7 @@ dataSDM$set('public', 'specifySpatial', function(sharedSpatial = FALSE,
   
   if (!missing(bias)) {
     
-    if (!bias %in% names(public$spatialFields$biasFields)) stop('Dataset name provided does not have a bias field. Please use ".$biasField()" beforehand.')
+    if (!bias %in% names(self$spatialFields$biasFields)) stop('Dataset name provided does not have a bias field. Please use ".$biasField()" beforehand.')
     
     field_type <- 'biasFields'
     if (!remove) index <- bias
