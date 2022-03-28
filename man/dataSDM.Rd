@@ -17,6 +17,9 @@ A data object containing the data and the relevant information about the integra
 \item \href{#method-updateFormula}{\code{dataSDM$updateFormula()}}
 \item \href{#method-changeComponents}{\code{dataSDM$changeComponents()}}
 \item \href{#method-samplingBias}{\code{dataSDM$samplingBias()}}
+\item \href{#method-spatialBlock}{\code{dataSDM$spatialBlock()}}
+\item \href{#method-priorsFixed}{\code{dataSDM$priorsFixed()}}
+\item \href{#method-specifySpatial}{\code{dataSDM$specifySpatial()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -112,7 +115,7 @@ A data object containing the data and the relevant information about the integra
   speciesName = NULL,
   markName = NULL,
   Formula,
-  allDataset = FALSE,
+  allDatasets = FALSE,
   keepSpatial = TRUE,
   keepIntercepts = TRUE,
   newFormula,
@@ -126,7 +129,7 @@ A data object containing the data and the relevant information about the integra
 \if{latex}{\out{\hypertarget{method-changeComponents}{}}}
 \subsection{Method \code{changeComponents()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$changeComponents(addComponent, removeComponent)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$changeComponents(addComponent, removeComponent, print = TRUE)}\if{html}{\out{</div>}}
 }
 
 }
@@ -136,6 +139,46 @@ A data object containing the data and the relevant information about the integra
 \subsection{Method \code{samplingBias()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$samplingBias(...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-spatialBlock"></a>}}
+\if{latex}{\out{\hypertarget{method-spatialBlock}{}}}
+\subsection{Method \code{spatialBlock()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$spatialBlock(k, rows, cols, plot = FALSE, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-priorsFixed"></a>}}
+\if{latex}{\out{\hypertarget{method-priorsFixed}{}}}
+\subsection{Method \code{priorsFixed()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$priorsFixed(
+  effect,
+  species = NULL,
+  dataset = NULL,
+  mean.linear = 0,
+  prec.linear = 0.001
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-specifySpatial"></a>}}
+\if{latex}{\out{\hypertarget{method-specifySpatial}{}}}
+\subsection{Method \code{specifySpatial()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$specifySpatial(
+  sharedSpatial = FALSE,
+  species,
+  mark,
+  bias,
+  remove = FALSE,
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 }
