@@ -255,8 +255,13 @@ test_that('updateFormula is able to change the formula of a dataset', {
 
 test_that('changeComponents can change the components of the model', {
   
+  #remove binmark_spatial from model
+  check$changeComponents(removeComponent = 'binmark_spatial')
+  expect_false('binommark_spatial(main = coordinates, model = binommark_field)'%in%check$.__enclos_env__$private$Components)
   
-  
+  ##Add it back into the components
+  check$changeComponents(addComponent = 'binommark_spatial(main = coordinates, model = binommark_field)')
+  expect_false(!'binommark_spatial(main = coordinates, model = binommark_field)'%in%check$.__enclos_env__$private$Components)
   
 })
 
