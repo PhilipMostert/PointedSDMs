@@ -11,23 +11,7 @@ runModel <- function(data, options = list()) {
   
   if (!inherits(data, 'dataSDM')) stop('data needs to be a dataSDM object.')
 
-  ## Need to assign all relevant variables into this environment
-  #$.__enclos_env__$private$
-  
-  #Things needed:
-   #proj ## why do I need proj ...
-   #spatialmodel (for points and for species) #Do we need to get the environment for these??
-   #spatialcovariates
-   #components
-  
-   ## Things to do here:
-   # Assign all relevant variables to this environment
-    # Most notably the spatial covariates: get each covariate as its own SPpixeldataframe
-
   data2ENV(data = data, env = environment())
-  #stop(return(ls()))
-  ## Get all components in formula; get all components but without the ()
-   # if not in formulas then remove from components
   
   formula_terms <- unique(unlist(lapply(data$.__enclos_env__$private$modelData, function(x) {
     
