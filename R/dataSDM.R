@@ -372,8 +372,8 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
   
   if (!missing(pointsField)) {
     
-    if (!is.null(pointsField)) self$spatialFields$sharedField <- pointsField #private$pointsField <- pointsField
-    else self$spatialFields$sharedField <- INLA::inla.spde2.matern(mesh = private$INLAmesh) #private$pointsField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+    if (!is.null(pointsField)) self$spatialFields$sharedField[['sharedField']] <- pointsField #private$pointsField <- pointsField
+    else self$spatialFields$sharedField[['sharedField']] <- INLA::inla.spde2.matern(mesh = private$INLAmesh) #private$pointsField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
     
   }
   
@@ -1162,7 +1162,18 @@ dataSDM$set('public', 'samplingBias', function(...) {
 #' 
 dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...) {
    
-  stop('Need to completely re do')
+  #stop('Need to completely re do')
+  #The easiest thing to do may be to do likelihood construction in runModel and blockedCV
+  #So need to move all the objects from dataOrganize to here
+  #And then be careful with regards to indexing for all the slot functions here...
+  
+  #Functions this would effect:
+   #...$plot()
+   #...$addData()
+   #...$addBias()
+   #...$updateFormula()
+   #runModel()
+   #dataOrganize()
   
   blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, lapply(private$modelData, function(x) x$data)),
                                                               k = k, rows = rows, cols = cols, selection = 'random',
@@ -1211,7 +1222,7 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
     ggplot() + gg(blocks$blocks) + blocks$plot$layers[[2]] +
       gg(all_data, aes(col = block_index)) +
       gg(blocks$blocks) +
-      gg(SpatPolys) +
+      gg(spatPolys) +
       ggtitle('Plot of the blocked data') +
       theme(plot.title = element_text(hjust = 0.5))
     
@@ -1293,4 +1304,98 @@ dataSDM$set('public', 'priorsFixed', function(effect, species = NULL, dataset = 
   }
   
 })
-        
+
+#' @description Function to specify the random fields in the model using PC priors for the parameters.
+#' 
+#' @param sharedSpatial
+#' @param dataset
+#' @param species
+#' @param mark
+#' @param bias
+#' @param remove
+#' @param alpha
+#' @param prior.range
+#' @param prior.sigma
+#' @param ...
+#' 
+#' ##WHAT ABOUT ALL FIELDS?
+#' ##Maybe if all dataset/species/mark NULL it makes pc for all fields?
+#' ##Check: is 
+#' ##Maybe even add option to remove spatial?
+dataSDM$set('public', 'specifySpatial', function(sharedSpatial = FALSE, species, mark,
+                                                 bias, remove = FALSE, alpha = 2,
+                                                 prior.range, prior.sigma, ...) {
+  
+  if (all(!sharedSpatial || missing(species) || missing(mark) || missing(bias))) stop('At least one of sharedSpatial, dataset, species or mark needs to be provided.')
+  
+  if (sum(sharedSpatial, !missing(species), !missing(mark), !missing(bias)) != 1) stop('Please only choose one of sharedSpatial, species, mark or bias.')
+  
+  if (sharedSpatial) {
+    
+    if (!private$Spatial) stop('Shared spatial field not included in the model. Please use pointsSpatial = TRUE in bruSDM.')
+    
+    field_type <- 'sharedField'
+    if (!remove) index <- 'sharedField'
+    else index <- 'shared_spatial'
+    
+  }
+  
+  if (!missing(species)) {
+    
+    if (is.null(unlist(private$speciesIn))) stop('Species name provided but no species present in the model.') 
+    
+    if (!species %in% unlist(private$speciesIn)) stop('Species name provided is not currently in the model.')
+    
+    field_type <- 'speciesFields'
+    if (!remove) index <- species
+    else index <- paste0(species, '_spatial')
+    
+  }
+  
+  if (!missing(mark)) {
+    
+    if (is.null(unlist(private$markNames))) stop('Mark name provided but no marks present in the model.') 
+    
+    if (!mark %in% unlist(private$markNames)) stop('Mark name provided is not currently in the model.')
+    
+    if (!remove) field_type <- 'markFields'
+    else index <- paste0(mark, '_spatial')
+    
+  } 
+  
+  if (!missing(bias)) {
+    
+    if (!bias %in% names(public$spatialFields$biasFields)) stop('Dataset name provided does not have a bias field. Please use ".$biasField()" beforehand.')
+    
+    field_type <- 'biasFields'
+    if (!remove) index <- bias
+    else index <- paste0(bias, 'biasField')
+    
+  }
+  
+  if (missing(prior.range) || missing(prior.sigma)) stop('Both prior.range and prior.sigma need to be spefied.')
+  
+  if (!remove) {
+    
+  for (field in index) {
+    
+    public$spatialFields[[field_type]][[field]] <- INLA::inla.spde2.pcmatern(mesh = private$INLAmesh, alpha = alpha,
+                                                                             prior.range = prior.range, prior.sigma = prior.sigma, ...)
+    
+    
+  }  
+    
+  }
+  else {
+  
+  public$changeComponents(removeComponent = index)
+    
+  for (term in index) {
+      
+  public$updateFormula(allDataset, newFormula = formula(paste('~ -', term)))  
+  
+  } 
+  
+  }
+  
+})        
