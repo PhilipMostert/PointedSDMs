@@ -256,24 +256,55 @@ test_that('updateFormula is able to change the formula of a dataset', {
 test_that('changeComponents can change the components of the model', {
   
   #remove binmark_spatial from model
-  check$changeComponents(removeComponent = 'binmark_spatial')
+  check$changeComponents(removeComponent = 'binommark_spatial')
   expect_false('binommark_spatial(main = coordinates, model = binommark_field)'%in%check$.__enclos_env__$private$Components)
   
   ##Add it back into the components
   check$changeComponents(addComponent = 'binommark_spatial(main = coordinates, model = binommark_field)')
-  expect_false(!'binommark_spatial(main = coordinates, model = binommark_field)'%in%check$.__enclos_env__$private$Components)
+  expect_true('binommark_spatial(main = coordinates, model = binommark_field)'%in%check$.__enclos_env__$private$Components)
+  
+  #customize component for whatever reason
+  check$changeComponents(addComponent = 'binommark_spatial(main = coordinates, model = different_field)')
+  expect_false('binommark_spatial(main = coordinates, model = binommark_field)'%in%check$.__enclos_env__$private$Components)
+  expect_true('binommark_spatial(main = coordinates, model = different_field)'%in%check$.__enclos_env__$private$Components)
+  
   
 })
 
 test_that('priorsFixed can add the correct priors to the fixed effects', {
   
+  #test errors
+   #incorrect effect
+  expect_error(check$priorsFixed(effect = 'notcovariate', mean.linear = 200, prec.linear = 20), 'Fixed effect provided not present in the model. Please add covariates using the "spatialCovariates" or "pointCovariates" argument in bruSDM.')
+   #species not in model
+  expect_error(check$priorsFixed(effect = 'covariate', species = 'monkey'), 'Species given is not available in the model.')
+  
+  #arbitrary mean and precision for insect_covariate
+  check$priorsFixed(effect = 'covariate', species = 'insect', mean.linear = 200, prec.linear = 20)
+  expect_true('insect_covariate(main = insect_covariate, model = "linear", mean.linear = 200, prec.linear = 20)' %in% check$.__enclos_env__$private$Components)
   
   
 })
 
 test_that('specifySpatial can correctly specify the spatial fields', {
   
+  #Check errors:
+   #give none of: sharedSpatial, species, mark, bias
+  expect_error(check$specifySpatial(prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'At least one of sharedSpatial, dataset, species or mark needs to be provided.')
+   #give wrong species name
+  expect_error(check$specifySpatial(species = 'elephant', prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'Species name provided is not currently in the model.')
+   #give wrong mark name
+  expect_error(check$specifySpatial(mark = 'height', prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'Mark name provided is not currently in the model.')
+   #give wrong bias field
+  expect_error(check$specifySpatial(bias = 'PA', prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)))
   
+  #specify the sharedSpatial
+  check$specifySpatial(sharedSpatial = TRUE, prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5))
+  expect_equal(check$spatialFields$sharedField$sharedField$model, 'pcmatern')
   
-  
+  #remove the spatial field from all processes
+  check$specifySpatial(sharedSpatial = TRUE, remove = TRUE)
+  expect_false('shared_spatial(main = coordinates, model = shared_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))'%in%check$.__enclos_env__$private$Components)
+  expect_false(any(unlist(lapply(check$.__enclos_env__$private$modelData, function(x) 'shared_spatial' %in% x$include_components))))
+    
 })
