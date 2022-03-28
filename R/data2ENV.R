@@ -2,8 +2,6 @@
 #' 
 #' @param data bruSDM data file to be used in the integrated model.
 #' @param env Environment where the objects should be assigned.
-#' 
-#' @export
 
 data2ENV <- function(data, env) {
   
