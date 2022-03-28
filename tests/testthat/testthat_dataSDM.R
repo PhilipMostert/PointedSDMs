@@ -45,6 +45,7 @@ pointCovs <- 'pointcov'
 speciesName <- 'species'
 markSpatial <- TRUE
 marksIntercept <- TRUE
+speciesSpatial <- TRUE
 temporalName <- 'temp'
 temporalModel <- deparse(list(model = 'ar1'))
 
@@ -60,7 +61,7 @@ test_that('dataSDMs initialize works as expected.', {
   
   check <<- dataSDM$new(coordinates = coordnames,
                        projection = projection,
-                       Inlamesh = mesh,
+                       Inlamesh = mesh, speciesspatial = speciesSpatial,
                        responsepa = responsePA,
                        trialspa = trialName,
                        responsecounts = responseCounts,
@@ -252,3 +253,22 @@ test_that('updateFormula is able to change the formula of a dataset', {
   
 })
 
+test_that('changeComponents can change the components of the model', {
+  
+  
+  
+  
+})
+
+test_that('priorsFixed can add the correct priors to the fixed effects', {
+  
+  
+  
+})
+
+test_that('specifySpatial can correctly specify the spatial fields', {
+  
+  
+  
+  
+})
