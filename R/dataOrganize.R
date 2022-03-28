@@ -287,7 +287,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           #else temp <- NULL
           
           if (!is.null(speciesIn)) {
-            
+             if (pointsResponse[[response]][j] %in% c('coordinates', paresp, countresp)) {
               ##Change this part ot the speciesIn: not sure what the one below does...
               if (speciesspatial) speciesspat <- paste0(speciesIn,'_spatial') ## new argument called speciesSpatial??
               else speciesspat <- NULL
@@ -302,7 +302,12 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             
             if (intercept) int <- paste0(speciesIn,'_intercept') 
             else int <- NULL
-            
+             }
+            else {
+              
+              speciesspat <- NULL
+
+            }
           } 
           else {
             
