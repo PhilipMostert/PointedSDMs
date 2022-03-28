@@ -63,7 +63,7 @@ data2ENV <- function(data, env) {
   
   if (data$.__enclos_env__$private$Spatial) {
     
-    assign('shared_field', data$spatialFields$sharedField, envir = env)
+    assign('shared_field', data$spatialFields$sharedField$sharedField, envir = env)
     pointsSpatial <- TRUE
     
   } else pointsSpatial <- FALSE
