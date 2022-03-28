@@ -581,7 +581,7 @@ dataSDM$set('public', 'addData', function(..., responseCounts, responsePA, trial
     
     if (private$speciesSpatial) {
     
-    if (!is.null(speciesField)) self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(speciesField)
+    if (!missing(speciesField)) self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(speciesField)
     else self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(INLA::inla.spde2.matern(mesh = private$INLAmesh))
       
     
