@@ -869,24 +869,24 @@ dataSDM$set('public', 'addBias', function(datasetNames = NULL,
 #' @param speciesName Name of the species to change the formula for.
 #' @param markName Name of the mark to change the formula for.
 #' @param Formula An updated formula to give to the process.
-#' @param allDataset Logical argument: if \code{TRUE} changes the formulas for all processes in a dataset.
+#' @param allDatasets Logical argument: if \code{TRUE} changes the formulas for all processes in a dataset.
 #' @param keepSpatial Logical argument: should the spatial effects remain in the formula. Defaults to \code{TRUE}.
 #' @param keepIntercepts Logical argument: should the intercepts remain in the formula. Defaults to \code{TRUE}.
-#' @param newFormula Completely change the formula for a process. Note: all terms need to be correctly specified here. ## TO ADD
+#' @param newFormula Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.
 
 dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName = NULL,
-                                                markName = NULL, Formula, allDataset = FALSE,
+                                                markName = NULL, Formula, allDatasets = FALSE,
                                                 keepSpatial = TRUE, keepIntercepts = TRUE,
                                                 newFormula, ...) {
   ## Will need to update this such that if keepSpatial & species then paste0(species,_spatial)
   
-  if (all(is.null(datasetName), is.null(speciesName), is.null(markName))) stop ('At least one of: datasetName, speciesName or markName needs to be specified.')
+  if (all(is.null(datasetName), is.null(speciesName), is.null(markName))) stop ('At least one of: datasetName, speciesName, markName or allDatasets needs to be specified.')
   
   if (!is.null(speciesName) && is.null(private$speciesName)) stop ('Species are given but none are present in the model. Please specify species in the model with "speciesName" in bruSDM.')
   
   if (is.null(speciesName) && !is.null(private$speciesName)) speciesName <- unlist(private$speciesIn[datasetName])
   
-  if (!datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
+  if (!allDatasets && !datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
   
   if (!missing(Formula) && !missing(newFormula)) stop ('Please provide only one of Formula and newFormula. \n Use Formula to update the current formula; use newFormula to make a completely new formula.')
   
@@ -896,9 +896,7 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
   
   if (!missing(Formula) && length(as.character(Formula)) == 3) stop ("Please remove the response variable of the formula.")
   
-  if (!missing(newFormula) && length(as.character(newFormula)) == 3) stop ("Please remove the response variable of the formula.")
-  
-  if (allDataset && is.null(datasetName)) stop ('Please provide a dataset name in conjunction with allDataset.')
+  if (allDatasets && is.null(datasetName)) stop ('Please provide a dataset name in conjunction with allDatasets.') #?
   
   if (!is.null(markName)) {
     
@@ -933,7 +931,7 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
     
   } else speciesInd <- speciesName
   
-  if (allDataset) name_index <- names(private$modelData)[startsWith(private$modelData, paste0(datasetName, '_'))]
+  if (allDatasets) name_index <- names(private$modelData)[startsWith(names(private$modelData), paste0(datasetName, '_'))]
   
   else{
     
@@ -1073,24 +1071,26 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
       
       
       ## Get old formula:
-      cat('Old formula for', paste0(dataset, ': '))
+      #cat('Old formula for', paste0(dataset, ': '))
       if (length(all.vars(private$modelData[[dataset]]$formula)) == 2) {
         
         oldForm <- update(private$modelData[[dataset]]$formula, paste(' ~ ', paste(private$modelData[[dataset]]$include_components, collapse = ' + ')))
         
-        print(oldForm)
-        cat('New formula: ')
+        #print(oldForm)
+        #cat('New formula: ')
+    
         ## Maybe I should do a check: if cov in newFormula then paste0(species, _ , covariate) ## how else does it work within a for loop
-        newForm <- update(private$modelData[[dataset]]$formula, newFormula)
-        print(newFormula)
-        cat('\n')
+        newForm <- update(oldForm, newFormula)
+        #newForm <- update(private$modelData[[dataset]]$formula, newFormula)
+        #print(newForm)
+        #cat('\n')
         
       }
       else {
         
-        print(private$modelData[[dataset]]$formula)
-        cat('\n')
-        cat('New formula: ')
+        #print(private$modelData[[dataset]]$formula)
+        #cat('\n')
+        #cat('New formula: ')
         newForm <- update(paste(as.character(private$modelData[[dataset]]$formula), '~ '), newFormula)
       }
       
@@ -1108,7 +1108,7 @@ dataSDM$set('public', 'updateFormula', function(datasetName = NULL, speciesName 
 #' @param addComponent Component to add to the model.
 #' @param removeComponent Component (or name of a component) present in the model which should be removed.
 
-dataSDM$set('public', 'changeComponents', function(addComponent, removeComponent) {
+dataSDM$set('public', 'changeComponents', function(addComponent, removeComponent, print = TRUE) {
   
   terms <- gsub('\\(.*$', '', private$Components)
   
@@ -1122,14 +1122,16 @@ dataSDM$set('public', 'changeComponents', function(addComponent, removeComponent
   
   if (!missing(removeComponent)) private$Components <- private$Components[!terms%in%removeComponent]
     
-  
-  
-  cat('Components:')
-  cat('\n')
   componentsJoint <- formula(paste('~ - 1 +', paste(private$Components, collapse = ' + ')))
   componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
   
-  print(componentsJoint)
+  if (print) {
+    
+    cat('Components:')
+    cat('\n')
+    print(componentsJoint)
+    
+  }
   
   
 })
@@ -1322,11 +1324,11 @@ dataSDM$set('public', 'priorsFixed', function(effect, species = NULL, dataset = 
 #' ##Maybe if all dataset/species/mark NULL it makes pc for all fields?
 #' ##Check: is 
 #' ##Maybe even add option to remove spatial?
-dataSDM$set('public', 'specifySpatial', function(sharedSpatial = FALSE, species, mark,
-                                                 bias, remove = FALSE, alpha = 2,
-                                                 prior.range, prior.sigma, ...) {
+dataSDM$set('public', 'specifySpatial', function(sharedSpatial = FALSE, 
+                                                 species, mark,
+                                                 bias, remove = FALSE, ...) {
   
-  if (all(!sharedSpatial || missing(species) || missing(mark) || missing(bias))) stop('At least one of sharedSpatial, dataset, species or mark needs to be provided.')
+  if (all(!sharedSpatial && missing(species)  && missing(mark)  &&  missing(bias))) stop('At least one of sharedSpatial, dataset, species or mark needs to be provided.')
   
   if (sum(sharedSpatial, !missing(species), !missing(mark), !missing(bias)) != 1) stop('Please only choose one of sharedSpatial, species, mark or bias.')
   
@@ -1373,14 +1375,13 @@ dataSDM$set('public', 'specifySpatial', function(sharedSpatial = FALSE, species,
     
   }
   
-  if (missing(prior.range) || missing(prior.sigma)) stop('Both prior.range and prior.sigma need to be spefied.')
+  #if (missing(prior.range) || missing(prior.sigma)) stop('Both prior.range and prior.sigma need to be spefied.')
   
   if (!remove) {
     
   for (field in index) {
     
-    public$spatialFields[[field_type]][[field]] <- INLA::inla.spde2.pcmatern(mesh = private$INLAmesh, alpha = alpha,
-                                                                             prior.range = prior.range, prior.sigma = prior.sigma, ...)
+    self$spatialFields[[field_type]][[field]] <- INLA::inla.spde2.pcmatern(mesh = private$INLAmesh, ...)
     
     
   }  
@@ -1388,13 +1389,18 @@ dataSDM$set('public', 'specifySpatial', function(sharedSpatial = FALSE, species,
   }
   else {
   
-  public$changeComponents(removeComponent = index)
+  #do I need to remove from self$spatialFields[[index?]]  
     
-  for (term in index) {
+  self$changeComponents(removeComponent = index, print = FALSE)
+  
+  for (data in unique(private$dataSource)) {  
       
-  public$updateFormula(allDataset, newFormula = formula(paste('~ -', term)))  
+  for (term in index) {
+
+  self$updateFormula(datasetName = data, allDatasets = TRUE, Formula = formula(paste(' ~ . -', term)))  
   
   } 
+  }
   
   }
   
