@@ -70,10 +70,10 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (!is.null(mask)) {
       
-      data <- pixels(mesh, mask = mask)
+      data <- inlabru::pixels(mesh, mask = mask)
       
     }   
-    else data <- pixels(mesh)
+    else data <- inlabru::pixels(mesh)
   }
   
   
