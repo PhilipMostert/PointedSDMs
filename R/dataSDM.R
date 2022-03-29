@@ -7,7 +7,7 @@
 dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = FALSE, public = list(
   
   
-  #' @description Initialize function for dataSDM: used to store some compulsory arguments.
+  #' @description Initialize function for dataSDM: used to store some compulsory arguments. Please refer to the wrapper function, \code{bruSDM} for creating new dataSDM objects.
   #' @param coordinates A vector of length 2 containing the names of the coordinates.
   #' @param projection The projection of the data.
   #' @param Inlamesh An inla.mesh object.
@@ -1060,16 +1060,12 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   ,
   #' @description Function to specify the random fields in the model using PC priors for the parameters.
   #' 
-  #' @param sharedSpatial
-  #' @param dataset
-  #' @param species
-  #' @param mark
-  #' @param bias
-  #' @param remove
-  #' @param alpha
-  #' @param prior.range
-  #' @param prior.sigma
-  #' @param ...
+  #' @param sharedSpatial Logical: specify the shared spatial field in the model. Defaults to \code{FALSE}.
+  #' @param species Name of the species's spatial field to be specified.
+  #' @param mark Name of the mark's spatial field to be specified.
+  #' @param bias Name of the dataset's bias field to be specified.
+  #' @param remove Logical: should the spatial field be removed. Requires one of sharedSpatial, species, mark or bias to be non-missing.
+  #' @param ... Additional arguments used by INLA's \code{inla.spde2.pcmatern} function.
   #' 
   #' ##WHAT ABOUT ALL FIELDS?
   #' ##Maybe if all dataset/species/mark NULL it makes pc for all fields?
@@ -1082,6 +1078,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (all(!sharedSpatial && missing(species)  && missing(mark)  &&  missing(bias))) stop('At least one of sharedSpatial, dataset, species or mark needs to be provided.')
     
     if (sum(sharedSpatial, !missing(species), !missing(mark), !missing(bias)) != 1) stop('Please only choose one of sharedSpatial, species, mark or bias.')
+    
+    if (remove && sum(sharedSpatial, !missing(species), !missing(mark), !missing(bias)) !=1) stop('Please choose one of sharedSpatial, species, mark or bias to remove.')
     
     if (sharedSpatial) {
       

@@ -26,7 +26,7 @@ A data object containing the data and the relevant information about the integra
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize function for dataSDM: used to store some compulsory arguments.
+Initialize function for dataSDM: used to store some compulsory arguments. Please refer to the wrapper function, \code{bruSDM} for creating new dataSDM objects.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$new(
   coordinates,
@@ -319,7 +319,19 @@ Function to specify the random fields in the model using PC priors for the param
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{##WHAT ABOUT ALL FIELDS?
+\item{\code{sharedSpatial}}{Logical: specify the shared spatial field in the model. Defaults to \code{FALSE}.}
+
+\item{\code{species}}{Name of the species's spatial field to be specified.}
+
+\item{\code{mark}}{Name of the mark's spatial field to be specified.}
+
+\item{\code{bias}}{Name of the dataset's bias field to be specified.}
+
+\item{\code{remove}}{Logical: should the spatial field be removed. Requires one of sharedSpatial, species, mark or bias to be non-missing.}
+
+\item{\code{...}}{Additional arguments used by INLA's \code{inla.spde2.pcmatern} function.
+
+##WHAT ABOUT ALL FIELDS?
 ##Maybe if all dataset/species/mark NULL it makes pc for all fields?
 ##Check: is 
 ##Maybe even add option to remove spatial?}
