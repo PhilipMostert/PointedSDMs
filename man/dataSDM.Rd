@@ -16,17 +16,17 @@ A data object containing the data and the relevant information about the integra
 \item \href{#method-addBias}{\code{dataSDM$addBias()}}
 \item \href{#method-updateFormula}{\code{dataSDM$updateFormula()}}
 \item \href{#method-changeComponents}{\code{dataSDM$changeComponents()}}
-\item \href{#method-samplingBias}{\code{dataSDM$samplingBias()}}
-\item \href{#method-spatialBlock}{\code{dataSDM$spatialBlock()}}
 \item \href{#method-priorsFixed}{\code{dataSDM$priorsFixed()}}
 \item \href{#method-specifySpatial}{\code{dataSDM$specifySpatial()}}
+\item \href{#method-samplingBias}{\code{dataSDM$samplingBias()}}
+\item \href{#method-spatialBlock}{\code{dataSDM$spatialBlock()}}
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Makes a plot of the region as well as the points.
+Initialize function for dataSDM: used to store some compulsory arguments.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$new(
   coordinates,
@@ -57,6 +57,71 @@ Makes a plot of the region as well as the points.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{coordinates}}{A vector of length 2 containing the names of the coordinates.}
+
+\item{\code{projection}}{The projection of the data.}
+
+\item{\code{Inlamesh}}{An inla.mesh object.}
+
+\item{\code{initialnames}}{The names of the datasets if data is passed through bruSDM.}
+
+\item{\code{responsecounts}}{The name of the response variable for the count data.}
+
+\item{\code{responsepa}}{The name of the response variable for the presence absence data.}
+
+\item{\code{marksnames}}{The names of the marks contained in the data.}
+
+\item{\code{marksfamily}}{The statistical family of the marks.}
+
+\item{\code{pointcovariates}}{Names of the additional, non-spatial covariates describing the points.}
+
+\item{\code{trialspa}}{The name of the trials variable for the presence absence datasets.}
+
+\item{\code{trialsmarks}}{The name of the trials variable for the binomial marks datasets.}
+
+\item{\code{speciesname}}{Name of the species variable used in the data.}
+
+\item{\code{marksspatial}}{Should spatial fields be included for the marks}
+
+\item{\code{spatial}}{Logical argument describing if spatial effects should be included.}
+
+\item{\code{intercepts}}{Logical argument describing if intercepts should be included in the model.}
+
+\item{\code{spatialcovariates}}{Spatial covariates object used in the model.}
+
+\item{\code{boundary}}{A polygon map of the study area.}
+
+\item{\code{ips}}{Integration points and their respective weights to be used in the model.}
+
+\item{\code{temporal}}{Name of the temporal variable used in the model.}
+
+\item{\code{marksintercept}}{Logical argument describing if the marks should have interceptes.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Prints the datasets, their data type and the number of observations, as well as the marks and their respective families.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$print(...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-plot}{}}}
+\subsection{Method \code{plot()}}{
+Makes a plot of the region as well as the points.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$plot(Datasets, Species = FALSE, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
 \item{\code{Datasets}}{Name of the datasets to plot.}
 
 \item{\code{Species}}{Should species be plotted as well? Defaults to \code{FALSE}.}
@@ -68,27 +133,10 @@ A ggplot object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$print(...)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot"></a>}}
-\if{latex}{\out{\hypertarget{method-plot}{}}}
-\subsection{Method \code{plot()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$plot(Datasets, Species = FALSE, ...)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-addData"></a>}}
 \if{latex}{\out{\hypertarget{method-addData}{}}}
 \subsection{Method \code{addData()}}{
+Function used to add additional, and possibly heterogeneous data to the dataSDM object.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$addData(
   ...,
@@ -108,20 +156,64 @@ A ggplot object.
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{The datasets added into the model: should be a data.frame or a SpatialPoints* object.}
+
+\item{\code{responseCounts}}{The name of the response variable for the counts data.}
+
+\item{\code{responsePA}}{The name of the response variable for the presence absence data.}
+
+\item{\code{trialsPA}}{The name of the trials variable for the presence absence data.}
+
+\item{\code{markNames}}{The names of the marks found in the data.}
+
+\item{\code{markFamily}}{The associated distributions of the marks.}
+
+\item{\code{pointCovariates}}{The additional, non-spatial covariates describing the data.}
+
+\item{\code{trialsMarks}}{The name of the trials variable for the binomial marks.}
+
+\item{\code{speciesName}}{The name of the species variable included in the data.}
+
+\item{\code{Coordinates}}{A vector of length 2 describing the names of the coordinates of the data.}
+
+\item{\code{pointsField}}{An inla.spde model describing the random field for the points.}
+
+\item{\code{speciesField}}{An inla.spde model describing the random field for the species.}
+
+\item{\code{marksField}}{An inla.spde model describing the random field for the marks.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-addBias"></a>}}
 \if{latex}{\out{\hypertarget{method-addBias}{}}}
 \subsection{Method \code{addBias()}}{
+Function used to add additional bias fields to different data processes.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$addBias(datasetNames = NULL, allPO = FALSE, biasField = NULL)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{datasetNames}}{A vector of datasets to add the bias fields to.}
+
+\item{\code{allPO}}{Should the bias fields be added to all the presence only datasets. Defaults to \code{NULL}.}
+
+\item{\code{biasField}}{An inla.spde model descrbing the random bias field.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-updateFormula"></a>}}
 \if{latex}{\out{\hypertarget{method-updateFormula}{}}}
 \subsection{Method \code{updateFormula()}}{
+Function to update formulas for a given process.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$updateFormula(
   datasetName = NULL,
@@ -136,15 +228,104 @@ A ggplot object.
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{datasetName}}{Name of the dataset to change the formula for.}
+
+\item{\code{speciesName}}{Name of the species to change the formula for.}
+
+\item{\code{markName}}{Name of the mark to change the formula for.}
+
+\item{\code{Formula}}{An updated formula to give to the process.}
+
+\item{\code{allDatasets}}{Logical argument: if \code{TRUE} changes the formulas for all processes in a dataset.}
+
+\item{\code{keepSpatial}}{Logical argument: should the spatial effects remain in the formula. Defaults to \code{TRUE}.}
+
+\item{\code{keepIntercepts}}{Logical argument: should the intercepts remain in the formula. Defaults to \code{TRUE}.}
+
+\item{\code{newFormula}}{Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-changeComponents"></a>}}
 \if{latex}{\out{\hypertarget{method-changeComponents}{}}}
 \subsection{Method \code{changeComponents()}}{
+Function to add custom components to the integrated modeling.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$changeComponents(addComponent, removeComponent, print = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{addComponent}}{Component to add to the model.}
+
+\item{\code{removeComponent}}{Component (or name of a component) present in the model which should be removed.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-priorsFixed"></a>}}
+\if{latex}{\out{\hypertarget{method-priorsFixed}{}}}
+\subsection{Method \code{priorsFixed()}}{
+Function to change priors for the fixed (and possibly random) effects of the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$priorsFixed(
+  effect,
+  species = NULL,
+  dataset = NULL,
+  mean.linear = 0,
+  prec.linear = 0.001
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{effect}}{Name of the fixed effect covariate to change the prior for.}
+
+\item{\code{species}}{Name of the species for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.}
+
+\item{\code{dataset}}{Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercet'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.}
+
+\item{\code{mean.linear}}{Mean value for the prior of the fixed effect. Defaults to \code{0}.}
+
+\item{\code{prec.linear}}{Precision value for the prior of the fixed effect. Defaults to \code{0.001}.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-specifySpatial"></a>}}
+\if{latex}{\out{\hypertarget{method-specifySpatial}{}}}
+\subsection{Method \code{specifySpatial()}}{
+Function to specify the random fields in the model using PC priors for the parameters.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$specifySpatial(
+  sharedSpatial = FALSE,
+  species,
+  mark,
+  bias,
+  remove = FALSE,
+  ...
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{##WHAT ABOUT ALL FIELDS?
+##Maybe if all dataset/species/mark NULL it makes pc for all fields?
+##Check: is 
+##Maybe even add option to remove spatial?}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-samplingBias"></a>}}
@@ -161,37 +342,6 @@ A ggplot object.
 \subsection{Method \code{spatialBlock()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$spatialBlock(k, rows, cols, plot = FALSE, ...)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-priorsFixed"></a>}}
-\if{latex}{\out{\hypertarget{method-priorsFixed}{}}}
-\subsection{Method \code{priorsFixed()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$priorsFixed(
-  effect,
-  species = NULL,
-  dataset = NULL,
-  mean.linear = 0,
-  prec.linear = 0.001
-)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-specifySpatial"></a>}}
-\if{latex}{\out{\hypertarget{method-specifySpatial}{}}}
-\subsection{Method \code{specifySpatial()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$specifySpatial(
-  sharedSpatial = FALSE,
-  species,
-  mark,
-  bias,
-  remove = FALSE,
-  ...
-)}\if{html}{\out{</div>}}
 }
 
 }
