@@ -259,6 +259,9 @@ print.bruSDM_predict <- function(x, ...) {
 #' @param plot Should the plots be printed, defaults to \code{TRUE}. If \code{FALSE} will  produce a list of ggplot objects.
 #' @param ... Argument not used
 #' 
+#' @import gg
+#' @import ggplot
+#' 
 #' @exportS3Method 
 
 plot.bruSDM_predict <- function(x, plotall = TRUE,
