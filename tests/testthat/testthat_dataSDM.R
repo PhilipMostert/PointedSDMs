@@ -241,6 +241,12 @@ test_that('addBias is able to add bias fields to the model as well as succesfull
 
 test_that('updateFormula is able to change the formula of a dataset', {
   
+  #Test error: species/mark/dataset all NULL
+  expect_error(check$updateFormula(Formula = ~ covariate), 'At least one of: datasetName, speciesName, markName or allDatasets needs to be specified.')
+  
+  #Check the error regarding adding a new response variable.
+  expect_error(check$updateFormula(datasetName = 'PO', Formula = notResponse ~ covariate), 'Please remove the response variable of the formula.')
+  
   ##remove the covariate from the PO dataset
   check$updateFormula(datasetName = 'PO', Formula = ~ . - covariate)
   
@@ -251,7 +257,11 @@ test_that('updateFormula is able to change the formula of a dataset', {
   check$updateFormula('PO', markName = 'numvar', Formula = ~ . - covariate, keepSpatial = TRUE, keepIntercepts = TRUE)
   expect_setequal(check$.__enclos_env__$private$modelData$PO_fish_numvar$include_components, c("numvar_spatial", "numvar_intercept", "PO_biasField"))
   
-})
+  #create completely new formula for PO
+  check$updateFormula(datasetName = 'PO', newFormula = ~ . + covariate + I(covariate^2))
+  expect_equal(deparse1(check$.__enclos_env__$private$modelData$PO_fish_coordinates$formula), 'coordinates ~ shared_spatial + fish_intercept + fish_spatial + PO_biasField + covariate + I(covariate^2)')
+
+  })
 
 test_that('changeComponents can change the components of the model', {
   
