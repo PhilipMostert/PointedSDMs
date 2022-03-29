@@ -31,14 +31,14 @@ summary.bruSDM <- function(object, ...) {
   cat(paste0("INLA version: ", object$bru_info$INLA_version, "\n\n"))
   
   cat('Types of data modelled:\n')
-  names_data = data.frame(object[['dataType']][!duplicated(names(x[['dataType']]))])
+  names_data = data.frame(object[['dataType']][!duplicated(names(object[['dataType']]))])
   names(names_data) = c('                              ')
   print(names_data)
   cat('\n')
   
   if(!is.null(object[['multinomVars']])){
     cat('Summary of multinomial variables:\n\n')
-    for (i in x[['multinomVars']][order(x[['multinomVars']])]) {
+    for (i in object[['multinomVars']][order(object[['multinomVars']])]) {
       if (i%in%names(object$summary.random)) { 
         variable <- object$summary.random[[i]]
         names(variable)[1] <- i
@@ -63,7 +63,7 @@ summary.bruSDM <- function(object, ...) {
         
         cat('Summary for', paste0(species,':'))
         cat('\n')
-        print.data.frame(x[['summary.fixed']][grepl(paste0('\\<',species,'_'), row.names(object[['summary.fixed']])),])    
+        print.data.frame(object[['summary.fixed']][grepl(paste0('\\<',species,'_'), row.names(object[['summary.fixed']])),])    
         
         cat('\n')
         
