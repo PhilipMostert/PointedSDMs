@@ -10,7 +10,8 @@ BugReports: https://github.com/PhilipMostert/inlabru_SDMs/issues
 Description: A package to fit models based integrated species distribution models using hetrogeneous data.
 Depends:
     R (>= 3.5),
-    sp (>= 1.4-5)
+    sp (>= 1.4-5),
+    stats
 Imports:
     R6,
     rgeos,
