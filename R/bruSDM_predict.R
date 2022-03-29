@@ -296,7 +296,7 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
     names(x[[1]]@data)[names(x[[1]]@data) == temporalName] <- '..temporal_variable_index..'
 
     ##Would be nice to get full temporal variable names in here ...
-    plot_grid <- ggplot() + gg(x[[1]], aes_string(fill = whattoplot)) + facet_grid(~ ..temporal_variable_index..) + plot_colours + ggtitle('Plot of the temporal predictions')
+    plot_grid <- ggplot() + inlabru::gg(x[[1]], aes_string(fill = whattoplot)) + facet_grid(~ ..temporal_variable_index..) + plot_colours + ggtitle('Plot of the temporal predictions')
     return(plot_grid)
     
   }
@@ -322,7 +322,7 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
       if (nameObj ==  'speciesPredictions') title <- ggtitle(paste('Plot of predictions for', object))
       else title <- ggtitle(paste('Plot of bias field for', object))
 
-      all_plots[[object]] <- ggplot() + gg(x[[nameObj]][[object]], aes_string(fill = whattoplot)) + title + plot_colours
+      all_plots[[object]] <- ggplot() + inlabru::gg(x[[nameObj]][[object]], aes_string(fill = whattoplot)) + title + plot_colours
       
     }
 
@@ -351,7 +351,7 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
       #title <- ggtitle(paste('Plot of',stat,'for',plotname))
       title <- ggtitle('Plot of predictions')
       
-      prediction <- gg(x[[plotname]], aes_string(fill = stat))
+      prediction <- inlabru::gg(x[[plotname]], aes_string(fill = stat))
       
       if (!plot) prediction_list[[stat]] <- ggplot() + prediction
       
