@@ -62,7 +62,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   
   if (!all(covariates%in%row.names(object$summary.fixed)) && !all(as.vector(outer(paste0(unlist(object[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))%in%row.names(object$summary.fixed))) stop("Covariates provided not in model.")
   
-  if (is.null(formula) && !intercepts && !spatial && is.null(covariates) && !temporal && !biasfield) stop("Please provide either a formula or components of a formula to be predicted.")
+  if (is.null(formula) && !intercepts && !spatial && is.null(covariates) && !temporal && !biasfield && !predictor) stop("Please provide either a formula or components of a formula to be predicted.")
   
   if (temporal && is.null(object$temporal$temporalVar)) stop('temporal is set to TRUE but no temporal component found in the model.')
   
