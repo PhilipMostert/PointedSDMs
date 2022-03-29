@@ -38,7 +38,7 @@ runModel <- function(data, options = list()) {
   ##in case there are duplicates, will it cause an error??
   componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
   
-  allLiks <- do.call(like_list, data$.__enclos_env__$private$modelData)
+  allLiks <- do.call(inlabru::like_list, data$.__enclos_env__$private$modelData)
 
   ##For now just set bru_max_iter = 1
   
