@@ -26,6 +26,7 @@ A data object containing the data and the relevant information about the integra
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
+Makes a plot of the region as well as the points.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$new(
   coordinates,
@@ -53,6 +54,18 @@ A data object containing the data and the relevant information about the integra
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{Datasets}}{Name of the datasets to plot.}
+
+\item{\code{Species}}{Should species be plotted as well? Defaults to \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A ggplot object.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
