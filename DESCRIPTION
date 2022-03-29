@@ -19,7 +19,7 @@ Imports:
     dplyr,
     raster,
     R.devices,
-    ggplot2,
+    ggplot2
 Suggests: 
     testthat (>= 3.0.0),
     USAboundaries,
