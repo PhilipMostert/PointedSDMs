@@ -13,6 +13,15 @@ runModel <- function(data, options = list()) {
 
   data2ENV(data = data, env = environment())
   
+  if (data$.__enclos_env__$private$Spatial) pointsSpatial <- TRUE
+  else pointsSpatial <- FALSE
+  
+  if (!is.null(names(data$spatialFields$markFields))) marksSpatial <- TRUE
+  else marksSpatial <- FALSE
+  
+  if (!is.null(names(data$spatialFields$speciesFields))) speciesSpatial <- TRUE
+  else speciesSpatial <- FALSE
+  
   formula_terms <- unique(unlist(lapply(data$.__enclos_env__$private$modelData, function(x) {
     
     if (is.null(x$include_components))  attributes(terms(x$formula))[['term.labels']]

@@ -53,18 +53,16 @@ data2ENV <- function(data, env) {
         
       }
       
-      speciesSpatial <- TRUE
       
-    }  else speciesSpatial <- FALSE
+    }
     
-  } else speciesSpatial <- FALSE
+  }
   
   if (data$.__enclos_env__$private$Spatial) {
     
     assign('shared_field', data$spatialFields$sharedField$sharedField, envir = env)
-    pointsSpatial <- TRUE
-    
-  } else pointsSpatial <- FALSE
+
+  } 
   
   if (!is.null(data$.__enclos_env__$private$markNames)) {
     
@@ -76,11 +74,10 @@ data2ENV <- function(data, env) {
         
       }
       
-      marksSpatial <- TRUE  
       
-    } else marksSpatial <- FALSE  
+    } 
     
-  } else marksSpatial <- FALSE  
+  }
   
   if (length(data$spatialFields$biasFields) != 0) {
     
