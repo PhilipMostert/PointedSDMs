@@ -10,18 +10,26 @@ BugReports: https://github.com/PhilipMostert/inlabru_SDMs/issues
 Description: A package to fit models based integrated species distribution models using hetrogeneous data.
 Depends:
     R (>= 3.5),
-    inlabru (>= 2.3.1),
+    sp (>= 1.4-5)
+Imports:
+    R6,
+    rgeos,
+    inlabru (>= 2.5),
     dplyr,
     raster,
     R.devices,
-    sp (>= 1.4-5),
     ggplot2,
     stats
-Imports:
-    R6,
-    rgeos
+Suggests: 
+    testthat (>= 3.0.0),
+    USAboundaries,
+    sf,
+    rasterVis,
+    ggmap,
+    RColorBrewer,
+    cowplot,
+    knitr,
+    kableExtra
 RoxygenNote: 7.1.2
 License: GPL (>= 3)
-Suggests: 
-    testthat (>= 3.0.0)
 Config/testthat/edition: 3
