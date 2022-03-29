@@ -353,7 +353,7 @@ plot.bruSDM_predict <- function(x, plotall = TRUE,
       
       prediction <- gg(x[[plotname]], aes_string(fill = stat))
       
-      if (!plot) prediction_list[[stat]] <- prediction
+      if (!plot) prediction_list[[stat]] <- ggplot() + prediction
       
       if (!is.null(colours)) {
         
