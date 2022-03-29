@@ -17,6 +17,8 @@ Imports:
     R6,
     rgeos,
     dplyr,
+    inlabru (>= 2.5),
+    sp (>= 1.4-5),
     raster,
     R.devices,
     ggplot2
