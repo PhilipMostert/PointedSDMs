@@ -32,7 +32,6 @@
 #'
 #'dataset_out
 #' 
-#' 
 #' }
 
 datasetOut <- function(model, dataset,
