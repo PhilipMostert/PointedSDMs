@@ -32,19 +32,23 @@
 #' \dontrun{
 #' 
 #' #Specify whats needed
+#' 
 #' dataset1 <- data.frame(...)
 #' dataset2 <- sp::SpatialPointsDataFrame(...)
+#' 
 #' mesh <- inla.mesh.2d(...)
 #' spatiialCovariates <- raster::raster(...)
 #' Projection <- CRS(...)
 #' Coords <- c('Long', 'Lat')
 #' 
 #' #Run function
+#' 
 #' object <- bruSDM(dataset1, dataset2, Mesh = Mesh,
 #'                  spatialCovariates = spatialCovariates, Coords = Coords,
 #'                  Projection = Projection)
 #'                  
 #' #Return summary of data
+#' 
 #' object
 #' 
 #' }
