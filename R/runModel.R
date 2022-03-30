@@ -7,6 +7,23 @@
 #' 
 #' @return An inlabru model with additional information attached.
 #' 
+#' @examples 
+#' 
+#' \dontrun {
+#' 
+#' #Create dataSDM object
+#' 
+#' dataObject <- bruSDM(...)
+#' 
+#' #Run the joint model
+#' 
+#' joint_model <- runModel(dataObject, options = list(control.inla = list(int.strategy = 'eb')))
+#' 
+#' #Print summary of model
+#' joint_model
+#' 
+#' }
+#' 
 #' @export
 
 runModel <- function(data, options = list()) {

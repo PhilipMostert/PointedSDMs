@@ -17,3 +17,21 @@ An inlabru model with additional information attached.
 \description{
 This function takes a \code{bruSDM} object and produces an \code{inlabru} model object with additional lists and meta-data added.
 }
+\examples{
+
+\dontrun {
+
+#Create dataSDM object
+
+dataObject <- bruSDM(...)
+
+#Run the joint model
+
+joint_model <- runModel(dataObject, options = list(control.inla = list(int.strategy = 'eb')))
+
+#Print summary of model
+joint_model
+
+}
+
+}
