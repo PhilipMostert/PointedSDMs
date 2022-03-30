@@ -1066,11 +1066,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param bias Name of the dataset's bias field to be specified.
   #' @param remove Logical: should the spatial field be removed. Requires one of sharedSpatial, species, mark or bias to be non-missing.
   #' @param ... Additional arguments used by INLA's \code{inla.spde2.pcmatern} function.
-  #' 
-  #' ##WHAT ABOUT ALL FIELDS?
-  #' ##Maybe if all dataset/species/mark NULL it makes pc for all fields?
-  #' ##Check: is 
-  #' ##Maybe even add option to remove spatial?
+  
   specifySpatial = function(sharedSpatial = FALSE, 
                             species, mark,
                             bias, remove = FALSE, ...) {
