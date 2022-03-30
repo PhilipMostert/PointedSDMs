@@ -1,6 +1,6 @@
 #' @title R6 class to assist in reformatting the data to be used in dataSDM.
 #' @description Internal functions used to temporarily store data and other information before adding to dataSDM.
-#' @export
+
 #' @importFrom R6 R6Class
 
 dataOrganize <- R6::R6Class(classname = 'dataOrganize',
