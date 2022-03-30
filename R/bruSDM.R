@@ -25,7 +25,7 @@
 #' @param temporalName Name of the temporal variable in the model. This variable is required to be in all the datasets. Defaults to \code{NULL}.
 #' @param temporalModel List of model specifications given to the control.group argument in the time effect component.
 #' 
-#' @return A dataSDM object.
+#' @return A dataSDM object. Use ?dataSDM to see all the slot functions related to this object.
 #' 
 #' @examples 
 #' 
