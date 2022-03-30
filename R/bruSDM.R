@@ -9,7 +9,6 @@
 #' @param Boundary ##NOT USED YET.
 #' @param Mesh An \code{inla.mesh} object.
 #' @param IPS Integration points to be used in the model. Defaults to \code{NULL} which will create integration points from the \code{inla.mesh} object.
-#' @param pointsField Specification of the shared spatial field for the points. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.
 #' @param speciesField Specification of the shared spatial field for the species. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.
 #' @param speciesSpatial Logical argument: should the species have their own spatial fields. Defaults to \code{TRUE}.
 #' @param marksField  Specification of the fields for the marks. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.
@@ -30,9 +29,13 @@
 #' 
 #' @export
 
+
+##Need to remove the field things here...
+ # + everything in dataSDM and dataOrganize
+ #Then go to unit tests
 bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                    Projection, Boundary = NULL, Mesh, IPS = NULL,
-                   pointsField = NULL, speciesField = NULL, speciesSpatial = TRUE,
+                   speciesField = NULL, speciesSpatial = TRUE,
                    markNames = NULL, markFamily = NULL, marksField = NULL,
                    pointCovariates = NULL, pointsIntercept = TRUE, marksIntercept = TRUE,
                    pointsSpatial = TRUE, marksSpatial = TRUE,
@@ -142,7 +145,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                     responsePA = responsePA, trialsPA = trialsPA,
                     markNames = markNames, pointCovariates = pointCovariates,
                     trialsMarks = trialsMarks, speciesName = speciesName,
-                    pointsField = pointsField, speciesField = speciesField,
+                    speciesField = speciesField,
                     marksField = marksField, temporalName = temporalName)
     
   }

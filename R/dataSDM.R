@@ -240,14 +240,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param trialsMarks The name of the trials variable for the binomial marks.
   #' @param speciesName The name of the species variable included in the data.
   #' @param Coordinates A vector of length 2 describing the names of the coordinates of the data.
-  #' @param pointsField An inla.spde model describing the random field for the points.
   #' @param speciesField An inla.spde model describing the random field for the species.
   #' @param marksField An inla.spde model describing the random field for the marks.
   
   addData = function(..., responseCounts, responsePA, trialsPA,
                      markNames, markFamily, pointCovariates,
                      trialsMarks, speciesName, temporalName,
-                     Coordinates, pointsField,
+                     Coordinates,
                      speciesField,
                      marksField) {
     pointData <- dataOrganize$new()
@@ -307,10 +306,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                            as.character(match.call(expand.dots = FALSE)))
     }
     
-    if (!missing(pointsField)) {
+    if (private$Spatial) {
       
-      if (!is.null(pointsField)) self$spatialFields$sharedField[['sharedField']] <- pointsField #private$pointsField <- pointsField
-      else self$spatialFields$sharedField[['sharedField']] <- INLA::inla.spde2.matern(mesh = private$INLAmesh) #private$pointsField <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+      if (is.null(self$spatialFields$sharedField[['sharedField']])) self$spatialFields$sharedField[['sharedField']] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
       
     }
     
@@ -1178,7 +1176,6 @@ dataSDM$set('private', 'temporalModel', NULL)
 dataSDM$set('private', 'speciesSpatial', TRUE)
 
 dataSDM$set('private', 'modelData', list())
-dataSDM$set('private', 'pointsField', list())
 dataSDM$set('private', 'blockedCV', FALSE)
 ##Make speciesField a named list for each species
  # if no field given for a specific species: then inla.spde2.matern()
