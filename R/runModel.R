@@ -17,7 +17,8 @@
 #' 
 #' #Run the joint model
 #' 
-#' joint_model <- runModel(dataObject, options = list(control.inla = list(int.strategy = 'eb')))
+#' joint_model <- runModel(dataObject, 
+#'                         options = list(control.inla = list(int.strategy = 'eb')))
 #' 
 #' #Print summary of model
 #' 
