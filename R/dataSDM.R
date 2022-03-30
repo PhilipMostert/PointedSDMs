@@ -553,7 +553,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
           
         }
         
-        if (any(unlist(lapply(self$spatialFields$speciesFields, is.null))) {
+        if (any(unlist(lapply(self$spatialFields$speciesFields, is.null)))) {
           
           for (species in names(self$spatialFields$speciesFields)) {
             
