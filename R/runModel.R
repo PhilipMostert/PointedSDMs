@@ -40,13 +40,8 @@ runModel <- function(data, options = list()) {
   
   allLiks <- do.call(inlabru::like_list, data$.__enclos_env__$private$modelData)
 
-  ##For now just set bru_max_iter = 1
-  
   optionsJoint <- append(data$.__enclos_env__$private$optionsINLA, options)
   
-  ##For now set bru_max_iter to 1
-  optionsJoint$bru_max_iter <- 1
-
   inlaModel <- inlabru::bru(components = componentsJoint,
                                  allLiks, options = optionsJoint)
 
