@@ -150,7 +150,6 @@ Function used to add additional, and possibly heterogeneous data to the dataSDM 
   speciesName,
   temporalName,
   Coordinates,
-  pointsField,
   speciesField,
   marksField
 )}\if{html}{\out{</div>}}
@@ -178,8 +177,6 @@ Function used to add additional, and possibly heterogeneous data to the dataSDM 
 \item{\code{speciesName}}{The name of the species variable included in the data.}
 
 \item{\code{Coordinates}}{A vector of length 2 describing the names of the coordinates of the data.}
-
-\item{\code{pointsField}}{An inla.spde model describing the random field for the points.}
 
 \item{\code{speciesField}}{An inla.spde model describing the random field for the species.}
 
