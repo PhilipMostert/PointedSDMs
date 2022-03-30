@@ -341,7 +341,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         
         }
         ## re do this such that if is non null, don't touch
-        if (any(unlist(lapply(self$spatialFields$markFields, function(x) is.null)))) {
+        if (any(unlist(lapply(self$spatialFields$markFields, is.null)))) {
           
           for (mark in names(self$spatialFields$markFields)) {
             
@@ -553,7 +553,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
           
         }
         
-        if (any(unlist(lapply(self$spatialFields$speciesFields, function(x) is.null)))) {
+        if (any(unlist(lapply(self$spatialFields$speciesFields, is.null))) {
           
           for (species in names(self$spatialFields$speciesFields)) {
             
