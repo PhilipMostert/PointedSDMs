@@ -11,6 +11,9 @@ runModel(data, options = list())
 
 \item{options}{A list of INLA options used in the model. Defaults to \code{list()}.}
 }
+\value{
+An inlabru model with additional information attached.
+}
 \description{
 This function takes a \code{bruSDM} object and produces an \code{inlabru} model object with additional lists and meta-data added.
 }

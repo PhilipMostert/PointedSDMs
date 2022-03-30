@@ -74,6 +74,9 @@ bruSDM(
 
 \item{temporalModel}{List of model specifications given to the control.group argument in the time effect component.}
 }
+\value{
+A dataSDM object.
+}
 \description{
 This function is used to create a \code{bruSDM} object containing all the relevant data and meta-data to be used in the integrated distribution model.
 }

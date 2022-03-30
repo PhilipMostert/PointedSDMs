@@ -2,6 +2,8 @@
 #' 
 #' @param data A list of datasets.
 #' @param var A variable name.
+#' 
+#' @return A logical variable
 
 checkVar <- function(data, var) {
   

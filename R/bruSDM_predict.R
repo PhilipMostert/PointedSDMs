@@ -25,6 +25,7 @@ setClass('bruSDM_predict')
 #' 
 #' @method predict bruSDM
 #' @rdname predict
+#' @return A list of inlabru predict objects.
 #' @export
 #' 
 
@@ -258,7 +259,7 @@ print.bruSDM_predict <- function(x, ...) {
 #' @param layout Layout of the plots. Used by inlabru's multiplot function.
 #' @param plot Should the plots be printed, defaults to \code{TRUE}. If \code{FALSE} will  produce a list of ggplot objects.
 #' @param ... Argument not used
-#' 
+#' @return A ggplot2 object.
 #' @exportS3Method 
 
 plot.bruSDM_predict <- function(x, plotall = TRUE,

@@ -13,6 +13,9 @@ datasetOut(model, dataset, predictions = FALSE)
 
 \item{predictions}{Will new models be used for predictions. If \code{TRUE} returns marginals and bru_info in model. Defaults to \code{FALSE}.}
 }
+\value{
+A list of inlabru models with the specified dataset left out. If predictions is \code{FALSE}, these objects will be missing their \code{bru_info} and \code{call} lists.
+}
 \description{
 This function calculates the difference in covariate values between a full bru_sdm model and a model with one dataset left out, as well as some cross-validation score based on the effect of leaving out the dataset.
 }

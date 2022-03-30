@@ -56,6 +56,9 @@
 
 \item{...}{Additional arguments used by the inlabru \code{predict} function.}
 }
+\value{
+A list of inlabru predict objects.
+}
 \description{
 Predict for bru_sdm
 }

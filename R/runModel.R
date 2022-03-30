@@ -5,6 +5,8 @@
 #' @param data A bruSDM data file to be used in the integrated model.
 #' @param options A list of INLA options used in the model. Defaults to \code{list()}.
 #' 
+#' @return An inlabru model with additional information attached.
+#' 
 #' @export
 
 runModel <- function(data, options = list()) {

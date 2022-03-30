@@ -47,6 +47,9 @@ dataSet(
 
 \item{temporalvar}{Name of the temporal variable.}
 }
+\value{
+A list of relevent metadata
+}
 \description{
 Internal function used to assist in structuring the data.
 }

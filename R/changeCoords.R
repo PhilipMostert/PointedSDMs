@@ -2,6 +2,7 @@
 #' @param data A list of datasets.
 #' @param oldcoords The old coordinate names.
 #' @param newcoords The new coordinate names.
+#' @return A list of data.frame or spatial objects with the coordinate names changed.
 
 changeCoords <- function(data, oldcoords, newcoords) {
   

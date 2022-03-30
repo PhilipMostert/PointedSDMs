@@ -14,6 +14,8 @@
 #' @param pointcovnames Name of the point covariates used in the model.
 #' @param markfamily A vector describing the distribution of the marks.
 #' 
+#' @return A list of relevent metadata
+#' 
 #' @export
 
 dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,

@@ -6,6 +6,8 @@
 #' @param dataset Datasets to leave out.
 #' @param predictions Will new models be used for predictions. If \code{TRUE} returns marginals and bru_info in model. Defaults to \code{FALSE}. 
 #' 
+#' @return A list of inlabru models with the specified dataset left out. If predictions is \code{FALSE}, these objects will be missing their \code{bru_info} and \code{call} lists.
+#' 
 #' @export
 
 datasetOut <- function(model, dataset,

@@ -35,6 +35,9 @@
 
 \item{...}{Argument not used}
 }
+\value{
+A ggplot2 object.
+}
 \description{
 Plot for preduct_bru_sdm
 }
