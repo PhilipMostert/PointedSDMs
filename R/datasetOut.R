@@ -9,6 +9,31 @@
 #' @return A list of inlabru models with the specified dataset left out. If predictions is \code{FALSE}, these objects will be missing their \code{bru_info} and \code{call} lists.
 #' 
 #' @export
+#' 
+#' @examples 
+#' 
+#' \dontrun{
+#' 
+#' #Set up a dataSDM object
+#' 
+#' object <- bruSDM(...)
+#' 
+#' #Run a joint model
+#' 
+#' joint_model <- runModel(object)
+#' 
+#' #Leave dataset out, cross-validation
+#' 
+#' dataset_out <- datasetOut(model = joint_model,
+#'                           dataset = unique(joint_model$source),
+#'                           predictions = TRUE)
+#'                           
+#'#Print summary of reduced models
+#'
+#'dataset_out
+#' 
+#' 
+#' }
 
 datasetOut <- function(model, dataset,
                        predictions = FALSE) {

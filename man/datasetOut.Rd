@@ -19,3 +19,28 @@ A list of inlabru models with the specified dataset left out. If predictions is 
 \description{
 This function calculates the difference in covariate values between a full bru_sdm model and a model with one dataset left out, as well as some cross-validation score based on the effect of leaving out the dataset.
 }
+\examples{
+
+\dontrun{
+
+#Set up a dataSDM object
+
+object <- bruSDM(...)
+
+#Run a joint model
+
+joint_model <- runModel(object)
+
+#Leave dataset out, cross-validation
+
+dataset_out <- datasetOut(model = joint_model,
+                          dataset = unique(joint_model$source),
+                          predictions = TRUE)
+                          
+#Print summary of reduced models
+
+dataset_out
+
+
+}
+}
