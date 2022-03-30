@@ -329,12 +329,7 @@ Function to specify the random fields in the model using PC priors for the param
 
 \item{\code{remove}}{Logical: should the spatial field be removed. Requires one of sharedSpatial, species, mark or bias to be non-missing.}
 
-\item{\code{...}}{Additional arguments used by INLA's \code{inla.spde2.pcmatern} function.
-
-##WHAT ABOUT ALL FIELDS?
-##Maybe if all dataset/species/mark NULL it makes pc for all fields?
-##Check: is 
-##Maybe even add option to remove spatial?}
+\item{\code{...}}{Additional arguments used by INLA's \code{inla.spde2.pcmatern} function.}
 }
 \if{html}{\out{</div>}}
 }
