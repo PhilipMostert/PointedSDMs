@@ -1104,12 +1104,14 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param species Name of the species's spatial field to be specified.
   #' @param mark Name of the mark's spatial field to be specified.
   #' @param bias Name of the dataset's bias field to be specified.
+  #' @param pc Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}. 
   #' @param remove Logical: should the spatial field be removed. Requires one of sharedSpatial, species, mark or bias to be non-missing.
-  #' @param ... Additional arguments used by INLA's \code{inla.spde2.pcmatern} function.
+  #' @param ... Additional arguments used by INLA's \code{inla.spde2.pcmatern} or \code{inla.spde2.matern} function.
   
   specifySpatial = function(sharedSpatial = FALSE, 
                             species, mark,
-                            bias, remove = FALSE, ...) {
+                            bias, pc = TRUE,
+                            remove = FALSE, ...) {
     
     if (all(!sharedSpatial && missing(species)  && missing(mark)  &&  missing(bias))) stop('At least one of sharedSpatial, dataset, species or mark needs to be provided.')
     
@@ -1164,9 +1166,12 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (!remove) {
       
+      if (pc) model <- INLA::inla.spde2.pcmatern(mesh = private$INLAmesh, ...)
+      else model <- INLA::inla.spde2.matern(mesh = private$INLAmesh, ...)
+      
       for (field in index) {
         
-        self$spatialFields[[field_type]][[field]] <- INLA::inla.spde2.pcmatern(mesh = private$INLAmesh, ...)
+        self$spatialFields[[field_type]][[field]] <- model
         
         
       }  
