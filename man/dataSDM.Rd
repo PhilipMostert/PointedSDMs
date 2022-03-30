@@ -302,6 +302,7 @@ Function to specify the random fields in the model using PC priors for the param
   species,
   mark,
   bias,
+  pc = TRUE,
   remove = FALSE,
   ...
 )}\if{html}{\out{</div>}}
@@ -318,9 +319,11 @@ Function to specify the random fields in the model using PC priors for the param
 
 \item{\code{bias}}{Name of the dataset's bias field to be specified.}
 
+\item{\code{pc}}{Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}.}
+
 \item{\code{remove}}{Logical: should the spatial field be removed. Requires one of sharedSpatial, species, mark or bias to be non-missing.}
 
-\item{\code{...}}{Additional arguments used by INLA's \code{inla.spde2.pcmatern} function.}
+\item{\code{...}}{Additional arguments used by INLA's \code{inla.spde2.pcmatern} or \code{inla.spde2.matern} function.}
 }
 \if{html}{\out{</div>}}
 }
