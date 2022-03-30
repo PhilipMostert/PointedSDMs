@@ -19,7 +19,7 @@ This function takes a \code{bruSDM} object and produces an \code{inlabru} model 
 }
 \examples{
 
-\dontrun {
+\dontrun{
 
 #Create dataSDM object
 
@@ -30,6 +30,7 @@ dataObject <- bruSDM(...)
 joint_model <- runModel(dataObject, options = list(control.inla = list(int.strategy = 'eb')))
 
 #Print summary of model
+
 joint_model
 
 }
