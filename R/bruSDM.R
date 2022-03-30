@@ -9,9 +9,7 @@
 #' @param Boundary ##NOT USED YET.
 #' @param Mesh An \code{inla.mesh} object.
 #' @param IPS Integration points to be used in the model. Defaults to \code{NULL} which will create integration points from the \code{inla.mesh} object.
-#' @param speciesField Specification of the shared spatial field for the species. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.
 #' @param speciesSpatial Logical argument: should the species have their own spatial fields. Defaults to \code{TRUE}.
-#' @param marksField  Specification of the fields for the marks. Defaults to \code{NULL}, which will use \code{INLA::inla.spde2.matern(mesh = mesh)}.
 #' @param markNames A vector with the mark names to be included in the integrated model. These marks must be in the same data objects as the points.
 #' @param markFamily A vector with the statistical families of the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".
 #' @param pointCovariates The non-spatial covariates to be included in the integrated model. These covariates must be included in the same data object as the points.
@@ -35,8 +33,8 @@
  #Then go to unit tests
 bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                    Projection, Boundary = NULL, Mesh, IPS = NULL,
-                   speciesField = NULL, speciesSpatial = TRUE,
-                   markNames = NULL, markFamily = NULL, marksField = NULL,
+                   speciesSpatial = TRUE,
+                   markNames = NULL, markFamily = NULL,
                    pointCovariates = NULL, pointsIntercept = TRUE, marksIntercept = TRUE,
                    pointsSpatial = TRUE, marksSpatial = TRUE,
                    responseCounts = 'counts', responsePA = 'present', trialsPA = NULL,
@@ -145,8 +143,7 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
                     responsePA = responsePA, trialsPA = trialsPA,
                     markNames = markNames, pointCovariates = pointCovariates,
                     trialsMarks = trialsMarks, speciesName = speciesName,
-                    speciesField = speciesField,
-                    marksField = marksField, temporalName = temporalName)
+                    temporalName = temporalName)
     
   }
   

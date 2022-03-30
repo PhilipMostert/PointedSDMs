@@ -240,26 +240,40 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param trialsMarks The name of the trials variable for the binomial marks.
   #' @param speciesName The name of the species variable included in the data.
   #' @param Coordinates A vector of length 2 describing the names of the coordinates of the data.
-  #' @param speciesField An inla.spde model describing the random field for the species.
-  #' @param marksField An inla.spde model describing the random field for the marks.
-  
+
   addData = function(..., responseCounts, responsePA, trialsPA,
                      markNames, markFamily, pointCovariates,
                      trialsMarks, speciesName, temporalName,
-                     Coordinates,
-                     speciesField,
-                     marksField) {
+                     Coordinates) {
     pointData <- dataOrganize$new()
     
     dataPoints <- list(...)
     
-    if (missing(markNames)) markNames <- private$markNames
+    if (missing(markNames)) markNames <- private$markNames # do same for species
     else {
       
       newmarksLens <- length(markNames)
       private$markNames <- markNames <- unique(c(private$markNames, markNames))
       
     }
+    
+    if (!is.null(private$speciesName)) {
+      #Test
+      speciesOld <- unique(unlist(private$speciesIn))
+      
+      speciesNew <- unique(unlist(lapply(dataPoints, function(x) {
+        
+        if (inherits(x, 'Spatial')) x@data[,private$speciesName]
+        else x[,private$speciesName]
+        
+        
+      })))
+      
+      speciesIn <- c(speciesOld, speciesNew)
+      
+      
+    }
+    
     
     if (length(dataPoints) == 0) stop('Please provide data in the ... argument.')
     
@@ -315,17 +329,29 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (!is.null(markNames)) {
       
       if (private$marksSpatial) {
+        #re do this such that only add new marks to self$spatialFields$markFields
+        if (!all(markNames %in% names(self$spatialFields$markFields))) {
         
-        self$spatialFields$markFields <- vector(mode = 'list', length = length(markNames))
-        names(self$spatialFields$markFields) <- markNames
+        new_marks <- vector(mode = 'list', length = sum(!markNames %in% names(self$spatialFields$markFields)))
+        names(new_marks) <- markNames[!markNames %in% names(self$spatialFields$markFields)]
         
-        if (!missing(marksField)) self$spatialFields$markFields[1:length(self$spatialFields$markFields)] <- list(marksField)
-        else self$spatialFields$markFields[1:length(self$spatialFields$markFields)] <- list(INLA::inla.spde2.matern(mesh = private$INLAmesh))
+        self$spatialFields$markFields <- append(self$spatialFields$markFields, new_marks)
+        #self$spatialFields$markFields <- vector(mode = 'list', length = length(markNames))
+        #names(self$spatialFields$markFields) <- markNames
         
+        }
+        ## re do this such that if is non null, don't touch
+        if (any(unlist(lapply(self$spatialFields$markFields, function(x) is.null)))) {
+          
+          for (mark in names(self$spatialFields$markFields)) {
+            
+            if (is.null(self$spatialFields$markFields[[mark]])) self$spatialFields$markFields[[mark]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+            
+          }
+          
+        }
         
-        
-        
-      }
+        }
     }
     
     if (missing(responseCounts)) responseCounts <- private$responseCounts
@@ -516,8 +542,26 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       if (private$speciesSpatial) {
         
-        if (!missing(speciesField)) self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(speciesField)
-        else self$spatialFields$speciesFields[1:length(self$spatialFields$speciesField)] <- list(INLA::inla.spde2.matern(mesh = private$INLAmesh))
+        if (!all(speciesIn %in% names(self$spatialFields$speciesFields))) {
+          ##Not species Name
+          new_species <- vector(mode = 'list', length = sum(!speciesIn %in% names(self$spatialFields$speciesFields)))
+          names(new_species) <- speciesIn[!speciesIn %in% names(self$spatialFields$speciesFields)]
+          
+          self$spatialFields$speciesFields <- append(self$spatialFields$speciesFields, new_species)
+          #self$spatialFields$markFields <- vector(mode = 'list', length = length(markNames))
+          #names(self$spatialFields$markFields) <- markNames
+          
+        }
+        
+        if (any(unlist(lapply(self$spatialFields$speciesFields, function(x) is.null)))) {
+          
+          for (species in names(self$spatialFields$speciesFields)) {
+            
+            if (is.null(self$spatialFields$speciesFields[[species]])) self$spatialFields$speciesFields[[species]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+            
+          }
+          
+        }
         
         
       }
@@ -581,7 +625,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                                                      marksspatial = private$marksSpatial,
                                                      marksintercept = private$marksIntercepts,
                                                      temporalname = private$temporalName,
-                                                     #speciesspatial = private$speciesField,
                                                      numtime = length(unique(unlist(private$temporalVars))),
                                                      temporalmodel = private$temporalModel,
                                                      speciesspatial = private$speciesSpatial)
@@ -604,7 +647,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                                                 covariateclass = private$spatcovsClass,
                                                 marksspatial = private$marksSpatial,
                                                 marksintercept = private$marksIntercepts,
-                                                #speciesspatial = private$speciesField,
                                                 numtime = length(unique(unlist(private$temporalVars))),
                                                 temporalmodel = private$temporalModel,
                                                 temporalname = private$temporalName,
@@ -1177,11 +1219,7 @@ dataSDM$set('private', 'speciesSpatial', TRUE)
 
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'blockedCV', FALSE)
-##Make speciesField a named list for each species
- # if no field given for a specific species: then inla.spde2.matern()
-#dataSDM$set('private', 'speciesField', list())
-#dataSDM$set('private', 'biasField', list())
-#dataSDM$set('private', 'marksField', list())
+
 
 dataSDM$set('private', 'spatcovsObj', NULL)
 dataSDM$set('private', 'spatcovsNames', NULL)
