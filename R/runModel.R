@@ -9,7 +9,7 @@
 #' 
 #' @examples 
 #' 
-#' \dontrun {
+#' \dontrun{
 #' 
 #' #Create dataSDM object
 #' 
