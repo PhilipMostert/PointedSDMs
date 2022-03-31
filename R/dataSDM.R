@@ -665,7 +665,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
     
     private$Formulas <- pointData$Formulas
-    
+    private$Family <- pointData$Family
+    private$speciesIndex <- pointData$speciesIndex
     #pointData$makeLhoods(mesh = private$INLAmesh,
     #                     ips = private$IPS, paresp = responsePA,
     #                     ntrialsvar = trialsPA,
@@ -1182,6 +1183,8 @@ dataSDM$set('private', 'speciesSpatial', TRUE)
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'blockedCV', FALSE)
 dataSDM$set('private', 'Formulas', list())
+dataSDM$set('private', 'Family', list())
+dataSDM$set('private', 'speciesIndex', list())
 
 dataSDM$set('private', 'spatcovsObj', NULL)
 dataSDM$set('private', 'spatcovsNames', NULL)
