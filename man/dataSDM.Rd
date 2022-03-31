@@ -208,12 +208,11 @@ Function to update formulas for a given process.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$updateFormula(
   datasetName = NULL,
+  Points = TRUE,
   speciesName = NULL,
   markName = NULL,
   Formula,
-  allDatasets = FALSE,
-  keepSpatial = TRUE,
-  keepIntercepts = TRUE,
+  allProcesses = FALSE,
   newFormula,
   ...
 )}\if{html}{\out{</div>}}
@@ -224,17 +223,15 @@ Function to update formulas for a given process.
 \describe{
 \item{\code{datasetName}}{Name of the dataset to change the formula for.}
 
+\item{\code{Points}}{Logical: should the formula be changed for the points. Defaults to \code{TRUE}. If \code{FALSE}, then markNames needs to be non-null.}
+
 \item{\code{speciesName}}{Name of the species to change the formula for.}
 
 \item{\code{markName}}{Name of the mark to change the formula for.}
 
 \item{\code{Formula}}{An updated formula to give to the process.}
 
-\item{\code{allDatasets}}{Logical argument: if \code{TRUE} changes the formulas for all processes in a dataset.}
-
-\item{\code{keepSpatial}}{Logical argument: should the spatial effects remain in the formula. Defaults to \code{TRUE}.}
-
-\item{\code{keepIntercepts}}{Logical argument: should the intercepts remain in the formula. Defaults to \code{TRUE}.}
+\item{\code{allProcesses}}{Logical argument: if \code{TRUE} changes the formulas for all processes in a dataset.}
 
 \item{\code{newFormula}}{Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.}
 }
