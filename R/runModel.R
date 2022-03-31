@@ -42,13 +42,14 @@ runModel <- function(data, options = list()) {
   
   if (!is.null(names(data$spatialFields$speciesFields))) speciesSpatial <- TRUE
   else speciesSpatial <- FALSE
-  
-  formula_terms <- unique(unlist(lapply(data$.__enclos_env__$private$modelData, function(x) {
+
+  formula_terms <- unique(unlist(lapply(unlist(unlist(dataObj$.__enclos_env__$private$Formulas, recursive = F), recursive = F), function(x) {
     
-    if (is.null(x$include_components))  attributes(terms(x$formula))[['term.labels']]
-    else x$include_components
+    if (is.null(x$RHS))  attributes(terms(x$LHS))[['term.labels']]
+    else x$RHS
     
-  })))
+  }))
+  )
   
   comp_terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)
   
@@ -59,8 +60,18 @@ runModel <- function(data, options = list()) {
   ##in case there are duplicates, will it cause an error??
   componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
   
-  allLiks <- do.call(inlabru::like_list, data$.__enclos_env__$private$modelData)
-
+  allLiks <- do.call(inlabru::like_list,
+                     makeLhoods(data = data$.__enclos_env__$private$modelData,
+                     formula = data$.__enclos_env__$private$Formulas,
+                     family = data$.__enclos_env__$private$Family,
+                     mesh = data$.__enclos_env__$private$INLAmesh,
+                     ips = data$.__enclos_env__$private$IPS,
+                     paresp = data$.__enclos_env__$private$responsePA,
+                     ntrialsvar = data$.__enclos_env__$private$trialsPA,
+                     markstrialsvar = data$.__enclos_env__$private$trialsMarks,
+                     speciesname = data$.__enclos_env__$private$speciesName,
+                     speciesindex = data$.__enclos_env__$private$speciesIndex))
+  
   optionsJoint <- append(data$.__enclos_env__$private$optionsINLA, options)
   
   inlaModel <- inlabru::bru(components = componentsJoint,
