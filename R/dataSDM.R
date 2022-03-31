@@ -175,26 +175,23 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       index <- which(private$dataSource == data)
       
-      if (!is.null(private$markNames)) index <- index[!endsWith(names(private$modelData[index]), paste0('_', private$markNames))]
-      ##if species then dataset_species_response
-      # else paste dataset_response ## but also only need point response -- NOT MARKS
-      
-      #Probably want to create one df object with another variable called dataset placeholder or something
-      #Then colour by species or dataset or whatever
-      
-      #Also need to create a boundary of sorts... either if Boundary is non null; else can make from mesh...
-      #Maybe even allow maps if SpatialPolygon provided...
-      
+      if (!is.null(private$markNames)) {
+        
+       if (!is.null(private$speciesName)) index <- unique(private$speciesIn[[data]])
+       else index <- 1
+      #index <- index[!endsWith(names(private$modelData[index]), paste0('_', private$markNames))]
+        
+      } 
+
       for (i in 1:length(index)) {
         
-        idx <- index[i]  
-        points[[data]][[i]] <- private$modelData[[idx]]$data[, names(private$modelData[[idx]]$data) %in% c(private$speciesName, private$responseCounts,
-                                                                                                           private$responsePA,'BRU_aggregate')]
-        
+        points[[data]][[i]] <- private$modelData[[data]][[i]][, names(private$modelData[[data]][[i]]) %in% c(private$speciesName, private$responseCounts,
+                                                                                                                   private$responsePA,'BRU_aggregate')]
+
         if ('BRU_aggregate' %in% names(points[[data]][[i]])) points[[data]][[i]] <- points[[data]][[i]][points[[data]][[i]]$BRU_aggregate,]
-        
-        if (!Species) points[[data]][[i]]@data[,'..Dataset_placeholder_var..'] <- rep(data, nrow( points[[data]][[i]]@data))
-        
+   
+        if (!Species) points[[data]][[i]]@data[,'..Dataset_placeholder_var..'] <- rep(data, nrow(points[[data]][[i]]@data))
+       
         
       }
       
@@ -667,11 +664,11 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    pointData$makeLhoods(mesh = private$INLAmesh,
-                         ips = private$IPS, paresp = responsePA,
-                         ntrialsvar = trialsPA,
-                         markstrialsvar = trialsMarks,
-                         speciesname = speciesName)
+    #pointData$makeLhoods(mesh = private$INLAmesh,
+    #                     ips = private$IPS, paresp = responsePA,
+    #                     ntrialsvar = trialsPA,
+    #                     markstrialsvar = trialsMarks,
+    #                     speciesname = speciesName)
     
     if (!is.null(private$optionsINLA[['control.family']])) {
       
