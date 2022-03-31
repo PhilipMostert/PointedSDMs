@@ -664,6 +664,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
+    private$Formulas <- pointData$Formulas
+    
     #pointData$makeLhoods(mesh = private$INLAmesh,
     #                     ips = private$IPS, paresp = responsePA,
     #                     ntrialsvar = trialsPA,
@@ -727,12 +729,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     for (dat in datasetNames) {
       
-      index <- which(private$dataSource == dat)
+      #index <- which(private$dataSource == dat)
       
-      for (lik in index) {
+      for (lik in 1:length(private$Formulas[[dat]])) {
         
         #private$modelData[[lik]]$formula <- update(private$modelData[[lik]]$formula, paste0(' ~ . + ', dat,'_bias_field'))
-        private$modelData[[lik]]$include_components <- c(private$modelData[[lik]]$include_components, paste0(dat, '_biasField'))
+        private$Formulas[[dat]][[lik]][[1]]$RHS <- c(private$Formulas[[dat]][[lik]][[1]]$RHS, paste0(dat, '_biasField'))
+        #private$modelData[[lik]]$include_components <- c(private$modelData[[lik]]$include_components, paste0(dat, '_biasField'))
       }
       
       if (is.null(biasField)) self$spatialFields$biasFields[[dat]] <- inla.spde2.matern(mesh = private$INLAmesh)
@@ -1221,7 +1224,7 @@ dataSDM$set('private', 'speciesSpatial', TRUE)
 
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'blockedCV', FALSE)
-
+dataSDM$set('private', 'Formulas', list())
 
 dataSDM$set('private', 'spatcovsObj', NULL)
 dataSDM$set('private', 'spatcovsNames', NULL)
