@@ -761,25 +761,27 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   ,
   #' @description Function to update formulas for a given process.
   #' @param datasetName Name of the dataset to change the formula for.
+  #' @param Points Logical: should the formula be changed for the points. Defaults to \code{TRUE}. If \code{FALSE}, then markNames needs to be non-null.
   #' @param speciesName Name of the species to change the formula for.
   #' @param markName Name of the mark to change the formula for.
   #' @param Formula An updated formula to give to the process.
-  #' @param allDatasets Logical argument: if \code{TRUE} changes the formulas for all processes in a dataset.
-  #' @param keepSpatial Logical argument: should the spatial effects remain in the formula. Defaults to \code{TRUE}.
-  #' @param keepIntercepts Logical argument: should the intercepts remain in the formula. Defaults to \code{TRUE}.
+  #' @param allProcesses Logical argument: if \code{TRUE} changes the formulas for all processes in a dataset.
   #' @param newFormula Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.
   
-  updateFormula = function(datasetName = NULL, speciesName = NULL,
-                           markName = NULL, Formula, allDatasets = FALSE,
-                           keepSpatial = TRUE, keepIntercepts = TRUE,
+  updateFormula = function(datasetName = NULL, Points = TRUE, speciesName = NULL,
+                           markName = NULL, Formula, allProcesses = FALSE,
                            newFormula, ...) {
     ## Will need to update this such that if keepSpatial & species then paste0(species,_spatial)
     
-    if (all(is.null(datasetName), is.null(speciesName), is.null(markName))) stop ('At least one of: datasetName, speciesName, markName or allDatasets needs to be specified.')
+    if (all(is.null(datasetName), is.null(speciesName), is.null(markName))) stop ('At least one of: datasetName, speciesName, markName or allProcesses needs to be specified.')
     
     if (!is.null(speciesName) && is.null(private$speciesName)) stop ('Species are given but none are present in the model. Please specify species in the model with "speciesName" in bruSDM.')
     
     if (is.null(speciesName) && !is.null(private$speciesName)) speciesName <- unlist(private$speciesIn[datasetName])
+    
+    if (!Points && is.null(markName)) stop ('markNames cannot be non-null if Points is FALSE.')
+    
+    if (length(datasetName) != 1) stop ('Please only provide one dataset name.')
     
     if (!datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
     
@@ -791,7 +793,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (!missing(Formula) && length(as.character(Formula)) == 3) stop ("Please remove the response variable of the formula.")
     
-    if (allDatasets && is.null(datasetName)) stop ('Please provide a dataset name in conjunction with allDatasets.') #?
+    if (allProcesses && is.null(datasetName)) stop ('Please provide a dataset name in conjunction with allProcesses')
     
     if (!is.null(markName)) {
       
@@ -799,68 +801,73 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    if (keepSpatial) {
+  #  if (!is.null(speciesName) && !is.null(markName)) {
       
-      if (!private$Spatial && is.null(private$markNames)) keepSpatial <- FALSE
-      else
-        if (!private$Spatial && !private$marksSpatial) keepSpatial <- FALSE
+    #  speciesName <- list()
+      
+    #  for (dataset in datasetName) {
         
+    #    if (!is.na(private$printSummary$Marks[dataset])) {
+          
+    #      if (any(markName %in% private$printSummary$Marks[dataset])) speciesName[dataset] <- rep(private$speciesIn[datasetName], each = length(sum(markName %in% private$printSummary$Marks[dataset])))
+    #      else speciesName[dataset] <- private$speciesIn[dataset]
+          
+    #    } else speciesName[dataset] <- private$speciesIn[dataset]
+        
+    #  } 
+      
+    #  speciesInd <- unlist(speciesName)  
+      
+    #} else speciesInd <- speciesName
+    
+    if (allProcesses) {
+      
+      name_index <- names(private$Formulas[[datasetName]]) #name index should be species or dataset name
+      index2 <- seq_along(private$Formulas[[datasetName]][[1]]) ## Since they should all be the same ...
+      
     }
     
-    if (!is.null(speciesName) && !is.null(markName)) {
+    else {
       
-      speciesName <- list()
+    if (!is.null(private$speciesName)) {
       
-      for (dataset in datasetName) {
-        
-        if (!is.na(private$printSummary$Marks[dataset])) {
-          
-          if (any(markName %in% private$printSummary$Marks[dataset])) speciesName[dataset] <- rep(private$speciesIn[datasetName], each = length(sum(markName %in% private$printSummary$Marks[dataset])))
-          else speciesName[dataset] <- private$speciesIn[dataset]
-          
-        } else speciesName[dataset] <- private$speciesIn[dataset]
-        
-      } 
+      if (!is.null(speciesName))  {
+
+        if (!all(speciesName %in% names(private$Formulas[[datasetName]]))) stop('Species provided not available in the dataset.') 
+        else name_index <- speciesName
       
-      speciesInd <- unlist(speciesName)  
-      
-    } else speciesInd <- speciesName
-    
-    if (allDatasets) name_index <- names(private$modelData)[startsWith(names(private$modelData), paste0(datasetName, '_'))]
-    
-    else{
-      
-      if (!is.null(markName)) process_index <- paste0('_', markName)
-      else process_index <- paste0('_', c('coordinates', private$responsePA, private$responseCounts))
-      
-      if (!is.null(private$speciesName)) {
-        
-        if (!is.null(speciesName)) species_index <- paste0('_', speciesName)
-        else species_index <- NULL
-        
-        name_index <- apply(expand.grid(datasetName, species_index), MARGIN = 1, FUN = paste0,collapse='')
-        name_index <- apply(expand.grid(name_index, process_index), MARGIN = 1, FUN = paste0,collapse='')
-        
-        name_index <- name_index[name_index %in% names(private$modelData)]
-        
-        if (identical(name_index, character(0))) stop('Species name provided not in dataset given.')
-        
       }
-      else {
-        
-        name_index <-  apply(expand.grid(datasetName, process_index), MARGIN = 1, FUN = paste0,collapse='')  
-        name_index <- name_index[name_index %in% names(private$modelData)]
-        
-      }
+      else name_index <- names(private$Formulas[[datasetName]])
       
+      
+      
+    } else name_index <- datasetName
+    
+    if (Points) index2 <- 1
+    else index2 <- NULL
+    
+    if (!is.null(markName)) {
+      
+      if (!markName %in% names(private$Formulas[[datasetName]][[name_index[1]]])) stop('markName not provided in datasetName.')
+      else index2 <- c(index2, which(names(private$Formulas[[datasetName]][[name_index[1]]]) %in% markName)) #Since they should all be the same ...
+      
+      
+    }
+
+
     }
     
     if (missing(Formula) && missing(newFormula)) {
+    
+      get_formulas <- list()
+      for (i in index2) {
+        
+      get_formulas[[i]] <- lapply(private$Formulas[[datasetName]][name_index], function(x) list(formula = x[[i]]$LHS,
+                                                                             components = x[[i]]$RHS))
       
-      get_formulas <- lapply(private$modelData[name_index], function(x) list(formula = x$formula,
-                                                                             components = x$include_components))
-      
-      get_formulas <- lapply(get_formulas, function(x) {
+      }
+
+      get_formulas <- lapply(unlist(get_formulas, recursive = FALSE), function(x) {
         
         if (as.character(x$formula)[3] == '.') update(x$formula, paste('~', paste0(x$components, collapse = '+'))) 
         else x$formula
@@ -873,89 +880,36 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     else
       if (!missing(Formula)) {
         
-        #if (length(as.character(Formula)) == 2 && as.character(Formula)[2] == '.') formula_terms <- c()
-        #else formula_terms <- attributes(terms(formula))[['term.labels']]
-        
-        index_species <- 0
-        
-        
         for (dataset in name_index) {
           
-          index_species <- index_species + 1
-          
-          if (!is.null(markName)) {
+          for (process in index2) {
+            
+            formula_update <- Formula
             
             if (!is.null(private$speciesName)) {
               
-              if (dataset == paste0(datasetName, '_', markName, '_', speciesInd[index_species])) mark_p <- TRUE
-              else mark_p <- FALSE
+              covs_in <- all.vars(Formula)[all.vars(Formula) %in% private$spatcovsNames]
+       
+              ##What happens if people do species_var?
+              if (!identical(covs_in, character(0))) {
+                
+                char_formula <- unlist(strsplit(as.character(Formula), split = ' '))
+                
+                char_formula[char_formula == covs_in] <- paste0(dataset, '_', covs_in)
+           
+                formula_update <- formula(paste(char_formula, collapse = ' '))
+              
+              }
               
             }
-            else {
-              
-              if (dataset == paste0(datasetName, '_', markName)) mark_p <- TRUE
-              else mark_p <- FALSE
-            } 
-          }
-          else mark_p <- FALSE
-          
-          formula_update <- Formula ## This needs to be the formula
-          
-          if (!keepSpatial) {
-            ##Here update formula_update to - shared_spatial or mark_spatial or whatever
-            if (mark_p) {
-              
-              if (private$marksSpatial) formula_update <- update(formula_update, formula(paste('~ . -', paste0(markName, '_spatial'))))
-              
-            }
-            else {
-              
-              if (private$Spatial) formula_update <- update(formula_update, formula(~ . - shared_spatial))
-              
-            }
+            
+            updated_formula <- update(formula(paste('~ ', paste0(private$Formulas[[datasetName]][[dataset]][[process]]$RHS, collapse = ' + '))), formula_update)
+            updated_formula <- all.vars(updated_formula)[all.vars(updated_formula) != '.']
+
+            ##This will be removed once we move the like construction to runModel.
+            private$Formulas[[datasetName]][[dataset]][[process]]$RHS <- updated_formula
             
           }
-          
-          if (!keepIntercepts) {
-            ##Here update formula update to - intercepts of whatever
-            if (mark_p) {
-              
-              if (private$marksIntercepts) formula_update <- update(formula_update, formula(paste('~ . -', paste0(markName, '_intercept'))))
-              
-            }
-            
-            else {
-              
-              if (!is.null(private$speciesName)) formula_update <- update(formula_update, formula(paste('~ . -', paste0(speciesInd[index_species], '_intercept'))))
-              else formula_update <-update(formula_update, formula(paste('~ . -', paste0(datasetName, '_intercept'))))
-              
-              
-            }
-            
-          }
-          
-          if (!is.null(speciesName)) {
-            
-            covs_in <- all.vars(Formula)[all.vars(Formula) %in% private$spatcovsNames]
-            
-            if (!identical(covs_in, character(0))) {
-              #Change this to an update formula side
-              # but this is more difficult since what if there is a plus?
-              # need to do a strsplit; get all the covariate terms; and change them to species_cov
-              char_formula <- unlist(strsplit(as.character(Formula), split = ' '))
-              
-              char_formula[char_formula == covs_in] <- paste0(speciesInd[index_species], '_', covs_in)
-              
-              formula_update <- formula(paste(char_formula, collapse = ' '))
-              
-            }
-            
-          }
-          
-          updated_formula <- update(formula(paste('~ ', paste0(private$modelData[[dataset]]$include_components, collapse = ' + '))), formula_update)
-          updated_formula <- all.vars(updated_formula)[all.vars(updated_formula) != '.']
-          ##This will be removed once we move the like construction to runModel.
-          private$modelData[[dataset]]$include_components <- updated_formula
           
         }
         
@@ -964,12 +918,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       for (dataset in name_index) { 
         
-        
+        for (process in index2) {
+        ##Change all of these...
         ## Get old formula:
         #cat('Old formula for', paste0(dataset, ': '))
-        if (length(all.vars(private$modelData[[dataset]]$formula)) == 2) {
-          
-          oldForm <- update(private$modelData[[dataset]]$formula, paste(' ~ ', paste(private$modelData[[dataset]]$include_components, collapse = ' + ')))
+        if (length(all.vars(private$Formulas[[datasetName]][[dataset]][[process]]$LHS)) == 2) {
+        
+          oldForm <- update(private$Formulas[[datasetName]][[dataset]][[process]]$LHS, formula(paste(' ~ ',paste0(private$Formulas[[datasetName]][[dataset]][[process]]$RHS, collapse = ' + '))))
           
           #print(oldForm)
           #cat('New formula: ')
@@ -986,18 +941,20 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
           #print(private$modelData[[dataset]]$formula)
           #cat('\n')
           #cat('New formula: ')
-          newForm <- update(paste(as.character(private$modelData[[dataset]]$formula), '~ '), newFormula)
+          newForm <- update(paste(update(private$Formulas[[datasetName]][[dataset]][[process]]$LHS), '~ '), newFormula)
         }
+        #Change
+          
+        private$Formulas[[datasetName]][[dataset]][[process]]$LHS <- newForm
+        private$Formulas[[datasetName]][[dataset]][[process]]$RHS <- c()
         
-        private$modelData[[dataset]]$formula <- newForm
-        private$modelData[[dataset]]$include_components <- c()
-        
-      }
+      
       
       
     }
-    
-  }
+    }
+    }
+    }
   ,
   #' @description Function to add custom components to the integrated modeling.
   #' @param addComponent Component to add to the model.
@@ -1187,7 +1144,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         
         for (term in index) {
           
-          self$updateFormula(datasetName = data, allDatasets = TRUE, Formula = formula(paste(' ~ . -', term)))  
+          self$updateFormula(datasetName = data, allProcesses = TRUE, Formula = formula(paste(' ~ . -', term)))  
           
         } 
       }
