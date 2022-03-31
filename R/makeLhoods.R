@@ -2,7 +2,6 @@
 #' 
 #' @param data A list of sp objects containing the datasets for which likelihoods need to be constructed.
 #' @param formula A list of formulas to add to the likelihoods.
-#' @param include_components A list of vectors containing the components to include in each likelihood.
 #' @param family A list of vectors containing the families within each dataset.
 #' @param mesh An inla.mesh object.
 #' @param ips Integration points used.
@@ -12,7 +11,7 @@
 #' @param speciesname The name of the species variable used.
 #' @param speciesindex A vector containing the numeric index of where the species occurs in the data
 
-makeLhoods <- function(data, formula, include_components, family, mesh, ips,
+makeLhoods <- function(data, formula, family, mesh, ips,
                        paresp, ntrialsvar, markstrialsvar,
                        speciesname, speciesindex) {
   
@@ -77,7 +76,7 @@ makeLhoods <- function(data, formula, include_components, family, mesh, ips,
         ##rm formulas for now
         
         Likelihoods[[Likindex]] <- inlabru::like(formula = formula[[dataset]][[species]][[process]][['LHS']], ## but obs change these in function call
-                                                 include = include_components[[dataset]][[species]][[process]][['RHS']],
+                                                 include = formula[[dataset]][[species]][[process]][['RHS']],
                                                  data = data[[dataset]][[species]], 
                                                  Ntrials = Ntrials,
                                                  mesh = mesh,
