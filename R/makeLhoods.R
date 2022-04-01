@@ -10,10 +10,11 @@
 #' @param markstrialsvar The trial variable name for the binomial marks.
 #' @param speciesname The name of the species variable used.
 #' @param speciesindex A vector containing the numeric index of where the species occurs in the data
+#' @param filterblock If non-null, filters based on block_index.
 
 makeLhoods <- function(data, formula, family, mesh, ips,
                        paresp, ntrialsvar, markstrialsvar,
-                       speciesname, speciesindex) {
+                       speciesname, speciesindex, filterblock = NULL) {
   
   Likelihoods <- list()
 
@@ -73,11 +74,13 @@ makeLhoods <- function(data, formula, family, mesh, ips,
           
         }
         else IPS <- ips
-        ##rm formulas for now
+       
+        if (!is.null(filterblock)) filter <- data[[dataset]][[species]][data[[dataset]][[species]]$block_index == filterblock,]
+        else filter <- data[[dataset]][[species]]
         
         Likelihoods[[Likindex]] <- inlabru::like(formula = formula[[dataset]][[species]][[process]][['LHS']], ## but obs change these in function call
                                                  include = formula[[dataset]][[species]][[process]][['RHS']],
-                                                 data = data[[dataset]][[species]], 
+                                                 data = data[[dataset]][[species]][filter], 
                                                  Ntrials = Ntrials,
                                                  mesh = mesh,
                                                  ips = IPS,
