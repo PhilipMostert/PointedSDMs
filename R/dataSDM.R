@@ -682,11 +682,11 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     else {
       
       index1 <- 1
-      index2 <- length(pointData$Data)
+      index2 <- length(unlist(pointData$Family))
       
     }
     
-    familyIndex <- c(rep(NA, length(private$modelData)), sapply(pointData$Data, function(x) x$family))
+    familyIndex <- c(rep(NA, length(private$modelData)), unlist(private$Family))
     
     for (i in index1:index2) {
       
@@ -1330,15 +1330,7 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
   #So need to move all the objects from dataOrganize to here
   #And then be careful with regards to indexing for all the slot functions here...
   
-  #Functions this would effect:
-   #...$plot()
-   #...$addData()
-   #...$addBias()
-   #...$updateFormula()
-   #runModel()
-   #dataOrganize()
-  
-  blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, lapply(private$modelData, function(x) x$data)),
+  blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, unlist(private$modelData)),
                                                               k = k, rows = rows, cols = cols, selection = 'random',
                                                               verbose = FALSE, progress = FALSE, ...))
   
@@ -1350,14 +1342,15 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
   in_where <- list()
   
   ##Integration points?
+   ##Add how?
   
   for (data in names(private$modelData)) {
     
-    in_where[[data]] <- lapply(1:(rows * cols), function(i) !is.na(over(private$modelData[[data]]$data, blocksPoly[[1]][[i]])))
+    in_where[[data]] <- lapply(1:(rows * cols), function(i) !is.na(over(private$modelData[[data]], blocksPoly[[1]][[i]])))
     
     for (i in 1:(rows * cols)) {
       
-      blocked_data[[data]][[i]] <- private$modelData[[data]]$data[in_where[[data]][[i]], ]
+      blocked_data[[data]][[i]] <- private$modelData[[data]][in_where[[data]][[i]], ]
       
       if (nrow(blocked_data[[data]][[i]]) !=0) blocked_data[[data]][[i]]$block_index <- as.character(folds[i])
       
