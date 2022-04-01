@@ -1153,6 +1153,94 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
     
   }
+  ,
+  #' @description Function to spatially block the datasets
+  #' @param k Number of cross-validation folds.
+  #' @param rows Integer value by which the area is divided into latitudinal bins.
+  #' @param cols Integer value by which the area is divided into longitudinal bins.
+  #' @param plot Plot the cross-validation folds. Defaults to \code{FALSE}.
+  #' @param ... Extra arguments used by blockCV's spatialBlock
+  #' 
+  #' 
+  spatialBlock =  function(k, rows, cols, plot = FALSE, ...) {
+    
+    #stop('Need to completely re do')
+    #The easiest thing to do may be to do likelihood construction in runModel and blockedCV
+    #So need to move all the objects from dataOrganize to here
+    #And then be careful with regards to indexing for all the slot functions here...
+    
+    blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
+                                                                k = k, rows = rows, cols = cols, selection = 'random',
+                                                                verbose = FALSE, progress = FALSE, ...))
+    
+    folds <- blocks$blocks$folds
+    
+    blocksPoly <- list(sapply(1:(rows * cols), function(s) SpatialPolygons(blocks$blocks@polygons[s], proj4string = private$Projection)))
+    
+    blocked_data <- list()
+    in_where <- list()
+    
+    ##Integration points?
+    ##Add how?
+    
+    for (data in names(private$modelData)) {
+      
+      for (process in names(private$modelData[[data]])) {
+        
+        in_where[[data]][[process]] <- lapply(1:(rows * cols), function(i) !is.na(over(private$modelData[[data]][[process]], blocksPoly[[1]][[i]])))
+        
+        for (i in 1:(rows * cols)) {
+          
+          blocked_data[[data]][[process]][[i]] <- private$modelData[[data]][[process]][in_where[[data]][[process]][[i]], ]
+          
+          if (nrow(blocked_data[[data]][[process]][[i]]) !=0) blocked_data[[data]][[process]][[i]]$block_index <- as.character(folds[i])
+          
+        }
+        
+        private$modelData[[data]][[process]] <- do.call(rbind.SpatialPointsDataFrame, blocked_data[[data]][[process]])
+        
+      }
+      
+    }
+    
+    ##Do IPS
+    blocked_ips <- list()
+    where_ips <- lapply(1:(rows * cols), function(i) !is.na(over(private$IPS, blocksPoly[[1]][[i]])))
+    
+    for (i in 1:(rows * cols)) {
+      
+      blocked_ips[[i]] <- private$IPS[where_ips[[i]], ]
+      
+      if (nrow(blocked_ips[[i]]) !=0) blocked_ips[[i]]$block_index <- as.character(folds[i])
+      
+    }
+    private$IPS <- do.call(rbind.SpatialPointsDataFrame, blocked_ips)
+    
+    private$blockedCV <- TRUE 
+    
+    if (plot) {
+      
+      spatPolys <- private$polyfromMesh()
+      
+      all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(private$modelData, recursive = FALSE), function(x) {
+        
+        x[, 'block_index']
+        
+        
+      }))
+      
+      ggplot() + gg(blocks$blocks) + blocks$plot$layers[[2]] +
+        gg(all_data, aes(col = block_index)) +
+        gg(blocks$blocks) +
+        gg(spatPolys) +
+        ggtitle('Plot of the blocked data') +
+        theme(plot.title = element_text(hjust = 0.5))
+      
+      ## Need block block$plots + gg(species_data) + gg(boundary), which we need to get from the mesh
+      
+    }
+    
+  }
   
   ))
 
@@ -1313,94 +1401,6 @@ dataSDM$set('public', 'samplingBias', function(...) {
     # then we are essentially just duplicating the data?
      # Can we just use "expert maps"
       # ie use PA data to infer where the sampling locations are?  
-})
-
-#' @description Function to spatially block the datasets
-#' @param k Number of cross-validation folds.
-#' @param rows Integer value by which the area is divided into latitudinal bins.
-#' @param cols Integer value by which the area is divided into longitudinal bins.
-#' @param plot Plot the cross-validation folds. Defaults to \code{FALSE}.
-#' @param ... Extra arguments used by blockCV's spatialBlock
-#' 
-#' 
-dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...) {
-   
-  #stop('Need to completely re do')
-  #The easiest thing to do may be to do likelihood construction in runModel and blockedCV
-  #So need to move all the objects from dataOrganize to here
-  #And then be careful with regards to indexing for all the slot functions here...
-  
-  blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
-                                                              k = k, rows = rows, cols = cols, selection = 'random',
-                                                              verbose = FALSE, progress = FALSE, ...))
-  
-  folds <- blocks$blocks$folds
-  
-  blocksPoly <- list(sapply(1:(rows * cols), function(s) SpatialPolygons(blocks$blocks@polygons[s], proj4string = private$Projection)))
-  
-  blocked_data <- list()
-  in_where <- list()
-  
-  ##Integration points?
-   ##Add how?
-  
-  for (data in names(private$modelData)) {
-    
-    for (process in names(private$modelData[[data]])) {
-    
-    in_where[[data]][[process]] <- lapply(1:(rows * cols), function(i) !is.na(over(private$modelData[[data]][[process]], blocksPoly[[1]][[i]])))
-    
-    for (i in 1:(rows * cols)) {
-      
-      blocked_data[[data]][[process]][[i]] <- private$modelData[[data]][[process]][in_where[[data]][[process]][[i]], ]
-      
-      if (nrow(blocked_data[[data]][[process]][[i]]) !=0) blocked_data[[data]][[process]][[i]]$block_index <- as.character(folds[i])
-      
-    }
-    
-    private$modelData[[data]][[process]] <- do.call(rbind.SpatialPointsDataFrame, blocked_data[[data]][[process]])
-    
-    }
-    
-  }
-  
-  ##Do IPS
-  blocked_ips <- list()
-  where_ips <- lapply(1:(rows * cols), function(i) !is.na(over(private$IPS, blocksPoly[[1]][[i]])))
-  
-  for (i in 1:(rows * cols)) {
-    
-    blocked_ips[[i]] <- private$IPS[where_ips[[i]], ]
-    
-    if (nrow(blocked_ips[[i]]) !=0) blocked_ips[[i]]$block_index <- as.character(folds[i])
-    
-  }
-  private$IPS <- do.call(rbind.SpatialPointsDataFrame, blocked_ips)
-  
-  private$blockedCV <- TRUE 
-  
-  if (plot) {
-    
-    spatPolys <- private$polyfromMesh()
-    
-    all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(private$modelData, recursive = FALSE), function(x) {
-      
-      x[, 'block_index']
-      
-      
-    }))
-    
-    ggplot() + gg(blocks$blocks) + blocks$plot$layers[[2]] +
-      gg(all_data, aes(col = block_index)) +
-      gg(blocks$blocks) +
-      gg(spatPolys) +
-      ggtitle('Plot of the blocked data') +
-      theme(plot.title = element_text(hjust = 0.5))
-    
-    ## Need block block$plots + gg(species_data) + gg(boundary), which we need to get from the mesh
-    
-  }
-  
 })
 
 ## Need to change all the spatialFields to self$spatialFields and then the relevent sublist?

@@ -18,8 +18,8 @@ A data object containing the data and the relevant information about the integra
 \item \href{#method-changeComponents}{\code{dataSDM$changeComponents()}}
 \item \href{#method-priorsFixed}{\code{dataSDM$priorsFixed()}}
 \item \href{#method-specifySpatial}{\code{dataSDM$specifySpatial()}}
-\item \href{#method-samplingBias}{\code{dataSDM$samplingBias()}}
 \item \href{#method-spatialBlock}{\code{dataSDM$spatialBlock()}}
+\item \href{#method-samplingBias}{\code{dataSDM$samplingBias()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -326,20 +326,36 @@ Function to specify the random fields in the model using PC priors for the param
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-spatialBlock"></a>}}
+\if{latex}{\out{\hypertarget{method-spatialBlock}{}}}
+\subsection{Method \code{spatialBlock()}}{
+Function to spatially block the datasets
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$spatialBlock(k, rows, cols, plot = FALSE, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{k}}{Number of cross-validation folds.}
+
+\item{\code{rows}}{Integer value by which the area is divided into latitudinal bins.}
+
+\item{\code{cols}}{Integer value by which the area is divided into longitudinal bins.}
+
+\item{\code{plot}}{Plot the cross-validation folds. Defaults to \code{FALSE}.}
+
+\item{\code{...}}{Extra arguments used by blockCV's spatialBlock}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-samplingBias"></a>}}
 \if{latex}{\out{\hypertarget{method-samplingBias}{}}}
 \subsection{Method \code{samplingBias()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$samplingBias(...)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-spatialBlock"></a>}}
-\if{latex}{\out{\hypertarget{method-spatialBlock}{}}}
-\subsection{Method \code{spatialBlock()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$spatialBlock(k, rows, cols, plot = FALSE, ...)}\if{html}{\out{</div>}}
 }
 
 }
