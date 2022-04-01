@@ -1330,7 +1330,7 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
   #So need to move all the objects from dataOrganize to here
   #And then be careful with regards to indexing for all the slot functions here...
   
-  blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, unlist(private$modelData)),
+  blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
                                                               k = k, rows = rows, cols = cols, selection = 'random',
                                                               verbose = FALSE, progress = FALSE, ...))
   
@@ -1346,19 +1346,36 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
   
   for (data in names(private$modelData)) {
     
-    in_where[[data]] <- lapply(1:(rows * cols), function(i) !is.na(over(private$modelData[[data]], blocksPoly[[1]][[i]])))
+    for (process in names(private$modelData[[data]])) {
+    
+    in_where[[data]][[process]] <- lapply(1:(rows * cols), function(i) !is.na(over(private$modelData[[data]][[process]], blocksPoly[[1]][[i]])))
     
     for (i in 1:(rows * cols)) {
       
-      blocked_data[[data]][[i]] <- private$modelData[[data]][in_where[[data]][[i]], ]
+      blocked_data[[data]][[process]][[i]] <- private$modelData[[data]][[process]][in_where[[data]][[process]][[i]], ]
       
-      if (nrow(blocked_data[[data]][[i]]) !=0) blocked_data[[data]][[i]]$block_index <- as.character(folds[i])
+      if (nrow(blocked_data[[data]][[process]][[i]]) !=0) blocked_data[[data]][[process]][[i]]$block_index <- as.character(folds[i])
       
     }
     
-    private$modelData[[data]]$data <- do.call(rbind.SpatialPointsDataFrame, blocked_data[[data]])
+    private$modelData[[data]][[process]] <- do.call(rbind.SpatialPointsDataFrame, blocked_data[[data]][[process]])
+    
+    }
     
   }
+  
+  ##Do IPS
+  blocked_ips <- list()
+  where_ips <- lapply(1:(rows * cols), function(i) !is.na(over(private$IPS, blocksPoly[[1]][[i]])))
+  
+  for (i in 1:(rows * cols)) {
+    
+    blocked_ips[[i]] <- private$IPS[where_ips[[i]], ]
+    
+    if (nrow(blocked_ips[[i]]) !=0) blocked_ips[[i]]$block_index <- as.character(folds[i])
+    
+  }
+  private$IPS <- do.call(rbind.SpatialPointsDataFrame, blocked_ips)
   
   private$blockedCV <- TRUE 
   
@@ -1366,12 +1383,10 @@ dataSDM$set('public', 'spatialBlock', function(k, rows, cols, plot = FALSE, ...)
     
     spatPolys <- private$polyfromMesh()
     
-    all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(private$modelData, function(x) {
+    all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(private$modelData, recursive = FALSE), function(x) {
       
-      if ('BRU_aggregate' %in% names(x$data)) ob <- x$data[x$data$BRU_aggregate, 'block_index']
-      else ob <- x$data[,'block_index']
+      x[, 'block_index']
       
-      ob
       
     }))
     
