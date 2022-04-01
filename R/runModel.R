@@ -43,7 +43,7 @@ runModel <- function(data, options = list()) {
   if (!is.null(names(data$spatialFields$speciesFields))) speciesSpatial <- TRUE
   else speciesSpatial <- FALSE
 
-  formula_terms <- unique(unlist(lapply(unlist(unlist(dataObj$.__enclos_env__$private$Formulas, recursive = F), recursive = F), function(x) {
+  formula_terms <- unique(unlist(lapply(unlist(unlist(data$.__enclos_env__$private$Formulas, recursive = F), recursive = F), function(x) {
     
     if (is.null(x$RHS))  attributes(terms(x$LHS))[['term.labels']]
     else x$RHS
