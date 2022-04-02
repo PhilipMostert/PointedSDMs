@@ -1067,72 +1067,88 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @description Function to specify the random fields in the model using PC priors for the parameters.
   #' 
   #' @param sharedSpatial Logical: specify the shared spatial field in the model. Defaults to \code{FALSE}.
-  #' @param species Name of the species's spatial field to be specified.
-  #' @param mark Name of the mark's spatial field to be specified.
-  #' @param bias Name of the dataset's bias field to be specified.
-  #' @param pc Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}. 
-  #' @param remove Logical: should the spatial field be removed. Requires one of sharedSpatial, species, mark or bias to be non-missing.
+  #' @param Species Name of the species's spatial field to be specified.
+  #' @param Mark Name of the mark's spatial field to be specified.
+  #' @param Bias Name of the dataset's bias field to be specified.
+  #' @param PC Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}. 
+  #' @param Remove Logical: should the spatial field be removed. Requires one of sharedSpatial, species, mark or bias to be non-missing.
   #' @param ... Additional arguments used by INLA's \code{inla.spde2.pcmatern} or \code{inla.spde2.matern} function.
+  #' @examples 
+  #' \dontrun{
+  #' 
+  #' #Create data object
+  #' dataObj <- bruSDM(...)
+  #' 
+  #' #Specify spatial field
+  #' dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, prior.range = c(1,0.001), prior.sigma = c(1,0.001))
+  #' #Specify for a species
+  #' dataObj$specifySpatial(species = 'species', alpha = 1, PC = FALSE)
+  #' 
+  #' #Remove a spatial field
+  #' dataObj$specifySpatial(species = 'species', remove = TRUE)
+  #' #Which will also update the components and relevant formulas
+  #' 
+  #' }
   
   specifySpatial = function(sharedSpatial = FALSE, 
-                            species, mark,
-                            bias, pc = TRUE,
-                            remove = FALSE, ...) {
+                            Species, Mark,
+                            Bias, PC = TRUE,
+                            Remove = FALSE, ...) {
     
-    if (all(!sharedSpatial && missing(species)  && missing(mark)  &&  missing(bias))) stop('At least one of sharedSpatial, dataset, species or mark needs to be provided.')
+    if (all(!sharedSpatial && missing(Species)  && missing(Mark)  &&  missing(Bias))) stop('At least one of sharedSpatial, dataset, species or mark needs to be provided.')
     
-    if (sum(sharedSpatial, !missing(species), !missing(mark), !missing(bias)) != 1) stop('Please only choose one of sharedSpatial, species, mark or bias.')
+    if (sum(sharedSpatial, !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please only choose one of sharedSpatial, species, mark or bias.')
     
-    if (remove && sum(sharedSpatial, !missing(species), !missing(mark), !missing(bias)) !=1) stop('Please choose one of sharedSpatial, species, mark or bias to remove.')
+    if (Remove && sum(sharedSpatial, !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please choose one of sharedSpatial, species, mark or bias to remove.')
     
     if (sharedSpatial) {
       
       if (!private$Spatial) stop('Shared spatial field not included in the model. Please use pointsSpatial = TRUE in bruSDM.')
       
       field_type <- 'sharedField'
-      if (!remove) index <- 'sharedField'
+      if (!Remove) index <- 'sharedField'
       else index <- 'shared_spatial'
       
     }
     
-    if (!missing(species)) {
+    if (!missing(Species)) {
       
       if (is.null(unlist(private$speciesIn))) stop('Species name provided but no species present in the model.') 
       
-      if (!species %in% unlist(private$speciesIn)) stop('Species name provided is not currently in the model.')
+      if (!Species %in% unlist(private$speciesIn)) stop('Species name provided is not currently in the model.')
       
       field_type <- 'speciesFields'
-      if (!remove) index <- species
-      else index <- paste0(species, '_spatial')
+      if (!Remove) index <- Species
+      else index <- paste0(Species, '_spatial')
       
     }
     
-    if (!missing(mark)) {
+    if (!missing(Mark)) {
       
       if (is.null(unlist(private$markNames))) stop('Mark name provided but no marks present in the model.') 
       
-      if (!mark %in% unlist(private$markNames)) stop('Mark name provided is not currently in the model.')
+      if (!Mark %in% unlist(private$markNames)) stop('Mark name provided is not currently in the model.')
       
-      if (!remove) field_type <- 'markFields'
-      else index <- paste0(mark, '_spatial')
+      if (!Remove) field_type <- 'markFields'
+      else index <- paste0(Mark, '_spatial')
       
     } 
     
-    if (!missing(bias)) {
+    if (!missing(Bias)) {
       
-      if (!bias %in% names(self$spatialFields$biasFields)) stop('Dataset name provided does not have a bias field. Please use ".$biasField()" beforehand.')
+      if (!Bias %in% names(self$spatialFields$biasFields)) stop('Dataset name provided does not have a bias field. Please use ".$biasField()" beforehand.')
       
       field_type <- 'biasFields'
-      if (!remove) index <- bias
-      else index <- paste0(bias, 'biasField')
+      if (!Remove) index <- Bias
+      else index <- paste0(Bias, 'biasField')
       
     }
     
     #if (missing(prior.range) || missing(prior.sigma)) stop('Both prior.range and prior.sigma need to be spefied.')
     
-    if (!remove) {
+    if (!Remove) {
       
-      if (pc) model <- INLA::inla.spde2.pcmatern(mesh = private$INLAmesh, ...)
+      if (PC) model <- INLA::inla.spde2.pcmatern(mesh = private$INLAmesh, ...)
       else model <- INLA::inla.spde2.matern(mesh = private$INLAmesh, ...)
       
       for (field in index) {

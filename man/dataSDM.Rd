@@ -127,6 +127,26 @@ dataObj$priorsFixed(Effect = 'intercept', Dataset = 'datasetname',
                     mean.linear = 2, prec.linear = 0.005)
 
 }
+
+## ------------------------------------------------
+## Method `dataSDM$specifySpatial`
+## ------------------------------------------------
+
+\dontrun{
+
+#Create data object
+dataObj <- bruSDM(...)
+
+#Specify spatial field
+dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, prior.range = c(1,0.001), prior.sigma = c(1,0.001))
+#Specify for a species
+dataObj$specifySpatial(species = 'species', alpha = 1, PC = FALSE)
+
+#Remove a spatial field
+dataObj$specifySpatial(species = 'species', remove = TRUE)
+#Which will also update the components and relevant formulas
+
+}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -483,11 +503,11 @@ Function to specify the random fields in the model using PC priors for the param
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$specifySpatial(
   sharedSpatial = FALSE,
-  species,
-  mark,
-  bias,
-  pc = TRUE,
-  remove = FALSE,
+  Species,
+  Mark,
+  Bias,
+  PC = TRUE,
+  Remove = FALSE,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -497,20 +517,42 @@ Function to specify the random fields in the model using PC priors for the param
 \describe{
 \item{\code{sharedSpatial}}{Logical: specify the shared spatial field in the model. Defaults to \code{FALSE}.}
 
-\item{\code{species}}{Name of the species's spatial field to be specified.}
+\item{\code{Species}}{Name of the species's spatial field to be specified.}
 
-\item{\code{mark}}{Name of the mark's spatial field to be specified.}
+\item{\code{Mark}}{Name of the mark's spatial field to be specified.}
 
-\item{\code{bias}}{Name of the dataset's bias field to be specified.}
+\item{\code{Bias}}{Name of the dataset's bias field to be specified.}
 
-\item{\code{pc}}{Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}.}
+\item{\code{PC}}{Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}.}
 
-\item{\code{remove}}{Logical: should the spatial field be removed. Requires one of sharedSpatial, species, mark or bias to be non-missing.}
+\item{\code{Remove}}{Logical: should the spatial field be removed. Requires one of sharedSpatial, species, mark or bias to be non-missing.}
 
 \item{\code{...}}{Additional arguments used by INLA's \code{inla.spde2.pcmatern} or \code{inla.spde2.matern} function.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+
+#Create data object
+dataObj <- bruSDM(...)
+
+#Specify spatial field
+dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, prior.range = c(1,0.001), prior.sigma = c(1,0.001))
+#Specify for a species
+dataObj$specifySpatial(species = 'species', alpha = 1, PC = FALSE)
+
+#Remove a spatial field
+dataObj$specifySpatial(species = 'species', remove = TRUE)
+#Which will also update the components and relevant formulas
+
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-spatialBlock"></a>}}
