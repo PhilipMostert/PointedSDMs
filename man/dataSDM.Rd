@@ -109,6 +109,24 @@ datasetObj$changeComponent(removeComponent = 'shared_spatial')
 #Will remove shared_spatial from the components + all the formulas it is in
 
 }
+
+## ------------------------------------------------
+## Method `dataSDM$priorsFixed`
+## ------------------------------------------------
+
+\dontrun{
+
+#Make data object
+dataObj <- bruSDM(...)
+
+#Change priors for the fixed effect
+dataObj$priorsFixed(Effect = 'covariate', mean.linear = 2, prec.linear = 0.05)
+
+#Change priors for intercept
+dataObj$priorsFixed(Effect = 'intercept', Dataset = 'datasetname',
+                    mean.linear = 2, prec.linear = 0.005)
+
+}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -379,6 +397,8 @@ Function to add custom components to the integrated modeling.
 \item{\code{addComponent}}{Component to add to the model.}
 
 \item{\code{removeComponent}}{Component (or name of a component) present in the model which should be removed.}
+
+\item{\code{print}}{Logical: should the updated components be printed. Defaults to \code{TRUE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -411,9 +431,9 @@ datasetObj$changeComponent(removeComponent = 'shared_spatial')
 Function to change priors for the fixed (and possibly random) effects of the model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$priorsFixed(
-  effect,
-  species = NULL,
-  dataset = NULL,
+  Effect,
+  Species = NULL,
+  Dataset = NULL,
   mean.linear = 0,
   prec.linear = 0.001
 )}\if{html}{\out{</div>}}
@@ -422,11 +442,11 @@ Function to change priors for the fixed (and possibly random) effects of the mod
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{effect}}{Name of the fixed effect covariate to change the prior for.}
+\item{\code{Effect}}{Name of the fixed effect covariate to change the prior for.}
 
-\item{\code{species}}{Name of the species for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.}
+\item{\code{Species}}{Name of the species for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.}
 
-\item{\code{dataset}}{Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercet'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.}
+\item{\code{Dataset}}{Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.}
 
 \item{\code{mean.linear}}{Mean value for the prior of the fixed effect. Defaults to \code{0}.}
 
@@ -434,6 +454,26 @@ Function to change priors for the fixed (and possibly random) effects of the mod
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+
+#Make data object
+dataObj <- bruSDM(...)
+
+#Change priors for the fixed effect
+dataObj$priorsFixed(Effect = 'covariate', mean.linear = 2, prec.linear = 0.05)
+
+#Change priors for intercept
+dataObj$priorsFixed(Effect = 'intercept', Dataset = 'datasetname',
+                    mean.linear = 2, prec.linear = 0.005)
+
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifySpatial"></a>}}

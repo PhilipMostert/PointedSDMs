@@ -939,7 +939,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @description Function to add custom components to the integrated modeling.
   #' @param addComponent Component to add to the model.
   #' @param removeComponent Component (or name of a component) present in the model which should be removed.
-  #' 
+  #' @param print Logical: should the updated components be printed. Defaults to \code{TRUE}.
   #' @examples 
   #' \dontrun{
   #' 
@@ -984,19 +984,33 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   }
   ,
   #' @description Function to change priors for the fixed (and possibly random) effects of the model.
-  #' @param effect Name of the fixed effect covariate to change the prior for.
-  #' @param species Name of the species for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.
-  #' @param dataset Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercet'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.
+  #' @param Effect Name of the fixed effect covariate to change the prior for.
+  #' @param Species Name of the species for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.
+  #' @param Dataset Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.
   #' @param mean.linear Mean value for the prior of the fixed effect. Defaults to \code{0}.
   #' @param prec.linear Precision value for the prior of the fixed effect. Defaults to \code{0.001}.
+  #' @examples
+  #' \dontrun{
+  #' 
+  #' #Make data object
+  #' dataObj <- bruSDM(...)
+  #' 
+  #' #Change priors for the fixed effect
+  #' dataObj$priorsFixed(Effect = 'covariate', mean.linear = 2, prec.linear = 0.05)
+  #' 
+  #' #Change priors for intercept
+  #' dataObj$priorsFixed(Effect = 'intercept', Dataset = 'datasetname',
+  #'                     mean.linear = 2, prec.linear = 0.005)
+  #' 
+  #' }
 
-  priorsFixed = function(effect, species = NULL, dataset = NULL,
+  priorsFixed = function(Effect, Species = NULL, Dataset = NULL,
                          mean.linear = 0, prec.linear = 0.001) {
     
     
-    if (!missing(effect)) {
+    if (!missing(Effect)) {
       
-      if (effect == 'intercept') {
+      if (Effect == 'intercept') {
         
         intTRUE <- TRUE
         
@@ -1004,13 +1018,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
           
           if (!private$Intercepts) stop('Fixed effect is given as "intercept", but intercepts have been turned off in bruSDM.')
           
-          if (is.null(dataset)) effect <- paste0(unique(private$dataSource),'_intercept')
+          if (is.null(Dataset)) Effect <- paste0(unique(private$dataSource),'_intercept')
           
         } 
         else {
           
-          if (is.null(species)) effect <- paste0(unique(unlist(private$speciesIn)), '_intercept')  #this won't work, unless we run a for loop...
-          else effect <- paste0(species, '_intercept')
+          if (is.null(Species)) Effect <- paste0(unique(unlist(private$speciesIn)), '_intercept')  #this won't work, unless we run a for loop...
+          else Effect <- paste0(Species, '_intercept')
           
           
         }
@@ -1020,29 +1034,29 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         
         intTRUE <- FALSE
         
-        if (!effect %in% c(private$spatcovsNames, private$pointCovariates)) stop('Fixed effect provided not present in the model. Please add covariates using the "spatialCovariates" or "pointCovariates" argument in bruSDM.')
+        if (!Effect %in% c(private$spatcovsNames, private$pointCovariates)) stop('Fixed effect provided not present in the model. Please add covariates using the "spatialCovariates" or "pointCovariates" argument in bruSDM.')
         
         
       } 
       
-      if (effect %in% private$spatcovsNames) cov_class <- private$spatcovsClass[effect]
+      if (Effect %in% private$spatcovsNames) cov_class <- private$spatcovsClass[Effect]
       else cov_class <- 'linear'
       
       if (!is.null(private$speciesName)) {
         
-        if (!is.null(species)) {
+        if (!is.null(Species)) {
           
-          if (!species %in% unlist(private$speciesIn)) stop('Species given is not available in the model.')
+          if (!Species %in% unlist(private$speciesIn)) stop('Species given is not available in the model.')
           
-          effect <- paste0(species, '_', effect) #this won't work, unless we run a for loop...
+          Effect <- paste0(Species, '_', Effect) #this won't work, unless we run a for loop...
           
         }
-        else effect <- paste0(unique(unlist(private$speciesIn)), '_', effect)
+        else Effect <- paste0(unique(unlist(private$speciesIn)), '_', Effect)
         
       }
       
-      if (intTRUE) newComponent <- paste0(effect, '(1, mean.linear = ', mean.linear, ', prec.linear = ', prec.linear,' )')
-      else newComponent <- paste0(effect,'(main = ', effect, ', model = \"', cov_class, '\", mean.linear = ', mean.linear, ', prec.linear = ', prec.linear, ')')
+      if (intTRUE) newComponent <- paste0(Effect, '(1, mean.linear = ', mean.linear, ', prec.linear = ', prec.linear,' )')
+      else newComponent <- paste0(effect,'(main = ', Effect, ', model = \"', cov_class, '\", mean.linear = ', mean.linear, ', prec.linear = ', prec.linear, ')')
       
       self$changeComponents(addComponent = newComponent, print = FALSE)
       
