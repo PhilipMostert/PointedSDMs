@@ -60,6 +60,36 @@ dataObj <- bruSDM(...)
 dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
 
 }
+
+## ------------------------------------------------
+## Method `dataSDM$updateFormula`
+## ------------------------------------------------
+
+\dontrun{
+
+#Make data object
+dataObj <- bruSDM(...)
+
+#View formulas for a dataset
+dataObj$updateFormula(datasetName = 'dataset')
+#View formula for a species if speciesName is non-null in bruSDM
+dataObj$updateFormula(datasetName = 'dataset', speciesName = 'species')
+
+#Change formula across a dataset
+#Main purpose is to remove terms for a specific process
+#So start with full model with bruSDM()
+#And thin terms out with .$updateFormula()
+dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -covariate)
+dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -shared_spatial)
+
+#If you would like to add a special term to the model, use the NewFormula argument
+dataObj$updateFormula(dataset = 'dataset', Formula ~ . + (covariate+1e-5)*scaling)
+#And then also add that term to the components
+dataObj$changeComponents(newComponent = 'scaling')
+
+ }
+
+
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -282,6 +312,38 @@ Function to update formulas for a given process.
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+
+#Make data object
+dataObj <- bruSDM(...)
+
+#View formulas for a dataset
+dataObj$updateFormula(datasetName = 'dataset')
+#View formula for a species if speciesName is non-null in bruSDM
+dataObj$updateFormula(datasetName = 'dataset', speciesName = 'species')
+
+#Change formula across a dataset
+#Main purpose is to remove terms for a specific process
+#So start with full model with bruSDM()
+#And thin terms out with .$updateFormula()
+dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -covariate)
+dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -shared_spatial)
+
+#If you would like to add a special term to the model, use the NewFormula argument
+dataObj$updateFormula(dataset = 'dataset', Formula ~ . + (covariate+1e-5)*scaling)
+#And then also add that term to the components
+dataObj$changeComponents(newComponent = 'scaling')
+
+ }
+
+
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-changeComponents"></a>}}

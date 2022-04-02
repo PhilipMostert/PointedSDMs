@@ -721,7 +721,33 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param Formula An updated formula to give to the process.
   #' @param allProcesses Logical argument: if \code{TRUE} changes the formulas for all processes in a dataset.
   #' @param newFormula Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.
-  
+  #' 
+  #' @examples
+  #' \dontrun{
+  #' 
+  #' #Make data object
+  #' dataObj <- bruSDM(...)
+  #' 
+  #' #View formulas for a dataset
+  #' dataObj$updateFormula(datasetName = 'dataset')
+  #' #View formula for a species if speciesName is non-null in bruSDM
+  #' dataObj$updateFormula(datasetName = 'dataset', speciesName = 'species')
+  #' 
+  #' #Change formula across a dataset
+  #' #Main purpose is to remove terms for a specific process
+  #' #So start with full model with bruSDM()
+  #' #And thin terms out with .$updateFormula()
+  #' dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -covariate)
+  #' dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -shared_spatial)
+  #' 
+  #' #If you would like to add a special term to the model, use the NewFormula argument
+  #' dataObj$updateFormula(dataset = 'dataset', Formula ~ . + (covariate+1e-5)*scaling)
+  #' #And then also add that term to the components
+  #' dataObj$changeComponents(newComponent = 'scaling')
+  #' 
+  #'  }
+  #' 
+  #' 
   updateFormula = function(datasetName = NULL, Points = TRUE, speciesName = NULL,
                            markName = NULL, Formula, allProcesses = FALSE,
                            newFormula, ...) {
