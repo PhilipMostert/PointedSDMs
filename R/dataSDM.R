@@ -1178,14 +1178,24 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
   }
   ,
-  #' @description Function to spatially block the datasets
+  #' @description Function to spatially block the datasets. See the \code{spatialBlock} function from blockCV for spatial blocking.
   #' @param k Number of cross-validation folds.
   #' @param rows Integer value by which the area is divided into latitudinal bins.
   #' @param cols Integer value by which the area is divided into longitudinal bins.
   #' @param plot Plot the cross-validation folds. Defaults to \code{FALSE}.
   #' @param ... Extra arguments used by blockCV's spatialBlock
   #' 
+  #' @examples
+  #' \dontrun{
   #' 
+  #' #Make data object
+  #' dataObj <- bruSDM(...)
+  #' 
+  #' #Block the points spatially
+  #' dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
+  #' 
+  #' }
+  #'
   spatialBlock =  function(k, rows, cols, plot = FALSE, ...) {
     
     #stop('Need to completely re do')

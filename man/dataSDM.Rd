@@ -147,6 +147,21 @@ dataObj$specifySpatial(species = 'species', remove = TRUE)
 #Which will also update the components and relevant formulas
 
 }
+
+## ------------------------------------------------
+## Method `dataSDM$spatialBlock`
+## ------------------------------------------------
+
+\dontrun{
+
+#Make data object
+dataObj <- bruSDM(...)
+
+#Block the points spatially
+dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
+
+}
+
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -558,7 +573,7 @@ dataObj$specifySpatial(species = 'species', remove = TRUE)
 \if{html}{\out{<a id="method-spatialBlock"></a>}}
 \if{latex}{\out{\hypertarget{method-spatialBlock}{}}}
 \subsection{Method \code{spatialBlock()}}{
-Function to spatially block the datasets
+Function to spatially block the datasets. See the \code{spatialBlock} function from blockCV for spatial blocking.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$spatialBlock(k, rows, cols, plot = FALSE, ...)}\if{html}{\out{</div>}}
 }
@@ -578,6 +593,23 @@ Function to spatially block the datasets
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+
+#Make data object
+dataObj <- bruSDM(...)
+
+#Block the points spatially
+dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
+
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}
