@@ -96,6 +96,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   }
   ,
   #' @description Prints the datasets, their data type and the number of observations, as well as the marks and their respective families.
+  #' @param ... Not used.
   
   print = function(...) {
     
@@ -156,7 +157,25 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @description Makes a plot of the region as well as the points.
   #' @param Datasets Name of the datasets to plot.
   #' @param Species Should species be plotted as well? Defaults to \code{FALSE}.
+  #' @param ... Not used.
   #' @return A ggplot object.
+  #' @examples 
+  #' 
+  #' \dontrun{
+  #' 
+  #' #Make data Object.
+  #' dataObj <- bruSDM(...)
+  #' 
+  #' #Plot a specific datasets
+  #' dataObj$plot(Datasets = c('dataset1', 'dataset2'))
+  #' 
+  #' #Plot all datasets
+  #' dataObj$plot()
+  #' 
+  #' #If speciesName specified in bruSDM, plot species
+  #' dataObj(Species = TRUE)
+  #' 
+  #' }
   
   plot = function(Datasets, Species = FALSE, ...) {
     
@@ -242,6 +261,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                      markNames, markFamily, pointCovariates,
                      trialsMarks, speciesName, temporalName,
                      Coordinates) {
+    
     pointData <- dataOrganize$new()
     
     dataPoints <- list(...)
@@ -270,7 +290,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       
     }
-    
     
     if (length(dataPoints) == 0) stop('Please provide data in the ... argument.')
     
