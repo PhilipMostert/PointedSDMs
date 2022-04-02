@@ -15,7 +15,7 @@ A data object containing the data and the relevant information about the integra
 
 \dontrun{
 
-#Make data Object.
+#Make data object
 dataObj <- bruSDM(...)
 
 #Plot a specific datasets
@@ -26,6 +26,24 @@ dataObj$plot()
 
 #If speciesName specified in bruSDM, plot species
 dataObj(Species = TRUE)
+
+}
+
+## ------------------------------------------------
+## Method `dataSDM$addData`
+## ------------------------------------------------
+
+\dontrun{
+
+#Make data object with specified components
+dataObj <- bruSDM(...)
+
+#Add new data with non-standardized names
+dataObj$addData(dataset, responseCounts = responseCounts,
+                responsePA = responsePA, trialsPA = trialsPA,
+                markNames = markNames, markFamily = markFamily,
+                pointCovariates = pointCovariates,
+                speciesName = speciesName, Coordinates = Coordinates)
 
 }
 }
@@ -90,7 +108,7 @@ A ggplot object.
 \preformatted{
 \dontrun{
 
-#Make data Object.
+#Make data object
 dataObj <- bruSDM(...)
 
 #Plot a specific datasets
@@ -155,6 +173,26 @@ Function used to add additional, and possibly heterogeneous data to the dataSDM 
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+
+#Make data object with specified components
+dataObj <- bruSDM(...)
+
+#Add new data with non-standardized names
+dataObj$addData(dataset, responseCounts = responseCounts,
+                responsePA = responsePA, trialsPA = trialsPA,
+                markNames = markNames, markFamily = markFamily,
+                pointCovariates = pointCovariates,
+                speciesName = speciesName, Coordinates = Coordinates)
+
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-addBias"></a>}}

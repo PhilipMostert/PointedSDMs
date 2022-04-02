@@ -73,7 +73,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #' \dontrun{
   #' 
-  #' #Make data Object.
+  #' #Make data object
   #' dataObj <- bruSDM(...)
   #' 
   #' #Plot a specific datasets
@@ -166,7 +166,21 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param trialsMarks The name of the trials variable for the binomial marks.
   #' @param speciesName The name of the species variable included in the data.
   #' @param Coordinates A vector of length 2 describing the names of the coordinates of the data.
-
+  #'
+  #' @examples
+  #' \dontrun{
+  #' 
+  #' #Make data object with specified components
+  #' dataObj <- bruSDM(...)
+  #' 
+  #' #Add new data with non-standardized names
+  #' dataObj$addData(dataset, responseCounts = responseCounts,
+  #'                 responsePA = responsePA, trialsPA = trialsPA,
+  #'                 markNames = markNames, markFamily = markFamily,
+  #'                 pointCovariates = pointCovariates,
+  #'                 speciesName = speciesName, Coordinates = Coordinates)
+  #' 
+  #' }
   addData = function(..., responseCounts, responsePA, trialsPA,
                      markNames, markFamily, pointCovariates,
                      trialsMarks, speciesName, temporalName,
