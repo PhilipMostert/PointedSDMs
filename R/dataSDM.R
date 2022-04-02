@@ -939,7 +939,22 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @description Function to add custom components to the integrated modeling.
   #' @param addComponent Component to add to the model.
   #' @param removeComponent Component (or name of a component) present in the model which should be removed.
-  
+  #' 
+  #' @examples 
+  #' \dontrun{
+  #' 
+  #' #Make data object first
+  #' dataObj <- bruSDM(...)
+  #' 
+  #' #Change a component
+  #' dataObj$changeComponent(addComponent = 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)')
+  #' #Should update the bias field
+  #' 
+  #' #Remove a component
+  #' datasetObj$changeComponent(removeComponent = 'shared_spatial')
+  #' #Will remove shared_spatial from the components + all the formulas it is in
+  #' 
+  #' }
   changeComponents = function(addComponent, removeComponent, print = TRUE) {
     
     terms <- gsub('\\(.*$', '', private$Components)

@@ -90,6 +90,25 @@ dataObj$changeComponents(newComponent = 'scaling')
  }
 
 
+
+## ------------------------------------------------
+## Method `dataSDM$changeComponents`
+## ------------------------------------------------
+
+\dontrun{
+
+#Make data object first
+dataObj <- bruSDM(...)
+
+#Change a component
+dataObj$changeComponent(addComponent = 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)')
+#Should update the bias field
+
+#Remove a component
+datasetObj$changeComponent(removeComponent = 'shared_spatial')
+#Will remove shared_spatial from the components + all the formulas it is in
+
+}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -363,6 +382,27 @@ Function to add custom components to the integrated modeling.
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+
+#Make data object first
+dataObj <- bruSDM(...)
+
+#Change a component
+dataObj$changeComponent(addComponent = 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)')
+#Should update the bias field
+
+#Remove a component
+datasetObj$changeComponent(removeComponent = 'shared_spatial')
+#Will remove shared_spatial from the components + all the formulas it is in
+
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-priorsFixed"></a>}}
