@@ -6,10 +6,32 @@
 \description{
 A data object containing the data and the relevant information about the integrated model.
 }
+\examples{
+
+## ------------------------------------------------
+## Method `dataSDM$plot`
+## ------------------------------------------------
+
+
+\dontrun{
+
+#Make data Object.
+dataObj <- bruSDM(...)
+
+#Plot a specific datasets
+dataObj$plot(Datasets = c('dataset1', 'dataset2'))
+
+#Plot all datasets
+dataObj$plot()
+
+#If speciesName specified in bruSDM, plot species
+dataObj(Species = TRUE)
+
+}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{dataSDM$new()}}
 \item \href{#method-print}{\code{dataSDM$print()}}
 \item \href{#method-plot}{\code{dataSDM$plot()}}
 \item \href{#method-addData}{\code{dataSDM$addData()}}
@@ -19,85 +41,8 @@ A data object containing the data and the relevant information about the integra
 \item \href{#method-priorsFixed}{\code{dataSDM$priorsFixed()}}
 \item \href{#method-specifySpatial}{\code{dataSDM$specifySpatial()}}
 \item \href{#method-spatialBlock}{\code{dataSDM$spatialBlock()}}
+\item \href{#method-new}{\code{dataSDM$new()}}
 \item \href{#method-samplingBias}{\code{dataSDM$samplingBias()}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
-\subsection{Method \code{new()}}{
-Initialize function for dataSDM: used to store some compulsory arguments. Please refer to the wrapper function, \code{bruSDM} for creating new dataSDM objects.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$new(
-  coordinates,
-  projection,
-  Inlamesh,
-  initialnames,
-  responsecounts,
-  responsepa,
-  marksnames,
-  marksfamily,
-  pointcovariates,
-  trialspa,
-  trialsmarks,
-  speciesname,
-  marksspatial,
-  spatial,
-  intercepts,
-  spatialcovariates,
-  marksintercepts,
-  boundary,
-  ips,
-  temporal,
-  temporalmodel,
-  speciesspatial
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{coordinates}}{A vector of length 2 containing the names of the coordinates.}
-
-\item{\code{projection}}{The projection of the data.}
-
-\item{\code{Inlamesh}}{An inla.mesh object.}
-
-\item{\code{initialnames}}{The names of the datasets if data is passed through bruSDM.}
-
-\item{\code{responsecounts}}{The name of the response variable for the count data.}
-
-\item{\code{responsepa}}{The name of the response variable for the presence absence data.}
-
-\item{\code{marksnames}}{The names of the marks contained in the data.}
-
-\item{\code{marksfamily}}{The statistical family of the marks.}
-
-\item{\code{pointcovariates}}{Names of the additional, non-spatial covariates describing the points.}
-
-\item{\code{trialspa}}{The name of the trials variable for the presence absence datasets.}
-
-\item{\code{trialsmarks}}{The name of the trials variable for the binomial marks datasets.}
-
-\item{\code{speciesname}}{Name of the species variable used in the data.}
-
-\item{\code{marksspatial}}{Should spatial fields be included for the marks}
-
-\item{\code{spatial}}{Logical argument describing if spatial effects should be included.}
-
-\item{\code{intercepts}}{Logical argument describing if intercepts should be included in the model.}
-
-\item{\code{spatialcovariates}}{Spatial covariates object used in the model.}
-
-\item{\code{boundary}}{A polygon map of the study area.}
-
-\item{\code{ips}}{Integration points and their respective weights to be used in the model.}
-
-\item{\code{temporal}}{Name of the temporal variable used in the model.}
-
-\item{\code{marksintercept}}{Logical argument describing if the marks should have interceptes.}
-}
-\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -109,6 +54,13 @@ Prints the datasets, their data type and the number of observations, as well as 
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$print(...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Not used.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plot"></a>}}
@@ -125,12 +77,37 @@ Makes a plot of the region as well as the points.
 \item{\code{Datasets}}{Name of the datasets to plot.}
 
 \item{\code{Species}}{Should species be plotted as well? Defaults to \code{FALSE}.}
+
+\item{\code{...}}{Not used.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 A ggplot object.
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{
+\dontrun{
+
+#Make data Object.
+dataObj <- bruSDM(...)
+
+#Plot a specific datasets
+dataObj$plot(Datasets = c('dataset1', 'dataset2'))
+
+#Plot all datasets
+dataObj$plot()
+
+#If speciesName specified in bruSDM, plot species
+dataObj(Species = TRUE)
+
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-addData"></a>}}
@@ -349,6 +326,38 @@ Function to spatially block the datasets
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
+\subsection{Method \code{new()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$new(
+  coordinates,
+  projection,
+  Inlamesh,
+  initialnames,
+  responsecounts,
+  responsepa,
+  marksnames,
+  marksfamily,
+  pointcovariates,
+  trialspa,
+  trialsmarks,
+  speciesname,
+  marksspatial,
+  spatial,
+  intercepts,
+  spatialcovariates,
+  marksintercepts,
+  boundary,
+  ips,
+  temporal,
+  temporalmodel,
+  speciesspatial
+)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-samplingBias"></a>}}

@@ -5,99 +5,9 @@
 #' 
 
 dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = FALSE, public = list(
-  
-  
-  #' @description Initialize function for dataSDM: used to store some compulsory arguments. Please refer to the wrapper function, \code{bruSDM} for creating new dataSDM objects.
-  #' @param coordinates A vector of length 2 containing the names of the coordinates.
-  #' @param projection The projection of the data.
-  #' @param Inlamesh An inla.mesh object.
-  #' @param initialnames The names of the datasets if data is passed through bruSDM.
-  #' @param responsecounts The name of the response variable for the count data.
-  #' @param responsepa The name of the response variable for the presence absence data.
-  #' @param marksnames The names of the marks contained in the data.
-  #' @param marksfamily The statistical family of the marks.
-  #' @param pointcovariates Names of the additional, non-spatial covariates describing the points.
-  #' @param trialspa The name of the trials variable for the presence absence datasets.
-  #' @param trialsmarks The name of the trials variable for the binomial marks datasets.
-  #' @param speciesname Name of the species variable used in the data.
-  #' @param marksspatial Should spatial fields be included for the marks
-  #' @param spatial Logical argument describing if spatial effects should be included.
-  #' @param intercepts Logical argument describing if intercepts should be included in the model.
-  #' @param spatialcovariates Spatial covariates object used in the model.
-  #' @param marksintercept Logical argument describing if the marks should have interceptes.
-  #' @param boundary A polygon map of the study area.
-  #' @param ips Integration points and their respective weights to be used in the model.
-  #' @param temporal Name of the temporal variable used in the model.
-  
-  initialize = function(coordinates, projection, Inlamesh, initialnames,
-                        responsecounts, responsepa, 
-                        marksnames, marksfamily, pointcovariates,
-                        trialspa, trialsmarks, speciesname, marksspatial,
-                        spatial, intercepts, spatialcovariates, marksintercepts,
-                        boundary, ips, temporal, temporalmodel, speciesspatial) {
-    
-    if (missing(coordinates)) stop('Coordinates need to be given.')
-    if (missing(projection)) stop('projection needs to be given.')
-    if (missing(Inlamesh)) stop('Mesh needs to be given.')
-    
-    if (class(Inlamesh) != 'inla.mesh') stop('Mesh needs to be an inla.mesh object.')
-    
-    if (class(projection)[1] != 'CRS') stop('Projection needs to be a CRS object.')
-    
-    if (length(coordinates) != 2) stop('Coordinates needs to be a vector of length 2 containing the coordinate names.')
-    
-    if (coordinates[1] == coordinates[2]) stop('Coordinates need to be unique values.')
-    
-    if (any(missing(responsecounts), missing(responsepa)) ||
-        any(is.null(responsecounts), is.null(responsepa))) stop('At least one of responseCounts and responsePA are NULL. Please provide both.')
-    
-    private$responseCounts <- responsecounts
-    private$responsePA <- responsepa
-    
-    if (!missing(trialspa)) private$trialsPA <- trialspa
-    if (!missing(trialsmarks)) private$trialsMarks <- trialsmarks
-    
-    if (!missing(speciesname)) private$speciesName <- speciesname
-    
-    if (!missing(temporal)) private$temporalName <- temporal
-    private$temporalModel <- temporalmodel
-    
-    if (!missing(initialnames)) private$initialnames <- initialnames
-    if (!missing(boundary)) private$Boundary <- boundary
-    
-    private$markNames <- marksnames
-    private$markFamily <- marksfamily
-    
-    private$pointCovariates <- pointcovariates
-    
-    if (!is.null(spatialcovariates)) private$spatialCovariates(spatialcovariates)
-    
-    if (!is.null(ips)) private$IPS <- ips
-    else {
-      
-      if (is.null(boundary)) private$IPS <- inlabru::ipoints(samplers = boundary, domain = Inlamesh)
-      else private$IPS <- inlabru::ipoints(domain = Inlamesh)
-      
-    }
-    
-    private$Spatial <- spatial
-    private$marksSpatial <- marksspatial
-    private$Intercepts <- intercepts
-    private$marksIntercepts <- marksintercepts
-    
-    private$speciesSpatial <- speciesspatial
-    
-    #if (!private$Spatial && private$markSpatial) warning('Spatial has been set to FALSE but marksSpatial is TRUE. Spatial effects for the marks will still be run.')
-    
-    private$Coordinates <- coordinates
-    private$Projection <- projection
-    private$INLAmesh <- Inlamesh
-    invisible(self)
-  }
-  ,
+
   #' @description Prints the datasets, their data type and the number of observations, as well as the marks and their respective families.
   #' @param ... Not used.
-  
   print = function(...) {
     
     if (length(private$modelData) == 0) cat('No data found. Please add data using the `$.addData` function.')
@@ -1308,6 +1218,94 @@ dataSDM$set('private', 'multinomVars', NULL)
 dataSDM$set('private', 'printSummary', NULL)
 dataSDM$set('private', 'multinomIndex', list())
 dataSDM$set('private', 'optionsINLA', list())
+
+#' @description Initialize function for dataSDM: used to store some compulsory arguments. Please refer to the wrapper function, \code{bruSDM} for creating new dataSDM objects.
+#' @param coordinates A vector of length 2 containing the names of the coordinates.
+#' @param projection The projection of the data.
+#' @param Inlamesh An inla.mesh object.
+#' @param initialnames The names of the datasets if data is passed through bruSDM.
+#' @param responsecounts The name of the response variable for the count data.
+#' @param responsepa The name of the response variable for the presence absence data.
+#' @param marksnames The names of the marks contained in the data.
+#' @param marksfamily The statistical family of the marks.
+#' @param pointcovariates Names of the additional, non-spatial covariates describing the points.
+#' @param trialspa The name of the trials variable for the presence absence datasets.
+#' @param trialsmarks The name of the trials variable for the binomial marks datasets.
+#' @param speciesname Name of the species variable used in the data.
+#' @param marksspatial Should spatial fields be included for the marks
+#' @param spatial Logical argument describing if spatial effects should be included.
+#' @param intercepts Logical argument describing if intercepts should be included in the model.
+#' @param spatialcovariates Spatial covariates object used in the model.
+#' @param marksintercept Logical argument describing if the marks should have interceptes.
+#' @param boundary A polygon map of the study area.
+#' @param ips Integration points and their respective weights to be used in the model.
+#' @param temporal Name of the temporal variable used in the model.
+
+dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh, initialnames,
+                      responsecounts, responsepa, 
+                      marksnames, marksfamily, pointcovariates,
+                      trialspa, trialsmarks, speciesname, marksspatial,
+                      spatial, intercepts, spatialcovariates, marksintercepts,
+                      boundary, ips, temporal, temporalmodel, speciesspatial) {
+  
+  if (missing(coordinates)) stop('Coordinates need to be given.')
+  if (missing(projection)) stop('projection needs to be given.')
+  if (missing(Inlamesh)) stop('Mesh needs to be given.')
+  
+  if (class(Inlamesh) != 'inla.mesh') stop('Mesh needs to be an inla.mesh object.')
+  
+  if (class(projection)[1] != 'CRS') stop('Projection needs to be a CRS object.')
+  
+  if (length(coordinates) != 2) stop('Coordinates needs to be a vector of length 2 containing the coordinate names.')
+  
+  if (coordinates[1] == coordinates[2]) stop('Coordinates need to be unique values.')
+  
+  if (any(missing(responsecounts), missing(responsepa)) ||
+      any(is.null(responsecounts), is.null(responsepa))) stop('At least one of responseCounts and responsePA are NULL. Please provide both.')
+  
+  private$responseCounts <- responsecounts
+  private$responsePA <- responsepa
+  
+  if (!missing(trialspa)) private$trialsPA <- trialspa
+  if (!missing(trialsmarks)) private$trialsMarks <- trialsmarks
+  
+  if (!missing(speciesname)) private$speciesName <- speciesname
+  
+  if (!missing(temporal)) private$temporalName <- temporal
+  private$temporalModel <- temporalmodel
+  
+  if (!missing(initialnames)) private$initialnames <- initialnames
+  if (!missing(boundary)) private$Boundary <- boundary
+  
+  private$markNames <- marksnames
+  private$markFamily <- marksfamily
+  
+  private$pointCovariates <- pointcovariates
+  
+  if (!is.null(spatialcovariates)) private$spatialCovariates(spatialcovariates)
+  
+  if (!is.null(ips)) private$IPS <- ips
+  else {
+    
+    if (is.null(boundary)) private$IPS <- inlabru::ipoints(samplers = boundary, domain = Inlamesh)
+    else private$IPS <- inlabru::ipoints(domain = Inlamesh)
+    
+  }
+  
+  private$Spatial <- spatial
+  private$marksSpatial <- marksspatial
+  private$Intercepts <- intercepts
+  private$marksIntercepts <- marksintercepts
+  
+  private$speciesSpatial <- speciesspatial
+  
+  #if (!private$Spatial && private$markSpatial) warning('Spatial has been set to FALSE but marksSpatial is TRUE. Spatial effects for the marks will still be run.')
+  
+  private$Coordinates <- coordinates
+  private$Projection <- projection
+  private$INLAmesh <- Inlamesh
+  invisible(self)
+})
 
 dataSDM$set('private', 'polyfromMesh', function(...) {
   
