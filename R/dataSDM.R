@@ -660,7 +660,17 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param datasetNames A vector of datasets to add the bias fields to.
   #' @param allPO Should the bias fields be added to all the presence only datasets. Defaults to \code{NULL}.
   #' @param biasField An inla.spde model descrbing the random bias field.
-  
+  #' 
+  #' @examples
+  #' \dontrun{
+  #' 
+  #' #Make dataObject
+  #' dataObj <- bruSDM(...)
+  #' 
+  #' #Add biasfield for a dataset
+  #' dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
+  #' 
+  #' }
   addBias = function(datasetNames = NULL,
                      allPO = FALSE,
                      biasField = NULL) {

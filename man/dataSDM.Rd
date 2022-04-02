@@ -46,6 +46,20 @@ dataObj$addData(dataset, responseCounts = responseCounts,
                 speciesName = speciesName, Coordinates = Coordinates)
 
 }
+
+## ------------------------------------------------
+## Method `dataSDM$addBias`
+## ------------------------------------------------
+
+\dontrun{
+
+#Make dataObject
+dataObj <- bruSDM(...)
+
+#Add biasfield for a dataset
+dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
+
+}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -214,6 +228,22 @@ Function used to add additional bias fields to different data processes.
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+
+#Make dataObject
+dataObj <- bruSDM(...)
+
+#Add biasfield for a dataset
+dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
+
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-updateFormula"></a>}}
