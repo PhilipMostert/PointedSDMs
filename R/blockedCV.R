@@ -23,25 +23,40 @@ blockedCV <- function(data, options = list()) {
   
   #Need another index for number of blocks
   
-  block_index <- lapply(data$.__enclos_env__$private$modelData, function(x) x$data@data[,'block_index'])
+  block_index <- lapply(unlist(data$.__enclos_env__$private$modelData), function(x) x@data[,'block_index'])
   
   for (fold in unique(unlist(block_index))) {
     
-    for (dataset in names(data$.__enclos_env__$private$modelData)) {
-      
-      # if family == 'cp'
-       # index family by removing all the data points not in the fold
-       # go into data@data[,'BRU_aggregate'] and count the number of TRUEs
-       # Then go into response_data and change BRU_response_cp to that sum
-      ##Need to also remove ipoints not in fold::
-      
-      
-      #train: all data not fold
-      train <- zz
-      #test: all data fold
-      test <- xx  
-      
-    }
+    ##Maybe make block_index in dataSDM as a list such that we can see which datasets are not in block i to easily remove them.
+     #Get formula terms only after likelihood construction, and then thin components from there.
+     #And also for the whole, control.family thing
+    
+    trainLiks <- do.call(inlabru::like_list,
+                 makeLhoods(data = data$.__enclos_env__$private$modelData,
+                 formula = data$.__enclos_env__$private$Formulas,
+                 family = data$.__enclos_env__$private$Family,
+                 mesh = data$.__enclos_env__$private$INLAmesh,
+                 ips = data$.__enclos_env__$private$IPS,
+                 paresp = data$.__enclos_env__$private$responsePA,
+                 ntrialsvar = data$.__enclos_env__$private$trialsPA,
+                 markstrialsvar = data$.__enclos_env__$private$trialsMarks,
+                 speciesname = data$.__enclos_env__$private$speciesName,
+                 speciesindex = data$.__enclos_env__$private$speciesIndex,
+                 filter = block_index))
+      ##Get formulas here
+       #Then thin components
+    trainedModel <- inlabru::bru(components = thinnedComponents,
+                                 trainLiks,
+                                 options = thinedOptions)
+    
+    test <- do.call(rbind.SpatialPoints,
+            lapply(unlist(data$.__encos_enc__$private$modelData, recursive = TRUE), function (x) {
+        
+                x[x$block_index == block_index, ]}))
+    
+    
+    predictTest <- predict(object = trainedModel, data = test, formula = ~(predictor))
+    #...  
     
     }
   
