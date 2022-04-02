@@ -75,7 +75,7 @@ makeLhoods <- function(data, formula, family, mesh, ips,
         }
         else IPS <- ips
        
-        if (!is.null(filterblock)) filter <- data[[dataset]][[species]]$block_index == filterblock
+        if (!is.null(filterblock)) filter <- data[[dataset]][[species]]$block_index != filterblock
         else filter <- data[[dataset]][[species]]
         
         Likelihoods[[Likindex]] <- inlabru::like(formula = formula[[dataset]][[species]][[process]][['LHS']], ## but obs change these in function call
