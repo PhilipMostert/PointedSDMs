@@ -28,6 +28,31 @@ setClass('bruSDM_predict')
 #' @return A list of inlabru predict objects.
 #' @export
 #' 
+#' @examples 
+#' \dontrun{
+#' 
+#' #Make data object
+#' dataObj <- bruSDM(...)
+#' 
+#' ##Run model
+#' intModel <- runModel(dataObj, ...)
+#' 
+#' #Predict
+#' predictions <- predict(object = intModel, mask = spatialPolygons,
+#'                        mesh = inlaMesh, spatial = TRUE, covariates = 'covariates',
+#'                        fun = 'linear')
+#'                        
+#'#Predict linear predictor
+#'predictions <- predict(object = intModel, data = spatialPolygons,
+#'                       mesh = inlaMesh, predictor = TRUE)
+#'                       
+#'#Predict bias field
+#'predictions <- predict(object = intModel, data = spatialPolygons,
+#'                       mesh = inlaMesh, bias = 'datasetName')
+#'                        
+#' 
+#' }
+#' 
 
 predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL, 
                            mask = NULL, temporal = FALSE, covariates = NULL, spatial = FALSE,
@@ -251,8 +276,6 @@ print.bruSDM_predict <- function(x, ...) {
 #' Plot for preduct_bru_sdm
 #' 
 #' @param x A bruSDM_predict object.
-#' @param plotall Plot all predictions of the datasets.
-#' @param datasettoplot Plot a specific dataset.
 #' @param whattoplot One of the following statistics to plot: "mean", "sd", "q0.025", "median","q0.975", "smin", "smax", "cv", "var" 
 #' @param colours Custom colours of the plot provided by the function, scale_fill_gradientn.
 #' @param cols Number of columns required for the plotting. Used by inlabru's multiplot function.
@@ -260,10 +283,32 @@ print.bruSDM_predict <- function(x, ...) {
 #' @param plot Should the plots be printed, defaults to \code{TRUE}. If \code{FALSE} will  produce a list of ggplot objects.
 #' @param ... Argument not used
 #' @return A ggplot2 object.
-#' @exportS3Method 
+#' @exportS3Method
+#' 
+#' @examples 
+#' \dontrun{
+#' 
+#' #Make data object
+#' dataObj <- bruSDM(...)
+#' 
+#' #Run model
+#' intModel <- bruSDM(dataObj, ...)
+#' 
+#' #Predict
+#' predictions <- predict(object = intModel, mask = spatialPolygons,
+#'                        mesh = inlaMesh, predictor = TRUE)
+#'                        
+#'#Plot variance of predictions
+#'plot(predictions, whattoplt = 'var')
+#'
+#'#Obtain ggplot object
+#'
+#'plotObj <- plot(predictions, plot = FALSE)                              
+#' 
+#' }
+#' 
 
-plot.bruSDM_predict <- function(x, plotall = TRUE,
-                                datasettoplot = NULL,
+plot.bruSDM_predict <- function(x,
                                 whattoplot = c('mean'),
                                 colours = NULL,
                                 cols = NULL,

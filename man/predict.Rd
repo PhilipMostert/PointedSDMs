@@ -62,3 +62,29 @@ A list of inlabru predict objects.
 \description{
 Predict for bru_sdm
 }
+\examples{
+\dontrun{
+
+#Make data object
+dataObj <- bruSDM(...)
+
+##Run model
+intModel <- runModel(dataObj, ...)
+
+#Predict
+predictions <- predict(object = intModel, mask = spatialPolygons,
+                       mesh = inlaMesh, spatial = TRUE, covariates = 'covariates',
+                       fun = 'linear')
+                       
+#Predict linear predictor
+predictions <- predict(object = intModel, data = spatialPolygons,
+                      mesh = inlaMesh, predictor = TRUE)
+                      
+#Predict bias field
+predictions <- predict(object = intModel, data = spatialPolygons,
+                      mesh = inlaMesh, bias = 'datasetName')
+                       
+
+}
+
+}

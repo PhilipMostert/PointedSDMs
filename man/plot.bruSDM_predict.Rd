@@ -6,8 +6,6 @@
 \usage{
 \method{plot}{bruSDM_predict}(
   x,
-  plotall = TRUE,
-  datasettoplot = NULL,
   whattoplot = c("mean"),
   colours = NULL,
   cols = NULL,
@@ -18,10 +16,6 @@
 }
 \arguments{
 \item{x}{A bruSDM_predict object.}
-
-\item{plotall}{Plot all predictions of the datasets.}
-
-\item{datasettoplot}{Plot a specific dataset.}
 
 \item{whattoplot}{One of the following statistics to plot: "mean", "sd", "q0.025", "median","q0.975", "smin", "smax", "cv", "var"}
 
@@ -40,4 +34,27 @@ A ggplot2 object.
 }
 \description{
 Plot for preduct_bru_sdm
+}
+\examples{
+\dontrun{
+
+#Make data object
+dataObj <- bruSDM(...)
+
+#Run model
+intModel <- bruSDM(dataObj, ...)
+
+#Predict
+predictions <- predict(object = intModel, mask = spatialPolygons,
+                       mesh = inlaMesh, predictor = TRUE)
+                       
+#Plot variance of predictions
+plot(predictions, whattoplt = 'var')
+
+#Obtain ggplot object
+
+plotObj <- plot(predictions, plot = FALSE)                              
+
+}
+
 }
