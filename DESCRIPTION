@@ -30,7 +30,8 @@ Suggests:
     RColorBrewer,
     cowplot,
     knitr,
-    kableExtra
+    kableExtra,
+    rmarkdown
 RoxygenNote: 7.1.2
 License: GPL (>= 3)
 VignetteBuilder: knitr
