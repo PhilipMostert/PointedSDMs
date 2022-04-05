@@ -4,14 +4,14 @@
 \alias{datasetOut}
 \title{FdatasetOut: Function that removes a dataset out of the main model, and calculates some cross-validation score.}
 \usage{
-datasetOut(model, dataset, predictions = FALSE)
+datasetOut(model, dataset, predictions = TRUE)
 }
 \arguments{
 \item{model}{Model of class bru_sdm run with all datasets.}
 
-\item{dataset}{Datasets to leave out.}
+\item{dataset}{Datasets to leave out. If missing, will run for all datasets used in the full model.}
 
-\item{predictions}{Will new models be used for predictions. If \code{TRUE} returns marginals and bru_info in model. Defaults to \code{FALSE}.}
+\item{predictions}{Will new models be used for predictions. If \code{TRUE} returns marginals and bru_info in model. Defaults to \code{TRUE}.}
 }
 \value{
 A list of inlabru models with the specified dataset left out. If predictions is \code{FALSE}, these objects will be missing their \code{bru_info} and \code{call} lists.
