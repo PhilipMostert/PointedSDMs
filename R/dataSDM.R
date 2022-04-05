@@ -67,6 +67,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @description Makes a plot of the region as well as the points.
   #' @param Datasets Name of the datasets to plot.
   #' @param Species Should species be plotted as well? Defaults to \code{FALSE}.
+  #' @param Boundary Should a boundary (created using the inlaMesh object) be used in the plot. Defaults to \code{TRUE}.
   #' @param ... Not used.
   #' @return A ggplot object.
   #' @examples 
@@ -87,7 +88,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #' }
   
-  plot = function(Datasets, Species = FALSE, ...) {
+  plot = function(Datasets, Species = FALSE, Boundary = TRUE, ...) {
     
     if (length(private$modelData) == 0) stop('Please provide data before running the plot function.')
     
@@ -130,7 +131,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     plotData <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(points), function(x) x[, names(x) %in% c('..Dataset_placeholder_var..', private$speciesName)]))
     
-    bound <- private$polyfromMesh()
+    if (Boundary) bound <- gg(private$polyfromMesh())
+    else bound <- NULL
     
     if (Species) {
       
@@ -140,13 +142,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       colOption <- gg(plotData, aes(col = eval(parse(text = private$speciesName))))
       
-      ggplot() + colOption + gg(bound) + guides(col = guide_legend(title = 'Species Name')) 
+      ggplot() + colOption + bound + guides(col = guide_legend(title = 'Species Name')) 
       
     }
     else { 
       
       colOption <- gg(plotData, aes(col = eval(parse(text = '..Dataset_placeholder_var..'))))
-      ggplot() + colOption + gg(bound) + guides(col = guide_legend(title = 'Dataset Name')) 
+      ggplot() + colOption + bound + guides(col = guide_legend(title = 'Dataset Name')) 
       
     }
     

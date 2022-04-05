@@ -202,7 +202,7 @@ Prints the datasets, their data type and the number of observations, as well as 
 \subsection{Method \code{plot()}}{
 Makes a plot of the region as well as the points.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$plot(Datasets, Species = FALSE, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$plot(Datasets, Species = FALSE, Boundary = TRUE, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -211,6 +211,8 @@ Makes a plot of the region as well as the points.
 \item{\code{Datasets}}{Name of the datasets to plot.}
 
 \item{\code{Species}}{Should species be plotted as well? Defaults to \code{FALSE}.}
+
+\item{\code{Boundary}}{Should a boundary (created using the inlaMesh object) be used in the plot. Defaults to \code{TRUE}.}
 
 \item{\code{...}}{Not used.}
 }
