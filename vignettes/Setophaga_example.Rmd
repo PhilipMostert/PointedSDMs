@@ -1,0 +1,380 @@
+---
+title: "Setophaga example"
+author: "Philip Mostert"
+date: "`r Sys.Date()`"
+bibliography: References.bib
+biblio-style: authoryear
+output: rmarkdown::html_vignette
+---
+
+# Introduction
+
+Predicting the distribution of species across space and time is a fundamental piece for answering numerous questions across the field of ecology. There are several tools used to make these predictions, however the most common is certainly species distribution models (SDMs).
+
+As a result of the boom in digital technology and the collapse of data storage costs achieved over the last two decades, the number of species observations recorded has skyrocketed, and so SDMs have benefited greatly. However all these data were collected with a single purpose in mind; they all have their own sampling protocols, assumptions and attributes, making joint analysis of them difficult.
+
+As a result of this issue, the field of integrated species distribution modelling has progressed considerably over the last few years -- and now the associated methods are well-developed, and the benefits of using such models (over single dataset or data-pooling models) are apparent.
+
+The issue lies in the fact that the tools needed to make these models have not been established -- especially the tools to be used by general ecologists with minimal coding skills. This in turn has stagnated the growth of applying these models to real data.
+
+In light of this impediment to the field of integrated modelling, we decided to make *inlabruSDMs*, an *R* package to help simplify the modelling process of integrated species distribution models (ISDMs) for ecologists. It does so by using the *INLA* framework [@rue2009approximate] to approximate the models and by constructing wrapper functions around those provided in the *R* package, *inlabru* [@bachl2019inlabru].
+
+This *R markdown* file illustrates an example of modelling an ISDM with *inlabruSDMs,* using five disparate datasets containing species *Setophaga* collected around Pennsylvania state (United States of America). The first part of this file contains a brief introduction to the statistical model used in ISDMs, as well as an introduction to the included functions in the package. The second part of this file uses *inlabruSDMs* to run the ISDM.
+
+```{r Install inlabruSDMs, warning = FALSE, message = FALSE, eval = FALSE}
+
+##Install if need be
+devtools::install_github('PhilipMostert/inlabruSDMs')
+library(inlabruSDMs)
+
+```
+
+### Statistical model
+
+The goal of our statistical model is to infer the "true" distribution of our species' using the observations we have at hand, as well as environmental covariates describing the studied area, $\boldsymbol{X}$, and other parameters describing the species, $\boldsymbol{\theta}$. To do so, we construct a hierarchical state-space model composing of two parts: the underlying process model as well as observation models.
+
+The process model is a stochastic process which describes how the points are distributed in space. The most commonly assumed process model is the Log-Gaussian Cox process (LGCP), which is characterized by the intensity function $\lambda(s)$: such that a higher a higher intensity at a location implies the species is more abundant there, as well as a Gaussian random field used to account for all the environmental covariates not included in the model.
+
+The observation models give a statistical description of the data collection process, and are chosen for each dataset based on their underlying sampling protocols (see [@isaac2020data] for a detailed review of the types of observation models typically used in integrated models). As a result, we can write the likelihood of the observation model for a given dataset, $Y_i$ as $\mathcal{L} \left( Y_i \mid \lambda(s), \theta_i \right)$.
+
+Therefore, given a collection of heterogeneous datasets $\{Y_1, Y_2,...,Y_n\}$, the full-likelihood of the statistical process is given by:$$\mathcal{L} \left( \boldsymbol{Y} \mid \boldsymbol{X}, \boldsymbol{\theta}, \boldsymbol{\phi} \right) = p\left( \lambda(s), \boldsymbol{X}, \boldsymbol{\phi} \right) \times \prod_{i=1}^n \mathcal{L} \left(Y_i \mid \lambda(s), \theta_i\right),$$where $\boldsymbol\phi$ are parameters assumed for the underlying process.
+
+### Package use
+
+*inlabruSDMs* is designed to simplify the modelling process of integrated species distribution models by using wrapper functions around those found in *R-INLA* and *inlabru*. The simplification is regarding four key steps in the statistical-modelling process:
+
+-   data preparation,
+
+-   model fitting,
+
+-   cross-validation,
+
+-   prediction.
+
+The first function of interest with regards to these steps is `bruSDM`, which is designed to create objects required by *inlabru*, assign the relevant information to individual objects used in model specification, as well as structure the provided datasets together into a homogenized framework.
+
+```{r bruSDM}
+
+args(bruSDM)
+
+```
+
+The output of this function is an *R6* object, and so there are several slot functions included to help specify the model at a finer scale. Use `?dataSDM` to get a comprehensive description of these slot functions.
+
+The next function used is `runModel` which takes the data object created with `bruSDM` and runs the integrated model. The output of this function is in essence an *inlabru* model output with additional information to be used by the sequential functions.
+
+```{r runModel}
+
+args(runModel)
+
+```
+
+`datasetOut` provides cross-validation for integrated models by running the full model with one less dataset, and calculating a score measuring the retaliative importance of the left out dataset in the full model. It does so by...
+
+```{r datasetOut}
+
+args(datasetOut)
+
+```
+
+Finally prediction of the full model may be completed using the `predict` function; the arguments here are mostly related to specifying which components are required to be predicted, however the function can act identically to the *inlabru* `predict` function if need be. After predictions are complete, plots may be made using the generic `plot` function.
+
+## *Setophaga* example
+
+This example aims to predict the distribution of three species of genus *setophaga* across Pennsylvania state. This example is notable in integrated modelling since it has been used by two seminal papers in the field, namely those by: @isaac2020data and @miller2019recent. This file extends the example by adding two additional datasets containing two new studied species.
+
+### Model preparations
+
+The first step in our analysis is to load in the packages required.
+
+```{r Load packages, message=FALSE, warning=FALSE}
+
+library(INLA)
+library(inlabru)
+library(USAboundaries)
+library(sp)
+library(sf)
+library(raster)
+library(rasterVis)
+library(ggmap)
+library(RColorBrewer)
+library(cowplot)
+library(knitr)
+library(kableExtra)
+library(dplyr)
+
+```
+
+#### Species occurrence data
+
+The first step in our analysis is to load in the five datasets containing the geocoded locations of our studed species'. Here, the three present only datasets were obtained from the github repository: <https://github.com/oharar/IM_warbler>, who in turn obtained their data via the *spocc* [@spocc] package, which is a toolkit to obtain species' observation data from a selection of popular online data repositories (*GBIF*, *Vernet*, *BISON*, *iNaturalist* and *eBird*).
+
+```{r Load points, eval = FALSE}
+
+data('SetophagaData')
+
+```
+
+Their script was slightly adapted to obtain observations from the species, *magnolia* and *fusca*; however the script to obtain the presence only datasets (*eBird_caerulescens*, *eBird_fusca, eBird_magnolia)* remains fundamentally the same otherwise.
+
+The github repository noted above also contains two additional structured datasets (*BBA, BBS*), which were both assumed to be presence absence datasets in the study conducted by @isaac2020data, containing the variable, *NPres*, denoting the presence (or number of presences in the *BBS* dataset) at each sampling location. However, we changed the *NPres* variable name of the *BBS* dataset to *Counts* in order to consider it a counts dataset for illustrative purposes. No additional changes were made to the *BBA* dataset, and so it was considered a presence absence dataset as originally intended.\
+
+|   **Dataset name**   | **Type of data** | **Number of observations** | **Species name** |                                                                   **Source**                                                                   |
+|:--------------------:|:----------------:|:--------------------------:|:----------------:|:----------------------------------------------------------------------------------------------------------------------------------------------:|
+|        *BBS*         |      Counts      |             45             |  *Caerulescens*  | [North American Breeding Bird Survey](https://www.pwrc.usgs.gov/bbs/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
+|        *BBA*         | Present absence  |            5165            |  *Caerulescens*  |  [Pennsylvania Breeding Bird Atlas](http://www.pabirdatlas.psu.edu/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}  |
+| *eBird_caerulescens* |   Present only   |            264             |  *Caerulescens*  |                      [eBird](https://ebird.org/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                      |
+|   *eBird_magnolia*   |   Present only   |            354             |    *Magnolia*    |                      [eBird](https://ebird.org/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                      |
+|    *eBird_fusca*     |   Present only   |            217             |     *Fusca*      |                      [eBird](https://ebird.org/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                      |
+
+Table 1: Table illustrating the different datasets used in the analysis.
+
+In addition, two spatial covariates (*elevation* and *canopy)* were also obtained using the same github repository. The only changes made were that we kept the covariate objects as *Raster* objects; whereas the above script converts them to *SpatialPixelDataFrames* before analysis.
+
+```{r Load covartiates, eval = FALSE}
+##REMOVE
+load('data/SetophagaCovariates.RData')
+
+```
+
+More so, we create a *SpatialPolygons* object of Pennsylvania using the *USAboundaries* [@USABoundaries] package, which will be used later to create other necessary objects used in the model as well as for the graphics, and define the coordinate reference system used for the data.
+
+```{r spatial objects, warning = FALSE, message = FALSE}
+
+proj <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+
+PA <- USAboundaries::us_states(states = "Pennsylvania")
+PA <- PA$geometry[1]
+PA <- as(PA, "Spatial")
+
+```
+
+```{r map, warning = FALSE, message = FALSE}
+
+map <- ggmap::get_map(location = c(PA@bbox[1],
+                                   PA@bbox[2],
+                                   PA@bbox[3],
+                                   PA@bbox[4]))
+
+```
+
+```{r PO plot, warning = FALSE, message = FALSE, fig.width=8, fig.height=5}
+
+PO_plot <- ggmap::ggmap(map) + 
+           gg(PA, lwd = 1.2) + 
+           gg(eBird_magnolia, aes(col = Species_name), shape = 15) +
+           gg(eBird_caerulescens, aes(col = Species_name), shape = 15) +
+           gg(eBird_fusca, aes(col = Species_name), shape = 15) +
+           ggtitle('Plot showing locations for the present only datasets') +
+           labs(colour = 'Species name') + 
+           scale_colour_manual(values = c('#003f5c', '#bc5090','#ffa600')) +
+           theme_bw() +
+           guides(colour = guide_legend(override.aes = list(size = 10))) +
+           theme(plot.title = element_text(hjust = 0.5))
+           
+PO_plot
+
+```
+
+```{r PA plot, warning = FALSE, message = FALSE, fig.width=8, fig.height=5}
+
+PA_plot <- ggmap::ggmap(map) +
+           gg(PA, lwd = 1.2) +
+           gg(BBA, aes(col = NPres), shape =  15) +
+           labs(colour = 'Species \npresence') +
+           ggtitle(label = 'Plot of the presence absence data') + 
+           scale_colour_manual(labels = c('BBA, FALSE','BBA, TRUE'),
+                               values = c('#bc5090','#ffa600')) +
+           theme_bw() +
+           guides(colour = guide_legend(override.aes = list(size = 10), 
+                                        reverse = TRUE)) +
+           theme(plot.title = element_text(hjust = 0.5))
+PA_plot
+
+```
+
+```{r Counts plot, warning = FALSE, message = FALSE, fig.width=8, fig.height=5}
+
+Counts_plot <- ggmap::ggmap(map) +
+               gg(PA, lwd = 1.2) +
+               gg(BBS, aes(size = Counts), col = '#003f5c', shape = 15) +
+               labs(size = 'Counts') +
+               ggtitle(label = 'Plot of the count data') + 
+               theme_bw() +
+               guides(colour = guide_legend(override.aes = list(size = 10), 
+                                        reverse = TRUE)) +
+               theme(plot.title = element_text(hjust = 0.5))
+Counts_plot
+
+```
+
+#### Covariate data
+
+Species distribution models study the relationship between our in-situ species observations and the underlying environment, and so in line with the study conducted by @isaac2020data, we considered two covariates: *elevation*, describing the height above sea level (meters) and *canopy*, describing the proportion of tree canopy covered in the area. These two covariates were obtained from the @hollister2017elevatr and @FEDdata R packages respectively. The script to obtain these spatial covariates is provided in the same github repository as the species occurrence data above.
+
+```{r Covariate data, message = FALSE, warning = FALSE}
+
+covariates <- scale(stack(elev_raster, NLCD_canopy_raster))
+names(covariates) <- c('elevation', 'canopy')
+
+```
+
+#### Additional objects
+
+Finally, additional objects required by *inlabruSDMs* and the *R-INLA* [@martins2013bayesian] and *inlabru* [@bachl2019inlabru] packages need to be assembled.
+
+The `bruSDM` function is the first step in the modeling of our species data. The aim of the function is to organize and standardize our data to ensure that each process is correctly modeled in the integrated framework. For this standardization to work, we specify the response variable names of the counts data (*responseCounts*) and present absence (*responsePA*), the coordinate names (*Coordinates*) as well as the coordinate reference system used (*Projection*). In addition, the species variable name (*speciesName*) was also specified in order to model the effects for the species found in the datasets.
+
+The *R-INLA* package requires a Delaunay triangulated mesh used to approximate our spatial random fields, which is created by supplying the *max.edge, offset* and *cutoff* arguments as well as our *SpatialPolygons* map of Pennsylvania to the `inla.mesh.2d`function. With this mesh, `bruSDM` will create integration points required by our model using *inlabru*'s `ipoints` function.
+
+```{r Mesh, warning = FALSE, message = FALSE, fig.width=8, fig.height=5}
+
+mesh <- inla.mesh.2d(boundary = inla.sp2segment(PA), 
+                     cutoff = 0.2,
+                     max.edge = c(0.1, 0.24), 
+                     offset = c(0.1, 0.4))
+
+mesh$crs <- proj
+
+mesh_plot <- ggplot() +
+             gg(mesh) +
+             ggtitle('Plot of mesh') +
+             theme_bw() +
+             theme(plot.title = element_text(hjust = 0.5))
+mesh_plot
+
+```
+
+When conducting Bayesian analysis, the choice of prior distribution is imperative. In our example, we chose Penalizing complexity priors [@simpson2017penalising], which are designed to control the spatial range and marginal standard deviation in the GRF's Matérn covariance function in order to reduce over-fitting in the model.
+
+```{r Model prep, warning = FALSE, message = FALSE, eval = TRUE}
+
+pcmatern <- inla.spde2.pcmatern(mesh,
+                                prior.sigma = c(5, 0.01),
+                                prior.range = c(1, 0.01))
+
+spatial_data <- bruSDM(BBS, BBA, eBird_fusca, 
+                       eBird_caerulescens, eBird_magnolia,
+                       Coordinates = c('X', 'Y'), 
+                       Projection = proj, Mesh = mesh,
+                       responsePA = 'NPres', responseCounts = 'Counts',
+                       spatialCovariates = covariates, speciesName = 'Species_name')
+
+spatial_data$specifySpatial(shared_spatial = TRUE, 
+                            prior.sigma = c(5, 0.01),
+                            prior.range = c(1, 0.01))
+
+```
+
+Presence only datasets (such as our *eBird* data) are often noted to contain numerous biases, which in turn can heavily skew results obtained from our model. A common approach to account for these biases is by using a variable in the model such as sampling effort (some examples include: distance traveled, number of observations per visit, duration spent observing). However in the absence of such variables, running a second spatial field in the model can improve performance of the integrated model [@simmonds2020more]. To add a second spatial field to our model, we use the `` `.$addBias` `` function, which is part of the *bruSDM* object created above.
+
+```{r bias fields, eval = FALSE}
+
+spatial_data$addBias('eBird_caerulescens')
+spatial_data$addBias('eBird_fusca')
+spatial_data$addBias('eBird_magnolia')
+
+```
+
+### Results
+
+The integrated model is easily run with the `runModel` function as seen below by supplying the occurrence and *R-INLA* objects (created above with `bruSDM`*),* as well as our spatial covariates. Here we share a common spatial field between our five datasets, as well using additional effects for the three different species (specified with `specieseffects = TRUE`).
+
+```{r Running model, message=FALSE, warning=FALSE, eval=FALSE}
+
+joint_model <- runModel(data = spatial_data, 
+                       options = list(control.inla = list(int.strategy = 'eb')))
+
+```
+
+```{r Summary of model, message = FALSE, warning = FALSE, echo = TRUE,fig.width=7, fig.height=5}
+
+results_plot <- joint_model$summary.fixed %>%
+                mutate(species = gsub('_.*$','',
+                                      row.names(joint_model$summary.fixed))) %>%
+                mutate(coefficient = row.names(joint_model$summary.fixed))
+
+
+coefficient_plot <- ggplot(results_plot, aes(x = coefficient, y = mean)) +
+                    geom_hline(yintercept = 0, colour = grey(0.25), lty = 2) +
+                    geom_point(aes(x = coefficient, 
+                                   y = mean)) + 
+                    geom_linerange(aes(x = coefficient, 
+                                       ymin = `0.025quant`,
+                                       ymax = `0.975quant`,
+                                       col = species),
+                                       lwd = 1) +
+                                       theme_bw() +
+                    scale_colour_manual(values = c('#003f5c', '#bc5090','#ffa600')) +
+                    theme(legend.position="bottom",
+                    plot.title = element_text(hjust = 0.5)) +
+                    ggtitle("95% credibility intervals of the fixed effects\n
+                            for the three studied species") +
+                    labs(x = 'Variable', y = 'Coefficient value') +
+                    coord_flip()
+
+coefficient_plot
+
+```
+
+*inlabruSDMs* also includes the function `datasetOut`, which iteratively omits one dataset (and its associated marks) out of the full model. For example, we can calculate the effect on the other variables by leaving out the dataset *BBA*, which contributes the most occurrences used in our joint-likelihood model by a significant amount.
+
+Furthermore, by setting `predictions = TRUE` we are able to calculate some cross-validation score by leaving out the selected dataset. This score is calculated by predicting the covariate values of the left-out using the reduced model (i.e the model with the dataset left out), using the predicted values as an offset in a new model, and then finding the difference between the marginal-likelihood of the full model (i.e the model with all the datasets considered) and the marginal-likelihood of the offset model.
+
+```{r Leave one out, message = FALSE, warning = FALSE, eval = FALSE}
+
+dataset_out <- datasetOut(model = joint_model,
+                          dataset = "BBA",
+                          predictions = TRUE)
+
+dataset_out
+
+```
+
+```{r Leave one out show, message = FALSE, warning = FALSE, echo = FALSE}
+
+dataset_out
+
+```
+
+### Predictions
+
+A significant part of SDMs is creating prediction maps to understand the species' spread. Predictions of the integrated SDM's from `runModel` are made easy using the *predict* function. By supplying the relevant components, the predict function will create the formula required by *inlabru*'s predict function to make the predictive maps. In this example, we made predictions for effect of the species (by setting `species = TRUE`), using 1000 samples*.*
+
+```{r Projections, message = FALSE, warning = FALSE, eval = FALSE}
+
+##This needs to change
+projections <- predict(joint_model, mesh = mesh, mask = PA, 
+                       predictor = TRUE,
+                       fun = 'linear', n.samples = 1000)
+
+```
+
+*inlabruSDMs* also provides a general plotting function to plot the maps using the predicted values obtained in the *predict* function. By setting the plot argument to FALSE, the *ggplot* object of the predicted statistic is given, which would allow for more custom plotting functionality. The plot below shows the effects of the three individual species under consideration.
+
+Unfortunately in this example the species *Caerulescens* is dominated by the *BBA* dataset, which contains observations collected around central Pennsylvania. As a result, the log of the intensity of this species is heavily biased towards this area.
+
+```{r Plots, fig.width=8, fig.height=5, message = FALSE, warning = FALSE}
+
+projection_means <- plot(projections,
+                         whattoplot = 'mean')
+
+colours <- function(obj,statistic) {
+  
+  scale_fill_gradientn(colours = rev(brewer.pal(9,"YlGn")),
+                       limits = range(obj@data[,statistic]))
+
+}
+
+projection_means + 
+  colours(projections$`Species predictions`, 'mean') +
+  theme_bw() +
+  #coord_equal() +
+  ggtitle('Log intensity of predicted posterior') +
+  labs(fill = expression(paste('log(',lambda,'(s))'))) +
+  theme(legend.position="bottom",
+        plot.title = element_text(hjust = 0.5))
+  
+```
+
+#### References
