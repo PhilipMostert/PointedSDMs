@@ -3,8 +3,8 @@
 #' @description This function calculates the difference in covariate values between a full bru_sdm model and a model with one dataset left out, as well as some cross-validation score based on the effect of leaving out the dataset.
 #' 
 #' @param model Model of class bru_sdm run with all datasets.
-#' @param dataset Datasets to leave out.
-#' @param predictions Will new models be used for predictions. If \code{TRUE} returns marginals and bru_info in model. Defaults to \code{FALSE}. 
+#' @param dataset Datasets to leave out. If missing, will run for all datasets used in the full model.
+#' @param predictions Will new models be used for predictions. If \code{TRUE} returns marginals and bru_info in model. Defaults to \code{TRUE}. 
 #' 
 #' @return A list of inlabru models with the specified dataset left out. If predictions is \code{FALSE}, these objects will be missing their \code{bru_info} and \code{call} lists.
 #' 
@@ -35,9 +35,11 @@
 #' }
 
 datasetOut <- function(model, dataset,
-                       predictions = FALSE) {
+                       predictions = TRUE) {
   
   if (!inherits(model, 'bruSDM')) stop('Model needs to be of class "bru_sdm".')
+  
+  if (missing(dataset)) dataset <- unique(model[['source']])
   
   if (!all(dataset%in%model[['source']])) stop('Dataset provided not run in initial model.')
   
@@ -46,7 +48,7 @@ datasetOut <- function(model, dataset,
   model_results <- list()
   
   model_differences <- list()
-  
+  ##re-write all of this with data2env
   if (!is.null(model[['spatCovs']][['name']])) {
     
     for (names in model[['spatCovs']][['name']]) {
