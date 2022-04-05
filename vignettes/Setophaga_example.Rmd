@@ -219,7 +219,7 @@ When conducting Bayesian analysis, the choice of prior distribution is imperativ
 
 ```{r specifySpatial}
 
-spatial_data$specifySpatial(shared_spatial = TRUE, ##Change shared_spatial term name?
+spatial_data$specifySpatial(sharedSpatial = TRUE,
                             prior.sigma = c(5, 0.01),
                             prior.range = c(1, 0.01))
 
@@ -258,7 +258,7 @@ spatial_data$changeComponents()
 
 ```
 
-This model is thus specified with: two environmental covariates, an intercept term per species, a spatial field per species as well as a shared spatial field between the different datasets. If we wanted to add/change or remove a component entirely, this could be done with the `addComponent` and `removeComponent` argument respectively.
+This model is thus specified with: two environmental covariates, an intercept term per species, a spatial field per species, the three bias fields for the *presence only* data as well as a shared spatial field between the different datasets. If we wanted to add/change or remove a component entirely, this could be done with the `addComponent` and `removeComponent` argument respectively.
 
 ##### `runModel`
 
@@ -325,7 +325,7 @@ dataset_out
 
 ##### `predict`
 
-A significant part of SDMs is creating prediction maps to understand the species' spread. Predictions of the integrated SDM's from `runModel` are made easy using the `predict` function. By supplying the relevant components, the predict function will create the formula required by *inlabru*'s predict function to make the predictive maps. In this example, we made predictions for effect of the species (by setting `species = TRUE`), using 1000 samples*.*
+A significant part of SDMs is creating prediction maps to understand the species' spread. Predictions of the integrated SDM's from `runModel` are made easy using the `predict` function. By supplying the relevant components, the predict function will create the formula required by *inlabru*'s `predict` function to makepredictive maps. In this example, we made predictions for the entire linear predictor (specifying `predictor = TRUE`), on the linear scale using 1000 samples*.*
 
 ```{r Projections, message = FALSE, warning = FALSE, eval = FALSE}
 
