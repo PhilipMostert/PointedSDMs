@@ -130,7 +130,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
     
     plotData <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(points), function(x) x[, names(x) %in% c('..Dataset_placeholder_var..', private$speciesName)]))
-    
+
     if (Boundary) bound <- gg(private$polyfromMesh())
     else bound <- NULL
     
@@ -138,8 +138,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       ## Need to add the species in here
       
-      plotData@data[, private$speciesName] <- unlist(lapply(1:length(plotData[,private$speciesName]), function(x,y,z) y[z[x]], y = unlist(private$speciesIn), z= plotData@data[,private$speciesName]))
-      
+      plotData@data[, private$speciesName] <- unlist(private$speciesIndex) #unlist(lapply(1:length(plotData[,private$speciesName]), function(x,y,z) y[z[x]], y = unlist(private$speciesIn), z= plotData@data[,private$speciesName]))
+       
       colOption <- gg(plotData, aes(col = eval(parse(text = private$speciesName))))
       
       ggplot() + colOption + bound + guides(col = guide_legend(title = 'Species Name')) 
