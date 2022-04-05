@@ -1058,7 +1058,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       }
       
       if (intTRUE) newComponent <- paste0(Effect, '(1, mean.linear = ', mean.linear, ', prec.linear = ', prec.linear,' )')
-      else newComponent <- paste0(effect,'(main = ', Effect, ', model = \"', cov_class, '\", mean.linear = ', mean.linear, ', prec.linear = ', prec.linear, ')')
+      else newComponent <- paste0(Effect,'(main = ', Effect, ', model = \"', cov_class, '\", mean.linear = ', mean.linear, ', prec.linear = ', prec.linear, ')')
       
       self$changeComponents(addComponent = newComponent, print = FALSE)
       
