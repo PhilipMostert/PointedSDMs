@@ -289,7 +289,7 @@ This model is thus specified with: two environmental covariates, an intercept te
 
 The integrated model is easily run with the `runModel` function as seen below by supplying the occurrence and *R-INLA* objects (created above with `bruSDM`*)*. We specify `control.inla = list(int.strategy = 'eb')` in our `options` argument in order to speed up the model running time.
 
-```{r Running model, message=FALSE, warning=FALSE, eval=FALSE}
+```{r Running model, message=FALSE, warning=FALSE}
 
 joint_model <- runModel(data = spatial_data, 
                        options = list(control.inla = list(int.strategy = 'eb')))
@@ -332,7 +332,7 @@ coefficient_plot
 
 Furthermore, by setting `predictions = TRUE` we are able to calculate some cross-validation score by leaving out the selected dataset. This score is calculated by predicting the covariate values of the left-out using the reduced model (i.e the model with the dataset left out), using the predicted values as an offset in a new model, and then finding the difference between the marginal-likelihood of the full model (i.e the model with all the datasets considered) and the marginal-likelihood of the offset model.
 
-```{r Leave one out, message = FALSE, warning = FALSE, eval = FALSE}
+```{r Leave one out, message = FALSE, warning = FALSE}
 
 dataset_out <- datasetOut(model = joint_model,
                           dataset = "BBA",
@@ -352,7 +352,7 @@ dataset_out
 
 A significant part of SDMs is creating prediction maps to understand the species' spread. Predictions of the integrated SDM's from `runModel` are made easy using the `predict` function. By supplying the relevant components, the predict function will create the formula required by *inlabru*'s `predict` function to makepredictive maps. In this example, we made predictions for the entire linear predictor (specifying `predictor = TRUE`), on the linear scale using 1000 samples*.*
 
-```{r Projections, message = FALSE, warning = FALSE, eval = FALSE}
+```{r Projections, message = FALSE, warning = FALSE}
 
 ##This needs to change
 projections <- predict(joint_model, mesh = mesh, mask = PA, 
