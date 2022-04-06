@@ -22,7 +22,8 @@ Imports:
     ggpolypath,
     R.devices,
     ggplot2
-Suggests: 
+Suggests:
+    INLA,
     testthat (>= 3.0.0),
     USAboundaries,
     sf,
