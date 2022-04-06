@@ -27,6 +27,7 @@ Suggests:
     testthat (>= 3.0.0),
     USAboundaries,
     sf,
+    sn,
     rasterVis,
     ggmap,
     RColorBrewer,
