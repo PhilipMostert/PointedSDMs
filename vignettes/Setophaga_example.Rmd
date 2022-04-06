@@ -218,7 +218,11 @@ Let's have a look at a graphical representation of the species' distribution, us
 
 ```{r dataset plot}
 
-spatial_data$plot() # + others ...
+spatial_data$plot(Boundary = FALSE) +
+  gg(PA) +
+  theme_bw() +
+  ggtitle('Plot of the datasets') + 
+  theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
@@ -226,7 +230,11 @@ This will create a plot of the location of the species based on their dataset, h
 
 ```{r species plot}
 
-spatial_data$plot(Species = TRUE) # + others ...
+spatial_data$plot(Species = TRUE, Boundary = FALSE) +
+  gg(PA) +
+  theme_bw() +
+  ggtitle('Plot of the species') + 
+  theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
