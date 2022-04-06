@@ -19,6 +19,7 @@ Imports:
     inlabru (>= 2.5),
     sp (>= 1.4-5),
     raster,
+    ggpolypath,
     R.devices,
     ggplot2
 Suggests: 
