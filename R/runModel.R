@@ -73,7 +73,7 @@ runModel <- function(data, options = list()) {
                      speciesindex = data$.__enclos_env__$private$speciesIndex))
   
   optionsJoint <- append(data$.__enclos_env__$private$optionsINLA, options)
-  
+
   inlaModel <- inlabru::bru(components = componentsJoint,
                                  allLiks, options = optionsJoint)
 

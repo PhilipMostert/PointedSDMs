@@ -168,7 +168,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param trialsMarks The name of the trials variable for the binomial marks.
   #' @param speciesName The name of the species variable included in the data.
   #' @param Coordinates A vector of length 2 describing the names of the coordinates of the data.
-  #'
+  #' 
+  #' @import ggpolypath
   #' @examples
   #' \dontrun{
   #' 
@@ -1186,6 +1187,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param cols Integer value by which the area is divided into longitudinal bins.
   #' @param plot Plot the cross-validation folds. Defaults to \code{FALSE}.
   #' @param ... Extra arguments used by blockCV's spatialBlock
+  #' 
+  #' @import ggpolypath
   #' 
   #' @examples
   #' \dontrun{
