@@ -225,7 +225,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (length(datasetClass) == 1 && datasetClass == "list") {
       
       dataNames <- NULL
-      dataPoints <- unlist(dataPoints)
+      dataPoints <- unlist(dataPoints, recursive = FALSE)
       datasetClass <- lapply(dataPoints, class)
       dataList <- TRUE
       
