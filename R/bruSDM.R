@@ -94,13 +94,13 @@ bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
   if (length(datasetClass) == 1 && datasetClass == "list") {
 
     dataNames <- NULL
-    dataPoints <- unlist(dataPoints)
+    dataPoints <- unlist(dataPoints, recursive = FALSE)
     datasetClass <- lapply(dataPoints, class)
     dataList <- TRUE
     
   }
   else dataList <- FALSE
-  
+
   if (!all(unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame"))) stop("Datasets need to be either a SpatialPoints* object or a data frame.")
   
   if (dataList) {
