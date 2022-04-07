@@ -39,3 +39,4 @@ RoxygenNote: 7.1.2
 License: GPL (>= 3)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+LazyData: true

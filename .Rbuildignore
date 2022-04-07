@@ -6,3 +6,4 @@
 ^\.github$
 ^Makefile$
 ^Jenkinsfile$
+^data-raw$
