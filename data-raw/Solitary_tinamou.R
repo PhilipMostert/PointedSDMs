@@ -49,8 +49,8 @@ Mesh <- MakeSpatialRegion(data=NULL, bdry=Region, meshpars=Meshpars,
                           proj = Projection)
 
 
-SolitaryTinamou <- list(datasets = list(SolTin_ebird, SolTin_parks, SolTin_gbif),
-                        covariates = list(Forest, NPP, Altitude),
+SolitaryTinamou <- list(datasets = list(eBird = SolTin_ebird, Parks = SolTin_parks, Gbif = SolTin_gbif),
+                        covariates = list(Forest = Forest, NPP = NPP, Altitude = Altitude),
                         region = Region,
                         mesh = Mesh$mesh)
 
