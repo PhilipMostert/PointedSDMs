@@ -68,9 +68,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param Datasets Name of the datasets to plot.
   #' @param Species Should species be plotted as well? Defaults to \code{FALSE}.
   #' @param Boundary Should a boundary (created using the inlaMesh object) be used in the plot. Defaults to \code{TRUE}.
-  #' @param Map Logical: should the points be returned with a map obtained from ggmap (see ?ggmap). Dafaults to \code{FALSE}.
   #' @param ... Not used.
-  #' @import ggmap
   #' @return A ggplot object.
   #' @examples
   #' 
@@ -91,8 +89,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' }
   
   plot = function(Datasets, Species = FALSE, 
-                  Boundary = TRUE,
-                  Map = FALSE, ...) {
+                  Boundary = TRUE, ...) {
     
     if (length(private$modelData) == 0) stop('Please provide data before running the plot function.')
     
@@ -135,19 +132,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     plotData <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(points), function(x) x[, names(x) %in% c('..Dataset_placeholder_var..', private$speciesName)]))
 
-    if (Boundary) bound <- private$polyfromMesh()
+    if (Boundary) bound <- gg(private$polyfromMesh())
     else bound <- NULL
-    
-    if (Map) { 
-      
-      if (is.null(bound)) stop('Boundary required before a map can be made.')
-      
-      map <- ggmap::get_map(location = c(bound@bbox[1], bound@bbox[2],
-                                         bound@bbox[3], bound@bbox[4]))
-    
-    }
-    
-    if (!is.null(bound)) bound <- gg(bound)
     
     if (Species) {
       
@@ -157,16 +143,14 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
        
       colOption <- gg(plotData, aes(col = eval(parse(text = private$speciesName))))
       
-      if (Map) map + colOption +  bound + guides(col = guide_legend(title = 'Species Name')) 
-      else ggplot() + colOption + bound + guides(col = guide_legend(title = 'Species Name')) 
+      ggplot() + colOption + bound + guides(col = guide_legend(title = 'Species Name')) 
       
     }
     else { 
       
       colOption <- gg(plotData, aes(col = eval(parse(text = '..Dataset_placeholder_var..'))))
       
-      if (Map) map + colOption + bound + guides(col = guide_legend(title = 'Dataset Name')) 
-      gplot() + colOption + bound + guides(col = guide_legend(title = 'Dataset Name')) 
+      ggplot() + colOption + bound + guides(col = guide_legend(title = 'Dataset Name')) 
       
     }
     
