@@ -621,20 +621,25 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     #                     markstrialsvar = trialsMarks,
     #                     speciesname = speciesName)
     
+    if (!is.null(private$speciesName)) newFamily <- mapply(function(family, number) rep(family , times = number), family = private$Family,
+                                                           number = lapply(private$speciesIn, length))
+
+    else newFamily <- pointData$Family
+    
     if (!is.null(private$optionsINLA[['control.family']])) {
       
       index1 <- length(private$optionsINLA[['control.family']]) + 1
-      index2 <- length(private$optionsINLA[['control.family']]) + length(unlist(pointData$Family))
+      index2 <- length(private$optionsINLA[['control.family']]) + length(unlist(newFamily))
       
     }
     else {
       
       index1 <- 1
-      index2 <- length(unlist(pointData$Family))
+      index2 <- length(unlist(newFamily))
       
     }
-    
-    familyIndex <- c(rep(NA, length(private$modelData)), unlist(private$Family))
+    ##Rather just re do this with the changeLink function ... 
+    familyIndex <- c(rep(NA, length(private$modelData)), unlist(newFamily)) #Make this the length rep(NA, length(private$inlaOptions$link whatervers))
     
     for (i in index1:index2) {
       
@@ -1180,6 +1185,41 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       }
       
     }
+    
+  }
+  ,
+  #' @description Function used to change the link function for a given process.
+  #' @param Dataset Name of the dataset for which the link function needs to be changed.
+  #' @param Species Name of the species for which the link function needs to be changed.
+  #' @param Mark Name of the mark for which the link function needs to be changed.
+  #' @param Link Name of the link function to add to the process. If missing, will print the link function of the specified dataset.
+  #' @param ... Not used
+  #' 
+  #' @examples
+  #' \dontrun{
+  #' 
+  #' #Create data object
+  #' dataObj <- bruSDM(...)
+  #' 
+  #' #Print link function for a process
+  #' 
+  #' dataObj$changeLink(Dataset = Dataset, Species = Species)
+  #' 
+  #' #Change link function
+  #' dataObj$changeLink(Dataset = Dataset, Species = Species,
+  #'                    Link = "log")
+  #' 
+  #' }
+  changeLink = function(Dataset, Species, Mark,
+                        Link, ...) {
+    
+    if (missing(Dataset)) stop('Please provide a dataset name.')
+    
+    if (length(Dataset) > 1) stop('Please only provide one dataset at a time.')
+    
+    if (!Dataset %in% names(private$dataSource)) stop('Dataset name provided not in model.')
+    
+    if (!is.null(private$speciesName) && missing(Species)) stop('Please provide a species name.')
     
   }
   ,
