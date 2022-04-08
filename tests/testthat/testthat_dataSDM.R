@@ -285,7 +285,7 @@ test_that('priorsFixed can add the correct priors to the fixed effects', {
   
   #test errors
    #incorrect effect
-  expect_error(check$priorsFixed(effect = 'notcovariate', mean.linear = 200, prec.linear = 20), 'Fixed effect provided not present in the model. Please add covariates using the "spatialCovariates" or "pointCovariates" argument in bruSDM.')
+  expect_error(check$priorsFixed(effect = 'notcovariate', mean.linear = 200, prec.linear = 20), 'Fixed effect provided not present in the model. Please add covariates using the "spatialCovariates" or "pointCovariates" argument in intModel')
    #species not in model
   expect_error(check$priorsFixed(effect = 'covariate', species = 'monkey'), 'Species given is not available in the model.')
   

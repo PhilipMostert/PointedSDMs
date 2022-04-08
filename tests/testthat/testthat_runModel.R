@@ -53,7 +53,7 @@ test_that('runModel runs a dataSDM object, and produces an INLA model with extra
   cov <- raster(cov)
   
   
-  obj <- bruSDM(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
+  obj <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
                 IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                 responsePA = responsePA, markNames = NULL, markFamily = NULL,
                 speciesName = speciesName, spatialCovariates = cov)
@@ -77,7 +77,7 @@ test_that('runModel runs a dataSDM object, and produces an INLA model with extra
   expect_equal(spatMod[['spatCovs']][['class']], c(covariate = 'numeric'))
   
   ##Run with marks
-  obj2 <- bruSDM(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
+  obj2 <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
                 IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                 responsePA = responsePA, markNames = c('factvar', 'binommark'), markFamily = c('multinomial', 'binomial'),
                 speciesName = speciesName, spatialCovariates = cov, trialsMarks = 'marktrial')
