@@ -1,6 +1,6 @@
 #' @title FdatasetOut: Function that removes a dataset out of the main model, and calculates some cross-validation score.
 #' 
-#' @description This function calculates the difference in covariate values between a full bru_sdm model and a model with one dataset left out, as well as some cross-validation score based on the effect of leaving out the dataset.
+#' @description This function calculates the difference in covariate values between a full integrated model and a model with one dataset left out, as well as some cross-validation score based on the effect of leaving out the dataset.
 #' 
 #' @param model Model of class bru_sdm run with all datasets.
 #' @param dataset Datasets to leave out. If missing, will run for all datasets used in the full model.
@@ -16,7 +16,7 @@
 #' 
 #' #Set up a dataSDM object
 #' 
-#' object <- bruSDM(...)
+#' object <- intModel(...)
 #' 
 #' #Run a joint model
 #' 
