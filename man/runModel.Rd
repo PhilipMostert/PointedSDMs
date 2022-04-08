@@ -7,7 +7,7 @@
 runModel(data, options = list())
 }
 \arguments{
-\item{data}{A bruSDM data file to be used in the integrated model.}
+\item{data}{A intModel object to be used in the integrated model.}
 
 \item{options}{A list of INLA options used in the model. Defaults to \code{list()}.}
 }
@@ -15,7 +15,7 @@ runModel(data, options = list())
 An inlabru model with additional information attached.
 }
 \description{
-This function takes a \code{bruSDM} object and produces an \code{inlabru} model object with additional lists and meta-data added.
+This function takes a \code{intModel} object and produces an \code{inlabru} model object with additional lists and meta-data added.
 }
 \examples{
 
@@ -23,7 +23,7 @@ This function takes a \code{bruSDM} object and produces an \code{inlabru} model 
 
 #Create dataSDM object
 
-dataObject <- bruSDM(...)
+dataObject <- intModel(...)
 
 #Run the joint model
 

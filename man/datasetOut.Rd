@@ -17,7 +17,7 @@ datasetOut(model, dataset, predictions = TRUE)
 A list of inlabru models with the specified dataset left out. If predictions is \code{FALSE}, these objects will be missing their \code{bru_info} and \code{call} lists.
 }
 \description{
-This function calculates the difference in covariate values between a full bru_sdm model and a model with one dataset left out, as well as some cross-validation score based on the effect of leaving out the dataset.
+This function calculates the difference in covariate values between a full integrated model and a model with one dataset left out, as well as some cross-validation score based on the effect of leaving out the dataset.
 }
 \examples{
 
@@ -25,7 +25,7 @@ This function calculates the difference in covariate values between a full bru_s
 
 #Set up a dataSDM object
 
-object <- bruSDM(...)
+object <- intModel(...)
 
 #Run a joint model
 

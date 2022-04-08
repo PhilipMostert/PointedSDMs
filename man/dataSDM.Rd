@@ -16,7 +16,7 @@ A data object containing the data and the relevant information about the integra
 \dontrun{
 
 #Make data object
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Plot a specific datasets
 dataObj$plot(Datasets = c('dataset1', 'dataset2'))
@@ -24,7 +24,7 @@ dataObj$plot(Datasets = c('dataset1', 'dataset2'))
 #Plot all datasets
 dataObj$plot()
 
-#If speciesName specified in bruSDM, plot species
+#If speciesName specified in intModel, plot species
 dataObj(Species = TRUE)
 
 }
@@ -36,7 +36,7 @@ dataObj(Species = TRUE)
 \dontrun{
 
 #Make data object with specified components
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Add new data with non-standardized names
 dataObj$addData(dataset, responseCounts = responseCounts,
@@ -54,7 +54,7 @@ dataObj$addData(dataset, responseCounts = responseCounts,
 \dontrun{
 
 #Make dataObject
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Add biasfield for a dataset
 dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
@@ -68,16 +68,16 @@ dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
 \dontrun{
 
 #Make data object
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #View formulas for a dataset
 dataObj$updateFormula(datasetName = 'dataset')
-#View formula for a species if speciesName is non-null in bruSDM
+#View formula for a species if speciesName is non-null in intModel
 dataObj$updateFormula(datasetName = 'dataset', speciesName = 'species')
 
 #Change formula across a dataset
 #Main purpose is to remove terms for a specific process
-#So start with full model with bruSDM()
+#So start with full model with intModel()
 #And thin terms out with .$updateFormula()
 dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -covariate)
 dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -shared_spatial)
@@ -98,7 +98,7 @@ dataObj$changeComponents(newComponent = 'scaling')
 \dontrun{
 
 #Make data object first
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Change a component
 dataObj$changeComponent(addComponent = 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)')
@@ -117,7 +117,7 @@ datasetObj$changeComponent(removeComponent = 'shared_spatial')
 \dontrun{
 
 #Make data object
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Change priors for the fixed effect
 dataObj$priorsFixed(Effect = 'covariate', mean.linear = 2, prec.linear = 0.05)
@@ -135,7 +135,7 @@ dataObj$priorsFixed(Effect = 'intercept', Dataset = 'datasetname',
 \dontrun{
 
 #Create data object
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Specify spatial field
 dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, prior.range = c(1,0.001), prior.sigma = c(1,0.001))
@@ -149,13 +149,32 @@ dataObj$specifySpatial(species = 'species', remove = TRUE)
 }
 
 ## ------------------------------------------------
+## Method `dataSDM$changeLink`
+## ------------------------------------------------
+
+\dontrun{
+
+#Create data object
+dataObj <- intModel(...)
+
+#Print link function for a process
+
+dataObj$changeLink(Dataset = Dataset, Species = Species)
+
+#Change link function
+dataObj$changeLink(Dataset = Dataset, Species = Species,
+                   Link = "log")
+
+}
+
+## ------------------------------------------------
 ## Method `dataSDM$spatialBlock`
 ## ------------------------------------------------
 
 \dontrun{
 
 #Make data object
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Block the points spatially
 dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
@@ -174,6 +193,7 @@ dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
 \item \href{#method-changeComponents}{\code{dataSDM$changeComponents()}}
 \item \href{#method-priorsFixed}{\code{dataSDM$priorsFixed()}}
 \item \href{#method-specifySpatial}{\code{dataSDM$specifySpatial()}}
+\item \href{#method-changeLink}{\code{dataSDM$changeLink()}}
 \item \href{#method-spatialBlock}{\code{dataSDM$spatialBlock()}}
 \item \href{#method-new}{\code{dataSDM$new()}}
 \item \href{#method-samplingBias}{\code{dataSDM$samplingBias()}}
@@ -227,7 +247,7 @@ A ggplot object.
 \dontrun{
 
 #Make data object
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Plot a specific datasets
 dataObj$plot(Datasets = c('dataset1', 'dataset2'))
@@ -235,7 +255,7 @@ dataObj$plot(Datasets = c('dataset1', 'dataset2'))
 #Plot all datasets
 dataObj$plot()
 
-#If speciesName specified in bruSDM, plot species
+#If speciesName specified in intModel, plot species
 dataObj(Species = TRUE)
 
 }
@@ -296,7 +316,7 @@ Function used to add additional, and possibly heterogeneous data to the dataSDM 
 \preformatted{\dontrun{
 
 #Make data object with specified components
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Add new data with non-standardized names
 dataObj$addData(dataset, responseCounts = responseCounts,
@@ -337,7 +357,7 @@ Function used to add additional bias fields to different data processes.
 \preformatted{\dontrun{
 
 #Make dataObject
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Add biasfield for a dataset
 dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
@@ -391,16 +411,16 @@ Function to update formulas for a given process.
 \preformatted{\dontrun{
 
 #Make data object
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #View formulas for a dataset
 dataObj$updateFormula(datasetName = 'dataset')
-#View formula for a species if speciesName is non-null in bruSDM
+#View formula for a species if speciesName is non-null in intModel
 dataObj$updateFormula(datasetName = 'dataset', speciesName = 'species')
 
 #Change formula across a dataset
 #Main purpose is to remove terms for a specific process
-#So start with full model with bruSDM()
+#So start with full model with intModel()
 #And thin terms out with .$updateFormula()
 dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -covariate)
 dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -shared_spatial)
@@ -444,7 +464,7 @@ Function to add custom components to the integrated modeling.
 \preformatted{\dontrun{
 
 #Make data object first
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Change a component
 dataObj$changeComponent(addComponent = 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)')
@@ -496,7 +516,7 @@ Function to change priors for the fixed (and possibly random) effects of the mod
 \preformatted{\dontrun{
 
 #Make data object
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Change priors for the fixed effect
 dataObj$priorsFixed(Effect = 'covariate', mean.linear = 2, prec.linear = 0.05)
@@ -553,7 +573,7 @@ Function to specify the random fields in the model using PC priors for the param
 \preformatted{\dontrun{
 
 #Create data object
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Specify spatial field
 dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, prior.range = c(1,0.001), prior.sigma = c(1,0.001))
@@ -563,6 +583,52 @@ dataObj$specifySpatial(species = 'species', alpha = 1, PC = FALSE)
 #Remove a spatial field
 dataObj$specifySpatial(species = 'species', remove = TRUE)
 #Which will also update the components and relevant formulas
+
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-changeLink"></a>}}
+\if{latex}{\out{\hypertarget{method-changeLink}{}}}
+\subsection{Method \code{changeLink()}}{
+Function used to change the link function for a given process.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$changeLink(Dataset, Species, Mark, Link, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{Dataset}}{Name of the dataset for which the link function needs to be changed.}
+
+\item{\code{Species}}{Name of the species for which the link function needs to be changed.}
+
+\item{\code{Mark}}{Name of the mark for which the link function needs to be changed.}
+
+\item{\code{Link}}{Name of the link function to add to the process. If missing, will print the link function of the specified dataset.}
+
+\item{\code{...}}{Not used}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+
+#Create data object
+dataObj <- intModel(...)
+
+#Print link function for a process
+
+dataObj$changeLink(Dataset = Dataset, Species = Species)
+
+#Change link function
+dataObj$changeLink(Dataset = Dataset, Species = Species,
+                   Link = "log")
 
 }
 }
@@ -600,7 +666,7 @@ Function to spatially block the datasets. See the \code{spatialBlock} function f
 \preformatted{\dontrun{
 
 #Make data object
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Block the points spatially
 dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
