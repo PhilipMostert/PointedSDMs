@@ -60,13 +60,13 @@
  # + everything in dataSDM and dataOrganize
  #Then go to unit tests
 intModel <- function(..., spatialCovariates = NULL, Coordinates,
-                   Projection, Boundary = NULL, Mesh, IPS = NULL,
-                   speciesSpatial = TRUE,
-                   markNames = NULL, markFamily = NULL,
-                   pointCovariates = NULL, pointsIntercept = TRUE, marksIntercept = TRUE,
-                   pointsSpatial = TRUE, marksSpatial = TRUE,
-                   responseCounts = 'counts', responsePA = 'present', trialsPA = NULL,
-                   trialsMarks = NULL, speciesName = NULL, temporalName = NULL, temporalModel = list(model = 'ar1')) {
+                     Projection, Boundary = NULL, Mesh, IPS = NULL,
+                     speciesSpatial = TRUE,
+                     markNames = NULL, markFamily = NULL,
+                     pointCovariates = NULL, pointsIntercept = TRUE, marksIntercept = TRUE,
+                     pointsSpatial = TRUE, marksSpatial = TRUE,
+                     responseCounts = 'counts', responsePA = 'present', trialsPA = NULL,
+                     trialsMarks = NULL, speciesName = NULL, temporalName = NULL, temporalModel = list(model = 'ar1')) {
   
   if (length(Coordinates) != 2) stop('Coordinates needs to be a vector of length 2 containing the coordinate names.')
   
