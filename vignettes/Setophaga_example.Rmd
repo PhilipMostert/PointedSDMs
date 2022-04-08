@@ -28,20 +28,20 @@ As a result of this issue, the field of integrated species distribution modellin
 
 The issue lies in the fact that the tools needed to make these models have not been established -- especially the tools to be used by general ecologists with minimal coding skills. This in turn has stagnated the growth of applying these models to real data.
 
-In light of this impediment to the field of integrated modelling, we decided to make *inlabruSDMs*, an *R* package to help simplify the modelling process of integrated species distribution models (ISDMs) for ecologists. It does so by using the *INLA* framework [@rue2009approximate] to approximate the models and by constructing wrapper functions around those provided in the *R* package, *inlabru* [@bachl2019inlabru].
+In light of this impediment to the field of integrated modelling, we decided to make *cSDMs*, an *R* package to help simplify the modelling process of integrated species distribution models (ISDMs) for ecologists. It does so by using the *INLA* framework [@rue2009approximate] to approximate the models and by constructing wrapper functions around those provided in the *R* package, *inlabru* [@bachl2019inlabru].
 
-This *R markdown* file illustrates an example of modelling an ISDM with *inlabruSDMs,* using five disparate datasets containing species *Setophaga* collected around Pennsylvania state (United States of America). The first part of this file contains a brief introduction to the statistical model used in ISDMs, as well as an introduction to the included functions in the package. The second part of this file uses *inlabruSDMs* to run the ISDM.
+This *R markdown* file illustrates an example of modelling an ISDM with *cSDMs,* using five disparate datasets containing species *Setophaga* collected around Pennsylvania state (United States of America). The first part of this file contains a brief introduction to the statistical model used in ISDMs, as well as an introduction to the included functions in the package. The second part of this file uses *cSDMs* to run the ISDM.
 
-```{r Install inlabruSDMs, warning = FALSE, message = FALSE, eval = FALSE}
+```{r Install cSDMs, warning = FALSE, message = FALSE, eval = FALSE}
 
 ##Install if need be
-devtools::install_github('PhilipMostert/inlabruSDMs')
+devtools::install_github('PhilipMostert/cSDMs')
 
 ```
 
-```{r library(inlabruSDMs)}
+```{r library(cSDMs)}
 
-library(inlabruSDMs)
+library(cSDMs)
 
 ```
 
@@ -58,7 +58,7 @@ Therefore, given a collection of heterogeneous datasets $\{Y_1, Y_2,...,Y_n\}$, 
 
 ### Package use
 
-*inlabruSDMs* is designed to simplify the modelling process of integrated species distribution models by using wrapper functions around those found in *R-INLA* and *inlabru*. The simplification is regarding four key steps in the statistical-modelling process:
+*cSDMs* is designed to simplify the modelling process of integrated species distribution models by using wrapper functions around those found in *R-INLA* and *inlabru*. The simplification is regarding four key steps in the statistical-modelling process:
 
 -   data preparation,
 
@@ -68,17 +68,17 @@ Therefore, given a collection of heterogeneous datasets $\{Y_1, Y_2,...,Y_n\}$, 
 
 -   prediction.
 
-The first function of interest with regards to these steps is `bruSDM`, which is designed to create objects required by *inlabru*, assign the relevant information to individual objects used in model specification, as well as structure the provided datasets together into a homogenized framework.
+The first function of interest with regards to these steps is `intModel`, which is designed to create objects required by *inlabru*, assign the relevant information to individual objects used in model specification, as well as structure the provided datasets together into a homogenized framework.
 
-```{r bruSDM}
+```{r intModel}
 
-args(bruSDM)
+args(intModel)
 
 ```
 
 The output of this function is an *R6* object, and so there are several slot functions included to help specify the model at a finer scale. Use `?dataSDM` to get a comprehensive description of these slot functions.
 
-The next function used is `runModel` which takes the data object created with `bruSDM` and runs the integrated model. The output of this function is in essence an *inlabru* model output with additional information to be used by the sequential functions.
+The next function used is `runModel` which takes the data object created with `intModel` and runs the integrated model. The output of this function is in essence an *inlabru* model output with additional information to be used by the sequential functions.
 
 ```{r runModel}
 
@@ -162,7 +162,7 @@ names(covariates) <- c('elevation', 'canopy')
 
 #### Additional objects
 
-Finally, additional objects required by *inlabruSDMs* and the *R-INLA* [@martins2013bayesian] and *inlabru* [@bachl2019inlabru] packages need to be assembled.
+Finally, additional objects required by *cSDMs* and the *R-INLA* [@martins2013bayesian] and *inlabru* [@bachl2019inlabru] packages need to be assembled.
 
 A *SpatialPolygons* object of Pennsylvania (obtained using the *USAboundaries* [@USABoundaries] package) is the first of these objects required, and it will be used to construct an *inla.mesh* object as well as help with the plotting of graphics. In order to create one of these polygons objects, we are first required to define the projection reference system (see `?CRS` ).
 
@@ -176,7 +176,7 @@ PA <- as(PA, "Spatial")
 
 ```
 
-The *R-INLA* package requires a Delaunay triangulated mesh used to approximate our spatial random fields, which is created by supplying the `max.edge`*,* `offset` and `cutoff` arguments as well as our *SpatialPolygons* map of Pennsylvania to the `inla.mesh.2d` function. With this mesh, `bruSDM` will create integration points required by our model using *inlabru*'s `ipoints` function.
+The *R-INLA* package requires a Delaunay triangulated mesh used to approximate our spatial random fields, which is created by supplying the `max.edge`*,* `offset` and `cutoff` arguments as well as our *SpatialPolygons* map of Pennsylvania to the `inla.mesh.2d` function. With this mesh, `intModel` will create integration points required by our model using *inlabru*'s `ipoints` function.
 
 ```{r Mesh, warning = FALSE, message = FALSE, fig.width=8, fig.height=5}
 
@@ -196,18 +196,18 @@ mesh_plot
 
 ```
 
-##### `bruSDM`
+##### `intModel`
 
-The `bruSDM` function is the first step in the modeling of our species data. The aim of the function is to organize and standardize our data to ensure that each process is correctly modeled in the integrated framework. For this standardization to work, we specify the response variable names of the counts data (`responseCounts`) and present absence (`responsePA`), the coordinate names (`Coordinates`) as well as the coordinate reference system used (`Projection`). In addition, the species variable name (`speciesName`) was also specified in order to model the effects for the species found in the datasets.
+The `intModel` function is the first step in the modeling of our species data. The aim of the function is to organize and standardize our data to ensure that each process is correctly modeled in the integrated framework. For this standardization to work, we specify the response variable names of the counts data (`responseCounts`) and present absence (`responsePA`), the coordinate names (`Coordinates`) as well as the coordinate reference system used (`Projection`). In addition, the species variable name (`speciesName`) was also specified in order to model the effects for the species found in the datasets.
 
 ```{r Model prep, warning = FALSE, message = FALSE, eval = TRUE}
 
-spatial_data <- bruSDM(BBS, BBA, eBird_fusca, 
-                       eBird_caerulescens, eBird_magnolia,
-                       Coordinates = c('X', 'Y'), 
-                       Projection = proj, Mesh = mesh,
-                       responsePA = 'NPres', responseCounts = 'Counts',
-                       spatialCovariates = covariates, speciesName = 'Species_name')
+spatial_data <- intModel(BBS, BBA, eBird_fusca, 
+                        eBird_caerulescens, eBird_magnolia,
+                        Coordinates = c('X', 'Y'), 
+                        Projection = proj, Mesh = mesh,
+                        responsePA = 'NPres', responseCounts = 'Counts',
+                        spatialCovariates = covariates, speciesName = 'Species_name')
 
 ```
 
@@ -253,7 +253,7 @@ spatial_data$specifySpatial(sharedSpatial = TRUE,
 
 ###### `.$addBias`
 
-Presence only datasets (such as our *eBird* data) are often noted to contain numerous biases, which in turn can heavily skew results obtained from our model. A common approach to account for these biases is by using a variable in the model such as sampling effort (some examples include: distance traveled, number of observations per visit, duration spent observing). However in the absence of such variables, running a second spatial field in the model can improve performance of the integrated model [@simmonds2020more]. To add a second spatial field to our model, we use the `.$addBias` function, which is part of the *bruSDM* object created above.
+Presence only datasets (such as our *eBird* data) are often noted to contain numerous biases, which in turn can heavily skew results obtained from our model. A common approach to account for these biases is by using a variable in the model such as sampling effort (some examples include: distance traveled, number of observations per visit, duration spent observing). However in the absence of such variables, running a second spatial field in the model can improve performance of the integrated model [@simmonds2020more]. To add a second spatial field to our model, we use the `.$addBias` function, which is part of the *intModel* object created above.
 
 ```{r bias fields, eval = FALSE}
 
@@ -288,7 +288,7 @@ This model is thus specified with: two environmental covariates, an intercept te
 
 ##### `runModel`
 
-The integrated model is easily run with the `runModel` function as seen below by supplying the occurrence and *R-INLA* objects (created above with `bruSDM`*)*. We specify `control.inla = list(int.strategy = 'eb')` in our `options` argument in order to speed up the model running time.
+The integrated model is easily run with the `runModel` function as seen below by supplying the occurrence and *R-INLA* objects (created above with `intModel`). We specify `control.inla = list(int.strategy = 'eb')` in our `options` argument in order to speed up the model running time.
 
 ```{r Running model, message=FALSE, warning=FALSE}
 
@@ -329,7 +329,7 @@ coefficient_plot
 
 ##### `datasetOut`
 
-*inlabruSDMs* also includes the function `datasetOut`, which iteratively omits one dataset (and its associated marks) out of the full model. For example, we can calculate the effect on the other variables by leaving out the dataset *BBA*, which contributes the most occurrences used in our joint-likelihood model by a significant amount.
+*cSDMs* also includes the function `datasetOut`, which iteratively omits one dataset (and its associated marks) out of the full model. For example, we can calculate the effect on the other variables by leaving out the dataset *BBA*, which contributes the most occurrences used in our joint-likelihood model by a significant amount.
 
 Furthermore, by setting `predictions = TRUE` we are able to calculate some cross-validation score by leaving out the selected dataset. This score is calculated by predicting the covariate values of the left-out using the reduced model (i.e the model with the dataset left out), using the predicted values as an offset in a new model, and then finding the difference between the marginal-likelihood of the full model (i.e the model with all the datasets considered) and the marginal-likelihood of the offset model.
 
@@ -364,7 +364,7 @@ projections <- predict(joint_model, mesh = mesh, mask = PA,
 
 ##### `plot`
 
-*inlabruSDMs* also provides a general plotting function to plot the maps using the predicted values obtained in the `predict` function. By setting `plot = FALSE` within the function, the *ggplot* object of the predicted statistic is given, which would allow for more custom plotting functionality. The plot below shows the effects of the three individual species under consideration.
+*cSDMs* also provides a general plotting function to plot the maps using the predicted values obtained in the `predict` function. By setting `plot = FALSE` within the function, the *ggplot* object of the predicted statistic is given, which would allow for more custom plotting functionality. The plot below shows the effects of the three individual species under consideration.
 
 Unfortunately in this example the species *Caerulescens* is dominated by the *BBA* dataset, which contains observations collected around central Pennsylvania. As a result, the log of the intensity of this species is heavily biased towards this area.
 
