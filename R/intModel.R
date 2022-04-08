@@ -1,6 +1,6 @@
-#' @title bruSDM: integrated model data object.
+#' @title intModel: integrated model data object.
 #' 
-#' @description This function is used to create a \code{bruSDM} object containing all the relevant data and meta-data to be used in the integrated distribution model.
+#' @description This function is used to create a \code{dataSDM} object containing all the relevant data and meta-data to be used in the integrated distribution model.
 #' 
 #' @param ... The datasets to be used in the model. May come as either a \code{data.frame} or \code{SpatialPoints*}, or as a list of datasets inheriting the mentioned classes.
 #' @param spatialCovariates The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{Raster*} or \code{SpatialPixelsDataFrame} object.
@@ -43,9 +43,9 @@
 #' 
 #' #Run function
 #' 
-#' object <- bruSDM(dataset1, dataset2, Mesh = Mesh,
-#'                  spatialCovariates = spatialCovariates, Coords = Coords,
-#'                  Projection = Projection)
+#' object <- intModel(dataset1, dataset2, Mesh = Mesh,
+#'                   spatialCovariates = spatialCovariates, Coords = Coords,
+#'                   Projection = Projection)
 #'                  
 #' #Return summary of data
 #' 
@@ -59,7 +59,7 @@
 ##Need to remove the field things here...
  # + everything in dataSDM and dataOrganize
  #Then go to unit tests
-bruSDM <- function(..., spatialCovariates = NULL, Coordinates,
+intModel <- function(..., spatialCovariates = NULL, Coordinates,
                    Projection, Boundary = NULL, Mesh, IPS = NULL,
                    speciesSpatial = TRUE,
                    markNames = NULL, markFamily = NULL,
