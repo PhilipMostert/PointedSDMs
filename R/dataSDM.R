@@ -75,7 +75,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' \dontrun{
   #' 
   #' #Make data object
-  #' dataObj <- bruSDM(...)
+  #' dataObj <- intModel(...)
   #' 
   #' #Plot a specific datasets
   #' dataObj$plot(Datasets = c('dataset1', 'dataset2'))
@@ -83,7 +83,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' #Plot all datasets
   #' dataObj$plot()
   #' 
-  #' #If speciesName specified in bruSDM, plot species
+  #' #If speciesName specified in intModel, plot species
   #' dataObj(Species = TRUE)
   #' 
   #' }
@@ -97,7 +97,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (!all(Datasets %in% private$dataSource)) stop('Dataset provided not provided to the object.') 
     
-    if (Species && is.null(private$speciesName)) stop('speciesName in bruSDM required before plotting species.')
+    if (Species && is.null(private$speciesName)) stop('speciesName in intModel required before plotting species.')
     
     ##Get data
     points <- list()
@@ -176,7 +176,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' \dontrun{
   #' 
   #' #Make data object with specified components
-  #' dataObj <- bruSDM(...)
+  #' dataObj <- intModel(...)
   #' 
   #' #Add new data with non-standardized names
   #' dataObj$addData(dataset, responseCounts = responseCounts,
@@ -675,7 +675,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' \dontrun{
   #' 
   #' #Make dataObject
-  #' dataObj <- bruSDM(...)
+  #' dataObj <- intModel(...)
   #' 
   #' #Add biasfield for a dataset
   #' dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
@@ -736,16 +736,16 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' \dontrun{
   #' 
   #' #Make data object
-  #' dataObj <- bruSDM(...)
+  #' dataObj <- intModel(...)
   #' 
   #' #View formulas for a dataset
   #' dataObj$updateFormula(datasetName = 'dataset')
-  #' #View formula for a species if speciesName is non-null in bruSDM
+  #' #View formula for a species if speciesName is non-null in intModel
   #' dataObj$updateFormula(datasetName = 'dataset', speciesName = 'species')
   #' 
   #' #Change formula across a dataset
   #' #Main purpose is to remove terms for a specific process
-  #' #So start with full model with bruSDM()
+  #' #So start with full model with intModel()
   #' #And thin terms out with .$updateFormula()
   #' dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -covariate)
   #' dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -shared_spatial)
@@ -765,7 +765,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (all(is.null(datasetName), is.null(speciesName), is.null(markName))) stop ('At least one of: datasetName, speciesName, markName or allProcesses needs to be specified.')
     
-    if (!is.null(speciesName) && is.null(private$speciesName)) stop ('Species are given but none are present in the model. Please specify species in the model with "speciesName" in bruSDM.')
+    if (!is.null(speciesName) && is.null(private$speciesName)) stop ('Species are given but none are present in the model. Please specify species in the model with "speciesName" in intModel.')
     
     if (is.null(speciesName) && !is.null(private$speciesName)) speciesName <- unlist(private$speciesIn[datasetName])
     
@@ -954,7 +954,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' \dontrun{
   #' 
   #' #Make data object first
-  #' dataObj <- bruSDM(...)
+  #' dataObj <- intModel(...)
   #' 
   #' #Change a component
   #' dataObj$changeComponent(addComponent = 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)')
@@ -1003,7 +1003,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' \dontrun{
   #' 
   #' #Make data object
-  #' dataObj <- bruSDM(...)
+  #' dataObj <- intModel(...)
   #' 
   #' #Change priors for the fixed effect
   #' dataObj$priorsFixed(Effect = 'covariate', mean.linear = 2, prec.linear = 0.05)
@@ -1026,7 +1026,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         
         if (is.null(private$speciesName)) {
           
-          if (!private$Intercepts) stop('Fixed effect is given as "intercept", but intercepts have been turned off in bruSDM.')
+          if (!private$Intercepts) stop('Fixed effect is given as "intercept", but intercepts have been turned off in intModel.')
           
           if (is.null(Dataset)) Effect <- paste0(unique(private$dataSource),'_intercept')
           
@@ -1044,7 +1044,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         
         intTRUE <- FALSE
         
-        if (!Effect %in% c(private$spatcovsNames, private$pointCovariates)) stop('Fixed effect provided not present in the model. Please add covariates using the "spatialCovariates" or "pointCovariates" argument in bruSDM.')
+        if (!Effect %in% c(private$spatcovsNames, private$pointCovariates)) stop('Fixed effect provided not present in the model. Please add covariates using the "spatialCovariates" or "pointCovariates" argument in intModel.')
         
         
       } 
@@ -1087,7 +1087,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' \dontrun{
   #' 
   #' #Create data object
-  #' dataObj <- bruSDM(...)
+  #' dataObj <- intModel(...)
   #' 
   #' #Specify spatial field
   #' dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, prior.range = c(1,0.001), prior.sigma = c(1,0.001))
@@ -1113,7 +1113,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (sharedSpatial) {
       
-      if (!private$Spatial) stop('Shared spatial field not included in the model. Please use pointsSpatial = TRUE in bruSDM.')
+      if (!private$Spatial) stop('Shared spatial field not included in the model. Please use pointsSpatial = TRUE in intModel.')
       
       field_type <- 'sharedField'
       if (!Remove) index <- 'sharedField'
@@ -1199,7 +1199,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' \dontrun{
   #' 
   #' #Create data object
-  #' dataObj <- bruSDM(...)
+  #' dataObj <- intModel(...)
   #' 
   #' #Print link function for a process
   #' 
@@ -1236,7 +1236,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' \dontrun{
   #' 
   #' #Make data object
-  #' dataObj <- bruSDM(...)
+  #' dataObj <- intModel(...)
   #' 
   #' #Block the points spatially
   #' dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
@@ -1371,11 +1371,11 @@ dataSDM$set('private', 'printSummary', NULL)
 dataSDM$set('private', 'multinomIndex', list())
 dataSDM$set('private', 'optionsINLA', list())
 
-#' @description Initialize function for dataSDM: used to store some compulsory arguments. Please refer to the wrapper function, \code{bruSDM} for creating new dataSDM objects.
+#' @description Initialize function for dataSDM: used to store some compulsory arguments. Please refer to the wrapper function, \code{intModel} for creating new dataSDM objects.
 #' @param coordinates A vector of length 2 containing the names of the coordinates.
 #' @param projection The projection of the data.
 #' @param Inlamesh An inla.mesh object.
-#' @param initialnames The names of the datasets if data is passed through bruSDM.
+#' @param initialnames The names of the datasets if data is passed through intModel.
 #' @param responsecounts The name of the response variable for the count data.
 #' @param responsepa The name of the response variable for the presence absence data.
 #' @param marksnames The names of the marks contained in the data.
