@@ -1,8 +1,8 @@
 ---
-title: "Example of inlabruSDMs for the solitary tinamou"
+title: "Example of cSDMs for the solitary tinamou"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Example of inlabruSDMs for the solitary tinamou}
+  %\VignetteIndexEntry{Example of cSDMs for the solitary tinamou}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
