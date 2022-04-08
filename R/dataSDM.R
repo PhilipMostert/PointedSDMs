@@ -65,7 +65,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   }
   ,
   #' @description Makes a plot of the region as well as the points.
-  #' @param Datasets Name of the datasets to plot.
+  #' @param datasetNames Name of the datasets to plot.
   #' @param Species Should species be plotted as well? Defaults to \code{FALSE}.
   #' @param Boundary Should a boundary (created using the inlaMesh object) be used in the plot. Defaults to \code{TRUE}.
   #' @param ... Not used.
@@ -88,21 +88,21 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #' }
   
-  plot = function(Datasets, Species = FALSE, 
+  plot = function(datasetNames, Species = FALSE, 
                   Boundary = TRUE, ...) {
     
     if (length(private$modelData) == 0) stop('Please provide data before running the plot function.')
     
-    if (missing(Datasets)) Datasets <- unique(private$dataSource)
+    if (missing(datasetNames)) datasetNames <- unique(private$dataSource)
     
-    if (!all(Datasets %in% private$dataSource)) stop('Dataset provided not provided to the object.') 
+    if (!all(datasetNames %in% private$dataSource)) stop('datasetNames provided not provided to the object.') 
     
     if (Species && is.null(private$speciesName)) stop('speciesName in intModel required before plotting species.')
     
     ##Get data
     points <- list()
     
-    for (data in Datasets) {
+    for (data in datasetNames) {
       
       index <- which(private$dataSource == data)
       
@@ -747,11 +747,11 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' #Main purpose is to remove terms for a specific process
   #' #So start with full model with intModel()
   #' #And thin terms out with .$updateFormula()
-  #' dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -covariate)
-  #' dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -shared_spatial)
+  #' dataObj$updateFormula(datasetName = 'dataset', Formula = ~ . -covariate)
+  #' dataObj$updateFormula(datasetName = 'dataset', Formula = ~ . -shared_spatial)
   #' 
   #' #If you would like to add a special term to the model, use the NewFormula argument
-  #' dataObj$updateFormula(dataset = 'dataset', Formula ~ . + (covariate+1e-5)*scaling)
+  #' dataObj$updateFormula(datasetName = 'dataset', Formula ~ . + (covariate+1e-5)*scaling)
   #' #And then also add that term to the components
   #' dataObj$changeComponents(newComponent = 'scaling')
   #' 
@@ -996,7 +996,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @description Function to change priors for the fixed (and possibly random) effects of the model.
   #' @param Effect Name of the fixed effect covariate to change the prior for.
   #' @param Species Name of the species for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.
-  #' @param Dataset Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.
+  #' @param datasetName Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.
   #' @param mean.linear Mean value for the prior of the fixed effect. Defaults to \code{0}.
   #' @param prec.linear Precision value for the prior of the fixed effect. Defaults to \code{0.001}.
   #' @examples
@@ -1009,12 +1009,12 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' dataObj$priorsFixed(Effect = 'covariate', mean.linear = 2, prec.linear = 0.05)
   #' 
   #' #Change priors for intercept
-  #' dataObj$priorsFixed(Effect = 'intercept', Dataset = 'datasetname',
+  #' dataObj$priorsFixed(Effect = 'intercept', datasetName = 'datasetname',
   #'                     mean.linear = 2, prec.linear = 0.005)
   #' 
   #' }
 
-  priorsFixed = function(Effect, Species = NULL, Dataset = NULL,
+  priorsFixed = function(Effect, Species = NULL, datasetName = NULL,
                          mean.linear = 0, prec.linear = 0.001) {
     
     
@@ -1028,7 +1028,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
           
           if (!private$Intercepts) stop('Fixed effect is given as "intercept", but intercepts have been turned off in intModel.')
           
-          if (is.null(Dataset)) Effect <- paste0(unique(private$dataSource),'_intercept')
+          if (is.null(datasetName)) Effect <- paste0(unique(private$dataSource),'_intercept')
           
         } 
         else {
@@ -1189,7 +1189,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   }
   ,
   #' @description Function used to change the link function for a given process.
-  #' @param Dataset Name of the dataset for which the link function needs to be changed.
+  #' @param datasetName Name of the dataset for which the link function needs to be changed.
   #' @param Species Name of the species for which the link function needs to be changed.
   #' @param Mark Name of the mark for which the link function needs to be changed.
   #' @param Link Name of the link function to add to the process. If missing, will print the link function of the specified dataset.
@@ -1210,14 +1210,15 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'                    Link = "log")
   #' 
   #' }
-  changeLink = function(Dataset, Species, Mark,
+  changeLink = function(datasetName, Species, Mark,
                         Link, ...) {
     
+    stop('Still need to do.')
     if (missing(Dataset)) stop('Please provide a dataset name.')
     
-    if (length(Dataset) > 1) stop('Please only provide one dataset at a time.')
+    if (length(datasetName) > 1) stop('Please only provide one dataset at a time.')
     
-    if (!Dataset %in% names(private$dataSource)) stop('Dataset name provided not in model.')
+    if (!datasetName %in% names(private$dataSource)) stop('Dataset name provided not in model.')
     
     if (!is.null(private$speciesName) && missing(Species)) stop('Please provide a species name.')
     

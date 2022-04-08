@@ -79,11 +79,11 @@ dataObj$updateFormula(datasetName = 'dataset', speciesName = 'species')
 #Main purpose is to remove terms for a specific process
 #So start with full model with intModel()
 #And thin terms out with .$updateFormula()
-dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -covariate)
-dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -shared_spatial)
+dataObj$updateFormula(datasetName = 'dataset', Formula = ~ . -covariate)
+dataObj$updateFormula(datasetName = 'dataset', Formula = ~ . -shared_spatial)
 
 #If you would like to add a special term to the model, use the NewFormula argument
-dataObj$updateFormula(dataset = 'dataset', Formula ~ . + (covariate+1e-5)*scaling)
+dataObj$updateFormula(datasetName = 'dataset', Formula ~ . + (covariate+1e-5)*scaling)
 #And then also add that term to the components
 dataObj$changeComponents(newComponent = 'scaling')
 
@@ -123,7 +123,7 @@ dataObj <- intModel(...)
 dataObj$priorsFixed(Effect = 'covariate', mean.linear = 2, prec.linear = 0.05)
 
 #Change priors for intercept
-dataObj$priorsFixed(Effect = 'intercept', Dataset = 'datasetname',
+dataObj$priorsFixed(Effect = 'intercept', datasetName = 'datasetname',
                     mean.linear = 2, prec.linear = 0.005)
 
 }
@@ -222,13 +222,13 @@ Prints the datasets, their data type and the number of observations, as well as 
 \subsection{Method \code{plot()}}{
 Makes a plot of the region as well as the points.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$plot(Datasets, Species = FALSE, Boundary = TRUE, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$plot(datasetNames, Species = FALSE, Boundary = TRUE, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{Datasets}}{Name of the datasets to plot.}
+\item{\code{datasetNames}}{Name of the datasets to plot.}
 
 \item{\code{Species}}{Should species be plotted as well? Defaults to \code{FALSE}.}
 
@@ -422,11 +422,11 @@ dataObj$updateFormula(datasetName = 'dataset', speciesName = 'species')
 #Main purpose is to remove terms for a specific process
 #So start with full model with intModel()
 #And thin terms out with .$updateFormula()
-dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -covariate)
-dataObj$updateFormula(dataset = 'dataset', Formula = ~ . -shared_spatial)
+dataObj$updateFormula(datasetName = 'dataset', Formula = ~ . -covariate)
+dataObj$updateFormula(datasetName = 'dataset', Formula = ~ . -shared_spatial)
 
 #If you would like to add a special term to the model, use the NewFormula argument
-dataObj$updateFormula(dataset = 'dataset', Formula ~ . + (covariate+1e-5)*scaling)
+dataObj$updateFormula(datasetName = 'dataset', Formula ~ . + (covariate+1e-5)*scaling)
 #And then also add that term to the components
 dataObj$changeComponents(newComponent = 'scaling')
 
@@ -490,7 +490,7 @@ Function to change priors for the fixed (and possibly random) effects of the mod
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$priorsFixed(
   Effect,
   Species = NULL,
-  Dataset = NULL,
+  datasetName = NULL,
   mean.linear = 0,
   prec.linear = 0.001
 )}\if{html}{\out{</div>}}
@@ -503,7 +503,7 @@ Function to change priors for the fixed (and possibly random) effects of the mod
 
 \item{\code{Species}}{Name of the species for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.}
 
-\item{\code{Dataset}}{Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.}
+\item{\code{datasetName}}{Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.}
 
 \item{\code{mean.linear}}{Mean value for the prior of the fixed effect. Defaults to \code{0}.}
 
@@ -522,7 +522,7 @@ dataObj <- intModel(...)
 dataObj$priorsFixed(Effect = 'covariate', mean.linear = 2, prec.linear = 0.05)
 
 #Change priors for intercept
-dataObj$priorsFixed(Effect = 'intercept', Dataset = 'datasetname',
+dataObj$priorsFixed(Effect = 'intercept', datasetName = 'datasetname',
                     mean.linear = 2, prec.linear = 0.005)
 
 }
@@ -597,13 +597,13 @@ dataObj$specifySpatial(species = 'species', remove = TRUE)
 \subsection{Method \code{changeLink()}}{
 Function used to change the link function for a given process.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$changeLink(Dataset, Species, Mark, Link, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$changeLink(datasetName, Species, Mark, Link, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{Dataset}}{Name of the dataset for which the link function needs to be changed.}
+\item{\code{datasetName}}{Name of the dataset for which the link function needs to be changed.}
 
 \item{\code{Species}}{Name of the species for which the link function needs to be changed.}
 
