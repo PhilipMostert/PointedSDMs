@@ -367,7 +367,7 @@ plot.bruSDM_predict <- function(x,
 
     if (plot) {
       
-      plots <- inlabru::multiplot(plotlist = all_plots, cols = length(all_plots), layout = layout) + colours
+      plots <- inlabru::multiplot(plotlist = all_plots, cols = length(all_plots), layout = layout)
       return(plots)
       
       }
