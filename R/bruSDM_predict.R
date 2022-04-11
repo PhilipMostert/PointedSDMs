@@ -371,12 +371,16 @@ plot.bruSDM_predict <- function(x,
 
     if (plot) {
       
-      plots <- inlabru::multiplot(plotlist = all_plots, cols = length(all_plots), layout = layout)
-      return(plots)
+      return(inlabru::multiplot(plotlist = all_plots, cols = length(all_plots), layout = layout))
+      
       
       }
-    else return(all_plots)
-    
+    else {
+      
+      return(all_plots)
+      
+    }
+
   }
   
   if (!plot) {
