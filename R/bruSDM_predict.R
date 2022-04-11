@@ -279,6 +279,8 @@ print.bruSDM_predict <- function(x, ...) {
 #' @param whattoplot One of the following statistics to plot: "mean", "sd", "q0.025", "median","q0.975", "smin", "smax", "cv", "var" 
 #' @param cols Number of columns required for the plotting. Used by inlabru's multiplot function.
 #' @param layout Layout of the plots. Used by inlabru's multiplot function.
+#' @param colourLow Colour for the low values in the predictions (see ?scale_colour_gradient from \code{ggplot2}). Defaults to \code{NULL}. If non-\code{NULL}, \code{colourHigh} is required.
+#' @param colourHigh Colour for the high values in the predictions (see ?scale_colour_gradient from \code{ggplot2}). Defaults to \code{NULL}. If non-\code{NULL}, \code{colourLow} is required.
 #' @param plot Should the plots be printed, defaults to \code{TRUE}. If \code{FALSE} will  produce a list of ggplot objects.
 #' @param ... Argument not used
 #' @return A ggplot2 object.
@@ -311,6 +313,8 @@ plot.bruSDM_predict <- function(x,
                                 whattoplot = c('mean'),
                                 cols = NULL,
                                 layout = NULL,
+                                colourLow = NULL,
+                                colourHigh = NULL,
                                 plot = TRUE,
                                 ...) {
   ## Add species plot::
@@ -322,6 +326,11 @@ plot.bruSDM_predict <- function(x,
   
   if (any(!whattoplot%in%c("mean", "sd", "q0.025", "median","q0.975",
                            "smin", "smax", "cv", "var" ))) stop('Whattoplot is not a valid variable to plot')
+  
+  if (!is.null(colourHigh) && is.null(colourLow) || !is.null(colourLow) & is.null(colourHigh)) stop ('Both colourLow and colourHigh are requried to be non-NULL.')
+  
+  if (!is.null(colourLow) && !is.null(colourHigh)) colours <- ggplot2::scale_fill_gradient(low = colourLow, high = colourHigh)
+  else colours <- NULL
   
   if (length(x) == 1 && names(x) %in% 'temporalPredictions') {
     
@@ -352,13 +361,13 @@ plot.bruSDM_predict <- function(x,
       if (nameObj ==  'speciesPredictions') title <- ggtitle(paste('Plot of predictions for', object))
       else title <- ggtitle(paste('Plot of bias field for', object))
 
-      all_plots[[object]] <- ggplot() + inlabru::gg(x[[nameObj]][[object]], aes_string(fill = whattoplot)) + title
+      all_plots[[object]] <- ggplot() + inlabru::gg(x[[nameObj]][[object]], aes_string(fill = whattoplot)) + title + colours
       
     }
 
     if (plot) {
       
-      plots <- inlabru::multiplot(plotlist = all_plots, cols = length(all_plots), layout = layout)
+      plots <- inlabru::multiplot(plotlist = all_plots, cols = length(all_plots), layout = layout) + colours
       return(plots)
       
       }
@@ -386,7 +395,7 @@ plot.bruSDM_predict <- function(x,
       if (!plot) prediction_list[[stat]] <- ggplot() + prediction
 
       
-      plot_list[[stat]] <- ggplot() + prediction + title
+      plot_list[[stat]] <- ggplot() + prediction + title + colours
       
     }
     

@@ -4,7 +4,16 @@
 \alias{plot.bruSDM_predict}
 \title{Plot for preduct_bru_sdm}
 \usage{
-\method{plot}{bruSDM_predict}(x, whattoplot = c("mean"), cols = NULL, layout = NULL, plot = TRUE, ...)
+\method{plot}{bruSDM_predict}(
+  x,
+  whattoplot = c("mean"),
+  cols = NULL,
+  layout = NULL,
+  colourLow = NULL,
+  colourHigh = NULL,
+  plot = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{A bruSDM_predict object.}
@@ -14,6 +23,10 @@
 \item{cols}{Number of columns required for the plotting. Used by inlabru's multiplot function.}
 
 \item{layout}{Layout of the plots. Used by inlabru's multiplot function.}
+
+\item{colourLow}{Colour for the low values in the predictions (see ?scale_colour_gradient from \code{ggplot2}). Defaults to \code{NULL}. If non-\code{NULL}, \code{colourHigh} is required.}
+
+\item{colourHigh}{Colour for the high values in the predictions (see ?scale_colour_gradient from \code{ggplot2}). Defaults to \code{NULL}. If non-\code{NULL}, \code{colourLow} is required.}
 
 \item{plot}{Should the plots be printed, defaults to \code{TRUE}. If \code{FALSE} will  produce a list of ggplot objects.}
 
