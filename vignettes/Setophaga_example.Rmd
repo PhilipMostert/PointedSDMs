@@ -351,43 +351,26 @@ dataset_out
 
 ##### `predict`
 
-A significant part of SDMs is creating prediction maps to understand the species' spread. Predictions of the integrated SDM's from `runModel` are made easy using the `predict` function. By supplying the relevant components, the predict function will create the formula required by *inlabru*'s `predict` function to makepredictive maps. In this example, we made predictions for the entire linear predictor (specifying `predictor = TRUE`), on the linear scale using 1000 samples*.*
+A significant part of SDMs is creating prediction maps to understand the species' spread. Predictions of the integrated SDM's from `runModel` are made easy using the `predict` function. By supplying the relevant components, the predict function will create the formula required by *inlabru*'s `predict` function to make predictive maps. In this example, we made predictions for the  three species spatial fields and the elevation covariate, on the linear scale using 1000 samples*.*
 
 ```{r Projections, message = FALSE, warning = FALSE}
 
-##This needs to change
 projections <- predict(joint_model, mesh = mesh, mask = PA, 
-                       predictor = TRUE,
+                       covariates = 'elevation', spatial = TRUE,
                        fun = 'linear', n.samples = 1000)
 
 ```
 
 ##### `plot`
 
-*cSDMs* also provides a general plotting function to plot the maps using the predicted values obtained in the `predict` function. By setting `plot = FALSE` within the function, the *ggplot* object of the predicted statistic is given, which would allow for more custom plotting functionality. The plot below shows the effects of the three individual species under consideration.
-
-Unfortunately in this example the species *Caerulescens* is dominated by the *BBA* dataset, which contains observations collected around central Pennsylvania. As a result, the log of the intensity of this species is heavily biased towards this area.
+*cSDMs* also provides a general plotting function to plot the maps using the predicted values obtained in the `predict` function. The plot below shows the predictions of the spatial fields and elevation for the three individual species under consideration.
 
 ```{r Plots, fig.width=8, fig.height=5, message = FALSE, warning = FALSE}
 
 projection_means <- plot(projections,
                          whattoplot = 'mean')
 
-colours <- function(obj,statistic) {
-  
-  scale_fill_gradientn(colours = rev(brewer.pal(9,"YlGn")),
-                       limits = range(obj@data[,statistic]))
 
-}
-
-projection_means + 
-  colours(projections$`Species predictions`, 'mean') +
-  theme_bw() +
-  #coord_equal() +
-  ggtitle('Log intensity of predicted posterior') +
-  labs(fill = expression(paste('log(',lambda,'(s))'))) +
-  theme(legend.position="bottom",
-        plot.title = element_text(hjust = 0.5))
   
 ```
 
