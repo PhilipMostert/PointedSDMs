@@ -4,22 +4,12 @@
 \alias{plot.bruSDM_predict}
 \title{Plot for preduct_bru_sdm}
 \usage{
-\method{plot}{bruSDM_predict}(
-  x,
-  whattoplot = c("mean"),
-  colours = NULL,
-  cols = NULL,
-  layout = NULL,
-  plot = TRUE,
-  ...
-)
+\method{plot}{bruSDM_predict}(x, whattoplot = c("mean"), cols = NULL, layout = NULL, plot = TRUE, ...)
 }
 \arguments{
 \item{x}{A bruSDM_predict object.}
 
 \item{whattoplot}{One of the following statistics to plot: "mean", "sd", "q0.025", "median","q0.975", "smin", "smax", "cv", "var"}
-
-\item{colours}{Custom colours of the plot provided by the function, scale_fill_gradientn.}
 
 \item{cols}{Number of columns required for the plotting. Used by inlabru's multiplot function.}
 

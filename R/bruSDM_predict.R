@@ -277,7 +277,6 @@ print.bruSDM_predict <- function(x, ...) {
 #' 
 #' @param x A bruSDM_predict object.
 #' @param whattoplot One of the following statistics to plot: "mean", "sd", "q0.025", "median","q0.975", "smin", "smax", "cv", "var" 
-#' @param colours Custom colours of the plot provided by the function, scale_fill_gradientn.
 #' @param cols Number of columns required for the plotting. Used by inlabru's multiplot function.
 #' @param layout Layout of the plots. Used by inlabru's multiplot function.
 #' @param plot Should the plots be printed, defaults to \code{TRUE}. If \code{FALSE} will  produce a list of ggplot objects.
@@ -310,7 +309,6 @@ print.bruSDM_predict <- function(x, ...) {
 
 plot.bruSDM_predict <- function(x,
                                 whattoplot = c('mean'),
-                                colours = NULL,
                                 cols = NULL,
                                 layout = NULL,
                                 plot = TRUE,
@@ -329,20 +327,13 @@ plot.bruSDM_predict <- function(x,
     
     if (length(whattoplot) > 1) stop('Please only plot one variable at a time for species plots.')
     
-    if (!is.null(colours)) {
-      
-      plot_colours <- scale_fill_gradientn(colours = rev(brewer.pal(9,colours)),
-                                           limits = range(x[[nameObj]]@data[,stat]))
-      
-    }
-    else plot_colours <- NULL
     
     temporalName <- names(x[[1]]@data)[!names(x[[1]]@data) %in% c('weight',  'mean', 'sd', 'q0.025', 'median', 'q0.975', 'smin', 'smax', 'cv','var')]
     class(x[[1]]@data[,temporalName]) <- 'character'
     names(x[[1]]@data)[names(x[[1]]@data) == temporalName] <- '..temporal_variable_index..'
 
     ##Would be nice to get full temporal variable names in here ...
-    plot_grid <- ggplot() + inlabru::gg(x[[1]], aes_string(fill = whattoplot)) + facet_grid(~ ..temporal_variable_index..) + plot_colours + ggtitle('Plot of the temporal predictions')
+    plot_grid <- ggplot() + inlabru::gg(x[[1]], aes_string(fill = whattoplot)) + facet_grid(~ ..temporal_variable_index..) + ggtitle('Plot of the temporal predictions')
     return(plot_grid)
     
   }
@@ -353,13 +344,6 @@ plot.bruSDM_predict <- function(x,
     
     if (length(whattoplot) > 1) stop('Please only plot one variable at a time for species plots.')
     
-    if (!is.null(colours)) {
-      
-      plot_colours <- scale_fill_gradientn(colours = rev(brewer.pal(9,colours)),
-                                           limits = range(x[[nameObj]]@data[,stat]))
-      
-    }
-    else plot_colours <- NULL
     
     all_plots <- list()
     
@@ -368,7 +352,7 @@ plot.bruSDM_predict <- function(x,
       if (nameObj ==  'speciesPredictions') title <- ggtitle(paste('Plot of predictions for', object))
       else title <- ggtitle(paste('Plot of bias field for', object))
 
-      all_plots[[object]] <- ggplot() + inlabru::gg(x[[nameObj]][[object]], aes_string(fill = whattoplot)) + title + plot_colours
+      all_plots[[object]] <- ggplot() + inlabru::gg(x[[nameObj]][[object]], aes_string(fill = whattoplot)) + title
       
     }
 
@@ -400,17 +384,9 @@ plot.bruSDM_predict <- function(x,
       prediction <- inlabru::gg(x[[plotname]], aes_string(fill = stat))
       
       if (!plot) prediction_list[[stat]] <- ggplot() + prediction
+
       
-      if (!is.null(colours)) {
-        
-        plot_colours <- scale_fill_gradientn(colours = rev(brewer.pal(9,colours)),
-                                             limits = range(x[[plotname]]@data[,stat]))
-        
-      }
-      else plot_colours <- NULL
-      
-      
-      plot_list[[stat]] <- ggplot() + prediction + title + plot_colours
+      plot_list[[stat]] <- ggplot() + prediction + title
       
     }
     
