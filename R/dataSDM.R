@@ -204,6 +204,11 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
     
     if (!is.null(private$speciesName)) {
+      
+      speciesOK <- checkVar(data = dataPoints,
+                            var = private$speciesName)
+      
+      if (!speciesOK) stop('The species variable name is required to be present in all the datasets.')
       #Test
       speciesOld <- unique(unlist(private$speciesIn))
       
@@ -429,15 +434,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                               coords = private$Coordinates)
       
       if (!coordsOK) stop('At least one dataset does not have the correct coordinates. Please try again.')  
-      
-    }
-    
-    if (!is.null(private$speciesName)) {
-      
-      speciesOK <- checkVar(data = dataPoints,
-                            var = private$speciesName)
-      
-      if (!speciesOK) stop('The species variable name is required to be present in all the datasets.')
       
     }
     
