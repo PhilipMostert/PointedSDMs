@@ -203,28 +203,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    if (!is.null(private$speciesName)) {
-      
-      speciesOK <- checkVar(data = dataPoints,
-                            var = private$speciesName)
-      
-      if (!speciesOK) stop('The species variable name is required to be present in all the datasets.')
-      #Test
-      speciesOld <- unique(unlist(private$speciesIn))
-      
-      speciesNew <- unique(unlist(lapply(dataPoints, function(x) {
-        
-        if (inherits(x, 'Spatial')) x@data[,private$speciesName]
-        else x[,private$speciesName]
-        
-        
-      })))
-      
-      speciesIn <- c(speciesOld, speciesNew)
-      
-      
-    }
-    
     if (length(dataPoints) == 0) stop('Please provide data in the ... argument.')
     
     datasetClass <- unlist(lapply(dataPoints, class))
@@ -268,6 +246,28 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       dataNames <- setdiff(as.character(match.call(expand.dots = TRUE)), 
                            as.character(match.call(expand.dots = FALSE)))
+    }
+    
+    if (!is.null(private$speciesName)) {
+      
+      speciesOK <- checkVar(data = dataPoints,
+                            var = private$speciesName)
+      
+      if (!speciesOK) stop('The species variable name is required to be present in all the datasets.')
+      #Test
+      speciesOld <- unique(unlist(private$speciesIn))
+      
+      speciesNew <- unique(unlist(lapply(dataPoints, function(x) {
+        
+        if (inherits(x, 'Spatial')) x@data[,private$speciesName]
+        else x[,private$speciesName]
+        
+        
+      })))
+      
+      speciesIn <- c(speciesOld, speciesNew)
+      
+      
     }
     
     if (private$Spatial) {
