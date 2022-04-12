@@ -296,30 +296,3 @@ test_that('makeComponents is able to make the correct components for all the pro
             
           })
 
-test_that('makeLhoods is able to make the construct the relevant bru_like objects
-          with the correct metadata for each of the processes.', {
-            
-    #Make arbitrary mesh        
-    mesh <- PointedSDMs::MakeSpatialRegion(bdry = SpatialPoly, meshpars = list(max.edge = 2))
-    ips <- inlabru::ipoints(samplers = SpatialPoly)
-    
-    Check$makeLhoods(mesh = mesh,
-                     ips = ips,
-                     paresp = 'PAresp',
-                     ntrials = 'trial',
-                     markstrialsvar = 'marktrial',
-                     speciesname = 'species')
-    
-    expect_equal(class(Check$Data), 'list')
-    expect_true(all(unlist(lapply(Check$Data, function(x) class(x))) == c("bru_like","list")))
-    
-    expect_setequal(names(Check$Data), c("PO_fish1_coordinates", "PO_fish1_numvar", "PO_fish1_factvar_response", 
-                                         "PO_fish2_coordinates", "PO_fish2_numvar", "PO_fish2_factvar_response", "PA_bird1_PAresp" ,       
-                                         "PA_bird1_binommark" , "PA_bird2_PAresp", "PA_bird2_binommark"))
-    
-    expect_equal(Check$Data$PA_bird1_PAresp$Ntrials, PA$trial[PA$species == 'bird1'])
-    expect_equal(Check$Data$PA_bird2_PAresp$Ntrials, PA$trial[PA$species == 'bird2'])
-    expect_equal(Check$Data$PA_bird1_binommark$Ntrials, PA$marktrial[PA$species == 'bird1'])
-    expect_equal(Check$Data$PA_bird2_binommark$Ntrials, PA$marktrial[PA$species == 'bird2'])        
-    
-        })
