@@ -415,11 +415,11 @@ plot.bruSDM_predict <- function(x,
     else{
       
       all_plots[[plotname]] <- prediction_list
+      return(all_plots)
       
     }
     
   }
   
-  if (!plot) return(all_plots)
-  
+
 }
