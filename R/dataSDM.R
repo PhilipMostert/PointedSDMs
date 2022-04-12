@@ -607,10 +607,15 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       private$IPS@data <- cbind(private$IPS@data, datMatrix)
       
     }
+    if (length(private$Formula) == 0)  private$Formulas <- pointData$Formulas
+    else private$Formula <- append(private$Formulas, pointData$Formulas)
     
-    private$Formulas <- pointData$Formulas
-    private$Family <- pointData$Family
-    private$speciesIndex <- pointData$speciesIndex
+    if (length(private$Family) == 0) private$Family <- pointData$Family
+    else private$Family <- append(private$Family, pointData$Family)
+    
+    if (length(private$speciesIndex) == 0) private$speciesIndex <- pointData$speciesIndex
+    else private$speciesIndex <- append(private$speciesIndex, pointData$speciesIndex)
+    
     #pointData$makeLhoods(mesh = private$INLAmesh,
     #                     ips = private$IPS, paresp = responsePA,
     #                     ntrialsvar = trialsPA,
@@ -635,10 +640,10 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     ##Rather just re do this with the changeLink function ... 
-    familyIndex <- c(rep(NA, length(private$modelData)), unlist(newFamily)) #Make this the length rep(NA, length(private$inlaOptions$link whatervers))
-    
+    familyIndex <- c(rep(NA, length(private$optionsINLA[['control.family']])), unlist(newFamily)) #Make this the length rep(NA, length(private$inlaOptions$link whatervers))
+
     for (i in index1:index2) {
-      
+
       if (familyIndex[i] == 'binomial') {
         
         private$optionsINLA[['control.family']][[i]] <- list(link = 'cloglog')
