@@ -1179,7 +1179,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       for (data in unique(private$dataSource)) {  
         
         for (term in index) {
-          
+  
           self$updateFormula(datasetName = data, allProcesses = TRUE, Formula = formula(paste(' ~ . -', term)))  
           
         } 

@@ -176,8 +176,8 @@ test_that('addData can correctly add and store the relevent metadata properly.',
   check$addData(PO,PA)
   
   ##ie also inclusive of marks + species
-  expect_setequal(names(check$.__enclos_env__$private$modelData), c("PO_fish_coordinates", "PO_fish_numvar", "PO_fish_factvar_response", "PA_bird_PAresp", "PA_bird_binommark"))
-  expect_true(all(unlist(lapply(check$.__enclos_env__$private$modelData, function(x) class(x))) == c('bru_like', 'list')))
+  expect_setequal(names(check$.__enclos_env__$private$modelData), c("PO", "PA"))
+  expect_true(all(unlist(lapply(check$.__enclos_env__$private$modelData, function(x) class(x))) == 'list'))
   #ie also inclusive of marks
   expect_equal(check$.__enclos_env__$private$dataSource, c(rep('PO',3), rep('PA',2)))
   
@@ -193,7 +193,7 @@ test_that('addData can correctly add and store the relevent metadata properly.',
   Pcount$temp <- sample(c(1,2), nrow(Pcount@data), TRUE)
   check$addData(Pcount)
   ##Check that the data has been added into the model
-  expect_setequal(names(check$.__enclos_env__$private$modelData), c("PO_fish_coordinates", "PO_fish_numvar", "PO_fish_factvar_response", "PA_bird_PAresp", "PA_bird_binommark", "Pcount_dog_count"))
+  expect_setequal(names(check$.__enclos_env__$private$modelData), c("PO", "PA", "Pcount"))
   expect_setequal(unlist(check$.__enclos_env__$private$optionsINLA), c('log', 'log', 'log', 'cloglog', 'cloglog', 'log'))
   
   #Add a new PA dataset with a different response variable name
@@ -203,7 +203,7 @@ test_that('addData can correctly add and store the relevent metadata properly.',
   PA2$temp <- sample(c(1,2), nrow(PA2@data), TRUE)
   check$addData(PA2, responsePA = 'newResponse')
   
-  expect_setequal(names(check$.__enclos_env__$private$modelData), c("PO_fish_coordinates", "PO_fish_numvar", "PO_fish_factvar_response", "PA_bird_PAresp", "PA_bird_binommark", "Pcount_dog_count", 'PA2_insect_PAresp'))
+  expect_setequal(names(check$.__enclos_env__$private$modelData), c("PO", "PA", "Pcount", "PA2"))
   expect_setequal(check$.__enclos_env__$private$dataSource, c("PO", "PO", "PO", "PA", "PA", "Pcount", "PA2"))
   ##The correct species_field is in the components, ie the object updated itself correctly
   expect_true('shared_spatial(main = coordinates, model = shared_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))' %in% check$.__enclos_env__$private$Components)
@@ -220,29 +220,21 @@ test_that('addBias is able to add bias fields to the model as well as succesfull
   check$addBias(datasetNames = 'PO', biasField = pcmatern)
   
   ##Check that bias field is in the formula of the PO dataset
-  POdats <- grepl('^PO', names(check$.__enclos_env__$private$modelData))
-  expect_true(all(unlist(lapply(check$.__enclos_env__$private$modelData[POdats], function(x) {
+  expect_true(unlist(lapply(check$.__enclos_env__$private$Formulas$PO$fish, function(x) {
     
-    'PO_biasField' %in% x$include
+    'PO_biasField' %in% x$RHS
     
-  }))))
-  expect_false(all(unlist(lapply(check$.__enclos_env__$private$modelData[!POdats], function(x) {
-    
-    'PO_biasField' %in% x$include
-    
-  }))))
+  }))[1])
+
   expect_true('PO_biasField(main = coordinates, model = PO_bias_field)' %in% check$.__enclos_env__$private$Components)
   
-  expect_identical(check$spatialFields$biasFields$PO, pcmatern)
-  
-  #Change bias field
   
 })
 
 test_that('updateFormula is able to change the formula of a dataset', {
   
   #Test error: species/mark/dataset all NULL
-  expect_error(check$updateFormula(Formula = ~ covariate), 'At least one of: datasetName, speciesName, markName or allDatasets needs to be specified.')
+  expect_error(check$updateFormula(Formula = ~ covariate), 'At least one of: datasetName, speciesName, markName or allProcesses needs to be specified.')
   
   #Check the error regarding adding a new response variable.
   expect_error(check$updateFormula(datasetName = 'PO', Formula = notResponse ~ covariate), 'Please remove the response variable of the formula.')
@@ -250,17 +242,9 @@ test_that('updateFormula is able to change the formula of a dataset', {
   ##remove the covariate from the PO dataset
   check$updateFormula(datasetName = 'PO', Formula = ~ . - covariate)
   
-  expect_setequal(check$.__enclos_env__$private$modelData$PO_fish_coordinates$include_components, c("fish_spatial", "shared_spatial", "fish_intercept", "PO_biasField"))
-  expect_setequal(check$.__enclos_env__$private$modelData$PA_bird_PAresp$include_components, c("bird_covariate", "bird_spatial", "shared_spatial", "bird_intercept", "pointcov"))
+  expect_setequal(check$.__enclos_env__$private$Formulas$PO$fish$coordinates$RHS, c("fish_spatial", "shared_spatial", "fish_intercept", "PO_biasField"))
+  expect_setequal(check$.__enclos_env__$private$Formulas$PA$bird$PAresp$RHS, c("bird_covariate", "bird_spatial", "shared_spatial", "bird_intercept", "pointcov"))
   
-  #remove covariate for the numvar mark
-  check$updateFormula('PO', markName = 'numvar', Formula = ~ . - covariate, keepSpatial = TRUE, keepIntercepts = TRUE)
-  expect_setequal(check$.__enclos_env__$private$modelData$PO_fish_numvar$include_components, c("numvar_spatial", "numvar_intercept", "PO_biasField"))
-  
-  #create completely new formula for PO
-  check$updateFormula(datasetName = 'PO', newFormula = ~ . + covariate + I(covariate^2))
-  expect_equal(deparse1(check$.__enclos_env__$private$modelData$PO_fish_coordinates$formula), 'coordinates ~ shared_spatial + fish_intercept + fish_spatial + PO_biasField + covariate + I(covariate^2)')
-
   })
 
 test_that('changeComponents can change the components of the model', {
@@ -285,12 +269,12 @@ test_that('priorsFixed can add the correct priors to the fixed effects', {
   
   #test errors
    #incorrect effect
-  expect_error(check$priorsFixed(effect = 'notcovariate', mean.linear = 200, prec.linear = 20), 'Fixed effect provided not present in the model. Please add covariates using the "spatialCovariates" or "pointCovariates" argument in intModel')
+  expect_error(check$priorsFixed(Effect = 'notcovariate', mean.linear = 200, prec.linear = 20), 'Fixed effect provided not present in the model. Please add covariates using the "spatialCovariates" or "pointCovariates" argument in intModel')
    #species not in model
-  expect_error(check$priorsFixed(effect = 'covariate', species = 'monkey'), 'Species given is not available in the model.')
+  expect_error(check$priorsFixed(Effect = 'covariate', Species = 'monkey'), 'Species given is not available in the model.')
   
   #arbitrary mean and precision for insect_covariate
-  check$priorsFixed(effect = 'covariate', species = 'insect', mean.linear = 200, prec.linear = 20)
+  check$priorsFixed(Effect = 'covariate', Species = 'insect', mean.linear = 200, prec.linear = 20)
   expect_true('insect_covariate(main = insect_covariate, model = "linear", mean.linear = 200, prec.linear = 20)' %in% check$.__enclos_env__$private$Components)
   
   
@@ -302,9 +286,9 @@ test_that('specifySpatial can correctly specify the spatial fields', {
    #give none of: sharedSpatial, species, mark, bias
   expect_error(check$specifySpatial(prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'At least one of sharedSpatial, dataset, species or mark needs to be provided.')
    #give wrong species name
-  expect_error(check$specifySpatial(species = 'elephant', prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'Species name provided is not currently in the model.')
+  expect_error(check$specifySpatial(Species = 'elephant', prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'Species name provided is not currently in the model.')
    #give wrong mark name
-  expect_error(check$specifySpatial(mark = 'height', prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'Mark name provided is not currently in the model.')
+  expect_error(check$specifySpatial(Mark = 'height', prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'Mark name provided is not currently in the model.')
    #give wrong bias field
   expect_error(check$specifySpatial(bias = 'PA', prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)))
   
@@ -313,7 +297,7 @@ test_that('specifySpatial can correctly specify the spatial fields', {
   expect_equal(check$spatialFields$sharedField$sharedField$model, 'pcmatern')
   
   #remove the spatial field from all processes
-  check$specifySpatial(sharedSpatial = TRUE, remove = TRUE)
+  check$specifySpatial(sharedSpatial = TRUE, Remove = TRUE)
   expect_false('shared_spatial(main = coordinates, model = shared_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))'%in%check$.__enclos_env__$private$Components)
   expect_false(any(unlist(lapply(check$.__enclos_env__$private$modelData, function(x) 'shared_spatial' %in% x$include_components))))
     
