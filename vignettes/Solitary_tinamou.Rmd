@@ -5,6 +5,7 @@ vignette: >
   %\VignetteIndexEntry{Example of cSDMs for the solitary tinamou}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+
 ---
 
 ```{r, include = FALSE}
@@ -78,7 +79,7 @@ plot(mesh)
 
 To set up an integrated species distribution model with `cSDMs`, we initialize it with the `intModel` function -- which results in an *R6* objects with additional slot functions to further customize the model. The base model we run for these data comprises of the spatial covariates and an intercept term for each dataset.
 
-```{r set up base model}
+```{r set up base model, warning = FALSE, message = FALSE}
 
 base <- intModel(datasets, spatialCovariates = covariates, Coordinates = c('X', 'Y'),
                  Projection = projection, Mesh = mesh, pointsSpatial = FALSE)
@@ -108,7 +109,7 @@ baseModel
 
 Spatial fields are fundamental in our spatial species distribution models, and so we include them in the model by setting `pointsSpatial = TRUE` in `intModel`. For this model, we also remove the intercept terms from the components by setting `pointsIntercept = FALSE`.
 
-```{r set up model with fields}
+```{r set up model with fields, warning = FALSE, message = FALSE}
 
 fields <- intModel(datasets, spatialCovariates = covariates, Coordinates = c('X', 'Y'),
                  Projection = projection, Mesh = mesh, 
@@ -153,7 +154,7 @@ fieldsModel <- runModel(fields, options = list(control.inla = list(int.strategy 
 
 If we wanted to make predictions of the shared spatial random field across the map, we set `spatial = TRUE` in the generic `predict` function.
 
-```{r predict spatial}
+```{r predict spatial, warning = FALSE, message = FALSE}
 
 spatial_predictions <- predict(fieldsModel, mesh = mesh,
                        mask = region, 
@@ -170,15 +171,14 @@ plot(spatial_predictions)
 
 ```
 
-However if we wanted to make predictions of the bias field, we would do this by setting `biasfield = TRUE` (and then adding `biasnames = 'ebird'`).
+However if we wanted to make predictions of the bias field, we would do this by setting `biasfield = TRUE`.
 
-```{r predict bias}
+```{r predict bias, warning = FALSE, message = FALSE}
 
 bias_predictions <- predict(fieldsModel, 
                     mesh = mesh, 
                     mask = region, 
                     biasfield = TRUE,
-                    biasnames = 'eBird',
                     fun = 'linear')
 
 ```
