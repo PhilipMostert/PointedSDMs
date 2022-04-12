@@ -607,8 +607,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       private$IPS@data <- cbind(private$IPS@data, datMatrix)
       
     }
-    if (length(private$Formula) == 0)  private$Formulas <- pointData$Formulas
-    else private$Formula <- append(private$Formulas, pointData$Formulas)
+    if (length(private$Formulas) == 0)  private$Formulas <- pointData$Formulas
+    else private$Formulas <- append(private$Formulas, pointData$Formulas)
     
     if (length(private$Family) == 0) private$Family <- pointData$Family
     else private$Family <- append(private$Family, pointData$Family)
