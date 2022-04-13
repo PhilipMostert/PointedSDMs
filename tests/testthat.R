@@ -1,4 +1,4 @@
 library(testthat)
-library(cSDMs)
+library(inlabruSDMs)
 
-test_package("cSDMs")
+test_package("inlabruSDMs")
