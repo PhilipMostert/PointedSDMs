@@ -51,6 +51,7 @@ jobs:
 
       - name: Check
         env:
+          r_check_args: "--no-build-vignettes --ignore-vignettes"
           _R_CHECK_CRAN_INCOMING_: false
         run: |
           options(crayon.enabled = TRUE)
