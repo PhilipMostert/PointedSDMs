@@ -1,12 +1,12 @@
-Package: cSDMs
+Package: inlabruSDMs
 Type: Package
 Title: Fit Models derived from Point Processes to Species Distributions using
     inlabru
 Version: 1.00
 Author: Philip Mostert
 Maintainer: Philip Mostert <philip.s.mostert@ntnu.no>
-URL: https://github.com/PhilipMostert/cSDMs
-BugReports: https://github.com/PhilipMostert/cSDMs/issues
+URL: https://github.com/PhilipMostert/inlabruSDMs
+BugReports: https://github.com/PhilipMostert/inlabruSDMs/issues
 Description: A package to fit models based integrated species distribution models using hetrogeneous data.
 Depends:
     R (>= 3.5),  
