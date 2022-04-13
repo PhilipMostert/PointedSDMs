@@ -50,8 +50,7 @@ test_that('intModel is able to initialize a dataSDM object as well as correctly 
                 speciesName = speciesName)
   
   expect_true(all(class(obj) == c('dataSDM', 'R6')))
-  expect_setequal(names(obj$.__enclos_env__$private$modelData), c("PO_fish_coordinates", "PO_fish_numvar", "PO_fish_factvar_response", "PA_bird_PAresp",
-                                                                  "PA_bird_binommark"))
+  expect_setequal(names(obj$.__enclos_env__$private$modelData), c("PO", "PA"))
   
   ##Test warnings: No data added
   expect_warning(intModel(Coordinates = coordnames, Projection = projection, Mesh = mesh,
