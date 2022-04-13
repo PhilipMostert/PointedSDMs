@@ -77,7 +77,7 @@ plot(mesh)
 
 ### Base model
 
-To set up an integrated species distribution model with `cSDMs`, we initialize it with the `intModel` function -- which results in an *R6* objects with additional slot functions to further customize the model. The base model we run for these data comprises of the spatial covariates and an intercept term for each dataset.
+To set up an integrated species distribution model with `inlabruSDMs`, we initialize it with the `intModel` function -- which results in an *R6* objects with additional slot functions to further customize the model. The base model we run for these data comprises of the spatial covariates and an intercept term for each dataset.
 
 ```{r set up base model, warning = FALSE, message = FALSE}
 
