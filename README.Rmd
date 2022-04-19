@@ -1,0 +1,78 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# inlabruSDMs
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/PhilipMostert/cSDMs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PhilipMostert/cSDMs/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
+The goal of inlabruSDMs is to simplify the construction of integrated species distribution models (ISDMs) for large collections of heterogeneous data. It does so by building wrapper functions around [inlabru](https://besjournals.onlinelibrary.wiley.com/doi/abs/10.1111/2041-210X.13168), which uses the [INLA methodology](https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-9868.2008.00700.x) to estimate a class of latent Gaussian models.
+
+
+## Installation
+
+You can install the development version of inlabruSDMs from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("PhilipMostert/inlabruSDMs")
+```
+
+## Example
+
+This is a basic example which shows you how to specify and run an integrated model, using three disparate datasets containing locations of the solitary tinamou.
+
+```{r example}
+library(inlabruSDMs)
+library(raster)
+## basic example code
+```
+
+```{r data}
+
+#Load data in
+data("SolitaryTinamou")
+
+projection <- CRS("+proj=longlat +ellps=WGS84")
+
+species <- SolitaryTinamou$datasets
+
+covariates <- SolitaryTinamou$covariates
+covariates <- scale(stack(covariates))
+crs(covariates) <- projection
+
+mesh <- SolitaryTinamou$mesh
+mesh$crs <- projection
+
+```
+
+```{r intModel, message = FALSE, warning = FALSE}
+
+#Specify model -- here we ryb a model with three spatial covariates and a shared spatial field
+model <- intModel(species, spatialCovariates = covariates, Coordinates = c('X', 'Y'),
+                 Projection = projection, Mesh = mesh, pointsSpatial = TRUE,
+                 pointsIntercept = FALSE)
+
+```
+
+```{r runModel}
+
+#Run the integrated model
+modelRun <- runModel(model, options = list(control.inla = list(int.strategy = 'eb')))
+summary(modelRun)
+
+```
+

@@ -7,3 +7,4 @@
 ^Makefile$
 ^Jenkinsfile$
 ^data-raw$
+^README\.Rmd$
