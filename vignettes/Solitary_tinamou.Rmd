@@ -82,7 +82,8 @@ To set up an integrated species distribution model with `inlabruSDMs`, we initia
 ```{r set up base model, warning = FALSE, message = FALSE}
 
 base <- intModel(datasets, spatialCovariates = covariates, Coordinates = c('X', 'Y'),
-                 Projection = projection, Mesh = mesh, pointsSpatial = FALSE)
+                 Projection = projection, responsePA = 'Present',
+                 Mesh = mesh, pointsSpatial = FALSE)
 
 ```
 
@@ -112,7 +113,7 @@ Spatial fields are fundamental in our spatial species distribution models, and s
 ```{r set up model with fields, warning = FALSE, message = FALSE}
 
 fields <- intModel(datasets, spatialCovariates = covariates, Coordinates = c('X', 'Y'),
-                 Projection = projection, Mesh = mesh, 
+                 Projection = projection, Mesh = mesh, responsePA = 'Present',
                  pointsSpatial = TRUE, pointsIntercept = FALSE)
 
 ```

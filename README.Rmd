@@ -35,6 +35,10 @@ devtools::install_github("PhilipMostert/inlabruSDMs")
 
 This is a basic example which shows you how to specify and run an integrated model, using three disparate datasets containing locations of the solitary tinamou.
 
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
 ```{r example}
 library(inlabruSDMs)
 library(raster)
@@ -63,8 +67,8 @@ mesh$crs <- projection
 
 #Specify model -- here we ryb a model with three spatial covariates and a shared spatial field
 model <- intModel(species, spatialCovariates = covariates, Coordinates = c('X', 'Y'),
-                 Projection = projection, Mesh = mesh, pointsSpatial = TRUE,
-                 pointsIntercept = FALSE)
+                 Projection = projection, Mesh = mesh, responsePA = 'Present',
+                 pointsSpatial = TRUE, pointsIntercept = FALSE)
 
 ```
 

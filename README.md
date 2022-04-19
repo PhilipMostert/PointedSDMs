@@ -34,233 +34,37 @@ the solitary tinamou.
 
 ``` r
 library(inlabruSDMs)
-#> Loading required package: INLA
-#> Loading required package: Matrix
-#> Loading required package: foreach
-#> Loading required package: parallel
-#> Loading required package: sp
-#> This is INLA_22.03.16 built 2022-03-16 13:24:07 UTC.
-#>  - See www.r-inla.org/contact-us for how to get help.
-#> Loading required package: inlabru
 library(raster)
-## basic example code
 ```
 
 ``` r
 #Load data in
+
 data("SolitaryTinamou")
 
 projection <- CRS("+proj=longlat +ellps=WGS84")
-#> Warning in showSRID(uprojargs, format = "PROJ", multiline = "NO", prefer_proj
-#> = prefer_proj): Discarded datum Unknown based on WGS84 ellipsoid in Proj4
-#> definition
 
 species <- SolitaryTinamou$datasets
 
-covariates <- SolitaryTinamou$covariates
-covariates <- scale(stack(covariates))
-crs(covariates) <- projection
+Forest <- SolitaryTinamou$covariates$Forest
+
+crs(Forest) <- projection
 
 mesh <- SolitaryTinamou$mesh
 mesh$crs <- projection
 ```
 
 ``` r
-#Specify model -- here we ryb a model with three spatial covariates and a shared spatial field
-model <- intModel(species, spatialCovariates = covariates, Coordinates = c('X', 'Y'),
-                 Projection = projection, Mesh = mesh, pointsSpatial = TRUE,
-                 pointsIntercept = FALSE)
+#Specify model -- here we run a model with one spatial covariate and a shared spatial field
+
+model <- intModel(species, spatialCovariates = Forest, Coordinates = c('X', 'Y'),
+                 Projection = projection, Mesh = mesh, responsePA = 'Present')
 ```
 
 ``` r
 #Run the integrated model
+
 modelRun <- runModel(model, options = list(control.inla = list(int.strategy = 'eb')))
-#> Warning in input_eval.bru_input(subcomp$input, data = lh$data, env = env, : Model input 'Forest' for 'Forest' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(subcomp$input, data = lh$data, env = env, : Model input 'Forest' for 'Forest' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(subcomp$input, data = lh$data, env = env, : Model input 'Forest' for 'Forest' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(subcomp$input, data = lh$data, env = env, : Model input 'NPP' for 'NPP' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(subcomp$input, data = lh$data, env = env, : Model input 'NPP' for 'NPP' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(subcomp$input, data = lh$data, env = env, : Model input 'NPP' for 'NPP' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(subcomp$input, data = lh$data, env = env, : Model input 'Altitude' for 'Altitude' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(subcomp$input, data = lh$data, env = env, : Model input 'Altitude' for 'Altitude' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(subcomp$input, data = lh$data, env = env, : Model input 'Altitude' for 'Altitude' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj
-#> = prefer_proj): Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1
-#> +no_defs +type=crs
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
-#> prefer_proj): Discarded datum unknown in Proj4 definition
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj
-#> = prefer_proj): Discarded ellps unknown in Proj4 definition: +proj=longlat
-#> +R=6378137 +no_defs +type=crs
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
-#> prefer_proj): Discarded datum unknown in Proj4 definition
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj
-#> = prefer_proj): Discarded ellps unknown in Proj4 definition: +proj=longlat
-#> +R=6378137 +no_defs +type=crs
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
-#> prefer_proj): Discarded datum unknown in Proj4 definition
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj
-#> = prefer_proj): Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1
-#> +units=m +no_defs +type=crs
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
-#> prefer_proj): Discarded datum unknown in Proj4 definition
-#> Warning in input_eval.bru_input(component[[part]]$input, data, env = component$env, : Model input 'Forest' for 'main' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(component[[part]]$input, data, env = component$env, : Model input 'NPP' for 'main' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(component[[part]]$input, data, env = component$env, : Model input 'Altitude' for 'main' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj
-#> = prefer_proj): Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1
-#> +no_defs +type=crs
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
-#> prefer_proj): Discarded datum unknown in Proj4 definition
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj
-#> = prefer_proj): Discarded ellps unknown in Proj4 definition: +proj=longlat
-#> +R=6378137 +no_defs +type=crs
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
-#> prefer_proj): Discarded datum unknown in Proj4 definition
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj
-#> = prefer_proj): Discarded ellps unknown in Proj4 definition: +proj=longlat
-#> +R=6378137 +no_defs +type=crs
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
-#> prefer_proj): Discarded datum unknown in Proj4 definition
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj
-#> = prefer_proj): Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1
-#> +units=m +no_defs +type=crs
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
-#> prefer_proj): Discarded datum unknown in Proj4 definition
-#> Warning in input_eval.bru_input(component[[part]]$input, data, env = component$env, : Model input 'Forest' for 'main' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(component[[part]]$input, data, env = component$env, : Model input 'NPP' for 'main' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(component[[part]]$input, data, env = component$env, : Model input 'Altitude' for 'main' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj
-#> = prefer_proj): Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1
-#> +no_defs +type=crs
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
-#> prefer_proj): Discarded datum unknown in Proj4 definition
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj
-#> = prefer_proj): Discarded ellps unknown in Proj4 definition: +proj=longlat
-#> +R=6378137 +no_defs +type=crs
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
-#> prefer_proj): Discarded datum unknown in Proj4 definition
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj
-#> = prefer_proj): Discarded ellps unknown in Proj4 definition: +proj=longlat
-#> +R=6378137 +no_defs +type=crs
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
-#> prefer_proj): Discarded datum unknown in Proj4 definition
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj
-#> = prefer_proj): Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1
-#> +units=m +no_defs +type=crs
-#> Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
-#> prefer_proj): Discarded datum unknown in Proj4 definition
-#> Warning in input_eval.bru_input(component[[part]]$input, data, env = component$env, : Model input 'Forest' for 'main' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(component[[part]]$input, data, env = component$env, : Model input 'NPP' for 'main' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
-#> Warning in input_eval.bru_input(component[[part]]$input, data, env = component$env, : Model input 'Altitude' for 'main' returned some NA values.
-#> Attempting to fill in spatially by nearest available value.
-#> To avoid this basic covariate imputation, supply complete data.
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 1 is not projected; GEOS expects planar coordinates
-#> Warning in RGEOSDistanceFunc(spgeom1, spgeom2, byid, "rgeos_distance"): Spatial
-#> object 2 is not projected; GEOS expects planar coordinates
 summary(modelRun)
 #> Summary of 'bruSDM' object:
 #> 
@@ -270,15 +74,16 @@ summary(modelRun)
 #> Types of data modelled:
 #>                                     
 #> eBird                   Present only
-#> Parks                   Present only
+#> Parks                Present absence
 #> Gbif                    Present only
 #> Time used:
-#>     Pre = 3.23, Running = 18.3, Post = 0.0341, Total = 21.6 
+#>     Pre = 3.11, Running = 7.37, Post = 0.0308, Total = 10.5 
 #> Fixed effects:
-#>           mean    sd 0.025quant 0.5quant 0.975quant  mode kld
-#> Forest   0.130 0.030      0.072    0.130      0.188 0.130   0
-#> NPP      0.098 0.029      0.041    0.098      0.154 0.098   0
-#> Altitude 0.113 0.030      0.054    0.113      0.173 0.113   0
+#>                   mean     sd 0.025quant 0.5quant 0.975quant   mode kld
+#> Forest           1.101  0.029      1.044    1.101      1.160  1.101   0
+#> eBird_intercept  4.186 18.184    -31.516    4.185     39.858  4.186   0
+#> Parks_intercept -8.790 18.187    -44.497   -8.790     26.888 -8.790   0
+#> Gbif_intercept   2.570 18.185    -33.132    2.570     38.243  2.570   0
 #> 
 #> Random effects:
 #>   Name     Model
@@ -286,17 +91,17 @@ summary(modelRun)
 #> 
 #> Model hyperparameters:
 #>                            mean   sd 0.025quant 0.5quant 0.975quant  mode
-#> Theta1 for shared_spatial -2.72 0.00      -2.72    -2.72      -2.72 -2.72
-#> Theta2 for shared_spatial -3.96 0.00      -3.97    -3.96      -3.96 -3.96
+#> Theta1 for shared_spatial -2.08 0.00      -2.08    -2.08      -2.05 -2.08
+#> Theta2 for shared_spatial -3.24 0.00      -3.24    -3.24      -3.18 -3.24
 #> 
-#> Deviance Information Criterion (DIC) ...............: 4666.47
-#> Deviance Information Criterion (DIC, saturated) ....: -36354.75
-#> Effective number of parameters .....................: -75.42
+#> Deviance Information Criterion (DIC) ...............: -2835.44
+#> Deviance Information Criterion (DIC, saturated) ....: -30379.28
+#> Effective number of parameters .....................: -986.73
 #> 
-#> Watanabe-Akaike information criterion (WAIC) ...: 5299.54
-#> Effective number of parameters .................: 546.02
+#> Watanabe-Akaike information criterion (WAIC) ...: -Inf
+#> Effective number of parameters .................: 4.46e+74
 #> 
-#> Marginal log-Likelihood:  -4221.12 
+#> Marginal log-Likelihood:  -571.83 
 #>  is computed 
 #> Posterior summaries for the linear predictor and the fitted values are computed
 #> (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')
