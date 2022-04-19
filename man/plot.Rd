@@ -42,10 +42,10 @@ Plot for preduct_bru_sdm
 \dontrun{
 
 #Make data object
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 #Run model
-intModel <- bruSDM(dataObj, ...)
+intModel <- intModel(dataObj, ...)
 
 #Predict
 predictions <- predict(object = intModel, mask = spatialPolygons,

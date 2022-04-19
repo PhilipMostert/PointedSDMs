@@ -32,7 +32,7 @@ setClass('bruSDM_predict')
 #' \dontrun{
 #' 
 #' #Make data object
-#' dataObj <- bruSDM(...)
+#' dataObj <- intModel(...)
 #' 
 #' ##Run model
 #' intModel <- runModel(dataObj, ...)
@@ -188,7 +188,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (spatial) {
       
-      if (!'shared_spatial' %in% names(object$summary.random)) stop('Model run without spatial effects. Please specify Spatial = TRUE in bruSDM.')
+      if (!'shared_spatial' %in% names(object$summary.random)) stop('Model run without spatial effects. Please specify Spatial = TRUE in intModel.')
       else spatial_obj <- 'shared_spatial'
       
     } 
@@ -294,10 +294,10 @@ print.bruSDM_predict <- function(x, ...) {
 #' \dontrun{
 #' 
 #' #Make data object
-#' dataObj <- bruSDM(...)
+#' dataObj <- intModel(...)
 #' 
 #' #Run model
-#' intModel <- bruSDM(dataObj, ...)
+#' intModel <- intModel(dataObj, ...)
 #' 
 #' #Predict
 #' predictions <- predict(object = intModel, mask = spatialPolygons,

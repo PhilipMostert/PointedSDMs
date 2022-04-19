@@ -66,7 +66,7 @@ Predict for bru_sdm
 \dontrun{
 
 #Make data object
-dataObj <- bruSDM(...)
+dataObj <- intModel(...)
 
 ##Run model
 intModel <- runModel(dataObj, ...)
