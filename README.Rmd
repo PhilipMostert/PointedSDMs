@@ -42,21 +42,22 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```{r example}
 library(inlabruSDMs)
 library(raster)
-## basic example code
+
 ```
 
 ```{r data}
 
 #Load data in
+
 data("SolitaryTinamou")
 
 projection <- CRS("+proj=longlat +ellps=WGS84")
 
 species <- SolitaryTinamou$datasets
 
-covariates <- SolitaryTinamou$covariates
-covariates <- scale(stack(covariates))
-crs(covariates) <- projection
+Forest <- SolitaryTinamou$covariates$Forest
+
+crs(Forest) <- projection
 
 mesh <- SolitaryTinamou$mesh
 mesh$crs <- projection
@@ -65,16 +66,17 @@ mesh$crs <- projection
 
 ```{r intModel, message = FALSE, warning = FALSE}
 
-#Specify model -- here we ryb a model with three spatial covariates and a shared spatial field
-model <- intModel(species, spatialCovariates = covariates, Coordinates = c('X', 'Y'),
-                 Projection = projection, Mesh = mesh, responsePA = 'Present',
-                 pointsSpatial = TRUE, pointsIntercept = FALSE)
+#Specify model -- here we run a model with one spatial covariate and a shared spatial field
+
+model <- intModel(species, spatialCovariates = Forest, Coordinates = c('X', 'Y'),
+                 Projection = projection, Mesh = mesh, responsePA = 'Present')
 
 ```
 
 ```{r runModel}
 
 #Run the integrated model
+
 modelRun <- runModel(model, options = list(control.inla = list(int.strategy = 'eb')))
 summary(modelRun)
 
