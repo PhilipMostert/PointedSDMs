@@ -67,7 +67,7 @@ class(region)
 
 The next object is `covariates`, a `list` of `Raster` objects of the covariates (*Forest, NPP* and *Altitude*) describing the area of the parks. We stack these three objects together using the `stack` function, and then scale them.
 
-```{r look at covariates, fig.width=8, fig.height=5}
+```{r covariates, fig.width=8, fig.height=5}
 
 covariates <- scale(stack(covariates))
 crs(covariates) <- projection
@@ -77,7 +77,7 @@ plot(covariates)
 
 Finally we require a *Delaunay triangulated mesh* for the construction of the spatial field. A plot of the mesh used for this vignette is provided below.
 
-```{r look at mesh, fig.width=8, fig.height=5}
+```{r mesh, fig.width=8, fig.height=5}
 
 plot(mesh)
 
@@ -97,7 +97,7 @@ base <- intModel(datasets, spatialCovariates = covariates, Coordinates = c('X', 
 
 Using the `.$plot` function produces a *gg* object of the points used in this analysis by dataset; from this plot, we see that most of the species locations are found towards the eastern and south-central part of the park.
 
-```{r plots of data, fig.width=8, fig.height=5}
+```{r data, fig.width=8, fig.height=5}
 
 base$plot(Boundary = FALSE) + 
   gg(region) +
@@ -175,7 +175,7 @@ spatial_predictions <- predict(fieldsModel, mesh = mesh,
 
 And subsequently plot using the generic `plot` function.
 
-```{r plot spatial, fig.width=8, fig.height=5}
+```{r spatial, fig.width=8, fig.height=5}
 
 plot(spatial_predictions)
 
@@ -193,7 +193,7 @@ bias_predictions <- predict(fieldsModel,
 
 ```
 
-```{r plot bias, fig.width=8, fig.height=5}
+```{r bias, fig.width=8, fig.height=5}
 
 plot(bias_predictions)
 
