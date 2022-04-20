@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
 ```
 
 ## Introduction
@@ -26,6 +27,13 @@ library(raster)
 library(ggplot2)
 
 ```
+
+```{r safe, include = FALSE}
+
+bru_options_set(inla.mode = "experimental")
+
+```
+
 
 ### Load data
 
@@ -108,13 +116,14 @@ baseModel
 
 ### Model with spatial fields
 
-Spatial fields are fundamental in our spatial species distribution models, and so we include them in the model by setting `pointsSpatial = TRUE` in `intModel`. For this model, we also remove the intercept terms from the components by setting `pointsIntercept = FALSE`.
+Spatial fields are fundamental in our spatial species distribution models, and so we include them in the model by setting `pointsSpatial = TRUE` in `intModel`. Furthermore, we will remove the intercept terms by specifying `pointsIntercept = FALSE`
 
 ```{r set up model with fields, warning = FALSE, message = FALSE}
 
+
 fields <- intModel(datasets, spatialCovariates = covariates, Coordinates = c('X', 'Y'),
-                 Projection = projection, Mesh = mesh, responsePA = 'Present',
-                 pointsSpatial = TRUE, pointsIntercept = FALSE)
+                   Projection = projection, Mesh = mesh, responsePA = 'Present',
+                   pointsIntercept = FALSE)
 
 ```
 

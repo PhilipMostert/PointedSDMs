@@ -8,3 +8,5 @@
 ^Jenkinsfile$
 ^data-raw$
 ^README\.Rmd$
+^doc$
+^Meta$
