@@ -1,13 +1,13 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# inlabruSDMs
+# PointedSDMs
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/PhilipMostert/cSDMs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PhilipMostert/cSDMs/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of inlabruSDMs is to simplify the construction of integrated
+The goal of PointedSDMs is to simplify the construction of integrated
 species distribution models (ISDMs) for large collections of
 heterogeneous data. It does so by building wrapper functions around
 [inlabru](https://besjournals.onlinelibrary.wiley.com/doi/abs/10.1111/2041-210X.13168),
@@ -17,12 +17,12 @@ to estimate a class of latent Gaussian models.
 
 ## Installation
 
-You can install the development version of inlabruSDMs from
+You can install the development version of PointedSDMs from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("PhilipMostert/inlabruSDMs")
+devtools::install_github("PhilipMostert/PointedSDMs")
 ```
 
 ## Example
@@ -32,7 +32,7 @@ integrated model, using three disparate datasets containing locations of
 the solitary tinamou.
 
 ``` r
-library(inlabruSDMs)
+library(PointedSDMs)
 library(raster)
 ```
 
