@@ -64,6 +64,7 @@ model <- intModel(species, spatialCovariates = Forest, Coordinates = c('X', 'Y')
 #Run the integrated model
 
 modelRun <- runModel(model, options = list(control.inla = list(int.strategy = 'eb')))
+
 summary(modelRun)
 #> Summary of 'bruSDM' object:
 #> 
