@@ -139,12 +139,12 @@
 <span class="va">covariates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/stack.html" class="external-link">stack</a></span><span class="op">(</span><span class="va">covariates</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projection.html" class="external-link">crs</a></span><span class="op">(</span><span class="va">covariates</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">projection</span>
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">covariates</span><span class="op">)</span></code></pre></div>
-<p><img src="Solitary_tinamou_files/figure-html/look%20at%20covariates-1.png" width="768"></p>
+<p><img src="Solitary_tinamou_files/figure-html/covariates-1.png" width="768"></p>
 <p>Finally we require a <em>Delaunay triangulated mesh</em> for the construction of the spatial field. A plot of the mesh used for this vignette is provided below.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span></code></pre></div>
-<p><img src="Solitary_tinamou_files/figure-html/look%20at%20mesh-1.png" width="768"></p>
+<p><img src="Solitary_tinamou_files/figure-html/mesh-1.png" width="768"></p>
 </div>
 <div class="section level3">
 <h3 id="base-model">Base model<a class="anchor" aria-label="anchor" href="#base-model"></a>
@@ -161,7 +161,7 @@
 <span class="va">base</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>Boundary <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://inlabru-org.github.io/inlabru/reference/gg.html" class="external-link">gg</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">'Plot of the species locations by dataset'</span><span class="op">)</span></code></pre></div>
-<p><img src="Solitary_tinamou_files/figure-html/plots%20of%20data-1.png" width="768"></p>
+<p><img src="Solitary_tinamou_files/figure-html/data-1.png" width="768"></p>
 <p>To run the integrated model, we use the <code>runModel</code> function with the <code>data</code> argument as the object created with the <code>intModel</code> function above.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
@@ -179,7 +179,7 @@
 <span class="co">#&gt; Gbif                    Present only</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 2.68, Running = 0.259, Post = 0.0373, Total = 2.98 </span>
+<span class="co">#&gt;     Pre = 3.1, Running = 0.261, Post = 0.0328, Total = 3.39 </span>
 <span class="co">#&gt; Fixed effects:</span>
 <span class="co">#&gt;                   mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span>
 <span class="co">#&gt; Forest           0.534 0.065      0.405    0.534      0.662  0.534   0</span>
@@ -243,7 +243,7 @@
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spatial_predictions</span><span class="op">)</span></code></pre></div>
-<p><img src="Solitary_tinamou_files/figure-html/plot%20spatial-1.png" width="768"></p>
+<p><img src="Solitary_tinamou_files/figure-html/spatial-1.png" width="768"></p>
 <p>However if we wanted to make predictions of the bias field, we would do this by setting <code>biasfield = TRUE</code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
@@ -255,7 +255,7 @@
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bias_predictions</span><span class="op">)</span></code></pre></div>
-<p><img src="Solitary_tinamou_files/figure-html/plot%20bias-1.png" width="768"></p>
+<p><img src="Solitary_tinamou_files/figure-html/bias-1.png" width="768"></p>
 </div>
 <div class="section level3">
 <h3 id="dataset-out-cross-validation">Dataset out cross-validation<a class="anchor" aria-label="anchor" href="#dataset-out-cross-validation"></a>
@@ -264,28 +264,23 @@
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">eBird_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/datasetOut.html">datasetOut</a></span><span class="op">(</span>model <span class="op">=</span> <span class="va">fieldsModel</span>, dataset <span class="op">=</span> <span class="st">'eBird'</span><span class="op">)</span>
-<span class="co">#&gt; Error in inla.inlaprogram.has.crashed() : </span>
-<span class="co">#&gt;   The inla-program exited with an error. Unless you interupted it yourself, please rerun with verbose=TRUE and check the output carefully.</span>
-<span class="co">#&gt;   If this does not help, please contact the developers at &lt;help@r-inla.org&gt;.</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;  *** inla.core.safe:  inla.program has crashed: rerun to get better initial values. try=1/2 </span>
-<span class="co">#&gt; Error in names(marginals.random) &lt;- names.random : </span>
-<span class="co">#&gt;   'names' attribute [2] must be the same length as the vector [1]</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;  *** inla.core.safe:  inla.program has crashed: rerun to get better initial values. try=2/2 </span>
-<span class="co">#&gt; Error in names(marginals.random) &lt;- names.random : </span>
-<span class="co">#&gt;   'names' attribute [2] must be the same length as the vector [1]</span></code></pre></div>
+<span class="co">#&gt;  *** inla.core.safe:  rerun to try to solve negative eigenvalue(s) in the Hessian</span></code></pre></div>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">eBird_out</span>
 <span class="co">#&gt; Changes in fixed values by leaving out eBird:</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;               mean        sd 0.025quant   0.5quant 0.975quant      mode kld</span>
-<span class="co">#&gt; NPP        83.8766 2.3682847   79.22685   83.87653   88.52245   83.8766   0</span>
-<span class="co">#&gt; Altitude -116.5988 0.6821237 -117.93800 -116.59878 -115.26064 -116.5988   0</span>
-<span class="co">#&gt; Forest   -151.7101 1.0602406 -153.79169 -151.71011 -149.63021 -151.7101   0</span>
+<span class="co">#&gt;               mean        sd 0.025quant   0.5quant 0.975quant      mode</span>
+<span class="co">#&gt; NPP        83.8766 2.3682852   79.22685   83.87653   88.52246   83.8766</span>
+<span class="co">#&gt; Altitude -116.5988 0.6821191 -117.93799 -116.59878 -115.26064 -116.5988</span>
+<span class="co">#&gt; Forest   -151.7101 1.0602287 -153.79166 -151.71011 -149.63023 -151.7101</span>
+<span class="co">#&gt;                   kld</span>
+<span class="co">#&gt; NPP      0.000000e+00</span>
+<span class="co">#&gt; Altitude 9.806639e-14</span>
+<span class="co">#&gt; Forest   0.000000e+00</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Leave-one-out cross-validation score: NA</span></code></pre></div>
+<span class="co">#&gt; Leave-one-out cross-validation score: 5869.849</span></code></pre></div>
 </div>
 </div>
   </div>
