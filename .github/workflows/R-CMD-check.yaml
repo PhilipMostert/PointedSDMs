@@ -38,6 +38,14 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
+          
+      - name: Install system dependencies on MacOS (X11, gdal)
+        if: runner.os == 'macOS'
+        run: |
+          brew install --cask xquartz
+          brew install pkg-config
+          brew install proj@9
+          brew install gdal
 
       - name: Add inla repo
         run: |
@@ -54,7 +62,7 @@ jobs:
           _R_CHECK_CRAN_INCOMING_: false
         run: |
           options(crayon.enabled = TRUE)
-          rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
+          rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), build_args  = c('--no-build-vignettes', '--ignore-vignettes'), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
 
       - name: Show testthat output
