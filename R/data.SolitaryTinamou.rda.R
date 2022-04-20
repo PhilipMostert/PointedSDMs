@@ -1,3 +1,10 @@
+#' List of all data objects used for the solitary tinamou vignette.
+#' @name SolitaryTinamou
+#' @docType data
+#' @keywords data
+NULL
+
+
 #' data.frame object containing solitary tinamou observations from eBird
 #' @name eBird
 #' @docType data
