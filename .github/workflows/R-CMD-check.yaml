@@ -49,7 +49,7 @@ jobs:
 
       - name: Add inla repo
         run: |
-          writeLines('options(repos = c(INLA = "https://inla.r-inla-download.org/R/stable/", getOption(\"repos\")))', file("~/.Rprofile", "ab"))
+          writeLines('options(repos = c(INLA = "https://inla.r-inla-download.org/R/testing/", getOption(\"repos\")))', file("~/.Rprofile", "ab"))
         shell: Rscript {0}
 
       - uses: r-lib/actions/setup-r-dependencies@v1
