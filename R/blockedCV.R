@@ -31,8 +31,20 @@ blockedCV <- function(data, options = list()) {
      #Get formula terms only after likelihood construction, and then thin components from there.
      #And also for the whole, control.family thing
     
+    
+    trainData <- lapply(dataObj$.__enclos_env__$private$modelData, function(data) {
+      
+      lapply(data, function(x) {
+        
+        x[x$block_index != fold,]
+        
+      })
+      
+      
+    })
+    
     trainLiks <- do.call(inlabru::like_list,
-                 makeLhoods(data = data$.__enclos_env__$private$modelData,
+                 makeLhoods(data = trainData,
                  formula = data$.__enclos_env__$private$Formulas,
                  family = data$.__enclos_env__$private$Family,
                  mesh = data$.__enclos_env__$private$INLAmesh,
@@ -41,14 +53,25 @@ blockedCV <- function(data, options = list()) {
                  ntrialsvar = data$.__enclos_env__$private$trialsPA,
                  markstrialsvar = data$.__enclos_env__$private$trialsMarks,
                  speciesname = data$.__enclos_env__$private$speciesName,
-                 speciesindex = data$.__enclos_env__$private$speciesIndex,
-                 filter = block_index))
-      ##Get formulas here
-       #Then thin components
+                 speciesindex = data$.__enclos_env__$private$speciesIndex))
+      
+    formula_terms <- unique(unlist(lapply(trainLiks, function(x) {
+      
+      if (!is.null(x$include_components)) x$include_components
+      else labels(terms(x$formula))
+      
+    })))
+    
+    comp_terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)
+    
+    comp_keep <- comp_terms %in% formula_terms
+    
+    thinnedComponents <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
+
     trainedModel <- inlabru::bru(components = thinnedComponents,
                                  trainLiks,
-                                 options = thinedOptions)
-    
+                                 options = options)
+    stop(return(trainedModel))
     test <- do.call(rbind.SpatialPoints,
             lapply(unlist(data$.__encos_enc__$private$modelData, recursive = TRUE), function (x) {
         
@@ -60,22 +83,6 @@ blockedCV <- function(data, options = list()) {
     
     }
   
-  
-  formula_terms <- unique(unlist(lapply(data$.__enclos_env__$private$modelData, function(x) {
-    
-    if (is.null(x$include_components))  attributes(terms(x$formula))[['term.labels']]
-    else x$include_components
-    
-  })))
-  
-  comp_terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)
-  
-  comp_keep <- comp_terms %in% formula_terms
-  
-  componentsJoint <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
-  
-  ##in case there are duplicates, will it cause an error??
-  componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
   
   
 }
