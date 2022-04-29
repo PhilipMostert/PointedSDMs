@@ -21,6 +21,8 @@ makeLhoods <- function(data, formula, family, mesh, ips,
     
     for (species in 1:length(data[[dataset]])) {
       
+      if (length(data[[dataset]][[species]]) != 0) {
+      
       Ntrialsvar <- list()
       
       if (!is.null(ntrialsvar)) {
@@ -74,8 +76,6 @@ makeLhoods <- function(data, formula, family, mesh, ips,
         }
         else IPS <- ips
         
-
-        print(data[[dataset]][[species]])
         Likelihoods[[Likindex]] <- inlabru::like(formula = formula[[dataset]][[species]][[process]][['LHS']], ## but obs change these in function call
                                                  include = formula[[dataset]][[species]][[process]][['RHS']],
                                                  data = data[[dataset]][[species]], 
@@ -89,11 +89,21 @@ makeLhoods <- function(data, formula, family, mesh, ips,
         
         names(Likelihoods)[[Likindex]] <- paste0(nameGive, '_', as.character(formula[[dataset]][[species]][[process]][['LHS']])[2])
         
-      }
+      } 
       
+      } else {
+       
+        Likindex <- length(Likelihoods) + 1
+         
+        Likelihoods[[Likindex]] <- NULL
+        
+      }
+        
     }
     
   }
+  
+  Likelihoods <- Likelihoods[!unlist(lapply(Likelihoods, is.null))]
   
   Likelihoods  
   
