@@ -1276,7 +1276,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
           
           blocked_data[[data]][[process]][[i]] <- private$modelData[[data]][[process]][in_where[[data]][[process]][[i]], ]
           
-          if (nrow(blocked_data[[data]][[process]][[i]]) !=0) blocked_data[[data]][[process]][[i]]$block_index <- as.character(folds[i])
+          if (nrow(blocked_data[[data]][[process]][[i]]) !=0) blocked_data[[data]][[process]][[i]]$.__block_index__ <- as.character(folds[i])
           
         }
         
@@ -1294,7 +1294,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       blocked_ips[[i]] <- private$IPS[where_ips[[i]], ]
       
-      if (nrow(blocked_ips[[i]]) !=0) blocked_ips[[i]]$block_index <- as.character(folds[i])
+      if (nrow(blocked_ips[[i]]) !=0) blocked_ips[[i]]$.__block_index__ <- as.character(folds[i])
       
     }
     private$IPS <- do.call(rbind.SpatialPointsDataFrame, blocked_ips)
@@ -1307,13 +1307,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(private$modelData, recursive = FALSE), function(x) {
         
-        x[, 'block_index']
+        x[, '.__block_index__']
         
         
       }))
       
       ggplot() + gg(blocks$blocks) + blocks$plot$layers[[2]] +
-        gg(all_data, aes(col = block_index)) +
+        gg(all_data, aes(col = .__block_index__)) +
         gg(blocks$blocks) +
         gg(spatPolys) +
         ggtitle('Plot of the blocked data') +

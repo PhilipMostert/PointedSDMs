@@ -23,7 +23,7 @@ blockedCV <- function(data, options = list()) {
   
   #Need another index for number of blocks
   
-  block_index <- lapply(unlist(data$.__enclos_env__$private$modelData), function(x) x@data[,'block_index'])
+  block_index <- lapply(unlist(data$.__enclos_env__$private$modelData), function(x) x@data[,'.__block_index__'])
   
   for (fold in unique(unlist(block_index))) {
     
@@ -36,7 +36,7 @@ blockedCV <- function(data, options = list()) {
       
       lapply(data, function(x) {
         
-        x[x$block_index != fold,]
+        x[x$.__block_index__ != fold,]
         
       })
       
@@ -71,12 +71,14 @@ blockedCV <- function(data, options = list()) {
     trainedModel <- inlabru::bru(components = thinnedComponents,
                                  trainLiks,
                                  options = options)
-    stop(return(trainedModel))
+    
     test <- do.call(rbind.SpatialPoints,
             lapply(unlist(data$.__encos_enc__$private$modelData, recursive = TRUE), function (x) {
         
-                x[x$block_index == block_index, ]}))
+                x[x$.__block_index__ == block_index, ]}))
     
+    
+    predictor <- paste(dd) #paste all spatcovs or terms in the components?
     
     predictTest <- predict(object = trainedModel, data = test, formula = ~(predictor))
     #...  
