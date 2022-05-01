@@ -73,15 +73,18 @@ blockedCV <- function(data, options = list()) {
                                  options = options)
     
     test <- do.call(rbind.SpatialPoints,
-            lapply(unlist(data$.__encos_enc__$private$modelData, recursive = TRUE), function (x) {
-        
-                x[x$.__block_index__ == block_index, ]}))
+            lapply(unlist(data$.__enclos_env__$private$modelData, recursive = TRUE), function (x, idx) {
+              
+              x[x$.__block_index__ == idx, ]
+                
+                }, idx = fold))
     
     
-    predictor <- paste(dd) #paste all spatcovs or terms in the components?
+    test_formula <- formula(paste('~ ', paste(gsub('\\(.*$', '', data$.__enclos_env__$private$Components[comp_keep]), collapse = ' + ')))
+
+    predictTest <- predict(object = trainedModel, data = test, formula = test_formula)
     
-    predictTest <- predict(object = trainedModel, data = test, formula = ~(predictor))
-    #...  
+    stop(return(predictTest))
     
     }
   
