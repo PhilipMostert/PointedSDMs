@@ -65,6 +65,14 @@ dataOrganize$set('public', 'makeData', function(datapoints, datanames, coords, p
   self$numObs <- dataMade[['numObs']]
   self$multinomVars <- dataMade[['multinomVars']]
   
+  if (is.null(speciesname)) {
+    
+    for (data in 1:length(self$Data))
+      
+      names(self$Data[[data]]) <- names(self$Data)[data]
+  
+  }
+  
   self$dataSource <- lapply(seq_along(dataMade[['Family']]), function(x, name, i) rep(name[i], each = length(x[[i]])),
                             x = dataMade[['Family']], name = names(dataMade[['Family']]))
   
