@@ -643,7 +643,7 @@ dataObj$changeLink(Dataset = Dataset, Species = Species,
 \subsection{Method \code{spatialBlock()}}{
 Function to spatially block the datasets. See the \code{spatialBlock} function from blockCV for spatial blocking.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$spatialBlock(k, rows, cols, plot = FALSE, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$spatialBlock(k, rows, cols, plot = FALSE, seed = 1234, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -656,6 +656,8 @@ Function to spatially block the datasets. See the \code{spatialBlock} function f
 \item{\code{cols}}{Integer value by which the area is divided into longitudinal bins.}
 
 \item{\code{plot}}{Plot the cross-validation folds. Defaults to \code{FALSE}.}
+
+\item{\code{seed}}{Seed used by blockCV's spatialBlock to make the spatialBlock reproducible. Defaults to \code{1234}.}
 
 \item{\code{...}}{Extra arguments used by blockCV's spatialBlock}
 }

@@ -1229,6 +1229,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param rows Integer value by which the area is divided into latitudinal bins.
   #' @param cols Integer value by which the area is divided into longitudinal bins.
   #' @param plot Plot the cross-validation folds. Defaults to \code{FALSE}.
+  #' @param seed Seed used by blockCV's spatialBlock to make the spatialBlock reproducible. Defaults to \code{1234}. 
   #' @param ... Extra arguments used by blockCV's spatialBlock
   #' 
   #' @import ggpolypath
@@ -1244,7 +1245,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #' }
   #'
-  spatialBlock =  function(k, rows, cols, plot = FALSE, ...) {
+  spatialBlock =  function(k, rows, cols, plot = FALSE, seed = 1234, ...) {
     
     #stop('Need to completely re do')
     #The easiest thing to do may be to do likelihood construction in runModel and blockedCV
@@ -1253,7 +1254,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
                                                                 k = k, rows = rows, cols = cols, selection = 'random',
-                                                                verbose = FALSE, progress = FALSE, ...))
+                                                                verbose = FALSE, progress = FALSE, seed = seed, ...))
     
     folds <- blocks$blocks$folds
     
