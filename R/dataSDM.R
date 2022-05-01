@@ -653,7 +653,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    
     if (length(private$modelData) == 0) {
       
       private$modelData <- pointData$Data
@@ -1304,7 +1303,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (plot) {
       
       spatPolys <- private$polyfromMesh()
-      
+
       all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(private$modelData, recursive = FALSE), function(x) {
         
         x[, '.__block_index__']
@@ -1316,6 +1315,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         gg(all_data, aes(col = .__block_index__)) +
         gg(blocks$blocks) +
         gg(spatPolys) +
+        labs(col = 'Block index') +
         ggtitle('Plot of the blocked data') +
         theme(plot.title = element_text(hjust = 0.5))
       
