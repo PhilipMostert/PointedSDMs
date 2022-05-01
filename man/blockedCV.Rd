@@ -7,7 +7,7 @@
 blockedCV(data, options = list())
 }
 \arguments{
-\item{data}{A bruSDM data file to be used in the integrated model.}
+\item{data}{An intModel data object to be used in the integrated model.}
 
 \item{options}{A list of INLA options used in the model. Defaults to \code{list()}.}
 }
