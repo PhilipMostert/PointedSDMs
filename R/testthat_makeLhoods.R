@@ -1,4 +1,4 @@
-testthat('makeLhoods makes a list of likelihoods', {
+test_that('makeLhoods makes a list of likelihoods', {
   
   ##Set up a model
   ##Set up arbitrary data
