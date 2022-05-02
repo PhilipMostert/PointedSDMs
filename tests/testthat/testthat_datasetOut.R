@@ -29,8 +29,8 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
   PA$binommark <- sample(x = 2:3, size = nrow(PA@data), replace = TRUE)
   PA$marktrial <- sample(x = 3:5, size = nrow(PA@data), replace = TRUE)
   PA$species <- sample(x = c('bird'), nrow(PA@data), replace = TRUE)
-  mesh <- PointedSDMs::MakeSpatialRegion(bdry = SpatialPoly, meshpars = list(max.edge = 2))
-  mesh <- mesh$mesh
+  mesh <- INLA::inla.mesh.2d(boundary = inla.sp2segment(SpatialPoly), 
+                             max.edge = 2)
   iPoints <- inlabru::ipoints(samplers = SpatialPoly)
   ##Make PA a data.frame object
   PA <- data.frame(PA)

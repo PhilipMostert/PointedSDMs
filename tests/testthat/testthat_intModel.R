@@ -27,8 +27,8 @@ test_that('intModel is able to initialize a dataSDM object as well as correctly 
   PA$binommark <- sample(x = 2:5, size = nrow(PA@data), replace = TRUE)
   PA$marktrial <- sample(x = 0:1, size = nrow(PA@data), replace = TRUE)
   PA$species <- sample(x = c('bird'), nrow(PA@data), replace = TRUE)
-  mesh <- PointedSDMs::MakeSpatialRegion(bdry = SpatialPoly, meshpars = list(max.edge = 2))
-  mesh <- mesh$mesh
+  mesh <- INLA::inla.mesh.2d(boundary = inla.sp2segment(SpatialPoly), 
+                             max.edge = 2)
   iPoints <- inlabru::ipoints(samplers = SpatialPoly)
   ##Make PA a data.frame object
   PA <- data.frame(PA)
