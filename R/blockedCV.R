@@ -1,11 +1,15 @@
 #' @title Run blocked cross-validation.
 #' 
-#' @param data A bruSDM data file to be used in the integrated model.
+#' @param data An intModel data object to be used in the integrated model.
 #' @param options A list of INLA options used in the model. Defaults to \code{list()}.
 #' 
 #' @export
 #' 
 blockedCV <- function(data, options = list()) {
+  
+  #How do we do this?
+   #Should we make data a list of data files;
+   # or should we make another argument for thinned formulas to test based on the full model?
   
   if (!inherits(data, 'dataSDM')) stop('data needs to be a dataSDM object.')
   
@@ -13,16 +17,7 @@ blockedCV <- function(data, options = list()) {
   
   data2ENV(data = data, env = environment())
   
-  #Need to subset data based on value of block_id
-  #Remove all species not in index
-  #Remember to delete all empty likelihoods
-  #Remember to delete all un-used components (ie similar to datasetOut so make function)
-  #Run model on these data
-  #Predict using the left out data
-  #calculate score
-  
-  #Need another index for number of blocks
-  
+  deviance <- list()
   block_index <- lapply(unlist(data$.__enclos_env__$private$modelData), function(x) x@data[,'.__block_index__'])
   
   for (fold in unique(unlist(block_index))) {
@@ -68,9 +63,17 @@ blockedCV <- function(data, options = list()) {
     
     thinnedComponents <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
 
+    foldOptions <- data$.__enclos_env__$private$optionsINLA
+    
+    fold_ind <- unique(unlist(block_index))[unique(unlist(block_index)) != fold]
+    foldOptions$control.family <- foldOptions$control.family[sapply(unlist(data$.__enclos_env__$private$modelData), 
+                                                                    function(x) fold_ind %in% x@data[, '.__block_index__'])]
+    
+    optionsTrain <- append(options, foldOptions)
+    
     trainedModel <- inlabru::bru(components = thinnedComponents,
                                  trainLiks,
-                                 options = options)
+                                 options = optionsTrain)
     
     test <- do.call(rbind.SpatialPoints,
             lapply(unlist(data$.__enclos_env__$private$modelData, recursive = TRUE), function (x, idx) {
@@ -84,10 +87,27 @@ blockedCV <- function(data, options = list()) {
 
     predictTest <- predict(object = trainedModel, data = test, formula = test_formula)
     
-    stop(return(predictTest))
+    test$offset <- predictTest$mean
+    
+    intPoints <- data$.__enclos_env__$private$IPS
+    intPoints$offset <- rep(0, nrow(intPoints@coords))
+
+    testLik <- inlabru::like(formula = coordinates ~ .,
+                             family = 'cp',
+                             data = test,
+                             mesh = data$.__enclos_env__$private$INLAmesh,
+                             ips = intPoints,
+                             include = c('offset'))
+
+    foldOptions <- data$.__enclos_env__$private$optionsINLA
+    
+    
+    testDev <- bru(components = ~ offset - 1, testLik, options = options)
+    
+    deviance[[paste0('DIC_fold_', fold)]] <- testDev$dic$dic
     
     }
   
-  
+  deviance
   
 }
