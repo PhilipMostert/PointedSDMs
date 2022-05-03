@@ -18,6 +18,7 @@ blockedCV <- function(data, options = list()) {
   data2ENV(data = data, env = environment())
   
   deviance <- list()
+  
   block_index <- lapply(unlist(data$.__enclos_env__$private$modelData), function(x) x@data[,'.__block_index__'])
   
   for (fold in unique(unlist(block_index))) {
@@ -71,43 +72,65 @@ blockedCV <- function(data, options = list()) {
     
     optionsTrain <- append(options, foldOptions)
     
+    ##Calculate DIC for just this model?
     trainedModel <- inlabru::bru(components = thinnedComponents,
                                  trainLiks,
                                  options = optionsTrain)
     
-    test <- do.call(rbind.SpatialPoints,
-            lapply(unlist(data$.__enclos_env__$private$modelData, recursive = TRUE), function (x, idx) {
-              
-              x[x$.__block_index__ == idx, ]
-                
-                }, idx = fold))
     
-    
-    test_formula <- formula(paste('~ ', paste(gsub('\\(.*$', '', data$.__enclos_env__$private$Components[comp_keep]), collapse = ' + ')))
-
-    predictTest <- predict(object = trainedModel, data = test, formula = test_formula)
-    
-    test$offset <- predictTest$mean
-    
-    intPoints <- data$.__enclos_env__$private$IPS
-    intPoints$offset <- rep(0, nrow(intPoints@coords))
-
-    testLik <- inlabru::like(formula = coordinates ~ .,
-                             family = 'cp',
-                             data = test,
-                             mesh = data$.__enclos_env__$private$INLAmesh,
-                             ips = intPoints,
-                             include = c('offset'))
-
-    foldOptions <- data$.__enclos_env__$private$optionsINLA
-    
-    
-    testDev <- bru(components = ~ offset - 1, testLik, options = options)
-    
-    deviance[[paste0('DIC_fold_', fold)]] <- testDev$dic$dic
+    deviance[[paste0('DIC_fold_', fold)]] <- trainedModel$dic
     
     }
   
-  deviance
   
+  
+  comps <- formula(paste0(' ~ ', paste0(gsub('\\(.*$', '', data$.__enclos_env__$private$Components), collapse = ' + ')))
+  deviance <- append(deviance, list(Formula = comps))
+  class(deviance) <- c('blockedCV', 'list')
+  deviance
+
+}
+
+
+#' Export class blockedCV
+#' 
+#' @export
+
+setClass('blockedCV')
+
+#' Print for blockedCV
+#' 
+#' @export print.blockedCV
+
+#' Export print.blockedCV
+#' @param x A blockedCV object.
+#' @param ... Unused argument.
+#' 
+#' @exportS3Method 
+
+print.blockedCV <- function(x, ...) {
+  
+  cat('Spatial block cross-validation score:')
+  cat('\n\n')
+  cat('Formula: ')
+
+  cat(deparse1(x$Formula))
+  cat('\n\n')
+  x$Formula <- NULL
+  mean.deviance <- sapply(x, function(y) y$mean.deviance)
+  p.eff <- sapply(x, function(y) y$p.eff)
+  dic <- sapply(x, function(y) y$dic)
+  
+  dataobj <- data.frame(mean.deviance = mean.deviance,
+                        p.eff = p.eff,
+                        dic = dic)
+  
+  row.names(dataobj) <- paste0('fold ', 1:nrow(dataobj))
+  
+  print.data.frame(dataobj)
+  
+  cat('\nmean dic score: ')
+  cat(mean(dataobj$dic))
+
+
 }
