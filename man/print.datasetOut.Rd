@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{datasetOut object.}
 
-\item{...}{Un used argument.}
+\item{...}{Unused argument.}
 }
 \description{
 Print for bru_sdm_leave_one_out

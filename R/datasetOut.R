@@ -310,7 +310,7 @@ setClass('datasetOut')
 
 #' Export print.bru_sdm_leave_one_out
 #' @param x datasetOut object.
-#' @param ... Un used argument.
+#' @param ... Unused argument.
 #' 
 #' @exportS3Method 
 
