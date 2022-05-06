@@ -13,6 +13,7 @@
 #' @param markNames A vector with the mark names to be included in the integrated model. These marks must be in the same data objects as the points.
 #' @param markFamily A vector with the statistical families of the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".
 #' @param pointCovariates The non-spatial covariates to be included in the integrated model. These covariates must be included in the same data object as the points.
+#' @param Offset Name of the offset variable in the datasets. Defaults to \code{NULL}.
 #' @param pointsIntercept Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.
 #' @param marksIntercept Logical argument: should the marks be modeled with intercepts. Defaults to \code{TRUE}.
 #' @param pointsSpatial Logical argument: should the points have a shared spatial field. Defaults to \code{TRUE}.
@@ -64,7 +65,7 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
                      speciesSpatial = TRUE,
                      markNames = NULL, markFamily = NULL,
                      pointCovariates = NULL, pointsIntercept = TRUE, marksIntercept = TRUE,
-                     pointsSpatial = TRUE, marksSpatial = TRUE,
+                     Offset = NULL, pointsSpatial = TRUE, marksSpatial = TRUE,
                      responseCounts = 'counts', responsePA = 'present', trialsPA = NULL,
                      trialsMarks = NULL, speciesName = NULL, temporalName = NULL, temporalModel = list(model = 'ar1')) {
   
@@ -157,7 +158,8 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
                          ips = IPS,
                          temporal = temporalName,
                          temporalmodel = temporalModel,
-                         speciesspatial = speciesSpatial)
+                         speciesspatial = speciesSpatial,
+                         offset = Offset)
   
   if (length(list(...)) == 0) warning('No point data added. You can add data to this object with `$.addData()`.')
  
@@ -171,7 +173,7 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
                     responsePA = responsePA, trialsPA = trialsPA,
                     markNames = markNames, pointCovariates = pointCovariates,
                     trialsMarks = trialsMarks, speciesName = speciesName,
-                    temporalName = temporalName)
+                    temporalName = temporalName, Offset = Offset)
     
   }
   

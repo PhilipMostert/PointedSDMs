@@ -170,6 +170,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param trialsMarks The name of the trials variable for the binomial marks.
   #' @param speciesName The name of the species variable included in the data.
   #' @param Coordinates A vector of length 2 describing the names of the coordinates of the data.
+  #' @Offset Name of the offset column in the dataset
   #' 
   #' @import ggpolypath
   #' @examples
@@ -189,8 +190,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   addData = function(..., responseCounts, responsePA, trialsPA,
                      markNames, markFamily, pointCovariates,
                      trialsMarks, speciesName, temporalName,
-                     Coordinates) {
-    
+                     Coordinates, Offset) {
+
     pointData <- dataOrganize$new()
     
     dataPoints <- list(...)
@@ -341,6 +342,19 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
+    if (missing(Offset)) offsetName <- private$Offset
+    else {
+      
+      if (!is.null(Offset) && Offset != private$Offset) {
+        
+        dataPoints <- nameChanger(data = dataPoints, oldName = Offset,
+                                  newName = private$Offset)
+        Offset <-  private$Offset
+        
+      }
+      
+    }
+    
     if (!is.null(private$speciesName)) {
       
       if (missing(speciesName)) speciesName <- private$speciesName
@@ -454,7 +468,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                        trialname = trialsPA, speciesname = speciesName,
                        marktrialname = trialsMarks, temporalvar = private$temporalName,
                        marks = markNames, markfamily = markFamily,
-                       pointcovnames = pointCovariates)
+                       pointcovnames = pointCovariates, offsetname = Offset)
     
     if (is.null(private$printSummary))  private$printSummary <- list(Type = unlist(pointData$dataType),
                                                                      numObs = unlist(pointData$numObs),
@@ -516,7 +530,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     #Also add markModel in the initial call.
     pointData$makeFormulas(spatcovs = private$spatcovsNames, speciesname = speciesName, temporalname = private$temporalName,
                            paresp = responsePA, countresp = responseCounts, marksspatial = private$marksSpatial,
-                           marks = markNames, spatial = private$Spatial, 
+                           marks = markNames, spatial = private$Spatial,
                            intercept = private$Intercepts, markintercept = private$marksIntercepts, speciesspatial = private$speciesSpatial)
     
     if (!is.null(private$temporalName)) {
@@ -568,7 +582,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                                                      temporalname = private$temporalName,
                                                      numtime = length(unique(unlist(private$temporalVars))),
                                                      temporalmodel = private$temporalModel,
-                                                     speciesspatial = private$speciesSpatial)
+                                                     speciesspatial = private$speciesSpatial,
+                                                     offsetname = private$Offset)
       
     }
     else {
@@ -591,7 +606,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                                                 numtime = length(unique(unlist(private$temporalVars))),
                                                 temporalmodel = private$temporalModel,
                                                 temporalname = private$temporalName,
-                                                speciesspatial = private$speciesSpatial)
+                                                speciesspatial = private$speciesSpatial,
+                                                offsetname = private$Offset)
       
       
       private$Components <- union(private$Components, newComponents)
@@ -1351,6 +1367,7 @@ dataSDM$set('private', 'temporalName', NULL)
 dataSDM$set('private', 'temporalVars', NULL)
 dataSDM$set('private', 'temporalModel', NULL)
 dataSDM$set('private', 'speciesSpatial', TRUE)
+dataSDM$set('private', 'Offset', NULL)
 
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'blockedCV', FALSE)
@@ -1395,13 +1412,14 @@ dataSDM$set('private', 'optionsINLA', list())
 #' @param boundary A polygon map of the study area.
 #' @param ips Integration points and their respective weights to be used in the model.
 #' @param temporal Name of the temporal variable used in the model.
+#' @param offset Name of the offset column in the datasets.
 
 dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh, initialnames,
                       responsecounts, responsepa, 
                       marksnames, marksfamily, pointcovariates,
                       trialspa, trialsmarks, speciesname, marksspatial,
                       spatial, intercepts, spatialcovariates, marksintercepts,
-                      boundary, ips, temporal, temporalmodel, speciesspatial) {
+                      boundary, ips, temporal, temporalmodel, speciesspatial, offset) {
   
   if (missing(coordinates)) stop('Coordinates need to be given.')
   if (missing(projection)) stop('projection needs to be given.')
@@ -1431,6 +1449,8 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   
   if (!missing(initialnames)) private$initialnames <- initialnames
   if (!missing(boundary)) private$Boundary <- boundary
+  
+  if (!missing(offset)) private$Offset <- offset
   
   private$markNames <- marksnames
   private$markFamily <- marksfamily

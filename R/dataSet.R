@@ -13,6 +13,7 @@
 #' @param marks Name of the marks considered in the model.
 #' @param pointcovnames Name of the point covariates used in the model.
 #' @param markfamily A vector describing the distribution of the marks.
+#' @param offsetname Name of the offset column in the datasets.
 #' 
 #' @return A list of relevent metadata
 #' 
@@ -20,7 +21,7 @@
 
 dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
                     paresp, countsresp, trialname, speciesname,
-                    marks, marktrialname, markfamily, temporalvar) {
+                    marks, marktrialname, markfamily, temporalvar, offsetname) {
   
   if (paresp != 'poresp' || countsresp != 'poresp') poresp <- 'poresp'
   else
@@ -73,7 +74,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
       data <- as.data.frame(dtSub)
       data_vars <- names(data)
       
-      varsin <- data_vars[data_vars %in% pointcovnames]
+      varsin <- data_vars[data_vars %in% c(pointcovnames, offsetname)]
       
       if (identical(varsin, character(0))) varsin <- NULL
       

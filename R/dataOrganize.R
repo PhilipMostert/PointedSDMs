@@ -48,13 +48,13 @@ dataOrganize$set('public', 'dataSource', list())
 
 dataOrganize$set('public', 'makeData', function(datapoints, datanames, coords, proj, marktrialname,
                                                 paresp, countsresp, trialname, speciesname, marks,
-                                                pointcovnames, markfamily, temporalvar) {
+                                                pointcovnames, markfamily, temporalvar, offsetname) {
   
   dataMade <- dataSet(datapoints = datapoints, datanames = datanames,
                       coords = coords, proj = proj, marks = marks,
                       paresp = paresp, countsresp = countsresp, pointcovnames = pointcovnames,
                       trialname = trialname, speciesname = speciesname, temporalvar = temporalvar,
-                      marktrialname = marktrialname, markfamily = markfamily)
+                      marktrialname = marktrialname, markfamily = markfamily, offsetname = offsetname)
   
   self$Data <- dataMade[['Data']]
   self$Family <- dataMade[['Family']]
@@ -434,6 +434,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
 #' @param marksintercept Logical: should intercepts be included for the marks.
 #' @param numtime Number of time increments included in the model.
 #' @param speciesspatial Logical: Should the species be run with spatial fields.
+#' @param offsetname Name of the offset column in the datasets.
 
 dataOrganize$set('public', 'makeComponents', function(spatial, intercepts, 
                                                       datanames, marks, speciesname,
@@ -443,7 +444,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
                                                       marksintercept,
                                                       temporalname,
                                                       speciesspatial,
-                                                      numtime,temporalmodel) {
+                                                      numtime,temporalmodel,
+                                                      offsetname) {
   ##Copy for marks fields???
   if (length(self$SpeciesInData) != 0) species <- unique(unlist(self$SpeciesInData))
   else species = NULL
@@ -541,6 +543,16 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
   } else covsPoints <- NULL
   
+  if (!is.null(offsetname)) {
+    
+    if (offsetname %in% unlist(self$Varsin)) {
+      
+      offsetTerm <- paste0('bruSDMoffset(log(',offsetname,'), model = "offset")')
+      
+    } else offsetTerm <- NULL
+    
+  } else offsetTerm <- NULL
+  
   #Intercepts: Dataset intercepts
   #            species intercepts
   #            marks intercepts # Am I doing this? Or are we doing dataset/species mark intercepts
@@ -574,7 +586,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
   }
   
-  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt)
+  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt, offsetTerm)
   
   RHS
   
