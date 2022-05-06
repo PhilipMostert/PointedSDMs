@@ -545,9 +545,9 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (!is.null(offsetname)) {
     
-    if (offsetname %in% unlist(self$Varsin)) {
+    if (offsetname %in% unlist(self$varsIn)) {
       
-      offsetTerm <- paste0('bruSDMoffset(log(',offsetname,'), model = "offset")')
+      offsetTerm <- paste0(offsetname,'(log(',offsetname,'), model = "offset")')
       
     } else offsetTerm <- NULL
     
