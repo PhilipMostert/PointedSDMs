@@ -28,7 +28,7 @@ blockedCV <- function(data, options = list()) {
      #And also for the whole, control.family thing
     
     
-    trainData <- lapply(dataObj$.__enclos_env__$private$modelData, function(data) {
+    trainData <- lapply(data$.__enclos_env__$private$modelData, function(data) {
       
       lapply(data, function(x) {
         
@@ -77,7 +77,8 @@ blockedCV <- function(data, options = list()) {
                                  trainLiks,
                                  options = optionsTrain)
     
-    
+    ## -log(intensity)
+    ## add an offset argument...
     deviance[[paste0('DIC_fold_', fold)]] <- trainedModel$dic
     
     }
