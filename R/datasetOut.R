@@ -128,89 +128,21 @@ datasetOut <- function(model, dataset,
       
     }
     
-    reduced_components <- update(model$components, paste0(' ~ . -',dataname,'_intercept(1)'))
-    
-    ##Need to add this later...
-    reduced_components <- update(reduced_components, paste0(' ~ . - ',
-                                                            dataname,'_spde(main = coordinates, model = spdemodel)'))
-    #reduced_components <- update(reduced_components, paste0(' ~ . -', dataname,'_bias_field(main = coordinates, model = biasField)'))
-    reduced_components <- update(reduced_components, paste0(' ~ . -', dataname,'_biasField(main = coordinates, model = ', paste0(dataname,'_bias_field)')))
-    
-    ##Also need to add biasField #pref something like spatia_datasets...
-    
-    #if (!is.null(model[['spatial_datasets']])) {
-    
-    #  if (!dataname%in%model[['spatial_datasets']]) {
-    
-    #    reduced_components <- update(reduced_components, paste0(' ~ . -','shared_spatial(main = coordinates, model = spdemodel)'))    
-    
-    #  }  
-    
-    #  }
-    ##Add a new marks used
-    
-    ##Redo
-    
-    if (!all(is.na(unlist(model$marks$marksIn)))) {
+    reduced_terms <- unique(unlist(lapply(model$bru_info$lhoods[index], function(x) {
       
-      marksOut <- model$marks$marksIn[[dataname]]
-      marksIn <- unique(unlist(model$marks$marksIn[!names(model$marks$marksIn)%in%dataname]))
+      if (!is.null(x$include_components)) x$include_components
+      else labels(terms(x))
       
-      marksRM <- marksOut[!marksOut %in% marksIn]
-      
-      if (!identical(marksRM, 'charachter(0)')) {
-        ##Still need to add markintercepts to the model...
-        reduced_components <- update(reduced_components, paste0(' ~ . -', marksRM,
-                                                                '_intercept(1)'))
-        reduced_components <- update(reduced_components, paste0(' ~ . -', marksRM,
-                                                                '_spatial(main = coordinates, model =', paste0(marksRM,'_field)')))
-        reduced_components <- update(reduced_components, paste0(' ~ . -', marksRM,
-                                                                paste0('_phi(main =', marksRM, '_phi, model = "iid", initial = -10, fixed = TRUE)')))
-        reduced_components <- update(reduced_components, paste0(' ~ . -', marksRM,
-                                                                paste0('(main =', marksRM, ', model = "iid", constr = FALSE, fixed = TRUE)')))
-        
-        
-      }
-      
-      
-    }
+    })))
     
-    if (!is.null(model[['species']][['speciesIn']])) {
-      ##Species in all but left out data
-      reduced_species <- unlist(unique(model[['species']][['speciesIn']][!names(model[['species']][['speciesIn']])%in%dataname]))
-      #species in left out data
-      species_dataset <- unlist(unique(model[['species']][['speciesIn']][dataname]))
-      #Need diff ## REDO
-      #species_rm <- intersect(reduced_species, species_dataset)
-      species_rm <- species_dataset[!species_dataset %in% reduced_species]
-      
-      if (!identical(species_rm, 'character(0)')) {
-        
-        if (any(!species_dataset%in%reduced_species)) {
-          
-          for (species in unique(species_dataset[!species_dataset%in%reduced_species])) {
-            
-            species_covs <- as.vector(outer(paste0(species,'_'), model[['spatCovs']][['name']], FUN = 'paste0'))
-            
-            for (i in 1:length(species_covs)) {
-              
-              reduced_components <- update(reduced_components, paste('~ . -',  paste0(species_covs[i],'(main = ', species_covs[i], ', model = "linear")')))  
-              reduced_components <- update(reduced_components, paste('~ . -',  paste0(species_covs[i],'(main = ', species_covs[i], ', model = "factor_full")')))  
-              reduced_components <- update(reduced_components, paste('~ . -',  paste0(species_covs[i],'(main = ', species_covs, ', model = "factor_contrast")')))  
-              
-            }
-            
-            reduced_components <- update(reduced_components, paste('~ . -', paste0(species,'_spatial(main = coordinates, model = ', paste0(species,'_field)'))))
-            reduced_components <- update(reduced_components, paste('~ . -', paste0(species,'_intercept(1)')))
-            
-          }
+    all_comp_terms <- labels(terms(model$componentsJoint))
+    
+    comp_terms <- gsub('\\(.*$', '', all_comp_terms)
+    
+    comp_keep <- comp_terms %in% reduced_terms
+    
+    reduced_components <- formula(paste('~ - 1 +', paste(all_comp_terms[comp_terms], collapse = ' + ')))
 
-        }
-        
-      }
-      
-    }
-    
     model_reduced <- inlabru::bru(components = formula(reduced_components),
                                   model$bru_info$lhoods[index],
                                   options = reduced_options)
