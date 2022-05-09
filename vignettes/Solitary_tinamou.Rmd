@@ -90,7 +90,7 @@ To set up an integrated species distribution model with `PointedSDMs`, we initia
 ```{r set up base model, warning = FALSE, message = FALSE}
 
 base <- intModel(datasets, spatialCovariates = covariates, Coordinates = c('X', 'Y'),
-                 Projection = projection, responsePA = 'Present',
+                 Projection = projection, responsePA = 'Present', Offset = 'area',
                  Mesh = mesh, pointsSpatial = FALSE)
 
 ```
@@ -102,6 +102,14 @@ Using the `.$plot` function produces a *gg* object of the points used in this an
 base$plot(Boundary = FALSE) + 
   gg(region) +
   ggtitle('Plot of the species locations by dataset')
+
+```
+
+In this model, we also include prior information for the *Forest* effect using `$priorsFixed`.
+
+```{r priorsFixed}
+
+base$priorsFixed(Effect = 'Forest', mean.linear = 0.5, prec.linear = 0.01)
 
 ```
 
@@ -121,8 +129,8 @@ Spatial fields are fundamental in our spatial species distribution models, and s
 ```{r set up model with fields, warning = FALSE, message = FALSE}
 
 
-fields <- intModel(datasets, spatialCovariates = covariates, Coordinates = c('X', 'Y'),
-                   Projection = projection, Mesh = mesh, responsePA = 'Present',
+fields <- intModel(datasets, Coordinates = c('X', 'Y'),
+                   Projection = projection, Mesh = mesh, responsePA = 'Present', Offset = 'area',
                    pointsIntercept = FALSE)
 
 ```
@@ -141,14 +149,6 @@ We furthermore include an additional spatial field (deemed the *bias field*) for
 ```{r addBias}
 
 fields$addBias('eBird')
-
-```
-
-In this model, we also include prior information for the *Forest* effect using `$priorsFixed`.
-
-```{r priorsFixed}
-
-fields$priorsFixed(Effect = 'Forest', mean.linear = 0.5, prec.linear = 0.01)
 
 ```
 
