@@ -1296,12 +1296,20 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
           
         }
         
+        blocked_data[[data]][[process]] <- lapply(blocked_data[[data]][[process]], function(x) {
+          
+          row.names(x@data) <- NULL
+          row.names(x@coords) <- NULL
+          x
+          
+        })
+        
         private$modelData[[data]][[process]] <- do.call(rbind.SpatialPointsDataFrame, blocked_data[[data]][[process]])
         
       }
       
     }
-    
+
     ##Do IPS
     blocked_ips <- list()
     where_ips <- lapply(1:(rows * cols), function(i) !is.na(over(private$IPS, blocksPoly[[1]][[i]])))
@@ -1328,7 +1336,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         
       }))
       
-      ggplot() + gg(blocks$blocks) + blocks$plot$layers[[2]] +
+      ggplot() + 
+        gg(blocks$blocks) +
+        blocks$plot$layers[[2]] +
         gg(all_data, aes(col = .__block_index__)) +
         gg(blocks$blocks) +
         gg(spatPolys) +
