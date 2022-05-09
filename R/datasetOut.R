@@ -139,10 +139,10 @@ datasetOut <- function(model, dataset,
     
     comp_terms <- gsub('\\(.*$', '', all_comp_terms)
     
-    comp_keep <- comp_terms %in% reduced_terms
+    comp_out <- !comp_terms %in% reduced_terms
     
-    reduced_components <- formula(paste('~ - 1 +', paste(all_comp_terms[comp_keep], collapse = ' + ')))
-
+    reduced_components <- update(model$componentsJoint, paste0(' ~ . -', all_comp_terms[comp_out]))
+ 
     model_reduced <- inlabru::bru(components = reduced_components,
                                   model$bru_info$lhoods[index],
                                   options = reduced_options)
@@ -184,7 +184,7 @@ datasetOut <- function(model, dataset,
         #if (!is.null(model[['species']][['speciesIn']])) covs <- as.vector(outer(paste0(reduced_species,'_'), model$spatCovs$name, FUN = 'paste0'))
         #else covs <- model$spatCovs$name
         
-        train <- predict(model_reduced, data = model$bru_info$lhoods[[data]]$data, formula = eval(parse(text = paste0('~ (',paste(comp_terms[comp_keep], collapse = ' + '),')'))))  
+        train <- predict(model_reduced, data = model$bru_info$lhoods[[data]]$data, formula = eval(parse(text = paste0('~ (',paste(comp_terms[!comp_out], collapse = ' + '),')'))))  
         
         reduced_lik[[data]]$data@data['offset'] <- train$mean
         #reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
