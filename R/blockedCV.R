@@ -67,7 +67,7 @@ blockedCV <- function(data, options = list()) {
     foldOptions <- data$.__enclos_env__$private$optionsINLA
     
     fold_ind <- unique(unlist(block_index))[unique(unlist(block_index)) != fold]
-    print(fold_ind)
+    
     foldOptions$control.family <- foldOptions$control.family[sapply(unlist(data$.__enclos_env__$private$modelData), 
                                                                     function(x) any(fold_ind %in% x@data[, '.__block_index__']))]
 
