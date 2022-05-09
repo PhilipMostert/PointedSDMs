@@ -141,9 +141,9 @@ datasetOut <- function(model, dataset,
     
     comp_keep <- comp_terms %in% reduced_terms
     
-    reduced_components <- formula(paste('~ - 1 +', paste(all_comp_terms[comp_terms], collapse = ' + ')))
+    reduced_components <- formula(paste('~ - 1 +', paste(all_comp_terms[comp_keep], collapse = ' + ')))
 
-    model_reduced <- inlabru::bru(components = formula(reduced_components),
+    model_reduced <- inlabru::bru(components = reduced_components,
                                   model$bru_info$lhoods[index],
                                   options = reduced_options)
     
