@@ -282,7 +282,8 @@ Function used to add additional, and possibly heterogeneous data to the dataSDM 
   trialsMarks,
   speciesName,
   temporalName,
-  Coordinates
+  Coordinates,
+  Offset
 )}\if{html}{\out{</div>}}
 }
 
@@ -708,7 +709,8 @@ dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
   ips,
   temporal,
   temporalmodel,
-  speciesspatial
+  speciesspatial,
+  offset
 )}\if{html}{\out{</div>}}
 }
 

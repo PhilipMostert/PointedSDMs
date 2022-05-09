@@ -17,7 +17,8 @@ dataSet(
   marks,
   marktrialname,
   markfamily,
-  temporalvar
+  temporalvar,
+  offsetname
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ dataSet(
 \item{markfamily}{A vector describing the distribution of the marks.}
 
 \item{temporalvar}{Name of the temporal variable.}
+
+\item{offsetname}{Name of the offset column in the datasets.}
 }
 \value{
 A list of relevent metadata

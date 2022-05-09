@@ -18,6 +18,7 @@ intModel(
   pointCovariates = NULL,
   pointsIntercept = TRUE,
   marksIntercept = TRUE,
+  Offset = NULL,
   pointsSpatial = TRUE,
   marksSpatial = TRUE,
   responseCounts = "counts",
@@ -55,6 +56,8 @@ intModel(
 \item{pointsIntercept}{Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.}
 
 \item{marksIntercept}{Logical argument: should the marks be modeled with intercepts. Defaults to \code{TRUE}.}
+
+\item{Offset}{Name of the offset variable in the datasets. Defaults to \code{NULL}.}
 
 \item{pointsSpatial}{Logical argument: should the points have a shared spatial field. Defaults to \code{TRUE}.}
 
