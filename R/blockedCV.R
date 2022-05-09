@@ -70,7 +70,7 @@ blockedCV <- function(data, options = list()) {
     print(fold_ind)
     foldOptions$control.family <- foldOptions$control.family[sapply(unlist(data$.__enclos_env__$private$modelData), 
                                                                     function(x) any(fold_ind %in% x@data[, '.__block_index__']))]
-stop(return(foldOptions))
+
     optionsTrain <- append(options, foldOptions)
     
     ##Calculate DIC for just this model?
