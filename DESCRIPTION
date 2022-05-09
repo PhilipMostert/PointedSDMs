@@ -12,6 +12,7 @@ Depends:
     R (>= 3.5),  
     stats,
     INLA,
+    blockCV,
     inlabru (>= 2.5),
     methods
 Imports:
