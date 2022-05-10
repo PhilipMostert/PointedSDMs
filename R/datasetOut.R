@@ -139,7 +139,7 @@ datasetOut <- function(model, dataset,
     
     comp_terms <- gsub('\\(.*$', '', all_comp_terms)
     
-    comp_out <- !comp_terms %in% reduced_terms
+    comp_out <- comp_terms %in% reduced_terms
     
     reduced_components <- update(model$componentsJoint, paste0(' ~ . -', all_comp_terms[comp_out]))
  
