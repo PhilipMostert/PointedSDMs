@@ -141,8 +141,9 @@ datasetOut <- function(model, dataset,
     
     comp_out <- comp_terms %in% reduced_terms
     
-    reduced_components <- update(model$componentsJoint, paste0(' ~ . -', all_comp_terms[comp_out]))
- 
+    if (all(!comp_out)) reduced_components <- model$componentsJoint
+    else reduced_components <- update(model$componentsJoint, paste0(' ~ . -', all_comp_terms[!comp_out]))
+    
     model_reduced <- inlabru::bru(components = reduced_components,
                                   model$bru_info$lhoods[index],
                                   options = reduced_options)
