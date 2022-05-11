@@ -184,7 +184,6 @@ datasetOut <- function(model, dataset,
         
         #if (!is.null(model[['species']][['speciesIn']])) covs <- as.vector(outer(paste0(reduced_species,'_'), model$spatCovs$name, FUN = 'paste0'))
         #else covs <- model$spatCovs$name
-        stop(return( paste0('~ (',paste(gsub('\\(.*$', '', labels(terms(reduced_components))), collapse = ' + '),')')))
         train <- predict(model_reduced, data = model$bru_info$lhoods[[data]]$data, formula = eval(parse(text = paste0('~(',paste(gsub('\\(.*$', '', labels(terms(reduced_components))), collapse = ' + '),')'))))  
         
         reduced_lik[[data]]$data@data['offset'] <- train$mean
