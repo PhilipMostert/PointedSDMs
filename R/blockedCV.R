@@ -131,7 +131,7 @@ print.blockedCV <- function(x, ...) {
   
   print.data.frame(dataobj)
   
-  cat('\nmean dic score: ')
+  cat('\nmean DIC score: ')
   cat(mean(dataobj$dic))
 
 
