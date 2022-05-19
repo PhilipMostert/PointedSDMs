@@ -99,6 +99,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (Species && is.null(private$speciesName)) stop('speciesName in intModel required before plotting species.')
     
+    if (Boundary && is.null(private$INLAmesh)) stop('An inla.mesh object is required to make the Boundary.')
+    
     ##Get data
     points <- list()
     
@@ -273,9 +275,10 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (private$Spatial) {
       
-      if (is.null(self$spatialFields$sharedField[['sharedField']])) self$spatialFields$sharedField[['sharedField']] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
-      
-    }
+      #if (is.null(self$spatialFields$sharedField[['sharedField']])) self$spatialFields$sharedField[['sharedField']] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+      if (is.null(self$spatialFields$sharedField[['sharedField']])) private$makeMatern(fieldType = 'sharedField', names = 'sharedField')  
+    
+      }
     
     if (!is.null(markNames)) {
       
@@ -294,11 +297,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         ## re do this such that if is non null, don't touch
         if (any(unlist(lapply(self$spatialFields$markFields, is.null)))) {
           
-          for (mark in names(self$spatialFields$markFields)) {
+          private$makeMatern(fieldType = 'markFields', name = names(self$spatialFields$markFields))
+          
+          #for (mark in names(self$spatialFields$markFields)) {
             
-            if (is.null(self$spatialFields$markFields[[mark]])) self$spatialFields$markFields[[mark]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+          #  if (is.null(self$spatialFields$markFields[[mark]])) self$spatialFields$markFields[[mark]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
             
-          }
+          #}
           
         }
         
@@ -510,11 +515,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         
         if (any(unlist(lapply(self$spatialFields$speciesFields, is.null)))) {
           
-          for (species in names(self$spatialFields$speciesFields)) {
+          private$makeMatern(fieldType = 'speciesFields', name = names(self$spatialFields$speciesFields))
+          
+          #for (species in names(self$spatialFields$speciesFields)) {
             
-            if (is.null(self$spatialFields$speciesFields[[species]])) self$spatialFields$speciesFields[[species]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+            #if (is.null(self$spatialFields$speciesFields[[species]])) self$spatialFields$speciesFields[[species]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
             
-          }
+          #}
           
         }
         
@@ -615,14 +622,17 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    
-    if (!is.null(private$pointCovariates)) {
+    if (!is.null(private$IPS)) {
       
-      datMatrix <- as.data.frame(matrix(0, nrow = nrow(private$IPS@coords), ncol = length(private$pointCovariates)))
-      names(datMatrix) <- private$pointCovariates
-      private$IPS@data <- cbind(private$IPS@data, datMatrix)
+      if (!is.null(private$pointCovariates)) {
+        
+        datMatrix <- as.data.frame(matrix(0, nrow = nrow(private$IPS@coords), ncol = length(private$pointCovariates)))
+        names(datMatrix) <- private$pointCovariates
+        private$IPS@data <- cbind(private$IPS@data, datMatrix)
       
-    }
+      }
+      
+      }
     if (length(private$Formulas) == 0)  private$Formulas <- pointData$Formulas
     else private$Formulas <- append(private$Formulas, pointData$Formulas)
     
@@ -718,7 +728,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         #private$modelData[[lik]]$include_components <- c(private$modelData[[lik]]$include_components, paste0(dat, '_biasField'))
       }
       
-      if (is.null(biasField)) self$spatialFields$biasFields[[dat]] <- inla.spde2.matern(mesh = private$INLAmesh)
+      if (is.null(biasField)) private$makeMatern(fieldType = 'biasFields', name = dat)#self$spatialFields$biasFields[[dat]] <- inla.spde2.matern(mesh = private$INLAmesh)
       else self$spatialFields$biasFields[[dat]] <- biasField
       
     }
@@ -1261,12 +1271,14 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #' }
   #'
-  spatialBlock =  function(k, rows, cols, plot = FALSE, seed = 1234, ...) {
+  spatialBlock = function(k, rows, cols, plot = FALSE, seed = 1234, ...) {
     
     #stop('Need to completely re do')
     #The easiest thing to do may be to do likelihood construction in runModel and blockedCV
     #So need to move all the objects from dataOrganize to here
     #And then be careful with regards to indexing for all the slot functions here...
+    
+    if (is.null(private$IPS)) stop('Integration points are required for `.$spatialBlock`. You may add them through an inla.mesh object, or through the IPS argument in `intModel`.')
     
     blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
                                                                 k = k, rows = rows, cols = cols, selection = 'random',
@@ -1351,8 +1363,68 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
     
   }
+  ,
+  #' @description Function used to make an inla.mesh object from a spatial boundary and a list of mesh specifications.
+  #' @param Boundary A \code{SpatialPolygons} object surrounding the area of the points.
+  #' @param Mesh An \code{inla.mesh} object.
+  #' @param Plot Logical argument: should the new mesh object be printed. Defaults to \code{TRUE}.
+  #' @param ... Additional mesh parameters required by \code{inla.mesh.2d}.
+  #' 
+  #' @examples
+  #' \dontrun{
+  #' 
+  #' #Make data object
+  #' dataObj <- intModel(...)
+  #' 
+  #' #Block the points spatially
+  #' dataObj$addMesh(Boundary = SpatialPolygons, cutoff=0.1, max.edge=c(0.1, 3), offset=c(1,1))
+  #' 
+  #' }
   
-  ))
+  addMesh = function(Boundary, Mesh, Plot = TRUE, ...) {
+    
+    if (!missing(Boundary)) private$Boundary <- Boundary
+    
+    if (is.null(private$Boundary) && missing(Mesh)) stop('Either a mesh or a Boundary are required.')
+    
+    if (missing(Mesh) && missing(meshParameters)) stop('A list of meshParameters are required to make an inla.mesh object.')
+    
+    if (!missing(Mesh) && class(Mesh) != 'inla.mesh') stop('Mesh is required to be an inla.mesh object.')
+    
+    if (!missing(Mesh)) private$INLAmesh <- Mesh
+    else {
+      
+      private$INLAmesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(Boundary), ...)
+      
+      if (Plot) ggplot() + gg(private$INLAmesh)
+      
+    }
+    
+    for (type in names(self$spatialFields)) {
+      
+      for (name in names(self$spatialFields[[type]])) {
+        
+        if (is.null(self$spatialFields[[type]][[name]])) private$makeMatern(fieldType = type, names  = name)
+        
+        
+      }
+      
+    }
+    
+    if (!is.null(private$Boundary)) private$IPS <- inlabru::ipoints(samplers = private$Boundary, domain = private$INLAmesh)
+    else private$IPS <- inlabru::ipoints(domain = private$INLAmesh)
+    
+    if (!is.null(private$pointCovariates)) {
+      
+      datMatrix <- as.data.frame(matrix(0, nrow = nrow(private$IPS@coords), ncol = length(private$pointCovariates)))
+      names(datMatrix) <- private$pointCovariates
+      private$IPS@data <- cbind(private$IPS@data, datMatrix)
+      
+    }
+    
+    
+  }
+))
 
 dataSDM$set('private', 'Projection', NULL)
 dataSDM$set('private', 'Coordinates', NULL)
@@ -1433,7 +1505,9 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   
   if (missing(coordinates)) stop('Coordinates need to be given.')
   if (missing(projection)) stop('projection needs to be given.')
-  if (missing(Inlamesh)) stop('Mesh needs to be given.')
+  #if (missing(Inlamesh)) stop('Mesh needs to be given.')
+  
+  if (missing(Inlamesh)) warning('An inla.mesh object is required for the model to run. Please use `.addMesh()` before making any inference.')
   
   if (class(Inlamesh) != 'inla.mesh') stop('Mesh needs to be an inla.mesh object.')
   
@@ -1472,9 +1546,12 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   if (!is.null(ips)) private$IPS <- ips
   else {
     
-    if (is.null(boundary)) private$IPS <- inlabru::ipoints(samplers = boundary, domain = Inlamesh)
-    else private$IPS <- inlabru::ipoints(domain = Inlamesh)
+    if (!missing(InlaMesh)) {
+      
+      if (!is.null(boundary)) private$IPS <- inlabru::ipoints(samplers = boundary, domain = Inlamesh)
+      else private$IPS <- inlabru::ipoints(domain = Inlamesh)
     
+      }
   }
   
   private$Spatial <- spatial
@@ -1490,6 +1567,17 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   private$Projection <- projection
   private$INLAmesh <- Inlamesh
   invisible(self)
+})
+
+dataSDM$set('private', 'makeMatern', function(fieldType, names) {
+  
+  for (proc in names) {
+    
+    if (is.null(self$spatialFields[[fieldType]][[proc]])) self$spatialFields[[fieldType]][[proc]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+    
+  }
+  
+  
 })
 
 dataSDM$set('private', 'polyfromMesh', function(...) {
