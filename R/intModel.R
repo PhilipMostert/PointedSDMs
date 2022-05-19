@@ -58,8 +58,8 @@
 
 
 ##Need to remove the field things here...
- # + everything in dataSDM and dataOrganize
- #Then go to unit tests
+# + everything in dataSDM and dataOrganize
+#Then go to unit tests
 intModel <- function(..., spatialCovariates = NULL, Coordinates,
                      Projection, Boundary = NULL, Mesh, IPS = NULL,
                      speciesSpatial = TRUE,
@@ -90,51 +90,51 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
   #if (length(dataPoints) == 0) stop('Please provide data in the ... argument.')
   if (length(dataPoints) > 0) {
     
-  datasetClass <- unlist(lapply(dataPoints, class))
-##Need something more here if object is list: get names from list
-  if (length(datasetClass) == 1 && datasetClass == "list") {
-
-    dataNames <- NULL
-    dataPoints <- unlist(dataPoints, recursive = FALSE)
-    datasetClass <- lapply(dataPoints, class)
-    dataList <- TRUE
-    
-  }
-  else dataList <- FALSE
-
-  if (!all(unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame"))) stop("Datasets need to be either a SpatialPoints* object or a data frame.")
-  
-  if (dataList) {
-    
-    if (is.null(dataNames)) {
+    datasetClass <- unlist(lapply(dataPoints, class))
+    ##Need something more here if object is list: get names from list
+    if (length(datasetClass) == 1 && datasetClass == "list") {
       
-      initialnames <- setdiff(gsub("list[(]|[)]", "", as.character(match.call(expand.dots = TRUE))), 
-                           gsub("list[(]|[)]", "", as.character(match.call(expand.dots = FALSE))))
-      initialnames <- unlist(strsplit(x = initialnames, split = ", "))
+      dataNames <- NULL
+      dataPoints <- unlist(dataPoints, recursive = FALSE)
+      datasetClass <- lapply(dataPoints, class)
+      dataList <- TRUE
       
-      if (length(initialnames) != length(dataPoints)) {
+    }
+    else dataList <- FALSE
+    
+    if (!all(unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame"))) stop("Datasets need to be either a SpatialPoints* object or a data frame.")
+    
+    if (dataList) {
+      
+      if (is.null(dataNames)) {
         
-        initialnames <- names(list(...)[[1]])
+        initialnames <- setdiff(gsub("list[(]|[)]", "", as.character(match.call(expand.dots = TRUE))), 
+                                gsub("list[(]|[)]", "", as.character(match.call(expand.dots = FALSE))))
+        initialnames <- unlist(strsplit(x = initialnames, split = ", "))
         
-        if (any(is.null(initialnames))) {
-        warning("Issues with naming the datasets from a list. Will create generic dataset names.", 
-                immediate. = FALSE)
-        
-        cat("\n")
-        initialnames <- paste0("dataset_", seq_len(length(datasetClass)))
+        if (length(initialnames) != length(dataPoints)) {
+          
+          initialnames <- names(list(...)[[1]])
+          
+          if (any(is.null(initialnames))) {
+            warning("Issues with naming the datasets from a list. Will create generic dataset names.", 
+                    immediate. = FALSE)
+            
+            cat("\n")
+            initialnames <- paste0("dataset_", seq_len(length(datasetClass)))
+            
+          }
+          
+        }
         
       }
+    }
+    else {
       
+      initialnames <- setdiff(as.character(match.call(expand.dots = TRUE)), 
+                              as.character(match.call(expand.dots = FALSE)))
     }
     
-    }
-  }
-  else {
-    
-    initialnames <- setdiff(as.character(match.call(expand.dots = TRUE)), 
-                            as.character(match.call(expand.dots = FALSE)))
-  }
-  
   } else initialnames <- NULL
   
   if (!is.null(temporalName)) temporalModel <- deparse(temporalModel)
@@ -162,14 +162,14 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
                          offset = Offset)
   
   if (length(list(...)) == 0) warning('No point data added. You can add data to this object with `$.addData()`.')
- 
+  
   else {
     
     if (is.null(responseCounts) || is.null(responsePA)) stop('One of responseCounts and responsePA are NULL. Both are required arguments.')
     
     #if (!is.null(responsePA) && is.null(trialsPA)) warning('Present absence response name given but trials name is NULL.')
-
-   bruData$addData(..., responseCounts = responseCounts,
+    
+    bruData$addData(..., responseCounts = responseCounts,
                     responsePA = responsePA, trialsPA = trialsPA,
                     markNames = markNames, pointCovariates = pointCovariates,
                     trialsMarks = trialsMarks, speciesName = speciesName,

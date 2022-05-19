@@ -5,7 +5,7 @@
 #' 
 
 dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = FALSE, public = list(
-
+  
   #' @description Prints the datasets, their data type and the number of observations, as well as the marks and their respective families.
   #' @param ... Not used.
   print = function(...) {
@@ -99,8 +99,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (Species && is.null(private$speciesName)) stop('speciesName in intModel required before plotting species.')
     
-    if (Boundary && is.null(private$INLAmesh)) stop('An inla.mesh object is required to make the Boundary.')
-    
     ##Get data
     points <- list()
     
@@ -110,21 +108,21 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       if (!is.null(private$markNames)) {
         
-       if (!is.null(private$speciesName)) index <- unique(private$speciesIn[[data]])
-       else index <- 1
-      #index <- index[!endsWith(names(private$modelData[index]), paste0('_', private$markNames))]
+        if (!is.null(private$speciesName)) index <- unique(private$speciesIn[[data]])
+        else index <- 1
+        #index <- index[!endsWith(names(private$modelData[index]), paste0('_', private$markNames))]
         
       } 
-
+      
       for (i in 1:length(index)) {
         
         points[[data]][[i]] <- private$modelData[[data]][[i]][, names(private$modelData[[data]][[i]]) %in% c(private$speciesName, private$responseCounts,
-                                                                                                                   private$responsePA,'BRU_aggregate')]
-
+                                                                                                             private$responsePA,'BRU_aggregate')]
+        
         if ('BRU_aggregate' %in% names(points[[data]][[i]])) points[[data]][[i]] <- points[[data]][[i]][points[[data]][[i]]$BRU_aggregate,]
-   
+        
         if (!Species) points[[data]][[i]]@data[,'..Dataset_placeholder_var..'] <- rep(data, nrow(points[[data]][[i]]@data))
-       
+        
         
       }
       
@@ -133,7 +131,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
     
     plotData <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(points), function(x) x[, names(x) %in% c('..Dataset_placeholder_var..', private$speciesName)]))
-
+    
     if (Boundary) bound <- gg(private$polyfromMesh())
     else bound <- NULL
     
@@ -142,7 +140,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       ## Need to add the species in here
       
       plotData@data[, private$speciesName] <- unlist(private$speciesIndex) #unlist(lapply(1:length(plotData[,private$speciesName]), function(x,y,z) y[z[x]], y = unlist(private$speciesIn), z= plotData@data[,private$speciesName]))
-       
+      
       colOption <- gg(plotData, aes(col = eval(parse(text = private$speciesName))))
       
       ggplot() + colOption + bound + guides(col = guide_legend(title = 'Species Name')) 
@@ -193,7 +191,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                      markNames, markFamily, pointCovariates,
                      trialsMarks, speciesName, temporalName,
                      Coordinates, Offset) {
-
+    
     pointData <- dataOrganize$new()
     
     dataPoints <- list(...)
@@ -275,39 +273,36 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (private$Spatial) {
       
-      #if (is.null(self$spatialFields$sharedField[['sharedField']])) self$spatialFields$sharedField[['sharedField']] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
-      if (is.null(self$spatialFields$sharedField[['sharedField']])) private$makeMatern(fieldType = 'sharedField', names = 'sharedField')  
-    
-      }
+      if (is.null(self$spatialFields$sharedField[['sharedField']])) self$spatialFields$sharedField[['sharedField']] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+      
+    }
     
     if (!is.null(markNames)) {
       
       if (private$marksSpatial) {
         #re do this such that only add new marks to self$spatialFields$markFields
         if (!all(markNames %in% names(self$spatialFields$markFields))) {
-        
-        new_marks <- vector(mode = 'list', length = sum(!markNames %in% names(self$spatialFields$markFields)))
-        names(new_marks) <- markNames[!markNames %in% names(self$spatialFields$markFields)]
-        
-        self$spatialFields$markFields <- append(self$spatialFields$markFields, new_marks)
-        #self$spatialFields$markFields <- vector(mode = 'list', length = length(markNames))
-        #names(self$spatialFields$markFields) <- markNames
-        
+          
+          new_marks <- vector(mode = 'list', length = sum(!markNames %in% names(self$spatialFields$markFields)))
+          names(new_marks) <- markNames[!markNames %in% names(self$spatialFields$markFields)]
+          
+          self$spatialFields$markFields <- append(self$spatialFields$markFields, new_marks)
+          #self$spatialFields$markFields <- vector(mode = 'list', length = length(markNames))
+          #names(self$spatialFields$markFields) <- markNames
+          
         }
         ## re do this such that if is non null, don't touch
         if (any(unlist(lapply(self$spatialFields$markFields, is.null)))) {
           
-          private$makeMatern(fieldType = 'markFields', name = names(self$spatialFields$markFields))
-          
-          #for (mark in names(self$spatialFields$markFields)) {
+          for (mark in names(self$spatialFields$markFields)) {
             
-          #  if (is.null(self$spatialFields$markFields[[mark]])) self$spatialFields$markFields[[mark]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+            if (is.null(self$spatialFields$markFields[[mark]])) self$spatialFields$markFields[[mark]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
             
-          #}
+          }
           
         }
         
-        }
+      }
     }
     
     if (missing(responseCounts)) responseCounts <- private$responseCounts
@@ -515,13 +510,11 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         
         if (any(unlist(lapply(self$spatialFields$speciesFields, is.null)))) {
           
-          private$makeMatern(fieldType = 'speciesFields', name = names(self$spatialFields$speciesFields))
-          
-          #for (species in names(self$spatialFields$speciesFields)) {
+          for (species in names(self$spatialFields$speciesFields)) {
             
-            #if (is.null(self$spatialFields$speciesFields[[species]])) self$spatialFields$speciesFields[[species]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+            if (is.null(self$spatialFields$speciesFields[[species]])) self$spatialFields$speciesFields[[species]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
             
-          #}
+          }
           
         }
         
@@ -622,17 +615,14 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    if (!is.null(private$IPS)) {
+    
+    if (!is.null(private$pointCovariates)) {
       
-      if (!is.null(private$pointCovariates)) {
-        
-        datMatrix <- as.data.frame(matrix(0, nrow = nrow(private$IPS@coords), ncol = length(private$pointCovariates)))
-        names(datMatrix) <- private$pointCovariates
-        private$IPS@data <- cbind(private$IPS@data, datMatrix)
+      datMatrix <- as.data.frame(matrix(0, nrow = nrow(private$IPS@coords), ncol = length(private$pointCovariates)))
+      names(datMatrix) <- private$pointCovariates
+      private$IPS@data <- cbind(private$IPS@data, datMatrix)
       
-      }
-      
-      }
+    }
     if (length(private$Formulas) == 0)  private$Formulas <- pointData$Formulas
     else private$Formulas <- append(private$Formulas, pointData$Formulas)
     
@@ -650,7 +640,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (!is.null(private$speciesName)) newFamily <- mapply(function(family, number) rep(family , times = number), family = private$Family,
                                                            number = lapply(private$speciesIn, length))
-
+    
     else newFamily <- pointData$Family
     
     if (!is.null(private$optionsINLA[['control.family']])) {
@@ -667,9 +657,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
     ##Rather just re do this with the changeLink function ... 
     familyIndex <- c(rep(NA, length(private$optionsINLA[['control.family']])), unlist(newFamily)) #Make this the length rep(NA, length(private$inlaOptions$link whatervers))
-
+    
     for (i in index1:index2) {
-
+      
       if (familyIndex[i] == 'binomial') {
         
         private$optionsINLA[['control.family']][[i]] <- list(link = 'cloglog')
@@ -728,7 +718,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         #private$modelData[[lik]]$include_components <- c(private$modelData[[lik]]$include_components, paste0(dat, '_biasField'))
       }
       
-      if (is.null(biasField)) private$makeMatern(fieldType = 'biasFields', name = dat)#self$spatialFields$biasFields[[dat]] <- inla.spde2.matern(mesh = private$INLAmesh)
+      if (is.null(biasField)) self$spatialFields$biasFields[[dat]] <- inla.spde2.matern(mesh = private$INLAmesh)
       else self$spatialFields$biasFields[[dat]] <- biasField
       
     }
@@ -817,23 +807,23 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-  #  if (!is.null(speciesName) && !is.null(markName)) {
-      
+    #  if (!is.null(speciesName) && !is.null(markName)) {
+    
     #  speciesName <- list()
-      
+    
     #  for (dataset in datasetName) {
-        
+    
     #    if (!is.na(private$printSummary$Marks[dataset])) {
-          
+    
     #      if (any(markName %in% private$printSummary$Marks[dataset])) speciesName[dataset] <- rep(private$speciesIn[datasetName], each = length(sum(markName %in% private$printSummary$Marks[dataset])))
     #      else speciesName[dataset] <- private$speciesIn[dataset]
-          
+    
     #    } else speciesName[dataset] <- private$speciesIn[dataset]
-        
+    
     #  } 
-      
+    
     #  speciesInd <- unlist(speciesName)  
-      
+    
     #} else speciesInd <- speciesName
     
     if (allProcesses) {
@@ -845,44 +835,44 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     else {
       
-    if (!is.null(private$speciesName)) {
+      if (!is.null(private$speciesName)) {
+        
+        if (!is.null(speciesName))  {
+          
+          if (!all(speciesName %in% names(private$Formulas[[datasetName]]))) stop('Species provided not available in the dataset.') 
+          else name_index <- speciesName
+          
+        }
+        else name_index <- names(private$Formulas[[datasetName]])
+        
+        
+        
+      } else name_index <- datasetName
       
-      if (!is.null(speciesName))  {
-
-        if (!all(speciesName %in% names(private$Formulas[[datasetName]]))) stop('Species provided not available in the dataset.') 
-        else name_index <- speciesName
+      if (Points) index2 <- 1
+      else index2 <- NULL
       
+      if (!is.null(markName)) {
+        
+        if (!markName %in% names(private$Formulas[[datasetName]][[name_index[1]]])) stop('markName not provided in datasetName.')
+        else index2 <- c(index2, which(names(private$Formulas[[datasetName]][[name_index[1]]]) %in% markName)) #Since they should all be the same ...
+        
+        
       }
-      else name_index <- names(private$Formulas[[datasetName]])
       
       
-      
-    } else name_index <- datasetName
-    
-    if (Points) index2 <- 1
-    else index2 <- NULL
-    
-    if (!is.null(markName)) {
-      
-      if (!markName %in% names(private$Formulas[[datasetName]][[name_index[1]]])) stop('markName not provided in datasetName.')
-      else index2 <- c(index2, which(names(private$Formulas[[datasetName]][[name_index[1]]]) %in% markName)) #Since they should all be the same ...
-      
-      
-    }
-
-
     }
     
     if (missing(Formula) && missing(newFormula)) {
-    
+      
       get_formulas <- list()
       for (i in index2) {
         
-      get_formulas[[i]] <- lapply(private$Formulas[[datasetName]][name_index], function(x) list(formula = x[[i]]$LHS,
-                                                                             components = x[[i]]$RHS))
-      
+        get_formulas[[i]] <- lapply(private$Formulas[[datasetName]][name_index], function(x) list(formula = x[[i]]$LHS,
+                                                                                                  components = x[[i]]$RHS))
+        
       }
-
+      
       get_formulas <- lapply(unlist(get_formulas, recursive = FALSE), function(x) {
         
         if (as.character(x$formula)[3] == '.') update(x$formula, paste('~', paste0(x$components, collapse = '+'))) 
@@ -905,23 +895,23 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
             if (!is.null(private$speciesName)) {
               
               covs_in <- all.vars(Formula)[all.vars(Formula) %in% private$spatcovsNames]
-       
+              
               ##What happens if people do species_var?
               if (!identical(covs_in, character(0))) {
                 
                 char_formula <- unlist(strsplit(as.character(Formula), split = ' '))
                 
                 char_formula[char_formula == covs_in] <- paste0(dataset, '_', covs_in)
-           
+                
                 formula_update <- formula(paste(char_formula, collapse = ' '))
-              
+                
               }
               
             }
             
             updated_formula <- update(formula(paste('~ ', paste0(private$Formulas[[datasetName]][[dataset]][[process]]$RHS, collapse = ' + '))), formula_update)
             updated_formula <- all.vars(updated_formula)[all.vars(updated_formula) != '.']
-
+            
             ##This will be removed once we move the like construction to runModel.
             private$Formulas[[datasetName]][[dataset]][[process]]$RHS <- updated_formula
             
@@ -935,42 +925,42 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       for (dataset in name_index) { 
         
         for (process in index2) {
-        ##Change all of these...
-        ## Get old formula:
-        #cat('Old formula for', paste0(dataset, ': '))
-        if (length(all.vars(private$Formulas[[datasetName]][[dataset]][[process]]$LHS)) == 2) {
-        
-          oldForm <- update(private$Formulas[[datasetName]][[dataset]][[process]]$LHS, formula(paste(' ~ ',paste0(private$Formulas[[datasetName]][[dataset]][[process]]$RHS, collapse = ' + '))))
+          ##Change all of these...
+          ## Get old formula:
+          #cat('Old formula for', paste0(dataset, ': '))
+          if (length(all.vars(private$Formulas[[datasetName]][[dataset]][[process]]$LHS)) == 2) {
+            
+            oldForm <- update(private$Formulas[[datasetName]][[dataset]][[process]]$LHS, formula(paste(' ~ ',paste0(private$Formulas[[datasetName]][[dataset]][[process]]$RHS, collapse = ' + '))))
+            
+            #print(oldForm)
+            #cat('New formula: ')
+            
+            ## Maybe I should do a check: if cov in newFormula then paste0(species, _ , covariate) ## how else does it work within a for loop
+            newForm <- update(oldForm, newFormula)
+            #newForm <- update(private$modelData[[dataset]]$formula, newFormula)
+            #print(newForm)
+            #cat('\n')
+            
+          }
+          else {
+            
+            #print(private$modelData[[dataset]]$formula)
+            #cat('\n')
+            #cat('New formula: ')
+            newForm <- update(paste(update(private$Formulas[[datasetName]][[dataset]][[process]]$LHS), '~ '), newFormula)
+          }
+          #Change
           
-          #print(oldForm)
-          #cat('New formula: ')
+          private$Formulas[[datasetName]][[dataset]][[process]]$LHS <- newForm
+          private$Formulas[[datasetName]][[dataset]][[process]]$RHS <- c()
           
-          ## Maybe I should do a check: if cov in newFormula then paste0(species, _ , covariate) ## how else does it work within a for loop
-          newForm <- update(oldForm, newFormula)
-          #newForm <- update(private$modelData[[dataset]]$formula, newFormula)
-          #print(newForm)
-          #cat('\n')
+          
+          
           
         }
-        else {
-          
-          #print(private$modelData[[dataset]]$formula)
-          #cat('\n')
-          #cat('New formula: ')
-          newForm <- update(paste(update(private$Formulas[[datasetName]][[dataset]][[process]]$LHS), '~ '), newFormula)
-        }
-        #Change
-          
-        private$Formulas[[datasetName]][[dataset]][[process]]$LHS <- newForm
-        private$Formulas[[datasetName]][[dataset]][[process]]$RHS <- c()
-        
-      
-      
-      
+      }
     }
-    }
-    }
-    }
+  }
   ,
   #' @description Function to add custom components to the integrated modeling.
   #' @param addComponent Component to add to the model.
@@ -1039,7 +1029,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'                     mean.linear = 2, prec.linear = 0.005)
   #' 
   #' }
-
+  
   priorsFixed = function(Effect, Species = NULL, datasetName = NULL,
                          mean.linear = 0, prec.linear = 0.001) {
     
@@ -1204,7 +1194,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       for (data in unique(private$dataSource)) {  
         
         for (term in index) {
-  
+          
           self$updateFormula(datasetName = data, allProcesses = TRUE, Formula = formula(paste(' ~ . -', term)))  
           
         } 
@@ -1271,14 +1261,12 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #' }
   #'
-  spatialBlock = function(k, rows, cols, plot = FALSE, seed = 1234, ...) {
+  spatialBlock =  function(k, rows, cols, plot = FALSE, seed = 1234, ...) {
     
     #stop('Need to completely re do')
     #The easiest thing to do may be to do likelihood construction in runModel and blockedCV
     #So need to move all the objects from dataOrganize to here
     #And then be careful with regards to indexing for all the slot functions here...
-    
-    if (is.null(private$IPS)) stop('Integration points are required for `.$spatialBlock`. You may add them through an inla.mesh object, or through the IPS argument in `intModel`.')
     
     blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
                                                                 k = k, rows = rows, cols = cols, selection = 'random',
@@ -1321,7 +1309,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       }
       
     }
-
+    
     ##Do IPS
     blocked_ips <- list()
     where_ips <- lapply(1:(rows * cols), function(i) !is.na(over(private$IPS, blocksPoly[[1]][[i]])))
@@ -1340,7 +1328,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (plot) {
       
       spatPolys <- private$polyfromMesh()
-
+      
       all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(private$modelData, recursive = FALSE), function(x) {
         
         x[, '.__block_index__']
@@ -1363,67 +1351,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
     
   }
-  ,
-  #' @description Function used to make an inla.mesh object from a spatial boundary and a list of mesh specifications.
-  #' @param Boundary A \code{SpatialPolygons} object surrounding the area of the points.
-  #' @param Mesh An \code{inla.mesh} object.
-  #' @param Plot Logical argument: should the new mesh object be printed. Defaults to \code{TRUE}.
-  #' @param ... Additional mesh parameters required by \code{inla.mesh.2d}.
-  #' 
-  #' @examples
-  #' \dontrun{
-  #' 
-  #' #Make data object
-  #' dataObj <- intModel(...)
-  #' 
-  #' #Block the points spatially
-  #' dataObj$addMesh(Boundary = SpatialPolygons, cutoff=0.1, max.edge=c(0.1, 3), offset=c(1,1))
-  #' 
-  #' }
   
-  addMesh = function(Boundary, Mesh, Plot = TRUE, ...) {
-    
-    if (!missing(Boundary)) private$Boundary <- Boundary
-    
-    if (is.null(private$Boundary) && missing(Mesh)) stop('Either a mesh or a Boundary are required.')
-    
-    if (missing(Mesh) && missing(meshParameters)) stop('A list of meshParameters are required to make an inla.mesh object.')
-    
-    if (!missing(Mesh) && class(Mesh) != 'inla.mesh') stop('Mesh is required to be an inla.mesh object.')
-    
-    if (!missing(Mesh)) private$INLAmesh <- Mesh
-    else {
-      
-      private$INLAmesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(Boundary), ...)
-      
-      if (Plot) ggplot() + gg(private$INLAmesh)
-      
-    }
-    
-    for (type in names(self$spatialFields)) {
-      
-      for (name in names(self$spatialFields[[type]])) {
-        
-        if (is.null(self$spatialFields[[type]][[name]])) private$makeMatern(fieldType = type, names  = name)
-        
-        
-      }
-      
-    }
-    
-    if (!is.null(private$Boundary)) private$IPS <- inlabru::ipoints(samplers = private$Boundary, domain = private$INLAmesh)
-    else private$IPS <- inlabru::ipoints(domain = private$INLAmesh)
-    
-    if (!is.null(private$pointCovariates)) {
-      
-      datMatrix <- as.data.frame(matrix(0, nrow = nrow(private$IPS@coords), ncol = length(private$pointCovariates)))
-      names(datMatrix) <- private$pointCovariates
-      private$IPS@data <- cbind(private$IPS@data, datMatrix)
-      
-    }
-    
-    
-  }
 ))
 
 dataSDM$set('private', 'Projection', NULL)
@@ -1497,17 +1425,15 @@ dataSDM$set('private', 'optionsINLA', list())
 #' @param offset Name of the offset column in the datasets.
 
 dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh, initialnames,
-                      responsecounts, responsepa, 
-                      marksnames, marksfamily, pointcovariates,
-                      trialspa, trialsmarks, speciesname, marksspatial,
-                      spatial, intercepts, spatialcovariates, marksintercepts,
-                      boundary, ips, temporal, temporalmodel, speciesspatial, offset) {
+                                              responsecounts, responsepa, 
+                                              marksnames, marksfamily, pointcovariates,
+                                              trialspa, trialsmarks, speciesname, marksspatial,
+                                              spatial, intercepts, spatialcovariates, marksintercepts,
+                                              boundary, ips, temporal, temporalmodel, speciesspatial, offset) {
   
   if (missing(coordinates)) stop('Coordinates need to be given.')
   if (missing(projection)) stop('projection needs to be given.')
-  #if (missing(Inlamesh)) stop('Mesh needs to be given.')
-  
-  if (missing(Inlamesh)) warning('An inla.mesh object is required for the model to run. Please use `.addMesh()` before making any inference.')
+  if (missing(Inlamesh)) stop('Mesh needs to be given.')
   
   if (class(Inlamesh) != 'inla.mesh') stop('Mesh needs to be an inla.mesh object.')
   
@@ -1546,12 +1472,9 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   if (!is.null(ips)) private$IPS <- ips
   else {
     
-    if (!missing(InlaMesh)) {
-      
-      if (!is.null(boundary)) private$IPS <- inlabru::ipoints(samplers = boundary, domain = Inlamesh)
-      else private$IPS <- inlabru::ipoints(domain = Inlamesh)
+    if (is.null(boundary)) private$IPS <- inlabru::ipoints(samplers = boundary, domain = Inlamesh)
+    else private$IPS <- inlabru::ipoints(domain = Inlamesh)
     
-      }
   }
   
   private$Spatial <- spatial
@@ -1567,17 +1490,6 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   private$Projection <- projection
   private$INLAmesh <- Inlamesh
   invisible(self)
-})
-
-dataSDM$set('private', 'makeMatern', function(fieldType, names) {
-  
-  for (proc in names) {
-    
-    if (is.null(self$spatialFields[[fieldType]][[proc]])) self$spatialFields[[fieldType]][[proc]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
-    
-  }
-  
-  
 })
 
 dataSDM$set('private', 'polyfromMesh', function(...) {
@@ -1685,12 +1597,12 @@ dataSDM$set('public', 'samplingBias', function(...) {
   stop('Do later...')
   
   # Things to consider::
-   # Do we treat every point as a sampling location???
-   # If all we have are points of species 
-    # ie reflecting only the location of the species
-    # then we are essentially just duplicating the data?
-     # Can we just use "expert maps"
-      # ie use PA data to infer where the sampling locations are?  
+  # Do we treat every point as a sampling location???
+  # If all we have are points of species 
+  # ie reflecting only the location of the species
+  # then we are essentially just duplicating the data?
+  # Can we just use "expert maps"
+  # ie use PA data to infer where the sampling locations are?  
 })
 
 ## Need to change all the spatialFields to self$spatialFields and then the relevent sublist?
@@ -1698,4 +1610,3 @@ dataSDM$set('public', 'spatialFields', list(sharedField = list(),
                                             speciesFields = list(),
                                             markFields = list(),
                                             biasFields = list()))
-
