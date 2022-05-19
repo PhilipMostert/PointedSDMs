@@ -16,11 +16,12 @@ knitr::opts_chunk$set(
 # PointedSDMs
 
 <!-- badges: start -->
+
 [![R-CMD-check](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
-The goal of PointedSDMs is to simplify the construction of integrated species distribution models (ISDMs) for large collections of heterogeneous data. It does so by building wrapper functions around [inlabru](https://besjournals.onlinelibrary.wiley.com/doi/abs/10.1111/2041-210X.13168), which uses the [INLA methodology](https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-9868.2008.00700.x) to estimate a class of latent Gaussian models.
-
+The goal of *PointedSDMs* is to simplify the construction of integrated species distribution models (ISDMs) for large collections of heterogeneous data. It does so by building wrapper functions around [inlabru](https://besjournals.onlinelibrary.wiley.com/doi/abs/10.1111/2041-210X.13168), which uses the [INLA methodology](https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-9868.2008.00700.x) to estimate a class of latent Gaussian models.
 
 ## Installation
 
@@ -31,16 +32,41 @@ You can install the development version of PointedSDMs from [GitHub](https://git
 devtools::install_github("PhilipMostert/PointedSDMs")
 ```
 
+## Package functionality
+
+*PointedSDMs* includes a selection of functions used to streamline the construction of ISDMs as well and perform model cross-validation. The core functions of the package are:
+
+| Function name  | Function description                                                                                          |
+|----------------|---------------------------------------------------------------------------------------------------------------|
+| `intModel()`   | Initialize and specify the components used in the integrated model.                                           |
+| `blockedCV()`  | Perform spatial blocked cross-validation.                                                                     |
+| `runModel()`   | Estimate the components of the integrated model.                                                              |
+| `datasetOut()` | Perform dataset-out cross-validation, which calculates the impact individual datasets have on the full model. |
+
+The function `intModel()` produces an [R6](https://github.com/r-lib/R6) object, and as a result there are various *slot functions* available to further specify the components of the model. These *slot functions* include:
+
+| `intModel()` slot function   | Function description                                                                                                                                            |
+|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `` `.$plot()` ``             | Used to create a plot of the available data. The output of this function is an object of class [`gg`](https://github.com/tidyverse/ggplot2).                    |
+| `` `.$addBias()` ``          | Add an additional spatial field to a dataset to account for sampling bias in unstructured datasets.                                                             |
+| `` `.$updateFormula()` ``    | Used to update a formula for a process. The idea is to start specify the full model with `intModel()`, and then thin components per dataset with this function. |
+| `` `.$updateComponents()` `` | Change or add new components used by [inlabru](https://besjournals.onlinelibrary.wiley.com/doi/abs/10.1111/2041-210X.13168) in the integrated model.            |
+| `` `.$priorsFixed()` ``      | Change the specification of the prior distribution for the fixed effects in the model.                                                                          |
+| `` `.$specifySpatial()` ``   | Specify the spatial field in the model using penalizing complexity (PC) priors.                                                                                 |
+| `` `.$spatialBlock()` ``     | Used to specify how the points are spatially blocked. Spatial cross-validation is subsequently performed using `blockedCV()`.                                   |
+
 ## Example
 
 This is a basic example which shows you how to specify and run an integrated model, using three disparate datasets containing locations of the solitary tinamou.
 
-```{r setup, include=FALSE} 
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 ```
 
 ```{r example}
+
 library(PointedSDMs)
+library(ggplot2)
 library(raster)
 
 ```
@@ -64,6 +90,8 @@ mesh$crs <- projection
 
 ```
 
+Setting up the model is done easily with `intModel()`, where we specify the required components of the model:
+
 ```{r intModel, message = FALSE, warning = FALSE}
 
 #Specify model -- here we run a model with one spatial covariate and a shared spatial field
@@ -73,7 +101,19 @@ model <- intModel(species, spatialCovariates = Forest, Coordinates = c('X', 'Y')
 
 ```
 
-```{r runModel}
+We can also make a quick plot of where the species are located using `` `.$plot()` ``:
+
+```{r plot, warning = FALSE, message = FALSE, fig.width=8, fig.height=5}
+
+region <- SolitaryTinamou$region
+
+model$plot(Boundary = FALSE) + gg(region) + theme_bw()
+
+```
+
+We can estimate the parameters in the model using the `runModel()` function:
+
+```{r runModel, warning = FALSE, message = FALSE}
 
 #Run the integrated model
 
@@ -82,3 +122,15 @@ summary(modelRun)
 
 ```
 
+*PointedSDMs* also includes generic predict and plot functions:
+
+```{r predict_and_plot, warning = FALSE, message = FALSE, fig.width=8, fig.height=5}
+
+predictions <- predict(modelRun, mesh = mesh,
+                       mask = region, 
+                       spatial = TRUE,
+                       fun = 'linear')
+
+plot(predictions)
+
+```
