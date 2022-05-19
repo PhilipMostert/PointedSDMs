@@ -32,6 +32,8 @@ runModel <- function(data, options = list()) {
   
   if (!inherits(data, 'dataSDM')) stop('data needs to be a dataSDM object.')
 
+  if (is.null(data$.__enclos_env__$private$INLAmesh)) stop('An inla.mesh object is required before any model is run.')
+  
   data2ENV(data = data, env = environment())
   
   if (data$.__enclos_env__$private$Spatial) pointsSpatial <- TRUE

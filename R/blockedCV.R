@@ -13,6 +13,8 @@ blockedCV <- function(data, options = list()) {
   
   if (!inherits(data, 'dataSDM')) stop('data needs to be a dataSDM object.')
   
+  if (is.null(data$.__enclos_env__$private$INLAmesh)) stop('An inla.mesh object is required before any model is run.')
+  
   if (!data$.__enclos_env__$private$blockedCV) stop('Please use ".$spatialBlock" before using this function.')
   
   data2ENV(data = data, env = environment())
