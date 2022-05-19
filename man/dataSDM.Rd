@@ -181,6 +181,20 @@ dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
 
 }
 
+
+## ------------------------------------------------
+## Method `dataSDM$addMesh`
+## ------------------------------------------------
+
+\dontrun{
+
+#Make data object
+dataObj <- intModel(...)
+
+#Block the points spatially
+dataObj$addMesh(Boundary = SpatialPolygons, cutoff=0.1, max.edge=c(0.1, 3), offset=c(1,1))
+
+}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -195,6 +209,7 @@ dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
 \item \href{#method-specifySpatial}{\code{dataSDM$specifySpatial()}}
 \item \href{#method-changeLink}{\code{dataSDM$changeLink()}}
 \item \href{#method-spatialBlock}{\code{dataSDM$spatialBlock()}}
+\item \href{#method-addMesh}{\code{dataSDM$addMesh()}}
 \item \href{#method-new}{\code{dataSDM$new()}}
 \item \href{#method-samplingBias}{\code{dataSDM$samplingBias()}}
 }
@@ -676,6 +691,45 @@ dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
 
 }
 
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-addMesh"></a>}}
+\if{latex}{\out{\hypertarget{method-addMesh}{}}}
+\subsection{Method \code{addMesh()}}{
+Function used to make an inla.mesh object from a spatial boundary and a list of mesh specifications.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$addMesh(Boundary, Mesh, Plot = TRUE, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{Boundary}}{A \code{SpatialPolygons} object surrounding the area of the points.}
+
+\item{\code{Mesh}}{An \code{inla.mesh} object.}
+
+\item{\code{Plot}}{Logical argument: should the new mesh object be printed. Defaults to \code{TRUE}.}
+
+\item{\code{...}}{Additional mesh parameters required by \code{inla.mesh.2d}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+
+#Make data object
+dataObj <- intModel(...)
+
+#Block the points spatially
+dataObj$addMesh(Boundary = SpatialPolygons, cutoff=0.1, max.edge=c(0.1, 3), offset=c(1,1))
+
+}
 }
 \if{html}{\out{</div>}}
 
