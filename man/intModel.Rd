@@ -33,6 +33,8 @@ intModel(
 \arguments{
 \item{...}{The datasets to be used in the model. May come as either \code{data.frame} or \code{SpatialPoints*} objects, or as a list of objects with these classes. The classes of the datasets do not necessarily need to be standardized, however the variable names within them often have to be.}
 
+\item{spatialCovariates}{The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{Raster*} or \code{SpatialPixelsDataFrame} object. Can be either \code{numeric} or \code{factor}\\code{character} data.}
+
 \item{Coordinates}{A vector of length 2 containing the names (class \code{character}) of the coordinate variables used in the model.}
 
 \item{Projection}{The coordinate reference system used by both the spatial points and spatial covariates. Must be of class \code{\link[sp]{CRS}} (see \code{CRS} from the \pkg{sp} package for more details).}
@@ -40,6 +42,8 @@ intModel(
 \item{Boundary}{##NOT USED YET.}
 
 \item{Mesh}{An \code{inla.mesh} object required for the spatial random fields and the integration points in the model (see \code{\link[INLA]{inla.mesh.2d}} from the \pkg{INLA} package for more details).}
+
+\item{IPS}{The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[inlabru]{ipoints}} from the \pkg{inlabru} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} object.}
 
 \item{speciesSpatial}{Logical argument: should the species have their own individual spatial fields in the integrated model. Defaults to \code{TRUE}.}
 
