@@ -1,3 +1,4 @@
+#' @title \emph{data2ENV}: function used to move objects from one environment to another.
 #' @description Internal function: used to assign objects specified in bruSDM to the dataSDM/blockedCV function environments.
 #' 
 #' @param data bruSDM data file to be used in the integrated model.

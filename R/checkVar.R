@@ -1,3 +1,4 @@
+#' @title \emph{checkVar}: Function used to check variable names.
 #' @description Internal function used to check if variable is in dataset.
 #' 
 #' @param data A list of datasets.

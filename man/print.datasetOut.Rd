@@ -2,7 +2,7 @@
 % Please edit documentation in R/datasetOut.R
 \name{print.datasetOut}
 \alias{print.datasetOut}
-\title{Print for bru_sdm_leave_one_out}
+\title{Generic print function for \code{datasetOut}.}
 \usage{
 \method{print}{datasetOut}(x, ...)
 }

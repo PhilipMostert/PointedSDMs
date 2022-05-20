@@ -2,7 +2,7 @@
 % Please edit documentation in R/bruSDM_predict.R
 \name{predict.bruSDM}
 \alias{predict.bruSDM}
-\title{Predict for bru_sdm}
+\title{Generic predict function for \code{bru_SDM} objects.}
 \usage{
 \method{predict}{bruSDM}(
   object,
@@ -24,13 +24,13 @@
 )
 }
 \arguments{
-\item{object}{A \code{bru_sdm object}.}
+\item{object}{A \code{bru_sdm} objects.}
 
 \item{data}{Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.}
 
 \item{formula}{Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.}
 
-\item{mesh}{An inla.mesh object}
+\item{mesh}{An \code{inla.mesh} object.}
 
 \item{mask}{A mask of the study background. Defaults to \code{NULL}.}
 
@@ -38,19 +38,19 @@
 
 \item{covariates}{Name of covariates to predict.}
 
-\item{spatial}{Include spatial effects in prediction.}
+\item{spatial}{Logical: include spatial effects in prediction. Defaults to \code{FALSE}.}
 
-\item{intercepts}{Include intercept in prediction.}
+\item{intercepts}{Logical: include intercept terms in prediction. Defaults to \code{FALSE}.}
 
 \item{datasets}{Names of the datasets to include intercept term. Default of \code{NULL} results in all datasets being predicted.}
 
 \item{species}{Names of the species to predict. Default of \code{NULL} results in all species being predicted.}
 
-\item{biasfield}{Include bias field in prediction.}
+\item{biasfield}{Logical include bias field in prediction. Defaults to \code{FALSE}.}
 
-\item{biasnames}{Names of the datasets to include bias term. Defaults to \code{NULL}.}
+\item{biasnames}{Names of the datasets to include bias term. Defaults to \code{NULL}. Note: the chosen dataset needs to be run with a bias field first; this can be done using \code{.$addBias} with the object produced by \code{\link{intModel}}.}
 
-\item{predictor}{Should all terms run in the linear predictor be included. Defaults to \code{FALSE}.}
+\item{predictor}{Should all terms run in the linear predictor be included in the predictions. Defaults to \code{FALSE}.}
 
 \item{fun}{Function used to predict. Set to \code{'linear'} if effects on the linear scale are desired.}
 
@@ -60,6 +60,9 @@
 A list of inlabru predict objects.
 }
 \description{
+Predict function for the object produced by \code{\link{runModel}}. Should act identically to \pkg{inlabru}'s generic predict function if wanted, but has additional arguments to help predict certain components created by the model. This is needed since \code{\link{intModel}} creates variable names which might not be directly apparent to the user.
+}
+\details{
 Predict for bru_sdm
 }
 \examples{

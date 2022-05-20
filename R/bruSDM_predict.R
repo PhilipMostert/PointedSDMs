@@ -6,20 +6,22 @@
 setClass('bruSDM_predict')
 
 #' Predict for bru_sdm
-#' @param object A \code{bru_sdm object}.
+#' @title Generic predict function for \code{bru_SDM} objects.
+#' @description Predict function for the object produced by \code{\link{runModel}}. Should act identically to \pkg{inlabru}'s generic predict function if wanted, but has additional arguments to help predict certain components created by the model. This is needed since \code{\link{intModel}} creates variable names which might not be directly apparent to the user.
+#' @param object A \code{bru_sdm} objects.
 #' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
 #' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.
-#' @param mesh An inla.mesh object
+#' @param mesh An \code{inla.mesh} object.
 #' @param mask A mask of the study background. Defaults to \code{NULL}.
 #' @param covariates Name of covariates to predict.
 #' @param temporal Make predictions for the temporal component of the model.
-#' @param spatial Include spatial effects in prediction.
-#' @param intercepts Include intercept in prediction.
+#' @param spatial Logical: include spatial effects in prediction. Defaults to \code{FALSE}.
+#' @param intercepts Logical: include intercept terms in prediction. Defaults to \code{FALSE}.
 #' @param datasets Names of the datasets to include intercept term. Default of \code{NULL} results in all datasets being predicted.
 #' @param species Names of the species to predict. Default of \code{NULL} results in all species being predicted.
-#' @param biasfield Include bias field in prediction.
-#' @param biasnames Names of the datasets to include bias term. Defaults to \code{NULL}.
-#' @param predictor Should all terms run in the linear predictor be included. Defaults to \code{FALSE}.
+#' @param biasfield Logical include bias field in prediction. Defaults to \code{FALSE}.
+#' @param biasnames Names of the datasets to include bias term. Defaults to \code{NULL}. Note: the chosen dataset needs to be run with a bias field first; this can be done using \code{.$addBias} with the object produced by \code{\link{intModel}}.
+#' @param predictor Should all terms run in the linear predictor be included in the predictions. Defaults to \code{FALSE}.
 #' @param fun Function used to predict. Set to \code{'linear'} if effects on the linear scale are desired.
 #' @param ... Additional arguments used by the inlabru \code{predict} function.
 #' 
@@ -226,6 +228,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   
 }
 
+#' @title Generic print function for \code{bru_sdm_predict}.
 #' @param x bruSDM_predict object
 #' @param ... Not used.
 
@@ -274,7 +277,7 @@ print.bruSDM_predict <- function(x, ...) {
 }
 
 #' Plot for preduct_bru_sdm
-#' 
+#' @title Generic plot function for \code{predict_bru_sdm}.
 #' @param x A bruSDM_predict object.
 #' @param whattoplot One of the following statistics to plot: "mean", "sd", "q0.025", "median","q0.975", "smin", "smax", "cv", "var" 
 #' @param cols Number of columns required for the plotting. Used by inlabru's multiplot function.

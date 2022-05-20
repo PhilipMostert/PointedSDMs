@@ -2,7 +2,7 @@
 % Please edit documentation in R/bruSDM_predict.R
 \name{plot.bruSDM_predict}
 \alias{plot.bruSDM_predict}
-\title{Plot for preduct_bru_sdm}
+\title{Generic plot function for \code{predict_bru_sdm}.}
 \usage{
 \method{plot}{bruSDM_predict}(
   x,

@@ -1,3 +1,4 @@
+#' @title \emph{checkCoords}: function used to check coordinate names.
 #' @description An internal function used to check if all the coordinates are the same.
 #' @param data A list of datasets.
 #' @param coords A vector of length 2 of the coordinate names.

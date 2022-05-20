@@ -6,6 +6,7 @@
 setClass('bruSDM')
 
 #' Print method for bru_sdm
+#' @title Generic print function for \code{bruSDM}.
 #' @param x bruSDM object.
 #' @param ... Un used argument.
 #' 
@@ -18,6 +19,7 @@ print.bruSDM <- function(x, ...) {
 }
 
 #' Summary for bru_sdm
+#' @title Generic summary function for \code{bruSDM}.
 #' @param object bruSDM object.
 #' @param ... Un used argument
 #' @rdname summary

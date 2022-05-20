@@ -1,9 +1,18 @@
-#' @title FdatasetOut: Function that removes a dataset out of the main model, and calculates some cross-validation score.
+#' @title \emph{datasetOut}: function that removes a dataset out of the main model, and calculates some cross-validation score.
 #' 
-#' @description This function calculates the difference in covariate values between a full integrated model and a model with one dataset left out, as well as some cross-validation score based on the effect of leaving out the dataset.
+#' @description This function calculates the difference in covariate values between a full integrated model and a model with one dataset left out, as well as some cross-validation score, which is used to obtain a score of the relative importance of the dataset in the full model. The score is calculated as follows:
+#' \enumerate{
 #' 
-#' @param model Model of class bru_sdm run with all datasets.
-#' @param dataset Datasets to leave out. If missing, will run for all datasets used in the full model.
+#'   \item Running a new model with one less dataset (from the main model) -- resulting in a reduced model,
+#'   \item predicting the intensity function at the locations of the left-out dataset with the reduced model,
+#'   \item using the predicted values as an offset in a new model,
+#'   \item finding the difference between the marginal-likelihood of the main model (ie the model with all the datasets considered) and the marginal-likelihood of the offset model.
+#' 
+#' }
+#' 
+#' 
+#' @param model Model of class bru_sdm run with multiple datasets.
+#' @param dataset Names of the datasets to leave out. If missing, will run for all datasets used in the full model.
 #' @param predictions Will new models be used for predictions. If \code{TRUE} returns marginals and bru_info in model. Defaults to \code{TRUE}. 
 #' 
 #' @return A list of inlabru models with the specified dataset left out. If predictions is \code{FALSE}, these objects will be missing their \code{bru_info} and \code{call} lists.
@@ -241,6 +250,7 @@ setClass('datasetOut')
 #' @export print.datasetOut
 
 #' Export print.bru_sdm_leave_one_out
+#' @title Generic print function for \code{datasetOut}.
 #' @param x datasetOut object.
 #' @param ... Unused argument.
 #' 

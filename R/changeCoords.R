@@ -1,3 +1,4 @@
+#' @title \emph{changeCoords}: function used to change coordinate names.
 #' @description An internal function used to change the coordinate names for datasets.
 #' @param data A list of datasets.
 #' @param oldcoords The old coordinate names.

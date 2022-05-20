@@ -2,7 +2,7 @@
 % Please edit documentation in R/bruSDM_outputs.R
 \name{print.bruSDM}
 \alias{print.bruSDM}
-\title{Print method for bru_sdm}
+\title{Generic print function for \code{bruSDM}.}
 \usage{
 \method{print}{bruSDM}(x, ...)
 }

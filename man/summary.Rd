@@ -2,7 +2,7 @@
 % Please edit documentation in R/bruSDM_outputs.R
 \name{summary.bruSDM}
 \alias{summary.bruSDM}
-\title{Summary for bru_sdm}
+\title{Generic summary function for \code{bruSDM}.}
 \usage{
 \method{summary}{bruSDM}(object, ...)
 }

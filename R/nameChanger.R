@@ -1,3 +1,4 @@
+#' @title \emph{nameChanger}: function to change a variable name.
 #' @description An internal function used to change the name of a variable.
 #' @param data A list of datasets.
 #' @param oldName The old variable name.
