@@ -528,7 +528,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     if (!is.null(species)) {
       
       speciesCovs <- apply(expand.grid(paste0(species,'_'), covariatenames), MARGIN = 1, FUN = paste0,collapse='')
-      speciesCovClass <- rep(covariateclass, each = length(covariatenames))
+      speciesCovClass <- rep(covariateclass, each = length(species))
       covs <- paste0(speciesCovs, '(main = ', speciesCovs, ', model = \"',speciesCovClass,'\")') #, collapse = ' + '
       
     }
