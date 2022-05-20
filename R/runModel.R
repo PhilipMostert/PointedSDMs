@@ -1,11 +1,11 @@
-#' @title runModel: function used to run the integrated model.
+#' @title \emph{runModel}: function used to run the integrated model.
 #' 
 #' @description This function takes a \code{intModel} object and produces an \code{inlabru} model object with additional lists and meta-data added.
 #' 
 #' @param data A intModel object to be used in the integrated model.
 #' @param options A list of INLA options used in the model. Defaults to \code{list()}.
 #' 
-#' @return An inlabru model with additional information attached.
+#' @return An inlabru model with additional lists containing some more metadata attached.
 #' 
 #' @examples 
 #' 

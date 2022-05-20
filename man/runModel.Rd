@@ -2,7 +2,7 @@
 % Please edit documentation in R/runModel.R
 \name{runModel}
 \alias{runModel}
-\title{runModel: function used to run the integrated model.}
+\title{\emph{runModel}: function used to run the integrated model.}
 \usage{
 runModel(data, options = list())
 }
@@ -12,7 +12,7 @@ runModel(data, options = list())
 \item{options}{A list of INLA options used in the model. Defaults to \code{list()}.}
 }
 \value{
-An inlabru model with additional information attached.
+An inlabru model with additional lists containing some more metadata attached.
 }
 \description{
 This function takes a \code{intModel} object and produces an \code{inlabru} model object with additional lists and meta-data added.
