@@ -2,9 +2,12 @@
 % Please edit documentation in R/dataSDM.R
 \name{dataSDM}
 \alias{dataSDM}
-\title{R6 class for creating a dataSDM object to be used in runModel}
+\title{R6 class for creating a \code{dataSDM} object.}
 \description{
-A data object containing the data and the relevant information about the integrated model.
+A data object containing the data and the relevant information about the integrated model. The function \code{\link{intModel}} acts as a wrapper in creating one of these objects. The output of this object has additional functions within the object which allow for further specification and customization of the integrated model.
+}
+\note{
+The arguments of this function may be missing (ie not provided) if they have already been specified in \code{\link{intModel}}, and do not need changing. Therefore this function is useful if there are some variable names not standardized across the datasets; this function will thus standardize the variable names to those provided initially in \code{\link{intModel}}.
 }
 \examples{
 
@@ -88,7 +91,6 @@ dataObj$updateFormula(datasetName = 'dataset', Formula ~ . + (covariate+1e-5)*sc
 dataObj$changeComponents(newComponent = 'scaling')
 
  }
-
 
 
 ## ------------------------------------------------
@@ -220,7 +222,7 @@ Prints the datasets, their data type and the number of observations, as well as 
 \if{html}{\out{<a id="method-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-plot}{}}}
 \subsection{Method \code{plot()}}{
-Makes a plot of the region as well as the points.
+Makes a plot of the points surrounded by the boundary of the region where they were collected. The points may either be plotted based on which dataset they come from, or which species group they are part of (if \code{speciesName} is non-\code{NULL} in \code{\link{intModel}}).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$plot(datasetNames, Species = FALSE, Boundary = TRUE, ...)}\if{html}{\out{</div>}}
 }
@@ -228,11 +230,11 @@ Makes a plot of the region as well as the points.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{datasetNames}}{Name of the datasets to plot.}
+\item{\code{datasetNames}}{Name of the datasets to plot. If this argument is missing, the function will plot all the data available to the model.}
 
-\item{\code{Species}}{Should species be plotted as well? Defaults to \code{FALSE}.}
+\item{\code{Species}}{Logical: should the points be plotted based on the species name. Defaults to \code{FALSE}.}
 
-\item{\code{Boundary}}{Should a boundary (created using the inlaMesh object) be used in the plot. Defaults to \code{TRUE}.}
+\item{\code{Boundary}}{Logical: should a boundary (created using the \code{Mesh} object) be used in the plot. Defaults to \code{TRUE}. Note that the output of this function is a \code{gg} object, and so a boundary surrounding the points may be added using standard \pkg(ggplot2) syntax and the \code{\link[inlabru]{gg}} function provided in the \pkg{inlabru} package.}
 
 \item{\code{...}}{Not used.}
 }
@@ -269,7 +271,7 @@ dataObj(Species = TRUE)
 \if{html}{\out{<a id="method-addData"></a>}}
 \if{latex}{\out{\hypertarget{method-addData}{}}}
 \subsection{Method \code{addData()}}{
-Function used to add additional, and possibly heterogeneous data to the dataSDM object.
+Function used to add additional datasets to the \code{dataSDM} object. This function should be used if the user would like to add any additional datasets to the integrated model, but do not have the same standardized variable names as those added initially with \code{\link{intModel}}. Use \code{?intModel} for a more comprehensive description on what each argument in this function is used for.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$addData(
   ...,
@@ -290,7 +292,7 @@ Function used to add additional, and possibly heterogeneous data to the dataSDM 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{The datasets added into the model: should be a data.frame or a SpatialPoints* object.}
+\item{\code{...}}{The datasets to be added to the integrated model: should be either \code{data.frame} or \code{SpatialPoints*} objects, or a list of objects from these classes.}
 
 \item{\code{responseCounts}}{The name of the response variable for the counts data.}
 
@@ -306,9 +308,13 @@ Function used to add additional, and possibly heterogeneous data to the dataSDM 
 
 \item{\code{trialsMarks}}{The name of the trials variable for the binomial marks.}
 
-\item{\code{speciesName}}{The name of the species variable included in the data.}
+\item{\code{speciesName}}{The name of the species variable included in the data. Used to make a stacked species distribution model.}
+
+\item{\code{temporalName}}{The name of the temporal variable in the datasets.}
 
 \item{\code{Coordinates}}{A vector of length 2 describing the names of the coordinates of the data.}
+
+\item{\code{Offset}}{Name of the offset column in the dataset}
 }
 \if{html}{\out{</div>}}
 }
@@ -337,7 +343,7 @@ dataObj$addData(dataset, responseCounts = responseCounts,
 \if{html}{\out{<a id="method-addBias"></a>}}
 \if{latex}{\out{\hypertarget{method-addBias}{}}}
 \subsection{Method \code{addBias()}}{
-Function used to add additional bias fields to different data processes.
+Function used to add additional spatial fields (called \emph{bias fields}) to a selected dataset present in the integrated model. \emph{Bias fields} are typically used to account for sampling biases in opportunistic citizen science data in the absence of any covariate to do such.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$addBias(datasetNames = NULL, allPO = FALSE, biasField = NULL)}\if{html}{\out{</div>}}
 }
@@ -345,11 +351,11 @@ Function used to add additional bias fields to different data processes.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{datasetNames}}{A vector of datasets to add the bias fields to.}
+\item{\code{datasetNames}}{A vector of dataset names (class \code{character}) for which a bias field needs to be added to. If \code{NULL} (default), then \code{allPO} has to be \code{TRUE}.}
 
-\item{\code{allPO}}{Should the bias fields be added to all the presence only datasets. Defaults to \code{NULL}.}
+\item{\code{allPO}}{Logical: should a bias field be added to all datasets classified as presence only in the integrated model. Defaults to \code{FALSE}.}
 
-\item{\code{biasField}}{An inla.spde model descrbing the random bias field.}
+\item{\code{biasField}}{An \code{inla.spde} object used to describe the bias field. Defaults to \code{NULL} which uses \code{\link[INLA]{inla.spde2.matern}} to create a Matern model for the field.}
 }
 \if{html}{\out{</div>}}
 }
@@ -374,7 +380,7 @@ dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
 \if{html}{\out{<a id="method-updateFormula"></a>}}
 \if{latex}{\out{\hypertarget{method-updateFormula}{}}}
 \subsection{Method \code{updateFormula()}}{
-Function to update formulas for a given process.
+Function used to update the formula for a selected observation model. The function is designed to work similarly to the generic \code{update} formula, and should be used to thin terms out of a process from the full model specified in \code{\link{intModel}}. The function also allows the user to add their own formula to the model, such that they can include non-linear components in the model. The function can also be used to print out the formula for a process by not specifying the \code{Formula} or \code{newFormula} arguments.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$updateFormula(
   datasetName = NULL,
@@ -383,29 +389,31 @@ Function to update formulas for a given process.
   markName = NULL,
   Formula,
   allProcesses = FALSE,
-  newFormula,
-  ...
+  newFormula
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{datasetName}}{Name of the dataset to change the formula for.}
+\item{\code{datasetName}}{Name of the dataset (class \code{character}) for which the formula needs to be changed.}
 
-\item{\code{Points}}{Logical: should the formula be changed for the points. Defaults to \code{TRUE}. If \code{FALSE}, then markNames needs to be non-null.}
+\item{\code{Points}}{Logical: should the formula be changed for the points (or otherwise, a marked process). Defaults to \code{TRUE}. If \code{FALSE}, then \code{markNames} needs to be non-\code{NULL} in \code{\link{intModel}}.}
 
-\item{\code{speciesName}}{Name of the species to change the formula for.}
+\item{\code{speciesName}}{Name of the species (class \code{character}) to change the formula for. Defaults to \code{NULL}. If \code{NULL} and \code{speciesName} is non-\code{NULL} in \code{\link{intModel}}, will update the formula for all species within the dataset. Cannot be non-\code{NULL} if \code{speciesName} is \code{NULL} in \code{\link{intModel}}.}
 
-\item{\code{markName}}{Name of the mark to change the formula for.}
+\item{\code{markName}}{Name of the mark (class \code{character}) to change the formula for. Defaults to \code{NULL}. If \code{NULL} and \code{markNames} is non-\code{NULL} in \code{\link{intModel}}, will update the formula for all marks within the dataset. Cannot be non-\code{NULL} if \code{markNames} is \code{NULL} in \code{\link{intModel}}.}
 
-\item{\code{Formula}}{An updated formula to give to the process.}
+\item{\code{Formula}}{An updated formula to give to the process. The syntax provided for the formula in this argument should be identical to the formula specification as in base \strong{R}. Should be used to thin terms out of a formula but could be used to add terms as well. If adding new terms not specified in \code{intModel}, remember to add the associated component using \code{.$addComponents} as well.}
 
-\item{\code{allProcesses}}{Logical argument: if \code{TRUE} changes the formulas for all processes in a dataset.}
+\item{\code{allProcesses}}{Logical argument: if \code{TRUE} changes the formulas for all of the processes in a dataset. Defaults to \code{FALSE}.}
 
 \item{\code{newFormula}}{Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+If \code{Formula} and \code{newFormula} are missing, will print out the formula for the specified processes.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -433,7 +441,6 @@ dataObj$changeComponents(newComponent = 'scaling')
 
  }
 
-
 }
 \if{html}{\out{</div>}}
 
@@ -444,7 +451,7 @@ dataObj$changeComponents(newComponent = 'scaling')
 \if{html}{\out{<a id="method-changeComponents"></a>}}
 \if{latex}{\out{\hypertarget{method-changeComponents}{}}}
 \subsection{Method \code{changeComponents()}}{
-Function to add custom components to the integrated modeling.
+Function to add and specify custom components to model, which are required by \pkg{inlabru}. The main purpose of the function is to re-specify or completely change components already in the model, however the user can also add completely new components to the model as well. In this case, the components need to be added to the correct formulas in the model using the \code{.$updateFormula} function. If \code{addComponent} and \code{removeComponent} are both missing, the function will print out the components to be supplied to \pkg{inlabru}'s \code{\link{bru}} function.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$changeComponents(addComponent, removeComponent, print = TRUE)}\if{html}{\out{</div>}}
 }
@@ -452,9 +459,9 @@ Function to add custom components to the integrated modeling.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{addComponent}}{Component to add to the model.}
+\item{\code{addComponent}}{Component to add to the integrated model. Note that if the user is re-specifying a component already present in the model, they do not need to remove the old component using \code{removeComponent}.}
 
-\item{\code{removeComponent}}{Component (or name of a component) present in the model which should be removed.}
+\item{\code{removeComponent}}{Component (or just the name of a component) present in the model which should be removed.}
 
 \item{\code{print}}{Logical: should the updated components be printed. Defaults to \code{TRUE}.}
 }
@@ -500,9 +507,9 @@ Function to change priors for the fixed (and possibly random) effects of the mod
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{Effect}}{Name of the fixed effect covariate to change the prior for.}
+\item{\code{Effect}}{Name of the fixed effect covariate to change the prior for. Can take on \code{'intercept'}, which will change the specification for an intercept (specified by one of \code{species} or \code{datasetName}).}
 
-\item{\code{Species}}{Name of the species for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.}
+\item{\code{Species}}{Name of the species (class \code{character}) for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.}
 
 \item{\code{datasetName}}{Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.}
 
@@ -537,7 +544,7 @@ dataObj$priorsFixed(Effect = 'intercept', datasetName = 'datasetname',
 \if{html}{\out{<a id="method-specifySpatial"></a>}}
 \if{latex}{\out{\hypertarget{method-specifySpatial}{}}}
 \subsection{Method \code{specifySpatial()}}{
-Function to specify the random fields in the model using PC priors for the parameters.
+Function to specify random fields in the model using penalizing complexity (PC) priors for the parameters.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$specifySpatial(
   sharedSpatial = FALSE,
@@ -555,17 +562,17 @@ Function to specify the random fields in the model using PC priors for the param
 \describe{
 \item{\code{sharedSpatial}}{Logical: specify the shared spatial field in the model. Defaults to \code{FALSE}.}
 
-\item{\code{Species}}{Name of the species's spatial field to be specified.}
+\item{\code{Species}}{Name of which of the species' spatial field to be specified. Requires \code{speciesName} to be non-\code{NULL} in \code{\link{intModel}}.}
 
-\item{\code{Mark}}{Name of the mark's spatial field to be specified.}
+\item{\code{Mark}}{Name of which of the mark' spatial field to be specified. Requires \code{markNames} to be non-\code{NULL} in \code{\link{intModel}}.}
 
-\item{\code{Bias}}{Name of the dataset's bias field to be specified.}
+\item{\code{Bias}}{Name of the dataset for which the bias field to be specified.}
 
-\item{\code{PC}}{Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}.}
+\item{\code{PC}}{Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}, which uses \code{\link[INLA]{inla.spde2.pcmatern}} to specify the model; otherwise uses \code{\link[INLA]{inla.spde2.matern}}.}
 
-\item{\code{Remove}}{Logical: should the spatial field be removed. Requires one of sharedSpatial, species, mark or bias to be non-missing.}
+\item{\code{Remove}}{Logical: should the chosen spatial field be removed. Requires one of \code{sharedSpatial}, \code{species}, \code{mark} or \code{bias} to be non-missing, which chooses which field to remove.}
 
-\item{\code{...}}{Additional arguments used by INLA's \code{inla.spde2.pcmatern} or \code{inla.spde2.matern} function.}
+\item{\code{...}}{Additional arguments used by \pkg{INLA}'s \code{\link[INLA]{inla.spde2.pcmatern}} or \code{\link[INLA]{inla.spde2.matern}} function, dependent on the value of \code{PC}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -642,7 +649,7 @@ dataObj$changeLink(Dataset = Dataset, Species = Species,
 \if{html}{\out{<a id="method-spatialBlock"></a>}}
 \if{latex}{\out{\hypertarget{method-spatialBlock}{}}}
 \subsection{Method \code{spatialBlock()}}{
-Function to spatially block the datasets. See the \code{spatialBlock} function from blockCV for spatial blocking.
+Function to spatially block the datasets, which will then be used for model cross-validation with \code{\link{blockedCV}}. See the \code{\link[blockCV]{spatialBlock}} function from \pkg{blockCV} for how the spatial blocking works and for further details on the function's arguments.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$spatialBlock(k, rows, cols, plot = FALSE, seed = 1234, ...)}\if{html}{\out{</div>}}
 }
@@ -650,17 +657,17 @@ Function to spatially block the datasets. See the \code{spatialBlock} function f
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{k}}{Number of cross-validation folds.}
+\item{\code{k}}{Integer value reflecting the number of folds to use.}
 
 \item{\code{rows}}{Integer value by which the area is divided into latitudinal bins.}
 
 \item{\code{cols}}{Integer value by which the area is divided into longitudinal bins.}
 
-\item{\code{plot}}{Plot the cross-validation folds. Defaults to \code{FALSE}.}
+\item{\code{plot}}{Plot the cross-validation folds as well as the points across the boundary. Defaults to \code{FALSE}.}
 
-\item{\code{seed}}{Seed used by blockCV's spatialBlock to make the spatialBlock reproducible. Defaults to \code{1234}.}
+\item{\code{seed}}{Seed used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}} to make the spatial blocking reproducible across different models. Defaults to \code{1234}.}
 
-\item{\code{...}}{Extra arguments used by blockCV's spatialBlock}
+\item{\code{...}}{Additional arguments used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}}.}
 }
 \if{html}{\out{</div>}}
 }

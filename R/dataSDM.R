@@ -1,5 +1,5 @@
-#' @title R6 class for creating a dataSDM object to be used in runModel
-#' @description A data object containing the data and the relevant information about the integrated model.
+#' @title R6 class for creating a \code{dataSDM} object.
+#' @description A data object containing the data and the relevant information about the integrated model. The function \code{\link{intModel}} acts as a wrapper in creating one of these objects. The output of this object has additional functions within the object which allow for further specification and customization of the integrated model.
 #' @export
 #' @importFrom R6 R6Class
 #' 
@@ -64,10 +64,10 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
   }
   ,
-  #' @description Makes a plot of the region as well as the points.
-  #' @param datasetNames Name of the datasets to plot.
-  #' @param Species Should species be plotted as well? Defaults to \code{FALSE}.
-  #' @param Boundary Should a boundary (created using the inlaMesh object) be used in the plot. Defaults to \code{TRUE}.
+  #' @description Makes a plot of the points surrounded by the boundary of the region where they were collected. The points may either be plotted based on which dataset they come from, or which species group they are part of (if \code{speciesName} is non-\code{NULL} in \code{\link{intModel}}).
+  #' @param datasetNames Name of the datasets to plot. If this argument is missing, the function will plot all the data available to the model.
+  #' @param Species Logical: should the points be plotted based on the species name. Defaults to \code{FALSE}.
+  #' @param Boundary Logical: should a boundary (created using the \code{Mesh} object) be used in the plot. Defaults to \code{TRUE}. Note that the output of this function is a \code{gg} object, and so a boundary surrounding the points may be added using standard \pkg(ggplot2) syntax and the \code{\link[inlabru]{gg}} function provided in the \pkg{inlabru} package.
   #' @param ... Not used.
   #' @return A ggplot object.
   #' @examples
@@ -159,8 +159,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
   }
   ,
-  #' @description Function used to add additional, and possibly heterogeneous data to the dataSDM object.
-  #' @param ... The datasets added into the model: should be a data.frame or a SpatialPoints* object.
+  #' @description Function used to add additional datasets to the \code{dataSDM} object. This function should be used if the user would like to add any additional datasets to the integrated model, but do not have the same standardized variable names as those added initially with \code{\link{intModel}}. Use \code{?intModel} for a more comprehensive description on what each argument in this function is used for.
+  #' @param ... The datasets to be added to the integrated model: should be either \code{data.frame} or \code{SpatialPoints*} objects, or a list of objects from these classes.
   #' @param responseCounts The name of the response variable for the counts data.
   #' @param responsePA The name of the response variable for the presence absence data.
   #' @param trialsPA The name of the trials variable for the presence absence data.
@@ -168,11 +168,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param markFamily The associated distributions of the marks.
   #' @param pointCovariates The additional, non-spatial covariates describing the data.
   #' @param trialsMarks The name of the trials variable for the binomial marks.
-  #' @param speciesName The name of the species variable included in the data.
+  #' @param speciesName The name of the species variable included in the data. Used to make a stacked species distribution model.
+  #' @param temporalName The name of the temporal variable in the datasets.
   #' @param Coordinates A vector of length 2 describing the names of the coordinates of the data.
-  #' @Offset Name of the offset column in the dataset
+  #' @param Offset Name of the offset column in the dataset
   #' 
-  #' @import ggpolypath
+  #' @note The arguments of this function may be missing (ie not provided) if they have already been specified in \code{\link{intModel}}, and do not need changing. Therefore this function is useful if there are some variable names not standardized across the datasets; this function will thus standardize the variable names to those provided initially in \code{\link{intModel}}.
+  #' 
   #' @examples
   #' \dontrun{
   #' 
@@ -682,10 +684,10 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
   }
   ,
-  #' @description Function used to add additional bias fields to different data processes.
-  #' @param datasetNames A vector of datasets to add the bias fields to.
-  #' @param allPO Should the bias fields be added to all the presence only datasets. Defaults to \code{NULL}.
-  #' @param biasField An inla.spde model descrbing the random bias field.
+  #' @description Function used to add additional spatial fields (called \emph{bias fields}) to a selected dataset present in the integrated model. \emph{Bias fields} are typically used to account for sampling biases in opportunistic citizen science data in the absence of any covariate to do such.
+  #' @param datasetNames A vector of dataset names (class \code{character}) for which a bias field needs to be added to. If \code{NULL} (default), then \code{allPO} has to be \code{TRUE}.
+  #' @param allPO Logical: should a bias field be added to all datasets classified as presence only in the integrated model. Defaults to \code{FALSE}.
+  #' @param biasField An \code{inla.spde} object used to describe the bias field. Defaults to \code{NULL} which uses \code{\link[INLA]{inla.spde2.matern}} to create a Matern model for the field.
   #' 
   #' @examples
   #' \dontrun{
@@ -739,13 +741,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
   }
   ,
-  #' @description Function to update formulas for a given process.
-  #' @param datasetName Name of the dataset to change the formula for.
-  #' @param Points Logical: should the formula be changed for the points. Defaults to \code{TRUE}. If \code{FALSE}, then markNames needs to be non-null.
-  #' @param speciesName Name of the species to change the formula for.
-  #' @param markName Name of the mark to change the formula for.
-  #' @param Formula An updated formula to give to the process.
-  #' @param allProcesses Logical argument: if \code{TRUE} changes the formulas for all processes in a dataset.
+  #' @description Function used to update the formula for a selected observation model. The function is designed to work similarly to the generic \code{update} formula, and should be used to thin terms out of a process from the full model specified in \code{\link{intModel}}. The function also allows the user to add their own formula to the model, such that they can include non-linear components in the model. The function can also be used to print out the formula for a process by not specifying the \code{Formula} or \code{newFormula} arguments.
+  #' @param datasetName Name of the dataset (class \code{character}) for which the formula needs to be changed.
+  #' @param Points Logical: should the formula be changed for the points (or otherwise, a marked process). Defaults to \code{TRUE}. If \code{FALSE}, then \code{markNames} needs to be non-\code{NULL} in \code{\link{intModel}}.
+  #' @param speciesName Name of the species (class \code{character}) to change the formula for. Defaults to \code{NULL}. If \code{NULL} and \code{speciesName} is non-\code{NULL} in \code{\link{intModel}}, will update the formula for all species within the dataset. Cannot be non-\code{NULL} if \code{speciesName} is \code{NULL} in \code{\link{intModel}}.
+  #' @param markName Name of the mark (class \code{character}) to change the formula for. Defaults to \code{NULL}. If \code{NULL} and \code{markNames} is non-\code{NULL} in \code{\link{intModel}}, will update the formula for all marks within the dataset. Cannot be non-\code{NULL} if \code{markNames} is \code{NULL} in \code{\link{intModel}}.
+  #' @param Formula An updated formula to give to the process. The syntax provided for the formula in this argument should be identical to the formula specification as in base \strong{R}. Should be used to thin terms out of a formula but could be used to add terms as well. If adding new terms not specified in \code{intModel}, remember to add the associated component using \code{.$addComponents} as well.
+  #' @param allProcesses Logical argument: if \code{TRUE} changes the formulas for all of the processes in a dataset. Defaults to \code{FALSE}.
   #' @param newFormula Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.
   #' 
   #' @examples
@@ -773,10 +775,11 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #'  }
   #' 
+  #' @return If \code{Formula} and \code{newFormula} are missing, will print out the formula for the specified processes. 
   #' 
   updateFormula = function(datasetName = NULL, Points = TRUE, speciesName = NULL,
                            markName = NULL, Formula, allProcesses = FALSE,
-                           newFormula, ...) {
+                           newFormula) {
     ## Will need to update this such that if keepSpatial & species then paste0(species,_spatial)
     
     if (all(is.null(datasetName), is.null(speciesName), is.null(markName))) stop ('At least one of: datasetName, speciesName, markName or allProcesses needs to be specified.')
@@ -962,9 +965,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
   }
   ,
-  #' @description Function to add custom components to the integrated modeling.
-  #' @param addComponent Component to add to the model.
-  #' @param removeComponent Component (or name of a component) present in the model which should be removed.
+  #' @description Function to add and specify custom components to model, which are required by \pkg{inlabru}. The main purpose of the function is to re-specify or completely change components already in the model, however the user can also add completely new components to the model as well. In this case, the components need to be added to the correct formulas in the model using the \code{.$updateFormula} function. If \code{addComponent} and \code{removeComponent} are both missing, the function will print out the components to be supplied to \pkg{inlabru}'s \code{\link{bru}} function.
+  #' @param addComponent Component to add to the integrated model. Note that if the user is re-specifying a component already present in the model, they do not need to remove the old component using \code{removeComponent}.
+  #' @param removeComponent Component (or just the name of a component) present in the model which should be removed.
   #' @param print Logical: should the updated components be printed. Defaults to \code{TRUE}.
   #' @examples 
   #' \dontrun{
@@ -1010,8 +1013,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   }
   ,
   #' @description Function to change priors for the fixed (and possibly random) effects of the model.
-  #' @param Effect Name of the fixed effect covariate to change the prior for.
-  #' @param Species Name of the species for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.
+  #' @param Effect Name of the fixed effect covariate to change the prior for. Can take on \code{'intercept'}, which will change the specification for an intercept (specified by one of \code{species} or \code{datasetName}).
+  #' @param Species Name of the species (class \code{character}) for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.
   #' @param datasetName Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.
   #' @param mean.linear Mean value for the prior of the fixed effect. Defaults to \code{0}.
   #' @param prec.linear Precision value for the prior of the fixed effect. Defaults to \code{0.001}.
@@ -1090,15 +1093,15 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
   }
   ,
-  #' @description Function to specify the random fields in the model using PC priors for the parameters.
+  #' @description Function to specify random fields in the model using penalizing complexity (PC) priors for the parameters.
   #' 
   #' @param sharedSpatial Logical: specify the shared spatial field in the model. Defaults to \code{FALSE}.
-  #' @param Species Name of the species's spatial field to be specified.
-  #' @param Mark Name of the mark's spatial field to be specified.
-  #' @param Bias Name of the dataset's bias field to be specified.
-  #' @param PC Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}. 
-  #' @param Remove Logical: should the spatial field be removed. Requires one of sharedSpatial, species, mark or bias to be non-missing.
-  #' @param ... Additional arguments used by INLA's \code{inla.spde2.pcmatern} or \code{inla.spde2.matern} function.
+  #' @param Species Name of which of the species' spatial field to be specified. Requires \code{speciesName} to be non-\code{NULL} in \code{\link{intModel}}.
+  #' @param Mark Name of which of the mark' spatial field to be specified. Requires \code{markNames} to be non-\code{NULL} in \code{\link{intModel}}.
+  #' @param Bias Name of the dataset for which the bias field to be specified.
+  #' @param PC Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}, which uses \code{\link[INLA]{inla.spde2.pcmatern}} to specify the model; otherwise uses \code{\link[INLA]{inla.spde2.matern}}.
+  #' @param Remove Logical: should the chosen spatial field be removed. Requires one of \code{sharedSpatial}, \code{species}, \code{mark} or \code{bias} to be non-missing, which chooses which field to remove.
+  #' @param ... Additional arguments used by \pkg{INLA}'s \code{\link[INLA]{inla.spde2.pcmatern}} or \code{\link[INLA]{inla.spde2.matern}} function, dependent on the value of \code{PC}.
   #' @examples 
   #' \dontrun{
   #' 
@@ -1240,13 +1243,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
   }
   ,
-  #' @description Function to spatially block the datasets. See the \code{spatialBlock} function from blockCV for spatial blocking.
-  #' @param k Number of cross-validation folds.
+  #' @description Function to spatially block the datasets, which will then be used for model cross-validation with \code{\link{blockedCV}}. See the \code{\link[blockCV]{spatialBlock}} function from \pkg{blockCV} for how the spatial blocking works and for further details on the function's arguments.
+  #' @param k Integer value reflecting the number of folds to use.
   #' @param rows Integer value by which the area is divided into latitudinal bins.
   #' @param cols Integer value by which the area is divided into longitudinal bins.
-  #' @param plot Plot the cross-validation folds. Defaults to \code{FALSE}.
-  #' @param seed Seed used by blockCV's spatialBlock to make the spatialBlock reproducible. Defaults to \code{1234}. 
-  #' @param ... Extra arguments used by blockCV's spatialBlock
+  #' @param plot Plot the cross-validation folds as well as the points across the boundary. Defaults to \code{FALSE}.
+  #' @param seed Seed used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}} to make the spatial blocking reproducible across different models. Defaults to \code{1234}. 
+  #' @param ... Additional arguments used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}}.
   #' 
   #' @import ggpolypath
   #' 
@@ -1263,11 +1266,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'
   spatialBlock =  function(k, rows, cols, plot = FALSE, seed = 1234, ...) {
     
-    #stop('Need to completely re do')
-    #The easiest thing to do may be to do likelihood construction in runModel and blockedCV
-    #So need to move all the objects from dataOrganize to here
-    #And then be careful with regards to indexing for all the slot functions here...
-    
     blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
                                                                 k = k, rows = rows, cols = cols, selection = 'random',
                                                                 verbose = FALSE, progress = FALSE, seed = seed, ...))
@@ -1278,9 +1276,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     blocked_data <- list()
     in_where <- list()
-    
-    ##Integration points?
-    ##Add how?
     
     for (data in names(private$modelData)) {
       
@@ -1310,7 +1305,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    ##Do IPS
     blocked_ips <- list()
     where_ips <- lapply(1:(rows * cols), function(i) !is.na(over(private$IPS, blocksPoly[[1]][[i]])))
     
@@ -1345,9 +1339,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         labs(col = 'Block index') +
         ggtitle('Plot of the blocked data') +
         theme(plot.title = element_text(hjust = 0.5))
-      
-      ## Need block block$plots + gg(species_data) + gg(boundary), which we need to get from the mesh
-      
+  
     }
     
   }
