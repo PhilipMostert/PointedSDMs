@@ -2,7 +2,7 @@
 % Please edit documentation in R/blockedCV.R
 \name{print.blockedCV}
 \alias{print.blockedCV}
-\title{Print for blockedCV}
+\title{Print function for \code{blockedCV}.}
 \usage{
 \method{print}{blockedCV}(x, ...)
 }

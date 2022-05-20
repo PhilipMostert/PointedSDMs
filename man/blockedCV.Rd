@@ -2,15 +2,42 @@
 % Please edit documentation in R/blockedCV.R
 \name{blockedCV}
 \alias{blockedCV}
-\title{Run blocked cross-validation.}
+\title{Run spatial blocked cross-validation on the integrated model.}
 \usage{
 blockedCV(data, options = list())
 }
 \arguments{
-\item{data}{An intModel data object to be used in the integrated model.}
+\item{data}{An object produced by \code{\link{intModel}}. Requires the slot function, \code{.$spatialBlock} to be run first in order to specify how the data in the model is blocked.}
 
-\item{options}{A list of INLA options used in the model. Defaults to \code{list()}.}
+\item{options}{A list of \pkg{INLA} or \pkg{inlabru} options to be used in the model. Defaults to \code{list()}.}
+}
+\value{
+An object of class \code{blockedCV}, which is essentially a list of DIC values obtained from each iteration of the model.
 }
 \description{
-Run blocked cross-validation.
+This function is used to perform spatial blocked cross-validation with regards to model selection for the integrated model. It does so by leaving out a block of data in the full model, running a model with the remaining data, and then calculating the deviance information criteria (DIC) as a score of model fit.
+}
+\examples{
+
+\dontrun{
+
+#Create dataSDM object
+
+dataObject <- intModel(...)
+
+#Create the spatial block
+
+dataObject$spatialBlock(...)
+
+#Perform spatial blocked cross-validation
+
+cv_scores <- blockedCV(dataObject, 
+                       options = list(control.inla = list(int.strategy = 'eb')))
+
+#Print summary of the scores
+
+cv_scores
+
+}
+
 }

@@ -1,9 +1,36 @@
-#' @title Run blocked cross-validation.
+#' @title Run spatial blocked cross-validation on the integrated model.
 #' 
-#' @param data An intModel data object to be used in the integrated model.
-#' @param options A list of INLA options used in the model. Defaults to \code{list()}.
+#' @description This function is used to perform spatial blocked cross-validation with regards to model selection for the integrated model. It does so by leaving out a block of data in the full model, running a model with the remaining data, and then calculating the deviance information criteria (DIC) as a score of model fit.
+#' @param data An object produced by \code{\link{intModel}}. Requires the slot function, \code{.$spatialBlock} to be run first in order to specify how the data in the model is blocked.
+#' @param options A list of \pkg{INLA} or \pkg{inlabru} options to be used in the model. Defaults to \code{list()}.
+#' @examples 
+#' 
+#' \dontrun{
+#' 
+#' #Create dataSDM object
+#' 
+#' dataObject <- intModel(...)
+#' 
+#' #Create the spatial block
+#' 
+#' dataObject$spatialBlock(...)
+#' 
+#' #Perform spatial blocked cross-validation
+#' 
+#' cv_scores <- blockedCV(dataObject, 
+#'                        options = list(control.inla = list(int.strategy = 'eb')))
+#' 
+#' #Print summary of the scores
+#' 
+#' cv_scores
+#' 
+#' }
+#' 
+#' @return An object of class \code{blockedCV}, which is essentially a list of DIC values obtained from each iteration of the model.
 #' 
 #' @export
+#' 
+#' 
 #' 
 blockedCV <- function(data, options = list()) {
   
@@ -107,6 +134,7 @@ setClass('blockedCV')
 #' @export print.blockedCV
 
 #' Export print.blockedCV
+#' @title Print function for \code{blockedCV}.
 #' @param x A blockedCV object.
 #' @param ... Unused argument.
 #' 
