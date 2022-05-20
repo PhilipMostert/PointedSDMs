@@ -234,7 +234,7 @@ Makes a plot of the points surrounded by the boundary of the region where they w
 
 \item{\code{Species}}{Logical: should the points be plotted based on the species name. Defaults to \code{FALSE}.}
 
-\item{\code{Boundary}}{Logical: should a boundary (created using the \code{Mesh} object) be used in the plot. Defaults to \code{TRUE}. Note that the output of this function is a \code{gg} object, and so a boundary surrounding the points may be added using standard \pkg(ggplot2) syntax and the \code{\link[inlabru]{gg}} function provided in the \pkg{inlabru} package.}
+\item{\code{Boundary}}{Logical: should a boundary (created using the \code{Mesh} object) be used in the plot. Defaults to \code{TRUE}. Note that the output of this function is a \code{gg} object, and so a boundary surrounding the points may be added using standard \pkg{ggplot2} syntax and the \code{\link[inlabru]{gg}} function provided in the \pkg{inlabru} package.}
 
 \item{\code{...}}{Not used.}
 }

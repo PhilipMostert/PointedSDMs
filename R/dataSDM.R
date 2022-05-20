@@ -67,7 +67,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @description Makes a plot of the points surrounded by the boundary of the region where they were collected. The points may either be plotted based on which dataset they come from, or which species group they are part of (if \code{speciesName} is non-\code{NULL} in \code{\link{intModel}}).
   #' @param datasetNames Name of the datasets to plot. If this argument is missing, the function will plot all the data available to the model.
   #' @param Species Logical: should the points be plotted based on the species name. Defaults to \code{FALSE}.
-  #' @param Boundary Logical: should a boundary (created using the \code{Mesh} object) be used in the plot. Defaults to \code{TRUE}. Note that the output of this function is a \code{gg} object, and so a boundary surrounding the points may be added using standard \pkg(ggplot2) syntax and the \code{\link[inlabru]{gg}} function provided in the \pkg{inlabru} package.
+  #' @param Boundary Logical: should a boundary (created using the \code{Mesh} object) be used in the plot. Defaults to \code{TRUE}. Note that the output of this function is a \code{gg} object, and so a boundary surrounding the points may be added using standard \pkg{ggplot2} syntax and the \code{\link[inlabru]{gg}} function provided in the \pkg{inlabru} package.
   #' @param ... Not used.
   #' @return A ggplot object.
   #' @examples
