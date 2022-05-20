@@ -2,7 +2,7 @@
 % Please edit documentation in R/intModel.R
 \name{intModel}
 \alias{intModel}
-\title{intModel: integrated model data object.}
+\title{\emph{intModel}: Function used to initialize the integrated species distribution model.}
 \usage{
 intModel(
   ...,
@@ -31,57 +31,59 @@ intModel(
 )
 }
 \arguments{
-\item{...}{The datasets to be used in the model. May come as either a \code{data.frame} or \code{SpatialPoints*}, or as a list of datasets inheriting the mentioned classes.}
+\item{...}{The datasets to be used in the model. May come as either \code{data.frame} or \code{SpatialPoints*} objects, or as a list of objects with these classes. The classes of the datasets do not necessarily need to be standardized, however the variable names within them often have to be.}
 
-\item{spatialCovariates}{The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{Raster*} or \code{SpatialPixelsDataFrame} object.}
+\item{Coordinates}{A vector of length 2 containing the names (class \code{character}) of the coordinate variables used in the model.}
 
-\item{Coordinates}{A vector of length 2 containing the names of the coordinate variables used in the model.}
-
-\item{Projection}{Projection used for the data and spatial covariates. Must be of class \code{CRS}.}
+\item{Projection}{The coordinate reference system used by both the spatial points and spatial covariates. Must be of class \code{\link[sp]{CRS}} (see \code{CRS} from the \pkg{sp} package for more details).}
 
 \item{Boundary}{##NOT USED YET.}
 
-\item{Mesh}{An \code{inla.mesh} object.}
+\item{Mesh}{An \code{inla.mesh} object required for the spatial random fields and the integration points in the model (see \code{\link[INLA]{inla.mesh.2d}} from the \pkg{INLA} package for more details).}
 
-\item{IPS}{Integration points to be used in the model. Defaults to \code{NULL} which will create integration points from the \code{inla.mesh} object.}
+\item{speciesSpatial}{Logical argument: should the species have their own individual spatial fields in the integrated model. Defaults to \code{TRUE}.}
 
-\item{speciesSpatial}{Logical argument: should the species have their own spatial fields. Defaults to \code{TRUE}.}
+\item{markNames}{A vector with the mark names (class \code{character}) to be included in the integrated model. Marks are variables which are used to describe the individual points in the model (for example, in the field of ecology the size of the species or its feeding type could be considered). Defaults to \code{NULL}, however if this argument is non-\code{NULL}, the model run will become a marked point process. The marks must be included in the same data object as the points.}
 
-\item{markNames}{A vector with the mark names to be included in the integrated model. These marks must be in the same data objects as the points.}
+\item{markFamily}{A vector with the statistical families (class \code{character}) assumed for the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".}
 
-\item{markFamily}{A vector with the statistical families of the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".}
-
-\item{pointCovariates}{The non-spatial covariates to be included in the integrated model. These covariates must be included in the same data object as the points.}
+\item{pointCovariates}{The non-spatial covariates to be included in the integrated model (for example, in the field of ecology the distance to the nearest road or time spemt sampling could be considered). These covariates must be included in the same data object as the points.}
 
 \item{pointsIntercept}{Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.}
 
 \item{marksIntercept}{Logical argument: should the marks be modeled with intercepts. Defaults to \code{TRUE}.}
 
-\item{Offset}{Name of the offset variable in the datasets. Defaults to \code{NULL}.}
+\item{Offset}{Name of the offset variable (class \code{character}) in the datasets. Defaults to \code{NULL}; if the argument is non-\code{NULL}, the variable name needs to be standardized across datasets (but does not need to be included in all datasets). The offset variable will be transformed onto the log-scale in the integrated model.}
 
 \item{pointsSpatial}{Logical argument: should the points have a shared spatial field. Defaults to \code{TRUE}.}
 
 \item{marksSpatial}{Logical argument: should the marks have their own spatial field. Defaults to \code{TRUE}.}
 
-\item{responseCounts}{Name of the response variable in the counts datasets. This variable name needs to be standardized across all counts datasets used in the integrated model. Defaults to \code{'counts'}.}
+\item{responseCounts}{Name of the response variable in the counts/abundance datasets. This variable name needs to be standardized across all counts datasets used in the integrated model. Defaults to \code{'counts'}.}
 
-\item{responsePA}{Name of the response variable in the presence absence datasets. This variable name needs to be standardized across all present absence datasets. Defaults to \code{'present'}.}
+\item{responsePA}{Name of the response variable (class \code{character}) in the presence absence/detection non-detection datasets. This variable name needs to be standardized across all present absence datasets. Defaults to \code{'present'}.}
 
-\item{trialsPA}{Name of the trials response variable for the presence absence datasets. Defaults to \code{NULL}.}
+\item{trialsPA}{Name of the trials response variable (class \code{character}) for the presence absence datasets. Defaults to \code{NULL}.}
 
-\item{trialsMarks}{Name of the trials response variable for the binomial marks. Defaults to \code{NULL}.}
+\item{trialsMarks}{Name of the trials response variable (class \code{character}) for the binomial marks (if included). Defaults to \code{NULL}.}
 
-\item{speciesName}{Name of the species variable name. Specifying this argument calculates covariate values for the individual species, as well as including a spatial group model for the species. Defaults to \code{NULL}}
+\item{speciesName}{Name of the species variable name (class \code{character}). Specifying this argument turns the model into a stacked species distribution model, and calculates covariate values for the individual species, as well as a species group model in the shared spatial field. Defaults to \code{NULL}}
 
-\item{temporalName}{Name of the temporal variable in the model. This variable is required to be in all the datasets. Defaults to \code{NULL}.}
+\item{temporalName}{Name of the temporal variable (class \code{character}) in the model. This variable is required to be in all the datasets. Defaults to \code{NULL}.}
 
-\item{temporalModel}{List of model specifications given to the control.group argument in the time effect component.}
+\item{temporalModel}{List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details.}
 }
 \value{
-A dataSDM object. Use ?dataSDM to see all the slot functions related to this object.
+A \code{\link{dataSDM}} object (class \code{R6}). Use \code{?dataSDM} to get a comprehensive description of the slot functions associated with this object.
 }
 \description{
-This function is used to create a \code{dataSDM} object containing all the relevant data and meta-data to be used in the integrated distribution model.
+This function is used to create an object containing all the data, metadata and relevant components required for the integrated species distribution model and \pkg{INLA} to work.
+As a result, the arguments associated with this function are predominantly related to describing variable names within the datasets that are relevant, and arguments related to what terms should be included in the formula for the integrated model. The output of this function is an \code{R6} object, and so there are a variety of public methods within the output of this function which can be used to further specify the model (see \code{?dataSDM} for a comprehensive description of these public methods).
+}
+\note{
+The idea with this function is to describe the full model: that is, all the covariates and spatial effects will appear in all the formulas for the datasets and species.
+If some of these terms should not be included in certain observation models in the integrated model, they can be thinned out using the \code{.$updateFormula} function.
+Note: the point covariate and mark terms will only be included in the formulas for where they are present in a given dataset, and so these terms do not need to be thinned out if they are not required by certain observation models.
 }
 \examples{
 
