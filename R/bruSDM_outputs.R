@@ -63,7 +63,14 @@ summary.bruSDM <- function(object, ...) {
         
         cat('Summary for', paste0(species,':'))
         cat('\n')
-        print.data.frame(object[['summary.fixed']][grepl(paste0('\\<',species,'_'), row.names(object[['summary.fixed']])),])    
+        if (any(paste0(species, '_', object$spatCovs$name) %in% names(object$summary.random))) {
+          
+          factorCovs <- do.call(rbind, object$summary.random[paste0(species, '_', object$spatCovs$name)])
+          row.names(factorCovs) <- paste0(species, '_', factorCovs$ID)
+          factorCovs$ID <- NULL
+        }
+        else factorCovs <- data.frame()
+        print.data.frame(rbind(object[['summary.fixed']][grepl(paste0('\\<',species,'_'), row.names(object[['summary.fixed']])),], factorCovs))   
         
         cat('\n')
         
