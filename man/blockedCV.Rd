@@ -2,7 +2,7 @@
 % Please edit documentation in R/blockedCV.R
 \name{blockedCV}
 \alias{blockedCV}
-\title{Run spatial blocked cross-validation on the integrated model.}
+\title{\emph{blockedCV}: run spatial blocked cross-validation on the integrated model.}
 \usage{
 blockedCV(data, options = list())
 }
