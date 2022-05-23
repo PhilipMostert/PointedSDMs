@@ -1370,6 +1370,7 @@ dataSDM$set('private', 'temporalVars', NULL)
 dataSDM$set('private', 'temporalModel', NULL)
 dataSDM$set('private', 'speciesSpatial', TRUE)
 dataSDM$set('private', 'Offset', NULL)
+dataSDM$set('private', 'biasLikes', list())
 
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'blockedCV', FALSE)
@@ -1580,21 +1581,61 @@ dataSDM$set('private', 'spatialCovariates', function(spatialCovariates) {
 })
 
 #' @description Function used to account for preferential sampling in the modeling framework.
-#' 
-#' 
+#' @param datasetName Use an existing dataset already in the model to account for preferential sampling. If \code{missing}, then \code{Data} needs to be given.
+#' @param Samplers Sampling locations of the species for the structured data. May come as a: \code{SpatialPolygons}, \code{SpatialLines} or \code{SpatialPoints} object. If \code{missing}, will assume the sampling locations as the locations given in \code{Data} or \code{datasetName}.
 #' 
 
-dataSDM$set('public', 'samplingBias', function(...) {
+dataSDM$set('public', 'samplingBias', function(datasetName, Samplers, ...) {
   
   stop('Do later...')
   
-  # Things to consider::
-  # Do we treat every point as a sampling location???
-  # If all we have are points of species 
-  # ie reflecting only the location of the species
-  # then we are essentially just duplicating the data?
-  # Can we just use "expert maps"
-  # ie use PA data to infer where the sampling locations are?  
+  ##Need to do: add all the covariate effects into the include section
+  
+  if (datasetName %in% private$dataSource) stop('datasetName provided in the model. If this is new data, please add it using the `Data` argument.')
+  
+  if (!missing(Samplers)) {
+    
+    if (!inherits(Samplers, 'Spatial')) stop('Data needs to be either a SpatialPoints*, SpatialLines*, or SpatialPolygons* object. ')
+    if (Samplers@proj4string != private$Projection) {
+      
+      message('Changing the coordinate reference system to the one specified in `intModel()`.')
+      Samplers@proj4string <- private$Projection
+      ##Should we check that these points are contained over the mesh area?
+      
+      private$biasLikes[[paste0(datasetName, '_samplers')]] <- inlabru::like(formula = coordinates ~ .,
+                                                                             data = do.call(rbind.SpatialPointsDataFrame, private$modelData[[datasetName]]),
+                                                                             include = c(paste0(datasetName, '_samplers_field'), paste0(datasetName, '_samplers'), self$spatcovsNames),
+                                                                             family = 'cp',
+                                                                             samplers = samplers,
+                                                                             ips = private$IPS,
+                                                                             domain = list(coordinates = private$INLAmesh))
+      
+    }
+
+  }
+  else {
+    
+    private$biasLikes[[paste0(datasetName, '_samplers')]] <- inlabru::like(formula = coordinates ~ .,
+                                                                           data = do.call(rbind.SpatialPointsDataFrame, private$modelData[[datasetName]]),
+                                                                           family = 'cp',
+                                                                           include = c(paste0(datasetName, '_samplers_field'), paste0(datasetName, '_samplers'), self$spatcovsNames),
+                                                                           samplers = do.call(rbind.SpatialPointsDataFrame, private$modelData[[datasetName]]),
+                                                                           ips = private$IPS,
+                                                                           domain = list(coordinates = private$INLAmesh))
+    
+    
+  }
+
+    
+  self$changeComponents(addComponent = paste0(datasetName, '_samplers_field(main = coordinates, model = shared_field, copy = shared_spatial, fixed = FALSE)')) ##probably not correct so change...
+  self$changeComponents(addComponent = paste0(datasetName,'_samplers(1)'))
+  
+  ##Things to do here:
+   #When doing spatial blocking: also spatially block the sampling locations:
+   #attach these likelihoods to the ones with the points
+   #attach all the other relevant metadata so that loo and all that can work (ie all the sources...)
+   #Add these fields to the predict + plot functions...
+  
 })
 
 ## Need to change all the spatialFields to self$spatialFields and then the relevent sublist?
