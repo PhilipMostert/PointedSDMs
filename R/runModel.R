@@ -55,7 +55,10 @@ runModel <- function(data, options = list()) {
   
   comp_terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)
   
-  comp_keep <- comp_terms %in% formula_terms
+  #Will need to change this to say comp_terms %in% c(formula_terms, bias_terms)
+  comp_keep <- comp_terms %in% c(formula_terms, 
+                                 paste0(data$.__enclos_env__$private$dataSource, '_samplers_field'),
+                                 paste0(data$.__enclos_env__$private$dataSource, 'samplers'))
   
   componentsJoint <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
 
@@ -73,6 +76,28 @@ runModel <- function(data, options = list()) {
                      markstrialsvar = data$.__enclos_env__$private$trialsMarks,
                      speciesname = data$.__enclos_env__$private$speciesName,
                      speciesindex = data$.__enclos_env__$private$speciesIndex))
+  
+  if (length(data$.__enclos_env__$private$biasData) > 0) {
+    
+    biasLikes <- list()
+    
+    for (bias in names(data$.__enclos_env__$private$biasData)) {
+      
+      biasLikes[[bias]] <- inlabru::like(formula = coordinates ~ .,
+                                         family = 'cp',
+                                         samplers = data$.__enclos_env__$private$biasData[[bias]],
+                                         ips = data$.__enclos_env__$private$IPS,
+                                         domain = list(coordinates = data$.__enclos_env__$private$INLAmesh),
+                                         include = c(paste0(bias, '_samplers_field'), paste0(bias,'_samplers'), data$.__enclos_env__$private$spatcovsNames))
+      
+      
+    }
+    
+    biasLikes <- do.call(inlabru::like_list, biasLikes)
+    
+    allLiks <- like_list(allLiks, biasLikes)
+    
+  }
   
   optionsJoint <- append(data$.__enclos_env__$private$optionsINLA, options)
 
