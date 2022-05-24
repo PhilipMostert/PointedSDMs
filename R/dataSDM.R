@@ -1266,6 +1266,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'
   spatialBlock =  function(k, rows, cols, plot = FALSE, seed = 1234, ...) {
     
+    
+    private$spatialBlockCall <- paste0(gsub('.*\\(', 'self$spatialBlock(', deparse(match.call())))
+
     blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
                                                                 k = k, rows = rows, cols = cols, selection = 'random',
                                                                 verbose = FALSE, progress = FALSE, seed = seed, ...))
@@ -1316,6 +1319,58 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     private$IPS <- do.call(rbind.SpatialPointsDataFrame, blocked_ips)
+    
+    if (length(private$biasData) > 0) {
+      
+      blocked_samplers <- list()
+      in_where_samplers <- list()
+      
+     for (sampler in names(private$biasData)) {
+       
+       if (class(private$biasData[[sampler]] %in% c('SpatialPoints', 'SpatialPointsDataFrame'))) {
+         
+         in_where_samplers[[sampler]] <- lapply(1:(rows * cols), function(i) !is.na(over(private$biasData[[sampler]], blocksPoly[[1]][[i]])))
+         
+         for (i in 1:(rows * cols)) {
+           
+           blocked_samplers[[sampler]][[i]] <- private$biasData[[sampler]][in_where[[sampler]][[i]], ]
+           
+           if (nrow(blocked_samplers[[sampler]][[i]]) !=0) blocked_samplers[[sampler]][[i]]$.__block_index__ <- as.character(folds[i])
+           
+         }
+         
+         blocked_samplers[[samplers]] <- lapply(blocked_samplers[[samplers]], function(x) {
+           
+           row.names(x@data) <- NULL
+           row.names(x@coords) <- NULL
+           x
+           
+         })
+         
+         private$biasData[[samplers]] <- do.call(rbind.SpatialPointsDataFrame, blocked_samplers[[samplers]])
+         
+       } else 
+         if (class(private$biasData[[sampler]] %in% c('SpatialPolygons', 'SpatialPolygonsDataFrame'))) {
+           
+           #What happens if the SpatialPolygon overlaps on two different blocks...
+           #Would we have to completely have to rethink this type of data ie have a list which includes what points are in each polygon/line (overlap included.)
+           
+         }
+       else {
+         
+         #Assuming this is a SpatialLines/SpatialLinesDataFrame object ...
+         
+       }
+       
+       
+     }
+      
+      # if class(private$biasData) == 'SpatialPoints' easy...
+      # if class(private$biasData) == 'SpatialPolygons' don't know...
+      ## if class(private$biasData) == 'SpatialLines': then we need to LineIn <- rgeos::gIntersects(SpatialLines(msamplers@lines[i], proj4string = private$Projection),SpatialPolygons(polygons, proj4string = private$Projection))
+      # With this we would probably need to somehow separate the lines and polygons; or add metadata which states where they are in the block
+            #maybe something like samplers@lines[[i]]@Lines$block = block?
+    }
     
     private$blockedCV <- TRUE 
     
@@ -1370,7 +1425,7 @@ dataSDM$set('private', 'temporalVars', NULL)
 dataSDM$set('private', 'temporalModel', NULL)
 dataSDM$set('private', 'speciesSpatial', TRUE)
 dataSDM$set('private', 'Offset', NULL)
-dataSDM$set('private', 'biasLikes', list())
+dataSDM$set('private', 'biasData', list())
 
 dataSDM$set('private', 'modelData', list())
 dataSDM$set('private', 'blockedCV', FALSE)
@@ -1393,6 +1448,8 @@ dataSDM$set('private', 'multinomVars', NULL)
 dataSDM$set('private', 'printSummary', NULL)
 dataSDM$set('private', 'multinomIndex', list())
 dataSDM$set('private', 'optionsINLA', list())
+
+dataSDM$set('private', 'spatialBlockCall', NULL)
 
 #' @description Initialize function for dataSDM: used to store some compulsory arguments. Please refer to the wrapper function, \code{intModel} for creating new dataSDM objects.
 #' @param coordinates A vector of length 2 containing the names of the coordinates.
@@ -1582,15 +1639,11 @@ dataSDM$set('private', 'spatialCovariates', function(spatialCovariates) {
 
 #' @description Function used to account for preferential sampling in the modeling framework.
 #' @param datasetName Use an existing dataset already in the model to account for preferential sampling. If \code{missing}, then \code{Data} needs to be given.
-#' @param Samplers Sampling locations of the species for the structured data. May come as a: \code{SpatialPolygons}, \code{SpatialLines} or \code{SpatialPoints} object. If \code{missing}, will assume the sampling locations as the locations given in \code{Data} or \code{datasetName}.
+#' @param Samplers Sampling locations of the species for the structured data. May come as a: \code{SpatialPolygons}, \code{SpatialLines} or \code{SpatialPoints} object. If \code{missing}, will assume the sampling locations as the locations given in the points specified with \code{datasetName}.
 #' 
 
-dataSDM$set('public', 'samplingBias', function(datasetName, Samplers, ...) {
-  
-  stop('Do later...')
-  
-  ##Need to do: add all the covariate effects into the include section
-  
+dataSDM$set('public', 'samplingBias', function(datasetName, Samplers) {
+
   if (datasetName %in% private$dataSource) stop('datasetName provided in the model. If this is new data, please add it using the `Data` argument.')
   
   if (!missing(Samplers)) {
@@ -1602,33 +1655,25 @@ dataSDM$set('public', 'samplingBias', function(datasetName, Samplers, ...) {
       Samplers@proj4string <- private$Projection
       ##Should we check that these points are contained over the mesh area?
       
-      private$biasLikes[[paste0(datasetName, '_samplers')]] <- inlabru::like(formula = coordinates ~ .,
-                                                                             data = do.call(rbind.SpatialPointsDataFrame, private$modelData[[datasetName]]),
-                                                                             include = c(paste0(datasetName, '_samplers_field'), paste0(datasetName, '_samplers'), self$spatcovsNames),
-                                                                             family = 'cp',
-                                                                             samplers = samplers,
-                                                                             ips = private$IPS,
-                                                                             domain = list(coordinates = private$INLAmesh))
-      
     }
+    
+    private$biasData[[datasetName]] <- samplers
 
   }
-  else {
-    
-    private$biasLikes[[paste0(datasetName, '_samplers')]] <- inlabru::like(formula = coordinates ~ .,
-                                                                           data = do.call(rbind.SpatialPointsDataFrame, private$modelData[[datasetName]]),
-                                                                           family = 'cp',
-                                                                           include = c(paste0(datasetName, '_samplers_field'), paste0(datasetName, '_samplers'), self$spatcovsNames),
-                                                                           samplers = do.call(rbind.SpatialPointsDataFrame, private$modelData[[datasetName]]),
-                                                                           ips = private$IPS,
-                                                                           domain = list(coordinates = private$INLAmesh))
-    
-    
-  }
-
+  else private$biasData[[datasetName]] <- do.call(rbind.SpatialPointsDataFrame, private$modelData[[datasetName]])
     
   self$changeComponents(addComponent = paste0(datasetName, '_samplers_field(main = coordinates, model = shared_field, copy = shared_spatial, fixed = FALSE)')) ##probably not correct so change...
   self$changeComponents(addComponent = paste0(datasetName,'_samplers(1)'))
+  
+  if (private$blockedCV) {
+    stop("For now don't combine blockedCV and samplers...")
+    message('Re-running `.$spatialBlock()` to incorporate the new data added to the model.')
+    eval(parse(text = private$spatialBlockCall))
+    
+  }
+  
+  #Add something like this::
+   #private$samplersSource <- c(private$samplersSource, datasetname) # and then attach the others all together...
   
   ##Things to do here:
    #When doing spatial blocking: also spatially block the sampling locations:
