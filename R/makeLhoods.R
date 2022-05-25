@@ -50,8 +50,8 @@ makeLhoods <- function(data, formula, family, mesh, ips,
         Likindex <- length(Likelihoods) + 1
         
         if (family[[dataset]][process] == 'binomial') {
-          
-          if (!is.na(Ntrialsvar[[1]]) || !is.na(Ntrialsvar[[2]])) {
+         
+          if (!all(is.na(Ntrialsvar[[1]])) || !all(is.na(Ntrialsvar[[2]]))) {
             
             if (as.character(formula[[dataset]][[species]][[process]][['LHS']])[2] == paresp) Ntrials <- Ntrialsvar[[1]]
             
