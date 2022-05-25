@@ -83,8 +83,9 @@ runModel <- function(data, options = list()) {
     
     for (bias in names(data$.__enclos_env__$private$biasData)) {
       
-      biasLikes[[bias]] <- inlabru::like(formula = coordinates ~ .,
+      biasLikes[[paste0(bias, '_samplers')]] <- inlabru::like(formula = coordinates ~ .,
                                          family = 'cp',
+                                         data = do.call(rbind.SpatialPointsDataFrame, data$.__enclos_env__$private$modelData[[bias]]),
                                          samplers = data$.__enclos_env__$private$biasData[[bias]],
                                          ips = data$.__enclos_env__$private$IPS,
                                          domain = list(coordinates = data$.__enclos_env__$private$INLAmesh),
@@ -95,7 +96,10 @@ runModel <- function(data, options = list()) {
     
     biasLikes <- do.call(inlabru::like_list, biasLikes)
     
-    allLiks <- like_list(allLiks, biasLikes)
+    allLiks <- inlabru::like_list(do.call(append, list(allLiks, biasLikes)))
+    
+    data$.__enclos_env__$private$optionsINLA$control.family <- append(data$.__enclos_env__$private$optionsINLA$control.family,
+                                                                      lapply(1:length(biasLikes), function(x) list(link = 'log')))
     
   }
   
