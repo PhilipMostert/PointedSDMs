@@ -1644,6 +1644,8 @@ dataSDM$set('private', 'spatialCovariates', function(spatialCovariates) {
 
 dataSDM$set('public', 'samplingBias', function(datasetName, Samplers) {
 
+  stop('Not run for now.')
+  
   if (!any(datasetName %in% private$dataSource)) stop('datasetName provided in the model. If this is new data, please add it using the `.addData()` function.')
   
   if (!missing(Samplers)) {
