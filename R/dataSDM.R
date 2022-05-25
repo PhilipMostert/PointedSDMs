@@ -1662,7 +1662,7 @@ dataSDM$set('public', 'samplingBias', function(datasetName, Samplers) {
   }
   else private$biasData[[datasetName]] <- do.call(rbind.SpatialPointsDataFrame, private$modelData[[datasetName]])
     
-  self$changeComponents(addComponent = paste0(datasetName, '_samplers_field(main = coordinates, model = shared_field, copy = "shared_spatial", fixed = FALSE)'), print = FALSE)
+  self$changeComponents(addComponent = paste0(datasetName, '_samplers_field(main = coordinates, copy = "shared_spatial", fixed = FALSE)'), print = FALSE)
   self$changeComponents(addComponent = paste0(datasetName,'_samplers(1)'), print = FALSE)
   
   if (private$blockedCV) {
