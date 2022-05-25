@@ -1644,7 +1644,7 @@ dataSDM$set('private', 'spatialCovariates', function(spatialCovariates) {
 
 dataSDM$set('public', 'samplingBias', function(datasetName, Samplers) {
 
-  if (datasetName %in% private$dataSource) stop('datasetName provided in the model. If this is new data, please add it using the `Data` argument.')
+  if (!any(datasetName %in% private$dataSource)) stop('datasetName provided in the model. If this is new data, please add it using the `.addData()` function.')
   
   if (!missing(Samplers)) {
     
@@ -1662,8 +1662,8 @@ dataSDM$set('public', 'samplingBias', function(datasetName, Samplers) {
   }
   else private$biasData[[datasetName]] <- do.call(rbind.SpatialPointsDataFrame, private$modelData[[datasetName]])
     
-  self$changeComponents(addComponent = paste0(datasetName, '_samplers_field(main = coordinates, model = shared_field, copy = shared_spatial, fixed = FALSE)')) ##probably not correct so change...
-  self$changeComponents(addComponent = paste0(datasetName,'_samplers(1)'))
+  self$changeComponents(addComponent = paste0(datasetName, '_samplers_field(main = coordinates, model = shared_field, copy = "shared_spatial", fixed = FALSE)'), print = FALSE)
+  self$changeComponents(addComponent = paste0(datasetName,'_samplers(1)'), print = FALSE)
   
   if (private$blockedCV) {
     stop("For now don't combine blockedCV and samplers...")
