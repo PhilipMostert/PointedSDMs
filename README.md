@@ -59,7 +59,7 @@ include:
 
 This is a basic example which shows you how to specify and run an
 integrated model, using three disparate datasets containing locations of
-the solitary tinamou.
+the solitary tinamou (*Tinamus solitarius)*.
 
 ``` r
 library(PointedSDMs)
@@ -100,7 +100,7 @@ We can also make a quick plot of where the species are located using
 ``` r
 region <- SolitaryTinamou$region
 
-model$plot(Boundary = FALSE) + gg(region) + theme_bw()
+model$plot(Boundary = FALSE) + gg(region)
 ```
 
 <img src="man/figures/README-plot-1.png" width="100%" />
@@ -116,7 +116,7 @@ summary(modelRun)
 #> Summary of 'bruSDM' object:
 #> 
 #> inlabru version: 2.5.2
-#> INLA version: 22.04.16
+#> INLA version: 22.05.18-2
 #> 
 #> Types of data modelled:
 #>                                     
@@ -124,31 +124,31 @@ summary(modelRun)
 #> Parks                Present absence
 #> Gbif                    Present only
 #> Time used:
-#>     Pre = 3.26, Running = 9.49, Post = 0.0327, Total = 12.8 
+#>     Pre = 1.51, Running = 18.2, Post = 0.0269, Total = 19.7 
 #> Fixed effects:
-#>                   mean    sd 0.025quant 0.5quant 0.975quant mode   kld
-#> Forest          -0.003 0.001     -0.006   -0.003      0.000   NA 0.091
-#> eBird_intercept -0.228 0.047     -0.320   -0.228     -0.136   NA 0.454
-#> Parks_intercept -0.511 0.180     -0.869   -0.510     -0.163   NA 0.000
-#> Gbif_intercept  -0.537 0.048     -0.631   -0.537     -0.444   NA 0.256
+#>                   mean     sd 0.025quant 0.5quant 0.975quant mode   kld
+#> Forest           0.307  0.014      0.279    0.307      0.334   NA 0.155
+#> eBird_intercept  1.930 18.257    -33.884    1.929     37.743   NA 0.000
+#> Parks_intercept -2.226 18.258    -38.039   -2.224     33.591   NA 0.000
+#> Gbif_intercept   0.314 18.257    -35.500    0.314     36.127   NA 0.000
 #> 
 #> Random effects:
 #>   Name     Model
 #>     shared_spatial SPDE2 model
 #> 
 #> Model hyperparameters:
-#>                            mean   sd 0.025quant 0.5quant 0.975quant mode
-#> Theta1 for shared_spatial -2.35 0.00      -2.35    -2.35      -2.35   NA
-#> Theta2 for shared_spatial -1.84 0.00      -1.84    -1.84      -1.84   NA
+#>                             mean    sd 0.025quant 0.5quant 0.975quant mode
+#> Theta1 for shared_spatial  -1.36 0.015      -1.40    -1.36      -1.34   NA
+#> Theta2 for shared_spatial -10.34 0.015     -10.37   -10.34     -10.31   NA
 #> 
-#> Deviance Information Criterion (DIC) ...............: 4201.28
-#> Deviance Information Criterion (DIC, saturated) ....: -23342.56
-#> Effective number of parameters .....................: 218.51
+#> Deviance Information Criterion (DIC) ...............: 5802.05
+#> Deviance Information Criterion (DIC, saturated) ....: -21741.79
+#> Effective number of parameters .....................: 2042.06
 #> 
-#> Watanabe-Akaike information criterion (WAIC) ...: 3045.11
-#> Effective number of parameters .................: 638.81
+#> Watanabe-Akaike information criterion (WAIC) ...: 3.81e+19
+#> Effective number of parameters .................: 1.9e+19
 #> 
-#> Marginal log-Likelihood:  -3278.25 
+#> Marginal log-Likelihood:  -1213.67 
 #>  is computed 
 #> Posterior summaries for the linear predictor and the fitted values are computed
 #> (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')
