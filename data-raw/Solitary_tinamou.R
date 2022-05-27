@@ -1,5 +1,6 @@
 
 library(usethis)
+devtools::install_github('oharar/PointedSDMs')
 library(PointedSDMs)
 
 
@@ -50,7 +51,7 @@ Mesh <- MakeSpatialRegion(data=NULL, bdry=Region, meshpars=Meshpars,
 
 
 SolitaryTinamou <- list(datasets = list(eBird = SolTin_ebird, Parks = SolTin_parks, Gbif = SolTin_gbif),
-                        #covariates = list(Forest = Forest, NPP = NPP, Altitude = Altitude),
+                        covariates = list(Forest = Forest, NPP = NPP, Altitude = Altitude),
                         region = Region,
                         mesh = Mesh$mesh)
 
