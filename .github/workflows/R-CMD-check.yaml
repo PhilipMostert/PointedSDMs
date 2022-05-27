@@ -25,7 +25,7 @@ jobs:
           - {os: ubuntu-20.04, r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
 
     env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      RSPM: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
       
     steps:
