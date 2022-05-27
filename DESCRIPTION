@@ -36,7 +36,8 @@ Suggests:
     cowplot,
     knitr,
     kableExtra,
-    rmarkdown
+    rmarkdown,
+    covr
 RoxygenNote: 7.1.2
 License: GPL (>= 3)
 VignetteBuilder: knitr

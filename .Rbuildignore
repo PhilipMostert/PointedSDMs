@@ -10,3 +10,4 @@
 ^README\.Rmd$
 ^doc$
 ^Meta$
+^codecov\.yml$
