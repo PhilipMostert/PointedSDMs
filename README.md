@@ -8,7 +8,6 @@
 [![R-CMD-check](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/PhilipMostert/PointedSDMs/branch/ChangingToR6/graph/badge.svg)](https://app.codecov.io/gh/PhilipMostert/PointedSDMs?branch=ChangingToR6)
-[![R-CMD-check](https://github.com/PhilipMostert/PointedSDMs/workflows/R-CMD-check/badge.svg)](https://github.com/PhilipMostert/PointedSDMs/actions)
 
 <!-- badges: end -->
 
@@ -127,7 +126,7 @@ summary(modelRun)
 #> Parks                Present absence
 #> Gbif                    Present only
 #> Time used:
-#>     Pre = 1.5, Running = 18.3, Post = 0.0649, Total = 19.9 
+#>     Pre = 1.6, Running = 18.9, Post = 0.0324, Total = 20.5 
 #> Fixed effects:
 #>                   mean     sd 0.025quant 0.5quant 0.975quant mode   kld
 #> Forest           0.307  0.014      0.279    0.307      0.334   NA 0.155
