@@ -52,7 +52,7 @@ jobs:
           brew install proj@9
           brew install gdal
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
+     - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           dependencies: '"all"'
           extra-packages: |
