@@ -12,21 +12,21 @@ Forest <- SpatialPixelsDataFrame(points = PointedSDMs::SolTin_covariates[,1:2],
                                  proj4string = Projection)
 
 Forest <- raster(Forest)
-Forest <- disaggregate(Forest, 5, method='bilinear')
+#Forest <- disaggregate(Forest, 5, method='bilinear')
 
 NPP <- SpatialPixelsDataFrame(points = PointedSDMs::SolTin_covariates[,1:2],
                               data = data.frame(NPP = PointedSDMs::SolTin_covariates[,'NPP']), tol = 0.1,
                               proj4string = Projection)
 
 NPP <- raster(NPP)
-NPP <- disaggregate(NPP, 5, method='bilinear')
+#NPP <- disaggregate(NPP, 5, method='bilinear')
 
 Altitude <- SpatialPixelsDataFrame(points = PointedSDMs::SolTin_covariates[,1:2],
                                    data = data.frame(Altitude = PointedSDMs::SolTin_covariates[,'Altitude']), tol = 0.1,
                                    proj4string = Projection)
 
 Altitude <- raster(Altitude)
-Altitude <- disaggregate(Altitude, 5, method='bilinear')
+#Altitude <- disaggregate(Altitude, 5, method='bilinear')
 
 data('SolTin_ebird')
 data('SolTin_gbif')
@@ -50,9 +50,9 @@ Mesh <- MakeSpatialRegion(data=NULL, bdry=Region, meshpars=Meshpars,
 
 
 SolitaryTinamou <- list(datasets = list(eBird = SolTin_ebird, Parks = SolTin_parks, Gbif = SolTin_gbif),
-                        covariates = list(Forest = Forest, NPP = NPP, Altitude = Altitude),
+                        #covariates = list(Forest = Forest, NPP = NPP, Altitude = Altitude),
                         region = Region,
                         mesh = Mesh$mesh)
 
-usethis::use_data(SolitaryTinamou, overwrite = TRUE)
+usethis::use_data(SolitaryTinamou, overwrite = TRUE, compress = 'xz')
 
