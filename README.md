@@ -126,31 +126,31 @@ summary(modelRun)
 #> Parks                Present absence
 #> Gbif                    Present only
 #> Time used:
-#>     Pre = 1.6, Running = 18.9, Post = 0.0324, Total = 20.5 
+#>     Pre = 1.51, Running = 17.2, Post = 0.0362, Total = 18.7 
 #> Fixed effects:
-#>                   mean     sd 0.025quant 0.5quant 0.975quant mode   kld
-#> Forest           0.307  0.014      0.279    0.307      0.334   NA 0.155
-#> eBird_intercept  1.930 18.257    -33.884    1.929     37.743   NA 0.000
-#> Parks_intercept -2.226 18.258    -38.039   -2.224     33.591   NA 0.000
-#> Gbif_intercept   0.314 18.257    -35.500    0.314     36.127   NA 0.000
+#>                   mean    sd 0.025quant 0.5quant 0.975quant mode   kld
+#> Forest          -0.002 0.001     -0.005   -0.002      0.000   NA 0.099
+#> eBird_intercept -0.244 0.047     -0.336   -0.244     -0.152   NA 0.505
+#> Parks_intercept -0.536 0.178     -0.892   -0.535     -0.191   NA 0.000
+#> Gbif_intercept  -0.553 0.048     -0.647   -0.553     -0.459   NA 0.285
 #> 
 #> Random effects:
 #>   Name     Model
 #>     shared_spatial SPDE2 model
 #> 
 #> Model hyperparameters:
-#>                             mean    sd 0.025quant 0.5quant 0.975quant mode
-#> Theta1 for shared_spatial  -1.36 0.015      -1.40    -1.36      -1.34   NA
-#> Theta2 for shared_spatial -10.34 0.015     -10.37   -10.34     -10.31   NA
+#>                            mean    sd 0.025quant 0.5quant 0.975quant mode
+#> Theta1 for shared_spatial -3.39 0.004      -3.39    -3.39      -3.38   NA
+#> Theta2 for shared_spatial -8.00 0.004      -8.01    -8.00      -7.99   NA
 #> 
-#> Deviance Information Criterion (DIC) ...............: 5802.05
-#> Deviance Information Criterion (DIC, saturated) ....: -21741.79
-#> Effective number of parameters .....................: 2042.06
+#> Deviance Information Criterion (DIC) ...............: 4204.54
+#> Deviance Information Criterion (DIC, saturated) ....: -23256.48
+#> Effective number of parameters .....................: 229.82
 #> 
-#> Watanabe-Akaike information criterion (WAIC) ...: 3.81e+19
-#> Effective number of parameters .................: 1.9e+19
+#> Watanabe-Akaike information criterion (WAIC) ...: 3088.50
+#> Effective number of parameters .................: 653.03
 #> 
-#> Marginal log-Likelihood:  -1213.67 
+#> Marginal log-Likelihood:  -3891.83 
 #>  is computed 
 #> Posterior summaries for the linear predictor and the fitted values are computed
 #> (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')
