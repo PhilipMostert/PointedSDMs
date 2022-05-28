@@ -470,7 +470,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                        trialname = trialsPA, speciesname = speciesName,
                        marktrialname = trialsMarks, temporalvar = private$temporalName,
                        marks = markNames, markfamily = markFamily,
-                       pointcovnames = pointCovariates, offsetname = Offset)
+                       pointcovnames = pointCovariates, offsetname = private$Offset)
     
     if (is.null(private$printSummary))  private$printSummary <- list(Type = unlist(pointData$dataType),
                                                                      numObs = unlist(pointData$numObs),
