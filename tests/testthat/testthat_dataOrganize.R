@@ -255,25 +255,27 @@ test_that('makeComponents is able to make the correct components for all the pro
                          speciesname = 'species', covariatenames = 'spatcovs', temporalname = 'temp', speciesspatial = TRUE,
                          covariateclass = 'numeric', numtime = 2)
     
-    expect_identical(formula(paste(' ~ -1 +', paste0(comps, collapse = ' + '))),
-                     ~-1 + shared_spatial(main = coordinates, model = shared_field, 
-                                          group = temp, ngroup = 2, control.group = list(model = "ar1")) + 
-                       fish1_spatial(main = coordinates, model = fish1_field) + 
-                       fish2_spatial(main = coordinates, model = fish2_field) + 
-                       bird1_spatial(main = coordinates, model = bird1_field) + 
-                       bird2_spatial(main = coordinates, model = bird2_field) + 
-                       numvar_spatial(main = coordinates, model = numvar_field) + 
-                       factvar_spatial(main = coordinates, model = factvar_field) + 
-                       binommark_spatial(main = coordinates, model = binommark_field) + 
-                       fish1_spatcovs(main = fish1_spatcovs, model = "numeric") + 
-                       fish2_spatcovs(main = fish2_spatcovs, model = "numeric") + 
-                       bird1_spatcovs(main = bird1_spatcovs, model = "numeric") + 
-                       bird2_spatcovs(main = bird2_spatcovs, model = "numeric") + 
-                       pointcov + fish1_intercept(1) + fish2_intercept(1) + bird1_intercept(1) + 
-                       bird2_intercept(1) + factvar(main = factvar, model = "iid", 
-                                                    constr = FALSE, fixed = TRUE) + factvar_phi(main = factvar_phi, 
-                                                                                                model = "iid", initial = -10, fixed = TRUE) + numvar_intercept(1) + 
-                       binommark_intercept(1))
+    expect_setequal(comps,c("shared_spatial(main = coordinates, model = shared_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))",
+                            "fish2_spatial(main = coordinates, model = fish2_field)",                                                                   
+                            "fish1_spatial(main = coordinates, model = fish1_field)",                                                                   
+                            "bird2_spatial(main = coordinates, model = bird2_field)",                                                                   
+                            "bird1_spatial(main = coordinates, model = bird1_field)",                                                                   
+                            "numvar_spatial(main = coordinates, model = numvar_field)",                                                                 
+                            "factvar_spatial(main = coordinates, model = factvar_field)",                                                               
+                            "binommark_spatial(main = coordinates, model = binommark_field)",                                                           
+                            "fish2_spatcovs(main = fish2_spatcovs, model = \"numeric\")",                                                               
+                            "fish1_spatcovs(main = fish1_spatcovs, model = \"numeric\")",                                                               
+                            "bird2_spatcovs(main = bird2_spatcovs, model = \"numeric\")",                                                               
+                            "bird1_spatcovs(main = bird1_spatcovs, model = \"numeric\")",                                                               
+                            "pointcov",                                                                                                                 
+                            "fish2_intercept(1)",                                                                                                       
+                            "fish1_intercept(1)",                                                                                                       
+                            "bird2_intercept(1)",                                                                                                      
+                            "bird1_intercept(1)",                                                                                                       
+                            "factvar(main = factvar, model = \"iid\",constr = FALSE, fixed=TRUE)",                                                      
+                            "factvar_phi(main = factvar_phi, model = \"iid\", initial = -10, fixed = TRUE)",                                            
+                            "numvar_intercept(1)",                                                                                                      
+                            "binommark_intercept(1)"))
     
     ## Change arguments
     #spatial and intercepts == FALSE
@@ -283,18 +285,17 @@ test_that('makeComponents is able to make the correct components for all the pro
                                   speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = TRUE,
                                   covariateclass = 'numeric', numtime =  2)
     
-    expect_identical(formula(paste(' ~ -1 +', paste0(comps2, collapse = ' + '))),
-                     ~-1 + fish1_spatial(main = coordinates, model = fish1_field) + 
-                       fish2_spatial(main = coordinates, model = fish2_field) + 
-                       bird1_spatial(main = coordinates, model = bird1_field) + 
-                       bird2_spatial(main = coordinates, model = bird2_field) + 
-                       fish1_spatcovs(main = fish1_spatcovs, model = "numeric") + 
-                       fish2_spatcovs(main = fish2_spatcovs, model = "numeric") + 
-                       bird1_spatcovs(main = bird1_spatcovs, model = "numeric") + 
-                       bird2_spatcovs(main = bird2_spatcovs, model = "numeric") + 
-                       pointcov + factvar(main = factvar, model = "iid", constr = FALSE, 
-                                          fixed = TRUE) + factvar_phi(main = factvar_phi, model = "iid", 
-                                                                      initial = -10, fixed = TRUE))
+    expect_setequal(comps2,c("fish2_spatial(main = coordinates, model = fish2_field)",                       
+                             "fish1_spatial(main = coordinates, model = fish1_field)",                       
+                             "bird2_spatial(main = coordinates, model = bird2_field)",                       
+                             "bird1_spatial(main = coordinates, model = bird1_field)",                       
+                             "fish2_spatcovs(main = fish2_spatcovs, model = \"numeric\")",                   
+                             "fish1_spatcovs(main = fish1_spatcovs, model = \"numeric\")",                   
+                             "bird2_spatcovs(main = bird2_spatcovs, model = \"numeric\")",                   
+                             "bird1_spatcovs(main = bird1_spatcovs, model = \"numeric\")",                   
+                             "pointcov",                                                                     
+                             "factvar(main = factvar, model = \"iid\",constr = FALSE, fixed=TRUE)",          
+                             "factvar_phi(main = factvar_phi, model = \"iid\", initial = -10, fixed = TRUE)"))
     
             
           })
