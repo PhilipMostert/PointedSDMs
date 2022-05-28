@@ -30,7 +30,7 @@ test_that('runModel runs a dataSDM object, and produces an INLA model with extra
   PA$species <- sample(x = c('bird'), nrow(PA@data), replace = TRUE)
   mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
                              max.edge = 2)
-  iPoints <- inlabru::ipoints(samplers = SpatialPoly)
+  iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
   ##Make PA a data.frame object
   PA <- data.frame(PA)
   
