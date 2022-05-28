@@ -187,23 +187,23 @@ dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-print}{\code{dataSDM$print()}}
-\item \href{#method-plot}{\code{dataSDM$plot()}}
-\item \href{#method-addData}{\code{dataSDM$addData()}}
-\item \href{#method-addBias}{\code{dataSDM$addBias()}}
-\item \href{#method-updateFormula}{\code{dataSDM$updateFormula()}}
-\item \href{#method-changeComponents}{\code{dataSDM$changeComponents()}}
-\item \href{#method-priorsFixed}{\code{dataSDM$priorsFixed()}}
-\item \href{#method-specifySpatial}{\code{dataSDM$specifySpatial()}}
-\item \href{#method-changeLink}{\code{dataSDM$changeLink()}}
-\item \href{#method-spatialBlock}{\code{dataSDM$spatialBlock()}}
-\item \href{#method-new}{\code{dataSDM$new()}}
-\item \href{#method-samplingBias}{\code{dataSDM$samplingBias()}}
+\item \href{#method-dataSDM-print}{\code{dataSDM$print()}}
+\item \href{#method-dataSDM-plot}{\code{dataSDM$plot()}}
+\item \href{#method-dataSDM-addData}{\code{dataSDM$addData()}}
+\item \href{#method-dataSDM-addBias}{\code{dataSDM$addBias()}}
+\item \href{#method-dataSDM-updateFormula}{\code{dataSDM$updateFormula()}}
+\item \href{#method-dataSDM-changeComponents}{\code{dataSDM$changeComponents()}}
+\item \href{#method-dataSDM-priorsFixed}{\code{dataSDM$priorsFixed()}}
+\item \href{#method-dataSDM-specifySpatial}{\code{dataSDM$specifySpatial()}}
+\item \href{#method-dataSDM-changeLink}{\code{dataSDM$changeLink()}}
+\item \href{#method-dataSDM-spatialBlock}{\code{dataSDM$spatialBlock()}}
+\item \href{#method-dataSDM-new}{\code{dataSDM$new()}}
+\item \href{#method-dataSDM-samplingBias}{\code{dataSDM$samplingBias()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-dataSDM-print"></a>}}
+\if{latex}{\out{\hypertarget{method-dataSDM-print}{}}}
 \subsection{Method \code{print()}}{
 Prints the datasets, their data type and the number of observations, as well as the marks and their respective families.
 \subsection{Usage}{
@@ -219,8 +219,8 @@ Prints the datasets, their data type and the number of observations, as well as 
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot"></a>}}
-\if{latex}{\out{\hypertarget{method-plot}{}}}
+\if{html}{\out{<a id="method-dataSDM-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-dataSDM-plot}{}}}
 \subsection{Method \code{plot()}}{
 Makes a plot of the points surrounded by the boundary of the region where they were collected. The points may either be plotted based on which dataset they come from, or which species group they are part of (if \code{speciesName} is non-\code{NULL} in \code{\link{intModel}}).
 \subsection{Usage}{
@@ -268,8 +268,8 @@ dataObj(Species = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addData"></a>}}
-\if{latex}{\out{\hypertarget{method-addData}{}}}
+\if{html}{\out{<a id="method-dataSDM-addData"></a>}}
+\if{latex}{\out{\hypertarget{method-dataSDM-addData}{}}}
 \subsection{Method \code{addData()}}{
 Function used to add additional datasets to the \code{dataSDM} object. This function should be used if the user would like to add any additional datasets to the integrated model, but do not have the same standardized variable names as those added initially with \code{\link{intModel}}. Use \code{?intModel} for a more comprehensive description on what each argument in this function is used for.
 \subsection{Usage}{
@@ -340,8 +340,8 @@ dataObj$addData(dataset, responseCounts = responseCounts,
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-addBias"></a>}}
-\if{latex}{\out{\hypertarget{method-addBias}{}}}
+\if{html}{\out{<a id="method-dataSDM-addBias"></a>}}
+\if{latex}{\out{\hypertarget{method-dataSDM-addBias}{}}}
 \subsection{Method \code{addBias()}}{
 Function used to add additional spatial fields (called \emph{bias fields}) to a selected dataset present in the integrated model. \emph{Bias fields} are typically used to account for sampling biases in opportunistic citizen science data in the absence of any covariate to do such.
 \subsection{Usage}{
@@ -377,8 +377,8 @@ dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-updateFormula"></a>}}
-\if{latex}{\out{\hypertarget{method-updateFormula}{}}}
+\if{html}{\out{<a id="method-dataSDM-updateFormula"></a>}}
+\if{latex}{\out{\hypertarget{method-dataSDM-updateFormula}{}}}
 \subsection{Method \code{updateFormula()}}{
 Function used to update the formula for a selected observation model. The function is designed to work similarly to the generic \code{update} formula, and should be used to thin terms out of a process from the full model specified in \code{\link{intModel}}. The function also allows the user to add their own formula to the model, such that they can include non-linear components in the model. The function can also be used to print out the formula for a process by not specifying the \code{Formula} or \code{newFormula} arguments.
 \subsection{Usage}{
@@ -448,8 +448,8 @@ dataObj$changeComponents(newComponent = 'scaling')
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-changeComponents"></a>}}
-\if{latex}{\out{\hypertarget{method-changeComponents}{}}}
+\if{html}{\out{<a id="method-dataSDM-changeComponents"></a>}}
+\if{latex}{\out{\hypertarget{method-dataSDM-changeComponents}{}}}
 \subsection{Method \code{changeComponents()}}{
 Function to add and specify custom components to model, which are required by \pkg{inlabru}. The main purpose of the function is to re-specify or completely change components already in the model, however the user can also add completely new components to the model as well. In this case, the components need to be added to the correct formulas in the model using the \code{.$updateFormula} function. If \code{addComponent} and \code{removeComponent} are both missing, the function will print out the components to be supplied to \pkg{inlabru}'s \code{\link{bru}} function.
 \subsection{Usage}{
@@ -490,8 +490,8 @@ datasetObj$changeComponent(removeComponent = 'shared_spatial')
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-priorsFixed"></a>}}
-\if{latex}{\out{\hypertarget{method-priorsFixed}{}}}
+\if{html}{\out{<a id="method-dataSDM-priorsFixed"></a>}}
+\if{latex}{\out{\hypertarget{method-dataSDM-priorsFixed}{}}}
 \subsection{Method \code{priorsFixed()}}{
 Function to change priors for the fixed (and possibly random) effects of the model.
 \subsection{Usage}{
@@ -541,8 +541,8 @@ dataObj$priorsFixed(Effect = 'intercept', datasetName = 'datasetname',
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-specifySpatial"></a>}}
-\if{latex}{\out{\hypertarget{method-specifySpatial}{}}}
+\if{html}{\out{<a id="method-dataSDM-specifySpatial"></a>}}
+\if{latex}{\out{\hypertarget{method-dataSDM-specifySpatial}{}}}
 \subsection{Method \code{specifySpatial()}}{
 Function to specify random fields in the model using penalizing complexity (PC) priors for the parameters.
 \subsection{Usage}{
@@ -600,8 +600,8 @@ dataObj$specifySpatial(species = 'species', remove = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-changeLink"></a>}}
-\if{latex}{\out{\hypertarget{method-changeLink}{}}}
+\if{html}{\out{<a id="method-dataSDM-changeLink"></a>}}
+\if{latex}{\out{\hypertarget{method-dataSDM-changeLink}{}}}
 \subsection{Method \code{changeLink()}}{
 Function used to change the link function for a given process.
 \subsection{Usage}{
@@ -646,8 +646,8 @@ dataObj$changeLink(Dataset = Dataset, Species = Species,
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-spatialBlock"></a>}}
-\if{latex}{\out{\hypertarget{method-spatialBlock}{}}}
+\if{html}{\out{<a id="method-dataSDM-spatialBlock"></a>}}
+\if{latex}{\out{\hypertarget{method-dataSDM-spatialBlock}{}}}
 \subsection{Method \code{spatialBlock()}}{
 Function to spatially block the datasets, which will then be used for model cross-validation with \code{\link{blockedCV}}. See the \code{\link[blockCV]{spatialBlock}} function from \pkg{blockCV} for how the spatial blocking works and for further details on the function's arguments.
 \subsection{Usage}{
@@ -690,8 +690,8 @@ dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-dataSDM-new"></a>}}
+\if{latex}{\out{\hypertarget{method-dataSDM-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$new(
@@ -723,11 +723,11 @@ dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-samplingBias"></a>}}
-\if{latex}{\out{\hypertarget{method-samplingBias}{}}}
+\if{html}{\out{<a id="method-dataSDM-samplingBias"></a>}}
+\if{latex}{\out{\hypertarget{method-dataSDM-samplingBias}{}}}
 \subsection{Method \code{samplingBias()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$samplingBias(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$samplingBias(datasetName, Samplers)}\if{html}{\out{</div>}}
 }
 
 }

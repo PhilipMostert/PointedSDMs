@@ -9,18 +9,18 @@ Internal functions used to temporarily store data and other information before a
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-makeData}{\code{dataOrganize$makeData()}}
-\item \href{#method-makeSpecies}{\code{dataOrganize$makeSpecies()}}
-\item \href{#method-makeMultinom}{\code{dataOrganize$makeMultinom()}}
-\item \href{#method-makeFormulas}{\code{dataOrganize$makeFormulas()}}
-\item \href{#method-makeComponents}{\code{dataOrganize$makeComponents()}}
-\item \href{#method-makeLhoods}{\code{dataOrganize$makeLhoods()}}
-\item \href{#method-clone}{\code{dataOrganize$clone()}}
+\item \href{#method-dataOrganize-makeData}{\code{dataOrganize$makeData()}}
+\item \href{#method-dataOrganize-makeSpecies}{\code{dataOrganize$makeSpecies()}}
+\item \href{#method-dataOrganize-makeMultinom}{\code{dataOrganize$makeMultinom()}}
+\item \href{#method-dataOrganize-makeFormulas}{\code{dataOrganize$makeFormulas()}}
+\item \href{#method-dataOrganize-makeComponents}{\code{dataOrganize$makeComponents()}}
+\item \href{#method-dataOrganize-makeLhoods}{\code{dataOrganize$makeLhoods()}}
+\item \href{#method-dataOrganize-clone}{\code{dataOrganize$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-makeData"></a>}}
-\if{latex}{\out{\hypertarget{method-makeData}{}}}
+\if{html}{\out{<a id="method-dataOrganize-makeData"></a>}}
+\if{latex}{\out{\hypertarget{method-dataOrganize-makeData}{}}}
 \subsection{Method \code{makeData()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeData(
@@ -43,8 +43,8 @@ Internal functions used to temporarily store data and other information before a
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-makeSpecies"></a>}}
-\if{latex}{\out{\hypertarget{method-makeSpecies}{}}}
+\if{html}{\out{<a id="method-dataOrganize-makeSpecies"></a>}}
+\if{latex}{\out{\hypertarget{method-dataOrganize-makeSpecies}{}}}
 \subsection{Method \code{makeSpecies()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeSpecies(speciesname)}\if{html}{\out{</div>}}
@@ -52,8 +52,8 @@ Internal functions used to temporarily store data and other information before a
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-makeMultinom"></a>}}
-\if{latex}{\out{\hypertarget{method-makeMultinom}{}}}
+\if{html}{\out{<a id="method-dataOrganize-makeMultinom"></a>}}
+\if{latex}{\out{\hypertarget{method-dataOrganize-makeMultinom}{}}}
 \subsection{Method \code{makeMultinom()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeMultinom(multinomVars, return, oldVars)}\if{html}{\out{</div>}}
@@ -61,8 +61,8 @@ Internal functions used to temporarily store data and other information before a
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-makeFormulas"></a>}}
-\if{latex}{\out{\hypertarget{method-makeFormulas}{}}}
+\if{html}{\out{<a id="method-dataOrganize-makeFormulas"></a>}}
+\if{latex}{\out{\hypertarget{method-dataOrganize-makeFormulas}{}}}
 \subsection{Method \code{makeFormulas()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeFormulas(
@@ -83,8 +83,8 @@ Internal functions used to temporarily store data and other information before a
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-makeComponents"></a>}}
-\if{latex}{\out{\hypertarget{method-makeComponents}{}}}
+\if{html}{\out{<a id="method-dataOrganize-makeComponents"></a>}}
+\if{latex}{\out{\hypertarget{method-dataOrganize-makeComponents}{}}}
 \subsection{Method \code{makeComponents()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeComponents(
@@ -109,8 +109,8 @@ Internal functions used to temporarily store data and other information before a
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-makeLhoods"></a>}}
-\if{latex}{\out{\hypertarget{method-makeLhoods}{}}}
+\if{html}{\out{<a id="method-dataOrganize-makeLhoods"></a>}}
+\if{latex}{\out{\hypertarget{method-dataOrganize-makeLhoods}{}}}
 \subsection{Method \code{makeLhoods()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeLhoods(
@@ -125,8 +125,8 @@ Internal functions used to temporarily store data and other information before a
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-dataOrganize-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-dataOrganize-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{
