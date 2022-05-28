@@ -29,9 +29,9 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
   PA$binommark <- sample(x = 2:3, size = nrow(PA@data), replace = TRUE)
   PA$marktrial <- sample(x = 3:5, size = nrow(PA@data), replace = TRUE)
   PA$species <- sample(x = c('bird'), nrow(PA@data), replace = TRUE)
-  mesh <- INLA::inla.mesh.2d(boundary = inla.sp2segment(SpatialPoly), 
+  mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
                              max.edge = 2)
-  iPoints <- inlabru::ipoints(samplers = SpatialPoly)
+  iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
   ##Make PA a data.frame object
   PA <- data.frame(PA)
   
@@ -51,7 +51,7 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
                                     data = data.frame(covariate = cov$covariate),
                                     proj4string = projection,
                                     tolerance = 0.585235)
-  cov <- raster(cov)
+  cov <- raster::raster(cov)
   
   obj <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
                  IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
