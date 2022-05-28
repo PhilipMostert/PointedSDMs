@@ -41,7 +41,7 @@ test_that('The internal function makeData returns a list of SpatialPointDataFram
           well as the relevent metadata to be used in the integrated model.', {
     
     Check$makeData(datapoints = spData, datanames = c('PO', 'PA'),
-                   coords = colnames(PO@coords), proj = projection,
+                   coords = colnames(PO@coords), proj = projection, offsetname = NULL,
                    pointcovnames = 'pointcov', paresp = 'PAresp', countsresp = 'counts', trialname = 'trial',
                    speciesname = 'species', marks = c('numvar', 'factvar', 'binommark'), temporalvar = 'temp',
                    marktrialname = 'marktrial', markfamily = c('uniform', 'multinomial', 'binomial'))
@@ -160,7 +160,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             #Spatcovs is the names of the spatial covariates
             #specnesname is the name of the species variable
             Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', markintercept = TRUE,
-                               paresp = 'PAresp', countresp = 'counts', marksspatial = TRUE,
+                               paresp = 'PAresp', countresp = 'counts', marksspatial = TRUE, speciesspatial = TRUE,
                                marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                                spatial = TRUE, intercept = TRUE, pointcovs = 'pointcov')
             
@@ -202,7 +202,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             ##Change terms
              #Set spatial and intercept to FALSE
             Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', temporalname = 'temp',
-                               paresp = 'PAresp', countresp = 'counts', marksspatial = FALSE,
+                               paresp = 'PAresp', countresp = 'counts', marksspatial = FALSE, speciesspatial = FALSE,
                                marks = c('numvar', 'factvar', 'binommark'), markintercept = FALSE,
                                spatial = FALSE, intercept = FALSE, pointcovs = 'pointcov')
           
@@ -221,7 +221,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             
             ##Change terms
             #Set spatcovs to NULL
-            Check$makeFormulas(spatcovs = NULL, speciesname = 'species', marksspatial = TRUE,
+            Check$makeFormulas(spatcovs = NULL, speciesname = 'species', marksspatial = TRUE, speciesspatial = TRUE,
                                paresp = 'PAresp', countresp = 'counts', markintercept = FALSE,
                                marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                                spatial = TRUE, intercept = TRUE, pointcovs = 'pointcov')
@@ -242,7 +242,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
 
 #Change back to original
 Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', marksspatial = TRUE,
-                   paresp = 'PAresp', countresp = 'counts', markintercept = TRUE,
+                   paresp = 'PAresp', countresp = 'counts', markintercept = TRUE, speciesspatial = TRUE,
                    marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                    spatial = TRUE, intercept = TRUE, pointcovs = 'pointcov')
 
@@ -251,8 +251,8 @@ test_that('makeComponents is able to make the correct components for all the pro
             
     comps <- Check$makeComponents(spatial = TRUE, intercepts = TRUE, datanames = c('PO','PA'), marksintercept = TRUE,
                          marks = c('numvar', 'factvar', 'binommark'), temporalmodel = deparse(list(model = "ar1")),
-                         multinomnames = 'factvar', pointcovariates = 'pointcov', marksspatial = TRUE,
-                         speciesname = 'species', covariatenames = 'spatcovs', temporalname = 'temp',
+                         multinomnames = 'factvar', pointcovariates = 'pointcov', marksspatial = TRUE, offsetname = NULL,
+                         speciesname = 'species', covariatenames = 'spatcovs', temporalname = 'temp', speciesspatial = TRUE,
                          covariateclass = 'numeric', numtime = 2)
     
     expect_identical(formula(paste(' ~ -1 +', paste0(comps, collapse = ' + '))),
@@ -260,35 +260,38 @@ test_that('makeComponents is able to make the correct components for all the pro
                                           group = temp, ngroup = 2, control.group = list(model = "ar1")) + 
                        fish1_spatial(main = coordinates, model = fish1_field) + 
                        fish2_spatial(main = coordinates, model = fish2_field) + 
-                       bird2_spatial(main = coordinates, model = bird2_field) + 
                        bird1_spatial(main = coordinates, model = bird1_field) + 
+                       bird2_spatial(main = coordinates, model = bird2_field) + 
                        numvar_spatial(main = coordinates, model = numvar_field) + 
                        factvar_spatial(main = coordinates, model = factvar_field) + 
                        binommark_spatial(main = coordinates, model = binommark_field) + 
                        fish1_spatcovs(main = fish1_spatcovs, model = "numeric") + 
                        fish2_spatcovs(main = fish2_spatcovs, model = "numeric") + 
-                       bird2_spatcovs(main = bird2_spatcovs, model = "numeric") + 
                        bird1_spatcovs(main = bird1_spatcovs, model = "numeric") + 
-                       pointcov + fish1_intercept(1) + fish2_intercept(1) + bird2_intercept(1) + 
-                       bird1_intercept(1) + factvar(main = factvar, model = "iid", 
-                                                    constr = FALSE, fixed = TRUE) +
-                       factvar_phi(main = factvar_phi, model = "iid", initial = -10, fixed = TRUE) +
-                       numvar_intercept(1) 
-                        + binommark_intercept(1))
+                       bird2_spatcovs(main = bird2_spatcovs, model = "numeric") + 
+                       pointcov + fish1_intercept(1) + fish2_intercept(1) + bird1_intercept(1) + 
+                       bird2_intercept(1) + factvar(main = factvar, model = "iid", 
+                                                    constr = FALSE, fixed = TRUE) + factvar_phi(main = factvar_phi, 
+                                                                                                model = "iid", initial = -10, fixed = TRUE) + numvar_intercept(1) + 
+                       binommark_intercept(1))
     
     ## Change arguments
     #spatial and intercepts == FALSE
     comps2 <- Check$makeComponents(spatial = FALSE, intercepts = FALSE, datanames = c('PO','PA'),
-                                  marks = c('numvar', 'factvar', 'binommark'), marksspatial = FALSE,
+                                  marks = c('numvar', 'factvar', 'binommark'), marksspatial = FALSE, offsetname = NULL,
                                   multinomnames = 'factvar', pointcovariates = 'pointcov', marksintercept = FALSE,
-                                  speciesname = 'species', covariatenames = 'spatcovs',
+                                  speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = TRUE,
                                   covariateclass = 'numeric', numtime =  2)
     
     expect_identical(formula(paste(' ~ -1 +', paste0(comps2, collapse = ' + '))),
-                     ~-1 + fish1_spatcovs(main = fish1_spatcovs, model = "numeric") + 
+                     ~-1 + fish1_spatial(main = coordinates, model = fish1_field) + 
+                       fish2_spatial(main = coordinates, model = fish2_field) + 
+                       bird1_spatial(main = coordinates, model = bird1_field) + 
+                       bird2_spatial(main = coordinates, model = bird2_field) + 
+                       fish1_spatcovs(main = fish1_spatcovs, model = "numeric") + 
                        fish2_spatcovs(main = fish2_spatcovs, model = "numeric") + 
-                       bird2_spatcovs(main = bird2_spatcovs, model = "numeric") + 
                        bird1_spatcovs(main = bird1_spatcovs, model = "numeric") + 
+                       bird2_spatcovs(main = bird2_spatcovs, model = "numeric") + 
                        pointcov + factvar(main = factvar, model = "iid", constr = FALSE, 
                                           fixed = TRUE) + factvar_phi(main = factvar_phi, model = "iid", 
                                                                       initial = -10, fixed = TRUE))
