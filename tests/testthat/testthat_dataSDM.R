@@ -214,7 +214,7 @@ test_that('addData can correctly add and store the relevent metadata properly.',
 test_that('addBias is able to add bias fields to the model as well as succesfully update the relevent formulas and components of the model.', {
   
   #Check adding bias to the present only dataset
-  pcmatern <- inla.spde2.pcmatern(mesh,
+  pcmatern <- INLA::inla.spde2.pcmatern(mesh,
                                   prior.sigma = c(2, 0.01),
                                   prior.range = c(1, 0.05))
   check$addBias(datasetNames = 'PO', biasField = pcmatern)
