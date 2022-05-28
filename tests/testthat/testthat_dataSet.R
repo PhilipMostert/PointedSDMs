@@ -42,7 +42,7 @@ test_that('dataSet transforms the data to SpatialPointsDataFrames, and produces 
                  pointcovnames = 'pointcov', paresp = 'PAresp', countsresp = 'counts', trialname = 'trial',
                  speciesname = 'species', marks = c('numvar', 'factvar', 'binommark'),
                  marktrialname = 'marktrial', markfamily = c('uniform', 'multinomial', 'binomial'),
-                 temporalvar = 'temp')
+                 temporalvar = 'temp', offsetname = NULL)
   
   expect_setequal(names(mod), c("Data", "Family", "dataType", "varsIn", "Marks",
                                 "marksType", "multinomVars", 'numObs'))
@@ -94,7 +94,7 @@ test_that('dataSet transforms the data to SpatialPointsDataFrames, and produces 
   
   #Remove a dataset name
   expect_error(dataSet(datapoints = spData, datanames = c('PO'),
-                       coords = colnames(PO@coords), proj = projection,
+                       coords = colnames(PO@coords), proj = projection, offsetname = NULL,
                        pointcovnames = 'pointcov', paresp = 'PAresp', countsresp = 'counts', trialname = 'trial',
                        speciesname = 'species', marks = c('numvar', 'factvar', 'binommark'),
                        marktrialname = 'marktrial', markfamily = c('uniform', 'multinomial', 'binomial')),
@@ -102,7 +102,7 @@ test_that('dataSet transforms the data to SpatialPointsDataFrames, and produces 
   
   #Remove a mark family
   expect_error(dataSet(datapoints = spData, datanames = c('PO','PA'),
-                       coords = colnames(PO@coords), proj = projection,
+                       coords = colnames(PO@coords), proj = projection, offsetname = NULL,
                        pointcovnames = 'pointcov', paresp = 'PAresp', countsresp = 'counts', trialname = 'trial',
                        speciesname = 'species', marks = c('numvar', 'factvar', 'binommark'),
                        marktrialname = 'marktrial', markfamily = c('uniform', 'multinomial')),
