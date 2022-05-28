@@ -28,7 +28,7 @@ test_that('runModel runs a dataSDM object, and produces an INLA model with extra
   PA$binommark <- sample(x = 2:3, size = nrow(PA@data), replace = TRUE)
   PA$marktrial <- sample(x = 3:5, size = nrow(PA@data), replace = TRUE)
   PA$species <- sample(x = c('bird'), nrow(PA@data), replace = TRUE)
-  mesh <- INLA::inla.mesh.2d(boundary = inla.sp2segment(SpatialPoly), 
+  mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
                              max.edge = 2)
   iPoints <- inlabru::ipoints(samplers = SpatialPoly)
   ##Make PA a data.frame object
