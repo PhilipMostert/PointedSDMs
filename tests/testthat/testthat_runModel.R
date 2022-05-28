@@ -50,7 +50,7 @@ test_that('runModel runs a dataSDM object, and produces an INLA model with extra
                                     data = data.frame(covariate = cov$covariate),
                                     proj4string = projection,
                                     tolerance = 0.585235)
-  cov <- raster(cov)
+  cov <- raster::raster(cov)
   
   
   obj <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
