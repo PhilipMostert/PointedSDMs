@@ -5,7 +5,6 @@ vignette: >
   %\VignetteIndexEntry{Example of PointedSDMs for the solitary tinamou}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-
 ---
 
 ```{r, include = FALSE}
@@ -34,7 +33,6 @@ library(ggplot2)
 bru_options_set(inla.mode = "experimental")
 
 ```
-
 
 ### Load data
 
