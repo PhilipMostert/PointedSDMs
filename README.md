@@ -39,7 +39,7 @@ core functions of the package are:
 |----------------|---------------------------------------------------------------------------------------------------------------|
 | `intModel()`   | Initialize and specify the components used in the integrated model.                                           |
 | `blockedCV()`  | Perform spatial blocked cross-validation.                                                                     |
-| `runModel()`   | Estimate the components of the integrated model.                                                              |
+| `runModel()`   | Estimate and preform inference on the integrated model.                                                       |
 | `datasetOut()` | Perform dataset-out cross-validation, which calculates the impact individual datasets have on the full model. |
 
 The function `intModel()` produces an [R6](https://github.com/r-lib/R6)
@@ -126,7 +126,7 @@ summary(modelRun)
 #> Parks                Present absence
 #> Gbif                    Present only
 #> Time used:
-#>     Pre = 1.51, Running = 17.2, Post = 0.0362, Total = 18.7 
+#>     Pre = 1.74, Running = 17.1, Post = 0.0217, Total = 18.8 
 #> Fixed effects:
 #>                   mean    sd 0.025quant 0.5quant 0.975quant mode   kld
 #> Forest          -0.002 0.001     -0.005   -0.002      0.000   NA 0.099
