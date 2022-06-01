@@ -8,6 +8,6 @@
 Raster object containing the elevation across Pennsylvania state.
 }
 \references{
-\url{https://cran.r-project.org/web/packages/elevatr/index.html}
+\url{https://cran.r-project.org/package=elevatr}
 }
 \keyword{data}

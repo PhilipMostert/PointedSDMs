@@ -8,6 +8,6 @@
 Raster object containing the canopy cover across Pennsylvania state.
 }
 \references{
-\url{https://cran.r-project.org/web/packages/FedData/index.html}
+\url{https://cran.r-project.org/package=FedData}
 }
 \keyword{data}

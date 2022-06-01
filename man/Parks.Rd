@@ -5,7 +5,7 @@
 \alias{Parks}
 \title{data.frame object containing solitary tinamou observations from Parks}
 \source{
-\url{http://www.gbif.org/}
+\url{https://www.gbif.org/}
 }
 \description{
 data.frame object containing solitary tinamou observations from Parks
