@@ -16,14 +16,14 @@ NULL
 #' @name Parks
 #' @docType data
 #' @keywords data
-#' @source \url{http://www.gbif.org/}
+#' @source \url{https://www.gbif.org/}
 NULL
 
 #' data.frame object containing solitary tinamou observations from Gbif
 #' @name Gbif
 #' @docType data
 #' @keywords data
-#' @source \url{http://www.gbif.org/}
+#' @source \url{https://www.gbif.org/}
 NULL
 
 #' SpatialPixelsDataFrame containing Forest covariate
