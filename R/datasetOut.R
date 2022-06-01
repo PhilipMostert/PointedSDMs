@@ -17,6 +17,8 @@
 #' 
 #' @return A list of inlabru models with the specified dataset left out. If predictions is \code{FALSE}, these objects will be missing their \code{bru_info} and \code{call} lists.
 #' 
+#' @import inlabru
+#' 
 #' @export
 #' 
 #' @examples 

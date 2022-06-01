@@ -9,7 +9,7 @@ nameChanger <- function(data, oldName, newName) {
   
   lapply(data, function(dat) {
     
-    if (class(dat) == 'data.frame') {
+    if (inherits(dat,'data.frame')) {
       
       if (oldName %in% names(dat)) {
         

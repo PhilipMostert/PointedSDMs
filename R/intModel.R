@@ -33,6 +33,8 @@
 #' If some of these terms should not be included in certain observation models in the integrated model, they can be thinned out using the \code{.$updateFormula} function.
 #' Note: the point covariate and mark terms will only be included in the formulas for where they are present in a given dataset, and so these terms do not need to be thinned out if they are not required by certain observation models.
 #' 
+#' @import methods
+#' 
 #' @examples 
 #' 
 #' \dontrun{

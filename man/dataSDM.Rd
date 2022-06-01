@@ -68,6 +68,7 @@ dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
 ## Method `dataSDM$updateFormula`
 ## ------------------------------------------------
 
+
 \dontrun{
 
 #Make data object
@@ -103,7 +104,8 @@ dataObj$changeComponents(newComponent = 'scaling')
 dataObj <- intModel(...)
 
 #Change a component
-dataObj$changeComponent(addComponent = 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)')
+newcomp <- 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)'
+dataObj$changeComponent(addComponent = newcomp)
 #Should update the bias field
 
 #Remove a component
@@ -140,7 +142,9 @@ dataObj$priorsFixed(Effect = 'intercept', datasetName = 'datasetname',
 dataObj <- intModel(...)
 
 #Specify spatial field
-dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, prior.range = c(1,0.001), prior.sigma = c(1,0.001))
+dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, 
+                       prior.range = c(1,0.001),
+                       prior.sigma = c(1,0.001))
 #Specify for a species
 dataObj$specifySpatial(species = 'species', alpha = 1, PC = FALSE)
 
@@ -417,7 +421,8 @@ If \code{Formula} and \code{newFormula} are missing, will print out the formula 
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
+\preformatted{
+\dontrun{
 
 #Make data object
 dataObj <- intModel(...)
@@ -475,7 +480,8 @@ Function to add and specify custom components to model, which are required by \p
 dataObj <- intModel(...)
 
 #Change a component
-dataObj$changeComponent(addComponent = 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)')
+newcomp <- 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)'
+dataObj$changeComponent(addComponent = newcomp)
 #Should update the bias field
 
 #Remove a component
@@ -584,7 +590,9 @@ Function to specify random fields in the model using penalizing complexity (PC) 
 dataObj <- intModel(...)
 
 #Specify spatial field
-dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, prior.range = c(1,0.001), prior.sigma = c(1,0.001))
+dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, 
+                       prior.range = c(1,0.001),
+                       prior.sigma = c(1,0.001))
 #Specify for a species
 dataObj$specifySpatial(species = 'species', alpha = 1, PC = FALSE)
 

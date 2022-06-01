@@ -8,6 +8,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   
   #' @description Prints the datasets, their data type and the number of observations, as well as the marks and their respective families.
   #' @param ... Not used.
+  #' @import stats
   print = function(...) {
     
     if (length(private$modelData) == 0) cat('No data found. Please add data using the `$.addData` function.')
@@ -70,6 +71,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param Boundary Logical: should a boundary (created using the \code{Mesh} object) be used in the plot. Defaults to \code{TRUE}. Note that the output of this function is a \code{gg} object, and so a boundary surrounding the points may be added using standard \pkg{ggplot2} syntax and the \code{\link[inlabru]{gg}} function provided in the \pkg{inlabru} package.
   #' @param ... Not used.
   #' @return A ggplot object.
+  #' @import ggplot2
   #' @examples
   #' 
   #' \dontrun{
@@ -174,6 +176,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param Offset Name of the offset column in the dataset
   #' 
   #' @note The arguments of this function may be missing (ie not provided) if they have already been specified in \code{\link{intModel}}, and do not need changing. Therefore this function is useful if there are some variable names not standardized across the datasets; this function will thus standardize the variable names to those provided initially in \code{\link{intModel}}.
+  #' 
+  #' @importFrom INLA inla.spde2.matern
+  #' @import methods
   #' 
   #' @examples
   #' \dontrun{
@@ -689,6 +694,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param allPO Logical: should a bias field be added to all datasets classified as presence only in the integrated model. Defaults to \code{FALSE}.
   #' @param biasField An \code{inla.spde} object used to describe the bias field. Defaults to \code{NULL} which uses \code{\link[INLA]{inla.spde2.matern}} to create a Matern model for the field.
   #' 
+  #' @importFrom INLA inla.spde2.matern
+  #' 
   #' @examples
   #' \dontrun{
   #' 
@@ -720,7 +727,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         #private$modelData[[lik]]$include_components <- c(private$modelData[[lik]]$include_components, paste0(dat, '_biasField'))
       }
       
-      if (is.null(biasField)) self$spatialFields$biasFields[[dat]] <- inla.spde2.matern(mesh = private$INLAmesh)
+      if (is.null(biasField)) self$spatialFields$biasFields[[dat]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
       else self$spatialFields$biasFields[[dat]] <- biasField
       
     }
@@ -750,7 +757,11 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param allProcesses Logical argument: if \code{TRUE} changes the formulas for all of the processes in a dataset. Defaults to \code{FALSE}.
   #' @param newFormula Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.
   #' 
+  #' @import methods
+  #' @import stats
+  #' 
   #' @examples
+  #' 
   #' \dontrun{
   #' 
   #' #Make data object
@@ -976,7 +987,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' dataObj <- intModel(...)
   #' 
   #' #Change a component
-  #' dataObj$changeComponent(addComponent = 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)')
+  #' newcomp <- 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)'
+  #' dataObj$changeComponent(addComponent = newcomp)
   #' #Should update the bias field
   #' 
   #' #Remove a component
@@ -1102,6 +1114,10 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param PC Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}, which uses \code{\link[INLA]{inla.spde2.pcmatern}} to specify the model; otherwise uses \code{\link[INLA]{inla.spde2.matern}}.
   #' @param Remove Logical: should the chosen spatial field be removed. Requires one of \code{sharedSpatial}, \code{species}, \code{mark} or \code{bias} to be non-missing, which chooses which field to remove.
   #' @param ... Additional arguments used by \pkg{INLA}'s \code{\link[INLA]{inla.spde2.pcmatern}} or \code{\link[INLA]{inla.spde2.matern}} function, dependent on the value of \code{PC}.
+  #' 
+  #' @importFrom INLA inla.spde2.matern
+  #' @importFrom INLA inla.spde2.pcmatern
+  #' 
   #' @examples 
   #' \dontrun{
   #' 
@@ -1109,7 +1125,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' dataObj <- intModel(...)
   #' 
   #' #Specify spatial field
-  #' dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, prior.range = c(1,0.001), prior.sigma = c(1,0.001))
+  #' dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, 
+  #'                        prior.range = c(1,0.001),
+  #'                        prior.sigma = c(1,0.001))
   #' #Specify for a species
   #' dataObj$specifySpatial(species = 'species', alpha = 1, PC = FALSE)
   #' 
@@ -1251,7 +1269,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param seed Seed used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}} to make the spatial blocking reproducible across different models. Defaults to \code{1234}. 
   #' @param ... Additional arguments used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}}.
   #' 
-  #' @import ggpolypath
+  #' @import ggplot2
+  #' @importFrom R.devices suppressGraphics
+  #' @importFrom blockCV spatialBlock
   #' 
   #' @examples
   #' \dontrun{
@@ -1559,6 +1579,9 @@ dataSDM$set('private', 'polyfromMesh', function(...) {
 
 #' @description Function used to add or change spatial covariates in the model.
 #' @param spatialCovariates A SpatialPixelsDataFrame or Raster* object describing covariates at each spatial point.
+#' 
+#' @import methods 
+#' @importFrom raster raster
 
 dataSDM$set('private', 'spatialCovariates', function(spatialCovariates) {
   

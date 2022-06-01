@@ -5,6 +5,9 @@
 #' @param data A intModel object to be used in the integrated model.
 #' @param options A list of INLA options used in the model. Defaults to \code{list()}.
 #' 
+#' @import inlabru
+#' @import stats
+#' 
 #' @return An inlabru model with additional lists containing some more metadata attached.
 #' 
 #' @examples 
@@ -85,7 +88,7 @@ runModel <- function(data, options = list()) {
       
       biasLikes[[paste0(bias, '_samplers')]] <- inlabru::like(formula = coordinates ~ .,
                                          family = 'cp',
-                                         data = do.call(rbind.SpatialPointsDataFrame, data$.__enclos_env__$private$modelData[[bias]]),
+                                         data = do.call(sp::rbind.SpatialPointsDataFrame, data$.__enclos_env__$private$modelData[[bias]]),
                                          samplers = data$.__enclos_env__$private$biasData[[bias]],
                                          ips = data$.__enclos_env__$private$IPS,
                                          domain = list(coordinates = data$.__enclos_env__$private$INLAmesh),
