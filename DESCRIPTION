@@ -3,7 +3,11 @@ Type: Package
 Title: Fit Models derived from Point Processes to Species Distributions using
     inlabru
 Version: 1.00
-Author: Philip Mostert
+Authors@R: c(
+  person(given = "Philip", family = "Mostert", email = "philip.s.mostert@ntnu.no",
+          role = c("aut", "cre")),
+  person(given = "Bob", family = "O'hara", email = "bob.ohara@ntnu.no",
+          role = c("aut")))
 Maintainer: Philip Mostert <philip.s.mostert@ntnu.no>
 URL: https://github.com/PhilipMostert/PointedSDMs
 BugReports: https://github.com/PhilipMostert/PointedSDMs/issues
@@ -11,23 +15,20 @@ Description: A package to fit models based integrated species distribution model
 Depends:
     R (>= 3.5),  
     stats,
-    blockCV,
-    inlabru (>= 2.5),
-    methods
+    methods,
+    ggplot2,
+    inlabru (>= 2.5)
 Imports:
     R6,
-    rgeos,
-    dplyr,
     sp (>= 1.4-5),
     raster,
-    ggpolypath,
+    INLA (>= 21.08.31),
     R.devices,
-    ggplot2
+    blockCV
 Suggests:
     testthat (>= 3.0.0),
     USAboundaries,
     sf,
-    INLA (>= 21.08.31),
     sn,
     rasterVis,
     ggmap,
@@ -42,3 +43,4 @@ License: GPL (>= 3)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 LazyData: true
+Encoding: UTF-8
