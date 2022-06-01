@@ -177,7 +177,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #' @note The arguments of this function may be missing (ie not provided) if they have already been specified in \code{\link{intModel}}, and do not need changing. Therefore this function is useful if there are some variable names not standardized across the datasets; this function will thus standardize the variable names to those provided initially in \code{\link{intModel}}.
   #' 
-  #' @importFrom INLA inla.spde2.matern
   #' @import methods
   #' 
   #' @examples
@@ -694,7 +693,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param allPO Logical: should a bias field be added to all datasets classified as presence only in the integrated model. Defaults to \code{FALSE}.
   #' @param biasField An \code{inla.spde} object used to describe the bias field. Defaults to \code{NULL} which uses \code{\link[INLA]{inla.spde2.matern}} to create a Matern model for the field.
   #' 
-  #' @importFrom INLA inla.spde2.matern
   #' 
   #' @examples
   #' \dontrun{
@@ -1115,8 +1113,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param Remove Logical: should the chosen spatial field be removed. Requires one of \code{sharedSpatial}, \code{species}, \code{mark} or \code{bias} to be non-missing, which chooses which field to remove.
   #' @param ... Additional arguments used by \pkg{INLA}'s \code{\link[INLA]{inla.spde2.pcmatern}} or \code{\link[INLA]{inla.spde2.matern}} function, dependent on the value of \code{PC}.
   #' 
-  #' @importFrom INLA inla.spde2.matern
-  #' @importFrom INLA inla.spde2.pcmatern
   #' 
   #' @examples 
   #' \dontrun{
