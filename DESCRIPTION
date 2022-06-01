@@ -21,7 +21,6 @@ Imports:
     R6,
     sp (>= 1.4-5),
     raster,
-    INLA (>= 21.08.31),
     R.devices,
     blockCV
 Suggests:
@@ -29,6 +28,7 @@ Suggests:
     USAboundaries,
     sf,
     sn,
+    INLA (>= 21.08.31),
     rasterVis,
     ggmap,
     ggpolypath,
