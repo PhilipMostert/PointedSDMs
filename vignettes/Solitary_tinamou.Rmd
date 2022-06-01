@@ -24,6 +24,7 @@ This vignette illustrates the various functions of *PointedSDMs* by using three 
 library(PointedSDMs)
 library(raster)
 library(ggpolypath)
+library(INLA)
 library(ggplot2)
 
 ```
@@ -71,6 +72,14 @@ The next object is `covariates`, a `list` of `Raster` objects of the covariates 
 covariates <- scale(stack(covariates))
 crs(covariates) <- projection
 plot(covariates)
+
+```
+
+Finally we require a *Delaunay triangulated mesh* for the construction of the spatial field. A plot of the mesh used for this vignette is provided below.
+
+```{r mesh, fig.width=8, fig.height=5}
+
+plot(mesh)
 
 ```
 
