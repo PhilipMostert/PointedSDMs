@@ -9,7 +9,7 @@ changeCoords <- function(data, oldcoords, newcoords) {
   
   lapply(data, function(dat) {
     
-    if (class(dat) == 'data.frame') {
+    if (inherits(dat,'data.frame')) {
       
       if (!all(oldcoords %in% names(dat))) stop('Coordinate names specified not in dataset.')
       else {

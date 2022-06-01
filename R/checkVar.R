@@ -9,7 +9,7 @@
 checkVar <- function(data, var) {
   
   var_in <- sapply(data, function(dat) {
-    if (class(dat) == "data.frame") 
+    if (inherits(dat,'data.frame')) 
       var %in% names(dat)
     else if (inherits(dat, "Spatial")) {
    
