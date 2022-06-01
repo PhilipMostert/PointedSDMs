@@ -2,14 +2,14 @@
 #' @name elev_raster
 #' @docType data
 #' @keywords data
-#' @references \url{https://cran.r-project.org/web/packages/elevatr/index.html}
+#' @references \url{https://cran.r-project.org/package=elevatr}
 NULL
 
 #' Raster object containing the canopy cover across Pennsylvania state.
 #' @name NLCD_canopy_raster
 #' @docType data
 #' @keywords data
-#' @references \url{https://cran.r-project.org/web/packages/FedData/index.html}
+#' @references \url{https://cran.r-project.org/package=FedData}
 NULL
 
 #' Dataset of setophaga caerulescens across Pennsylvania state.
