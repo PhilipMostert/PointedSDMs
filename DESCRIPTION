@@ -32,6 +32,7 @@ Suggests:
     sn,
     rasterVis,
     ggmap,
+    ggpolypath,
     RColorBrewer,
     cowplot,
     knitr,

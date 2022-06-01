@@ -23,6 +23,7 @@ This vignette illustrates the various functions of *PointedSDMs* by using three 
 
 library(PointedSDMs)
 library(raster)
+library(ggpolypath)
 library(INLA)
 library(ggplot2)
 
