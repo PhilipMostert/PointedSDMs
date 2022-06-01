@@ -11,7 +11,7 @@ Authors@R: c(
 Maintainer: Philip Mostert <philip.s.mostert@ntnu.no>
 URL: https://github.com/PhilipMostert/PointedSDMs
 BugReports: https://github.com/PhilipMostert/PointedSDMs/issues
-Description: A package to fit models based integrated species distribution models using hetrogeneous data.
+Description: A package to fit integrated species distribution models using a variety of hetrogeneous data.
 Depends:
     R (>= 3.5),  
     stats,
