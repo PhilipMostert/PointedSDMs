@@ -74,14 +74,6 @@ plot(covariates)
 
 ```
 
-Finally we require a *Delaunay triangulated mesh* for the construction of the spatial field. A plot of the mesh used for this vignette is provided below.
-
-```{r mesh, fig.width=8, fig.height=5}
-
-plot(mesh)
-
-```
-
 ### Base model
 
 To set up an integrated species distribution model with `PointedSDMs`, we initialize it with the `intModel` function -- which results in an *R6* objects with additional slot functions to further customize the model. The base model we run for these data comprises of the spatial covariates and an intercept term for each dataset.
