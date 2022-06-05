@@ -130,7 +130,8 @@ Spatial fields are fundamental in our spatial species distribution models, and s
 
 
 fields <- intModel(datasets, Coordinates = c('X', 'Y'),
-                   Projection = projection, Mesh = mesh, responsePA = 'Present', Offset = 'area',
+                   Projection = projection, Mesh = mesh, responsePA = 'Present', 
+                   Offset = 'area',
                    pointsIntercept = FALSE)
 
 ```
