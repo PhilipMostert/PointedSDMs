@@ -605,12 +605,12 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     else {
       ##Add if species; then remove first species_spatial
       
-      if (!is.null(private$speciesName) && private$Spatial) {
-        ##Select species_spatial with lowest ngroup...
-        ##or maybe just do ngroups again ...
-        private$Components <- private$Components[!grepl(paste0('^',private$speciesName,'_spatial'), private$Components)]
-        
-      }
+      #if (!is.null(private$speciesName) && private$speciesSpatial) {
+      #  ##Select species_spatial with lowest ngroup...
+      #  ##or maybe just do ngroups again ...
+      #  private$Components <- private$Components[!grepl(paste0('^',private$speciesName,'_spatial'), private$Components)]
+      #  
+      #}
       
       newComponents <- pointData$makeComponents(spatial = private$Spatial, intercepts = private$Intercepts,
                                                 marks = markNames, datanames = dataNames, speciesname = speciesName,
@@ -1154,7 +1154,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (sum(sharedSpatial, !missing(datasetName), !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please only choose one of sharedSpatial, datasetName, species, mark or bias.')
     
-    if (Remove && sum(sharedSpatial, datasetName, !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please choose one of sharedSpatial, datasetName, species, mark or bias to remove.')
+    if (Remove && sum(sharedSpatial, !missing(datasetName), !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please choose one of sharedSpatial, datasetName, species, mark or bias to remove.')
     
     if (sharedSpatial) {
       

@@ -74,7 +74,7 @@ test_that('dataSDMs initialize works as expected.', {
                        spatialcovariates = cov,
                        speciesname = speciesName,
                        ips = iPoints,
-                       spatial = TRUE, temporal = temporalName, 
+                       spatial = 'shared', temporal = temporalName, 
                        intercepts = TRUE, temporalmodel = temporalModel)
   ##Test private classes
   expect_true(all(check$.__enclos_env__$private$Coordinates%in%coordnames))
@@ -88,7 +88,7 @@ test_that('dataSDMs initialize works as expected.', {
   expect_true(all(check$.__enclos_env__$private$markFamily == marksFamily))
   expect_true(!is.null(check$.__enclos_env__$private$trialsMarks))
   
-  expect_true(check$.__enclos_env__$private$Spatial)
+  expect_equal(check$.__enclos_env__$private$Spatial, 'shared')
   expect_true(check$.__enclos_env__$private$Intercepts)
   
   expect_equal(check$.__enclos_env__$private$temporalName, 'temp')
@@ -103,7 +103,7 @@ test_that('dataSDMs initialize works as expected.', {
                            pointcovariates = pointCovs,
                            spatialcovariates = spatCovs,
                            ips = iPoints,
-                           spatial = FALSE,
+                           spatial = NULL,
                            intercepts = FALSE),
                'At least one of responseCounts and responsePA are NULL. Please provide both.')
   
@@ -118,7 +118,7 @@ test_that('dataSDMs initialize works as expected.', {
                            pointcovariates = pointCovs,
                            spatialcovariates = spatCovs,
                            ips = iPoints,
-                           spatial = FALSE,
+                           spatial = NULL,
                            intercepts = FALSE),
                'Mesh needs to be an inla.mesh object.')
   
@@ -133,7 +133,7 @@ test_that('dataSDMs initialize works as expected.', {
                            pointcovariates = pointCovs,
                            spatialcovariates = spatCovs,
                            ips = iPoints,
-                           spatial = FALSE,
+                           spatial = NULL,
                            intercepts = FALSE),
                'Coordinates needs to be a vector of length 2 containing the coordinate names.')
   
@@ -148,7 +148,7 @@ test_that('dataSDMs initialize works as expected.', {
                            pointcovariates = pointCovs,
                            spatialcovariates = spatCovs,
                            ips = iPoints,
-                           spatial = FALSE,
+                           spatial = NULL,
                            intercepts = FALSE),
                'Coordinates need to be unique values.')
   
@@ -163,7 +163,7 @@ test_that('dataSDMs initialize works as expected.', {
                            pointcovariates = pointCovs,
                            spatialcovariates = spatCovs,
                            ips = iPoints,
-                           spatial = FALSE,
+                           spatial = NULL,
                            intercepts = FALSE),
                'Projection needs to be a CRS object.')
   
@@ -284,7 +284,7 @@ test_that('specifySpatial can correctly specify the spatial fields', {
   
   #Check errors:
    #give none of: sharedSpatial, species, mark, bias
-  expect_error(check$specifySpatial(prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'At least one of sharedSpatial, dataset, species or mark needs to be provided.')
+  expect_error(check$specifySpatial(prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'At least one of sharedSpatial, datasetName, dataset, species or mark needs to be provided.')
    #give wrong species name
   expect_error(check$specifySpatial(Species = 'elephant', prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'Species name provided is not currently in the model.')
    #give wrong mark name
