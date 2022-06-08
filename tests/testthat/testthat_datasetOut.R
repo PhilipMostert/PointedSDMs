@@ -56,7 +56,7 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
   obj <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
                  IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                  responsePA = responsePA, markNames = c('factvar'), markFamily = c('multinomial'),
-                 speciesName = speciesName, spatialCovariates = cov, pointsSpatial= FALSE)
+                 speciesName = speciesName, spatialCovariates = cov, pointsSpatial = NULL)
   
   spatMod <- runModel(data = obj,
                       options  = list(control.inla=list(int.strategy='eb')))
