@@ -1567,6 +1567,7 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
     else private$IPS <- inlabru::ipoints(domain = Inlamesh)
     
   }
+  private$IPS@proj4string <- projection
   
   private$Spatial <- spatial
   private$marksSpatial <- marksspatial
