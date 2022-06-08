@@ -28,7 +28,6 @@ Suggests:
     USAboundaries,
     sf,
     sn,
-    devtools,
     INLA (>= 21.08.31),
     rasterVis,
     ggmap,

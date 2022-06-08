@@ -36,8 +36,6 @@ This *R markdown* file illustrates an example of modelling an ISDM with *Pointed
 ```{r Install PointedSDMs, warning = FALSE, message = FALSE, eval = TRUE}
 
 ##Install if need be
-library(devtools)
-if (!require(PointedSDMs)) install_github('PhilipMostert/PointedSDMs')
 library(PointedSDMs)
 
 ```
