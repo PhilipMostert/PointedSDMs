@@ -1,5 +1,5 @@
 ---
-title: "Setophaga multispecies example"
+title: "Setophaga example"
 author: "Philip Mostert"
 date: "`r Sys.Date()`"
 bibliography: '`r system.file("References.bib", package="PointedSDMs")`'
