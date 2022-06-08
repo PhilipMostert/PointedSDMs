@@ -91,7 +91,7 @@ To set up an integrated species distribution model with `PointedSDMs`, we initia
 
 base <- intModel(datasets, spatialCovariates = covariates, Coordinates = c('X', 'Y'),
                  Projection = projection, responsePA = 'Present', Offset = 'area',
-                 Mesh = mesh, pointsSpatial = FALSE)
+                 Mesh = mesh, pointsSpatial = NULL)
 
 ```
 
