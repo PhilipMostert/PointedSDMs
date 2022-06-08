@@ -82,9 +82,18 @@ datasetOut <- function(model, dataset,
   }
     
   
-  if (model$spatial$points) {
-      ##Also assign the speciesModel and the marksModel
-      assign('shared_field', model$bru_info$model$effects[[1]]$env[['spdeModel']])
+  if (!is.null(model$spatial$points)) {
+      
+      if (model$spatial$points == 'shared') assign('shared_field', model$bru_info$model$effects[[1]]$env[['spdeModel']])
+      else {
+        
+        for (data in unique(model$source)) {
+          
+          assign(paste0(data, '_field'),  model$bru_info$model$effects[[paste0(data,'field')]]$env[[paste0(data,'field')]])
+          
+        }
+        
+      }
       
     } else spdeModel <- NULL
     
@@ -179,7 +188,7 @@ datasetOut <- function(model, dataset,
     
 
     
-    class(model_reduced) <- c('bru_sdm',class(model_reduced))
+    class(model_reduced) <- c('bruSDM',class(model_reduced))
     
     model_results[[paste0('Leaving_out_',dataname)]] <- model_reduced
     

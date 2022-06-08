@@ -327,7 +327,11 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             
           }
         
-            if (spatial) spat <- 'shared_spatial'
+          if (!is.null(spatial)) {
+            if (spatial == 'shared') spat <- 'shared_spatial'
+            else 
+              if (spatial == 'individual') spat <- paste0(names(self$Data)[[dataset]], '_spatial')
+        }
             else spat <- NULL
             
           
@@ -451,10 +455,19 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   if (length(self$SpeciesInData) != 0) species <- unique(unlist(self$SpeciesInData))
   else species = NULL
   
-  if (spatial) {
+  if (!is.null(spatial)) {
+    
+    if (spatial == 'shared') {
     
     if (!is.null(temporalname)) spat <- paste0('shared_spatial(main = coordinates, model = shared_field, group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
     else spat <- paste0('shared_spatial(main = coordinates, model = shared_field)')
+    
+    }
+    else {
+      
+     spat <-  paste0(datanames, '_spatial(main = coordinates, model =', paste0(datanames,'_field'),')')
+      
+    }
     
   } else spat <- NULL
   

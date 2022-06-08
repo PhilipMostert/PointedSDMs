@@ -17,7 +17,7 @@
 #' @param Offset Name of the offset variable (class \code{character}) in the datasets. Defaults to \code{NULL}; if the argument is non-\code{NULL}, the variable name needs to be standardized across datasets (but does not need to be included in all datasets). The offset variable will be transformed onto the log-scale in the integrated model.
 #' @param pointsIntercept Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.
 #' @param marksIntercept Logical argument: should the marks be modeled with intercepts. Defaults to \code{TRUE}.
-#' @param pointsSpatial Logical argument: should the points have a shared spatial field. Defaults to \code{TRUE}.
+#' @param pointsSpatial Argument to determine whether the spatial field is shared between the datasets, or if each dataset has its own unique spatial field. May take on the values: \code{"shared"}, \code{"individual"} or \code{NULL} if no spatial field is required for the model. Defaults to \code{"shared"}.
 #' @param marksSpatial Logical argument: should the marks have their own spatial field. Defaults to \code{TRUE}.
 #' @param responseCounts Name of the response variable in the counts/abundance datasets. This variable name needs to be standardized across all counts datasets used in the integrated model. Defaults to \code{'counts'}.
 #' @param responsePA Name of the response variable (class \code{character}) in the presence absence/detection non-detection datasets. This variable name needs to be standardized across all present absence datasets. Defaults to \code{'present'}.
@@ -72,9 +72,12 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
                      speciesSpatial = TRUE,
                      markNames = NULL, markFamily = NULL,
                      pointCovariates = NULL, pointsIntercept = TRUE, marksIntercept = TRUE,
-                     Offset = NULL, pointsSpatial = TRUE, marksSpatial = TRUE,
+                     Offset = NULL, pointsSpatial = 'shared', marksSpatial = TRUE,
                      responseCounts = 'counts', responsePA = 'present', trialsPA = NULL,
                      trialsMarks = NULL, speciesName = NULL, temporalName = NULL, temporalModel = list(model = 'ar1')) {
+  
+  ##Things to do: make pointsSpatial one of: 'shared', 'individual', or NULL
+   #Need to make a whole new list for all the individual spatial field effects...
   
   if (length(Coordinates) != 2) stop('Coordinates needs to be a vector of length 2 containing the coordinate names.')
   
@@ -84,10 +87,19 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
   
   if (class(Mesh) != 'inla.mesh') stop('Mesh needs to be a inla.mesh object.')
   
-  if (!pointsSpatial && !is.null(temporalName)) {
+  
+  if (!is.null(pointsSpatial)) {
     
-    pointsSpatial <- TRUE
-    message('Setting pointsSpatial to TRUE since it is required for the temporalModel.')
+  if (length(pointsSpatial) != 1) stop('PointsSpatial needs to be one of: "shared", "individual" or NULL.')
+    
+  if (!pointsSpatial %in% c('shared', 'individual')) stop('PointsSpatial needs to be one of: "shared", "individual" or NULL.')
+    
+  } 
+  
+  if (pointsSpatial != 'shared' && !is.null(temporalName)) {
+    
+    pointsSpatial <- 'shared'
+    message('Setting pointsSpatial to "shared" since it is required for the temporalModel.')
     
   }
   

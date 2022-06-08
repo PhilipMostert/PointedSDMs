@@ -39,7 +39,7 @@ runModel <- function(data, options = list()) {
   
   data2ENV(data = data, env = environment())
   
-  if (data$.__enclos_env__$private$Spatial) pointsSpatial <- TRUE
+  if (!is.null(data$.__enclos_env__$private$Spatial)) pointsSpatial <- data$.__enclos_env__$private$Spatial
   else pointsSpatial <- FALSE
   
   if (!is.null(names(data$spatialFields$markFields))) marksSpatial <- TRUE

@@ -277,9 +277,19 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    if (private$Spatial) {
+    if (!is.null(private$Spatial)) {
       
-      if (is.null(self$spatialFields$sharedField[['sharedField']])) self$spatialFields$sharedField[['sharedField']] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+      if (private$Spatial == 'shared' && is.null(self$spatialFields$sharedField[['sharedField']])) self$spatialFields$sharedField[['sharedField']] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+      
+      else {
+        
+        for (dataset in dataNames) {
+          
+          if (is.null(self$spatialFields$datasetFields[[dataset]])) self$spatialFields$datasetFields[[dataset]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+          
+        }
+        
+      }
       
     }
     
@@ -1105,7 +1115,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   ,
   #' @description Function to specify random fields in the model using penalizing complexity (PC) priors for the parameters.
   #' 
-  #' @param sharedSpatial Logical: specify the shared spatial field in the model. Defaults to \code{FALSE}.
+  #' @param sharedSpatial Logical: specify the shared spatial field in the model. Requires \code{pointsSpatial == 'shared'} in \code{\link{intModel}}. Defaults to \code{FALSE}.
+  #' @param datasetName Name of which of the datasets' spatial fields to be specified. Requires \code{pointsSpatial = 'individual'} in \code{\link{intModel}}.
   #' @param Species Name of which of the species' spatial field to be specified. Requires \code{speciesName} to be non-\code{NULL} in \code{\link{intModel}}.
   #' @param Mark Name of which of the mark' spatial field to be specified. Requires \code{markNames} to be non-\code{NULL} in \code{\link{intModel}}.
   #' @param Bias Name of the dataset for which the bias field to be specified.
@@ -1133,24 +1144,38 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #' }
   
-  specifySpatial = function(sharedSpatial = FALSE, 
+  specifySpatial = function(sharedSpatial = FALSE,
+                            datasetName,
                             Species, Mark,
                             Bias, PC = TRUE,
                             Remove = FALSE, ...) {
     
-    if (all(!sharedSpatial && missing(Species)  && missing(Mark)  &&  missing(Bias))) stop('At least one of sharedSpatial, dataset, species or mark needs to be provided.')
+    if (all(!sharedSpatial && missing(datasetName) && missing(Species)  && missing(Mark)  &&  missing(Bias))) stop('At least one of sharedSpatial, datasetName, dataset, species or mark needs to be provided.')
     
-    if (sum(sharedSpatial, !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please only choose one of sharedSpatial, species, mark or bias.')
+    if (sum(sharedSpatial, !missing(datasetName), !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please only choose one of sharedSpatial, datasetName, species, mark or bias.')
     
-    if (Remove && sum(sharedSpatial, !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please choose one of sharedSpatial, species, mark or bias to remove.')
+    if (Remove && sum(sharedSpatial, datasetName, !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please choose one of sharedSpatial, datasetName, species, mark or bias to remove.')
     
     if (sharedSpatial) {
       
-      if (!private$Spatial) stop('Shared spatial field not included in the model. Please use pointsSpatial = TRUE in intModel.')
+      if (is.null(private$Spatial)) stop('Shared spatial field not included in the model. Please use pointsSpatial = "shared" in intModel.')
+      else 
+        if (private$Spatial == 'individual') stop('pointsSpatial specified as "individual" in intModel. Please specify a dataset spatial effect to specify with datasetName.')
+      
       
       field_type <- 'sharedField'
       if (!Remove) index <- 'sharedField'
       else index <- 'shared_spatial'
+      
+    }
+    
+    if (!missing(datasetName)) {
+      
+      if (!datasetName %in% unlist(private$dataSource)) stop('Dataset name provided is not currently in the model.')
+      
+      field_type <- 'datasetFields'
+      if (!Remove) index <- datasetName
+      else index <- datasetName
       
     }
     
@@ -1455,7 +1480,7 @@ dataSDM$set('private', 'spatcovsEnv', NULL)
 dataSDM$set('private', 'spatcovsClass', NULL)
 dataSDM$set('private', 'dataSource', NULL)
 
-dataSDM$set('private', 'Spatial', TRUE)
+dataSDM$set('private', 'Spatial', 'shared')
 dataSDM$set('private', 'marksSpatial', TRUE)
 dataSDM$set('private', 'Intercepts', TRUE)
 dataSDM$set('private', 'marksIntercepts', TRUE)
@@ -1706,6 +1731,7 @@ dataSDM$set('public', 'samplingBias', function(datasetName, Samplers) {
 
 ## Need to change all the spatialFields to self$spatialFields and then the relevent sublist?
 dataSDM$set('public', 'spatialFields', list(sharedField = list(),
+                                            datasetFields = list(),
                                             speciesFields = list(),
                                             markFields = list(),
                                             biasFields = list()))

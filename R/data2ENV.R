@@ -61,9 +61,19 @@ data2ENV <- function(data, env) {
     
   }
   
-  if (data$.__enclos_env__$private$Spatial) {
+  if (!is.null(data$.__enclos_env__$private$Spatial)) {
     
-    assign('shared_field', data$spatialFields$sharedField$sharedField, envir = env)
+    if (data$.__enclos_env__$private$Spatial == 'shared') assign('shared_field', data$spatialFields$sharedField$sharedField, envir = env)
+    
+    else {
+
+      for (dataset in names(data$spatialFields$datasetFields)) {
+       
+        assign(paste0(dataset, '_field'), data$spatialFields$datasetFields[[dataset]], envir = env)
+        
+      }
+      
+    }
 
   } 
   

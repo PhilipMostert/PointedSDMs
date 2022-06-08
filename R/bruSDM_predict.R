@@ -17,7 +17,7 @@ setClass('bruSDM_predict')
 #' @param temporal Make predictions for the temporal component of the model.
 #' @param spatial Logical: include spatial effects in prediction. Defaults to \code{FALSE}.
 #' @param intercepts Logical: include intercept terms in prediction. Defaults to \code{FALSE}.
-#' @param datasets Names of the datasets to include intercept term. Default of \code{NULL} results in all datasets being predicted.
+#' @param datasets Names of the datasets to include intercept and spatial term.
 #' @param species Names of the species to predict. Default of \code{NULL} results in all species being predicted.
 #' @param biasfield Logical include bias field in prediction. Defaults to \code{FALSE}.
 #' @param biasnames Names of the datasets to include bias term. Defaults to \code{NULL}. Note: the chosen dataset needs to be run with a bias field first; this can be done using \code{.$addBias} with the object produced by \code{\link{intModel}}.
@@ -70,6 +70,8 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   if (sum(predictor, temporal, biasfield) > 1) stop('Please only choose one of: predictor, temporal and biasfield.')
   ## if non-null biasfields ## if no bias fields in stop: if biasnames not in biasfields stop
   if (biasfield && spatial) stop('Please choose one of biasfield and spatial.')
+  
+  if (is.null(datasets)) datasets <- unique(object$source)
   
   if (!is.null(unlist(object[['species']][['speciesIn']]))) {
     
@@ -190,8 +192,10 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (spatial) {
       
-      if (!'shared_spatial' %in% names(object$summary.random)) stop('Model run without spatial effects. Please specify Spatial = TRUE in intModel.')
-      else spatial_obj <- 'shared_spatial'
+      if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
+      else 
+        if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in intModel.')
+      else spatial_obj <- paste0(datasets, '_spatial')
       
     } 
     else spatial_obj <- NULL
