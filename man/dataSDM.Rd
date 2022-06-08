@@ -554,6 +554,7 @@ Function to specify random fields in the model using penalizing complexity (PC) 
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$specifySpatial(
   sharedSpatial = FALSE,
+  datasetName,
   Species,
   Mark,
   Bias,
@@ -566,7 +567,9 @@ Function to specify random fields in the model using penalizing complexity (PC) 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{sharedSpatial}}{Logical: specify the shared spatial field in the model. Defaults to \code{FALSE}.}
+\item{\code{sharedSpatial}}{Logical: specify the shared spatial field in the model. Requires \code{pointsSpatial == 'shared'} in \code{\link{intModel}}. Defaults to \code{FALSE}.}
+
+\item{\code{datasetName}}{Name of which of the datasets' spatial fields to be specified. Requires \code{pointsSpatial = 'individual'} in \code{\link{intModel}}.}
 
 \item{\code{Species}}{Name of which of the species' spatial field to be specified. Requires \code{speciesName} to be non-\code{NULL} in \code{\link{intModel}}.}
 

@@ -19,7 +19,7 @@ intModel(
   pointsIntercept = TRUE,
   marksIntercept = TRUE,
   Offset = NULL,
-  pointsSpatial = TRUE,
+  pointsSpatial = "shared",
   marksSpatial = TRUE,
   responseCounts = "counts",
   responsePA = "present",
@@ -59,7 +59,7 @@ intModel(
 
 \item{Offset}{Name of the offset variable (class \code{character}) in the datasets. Defaults to \code{NULL}; if the argument is non-\code{NULL}, the variable name needs to be standardized across datasets (but does not need to be included in all datasets). The offset variable will be transformed onto the log-scale in the integrated model.}
 
-\item{pointsSpatial}{Logical argument: should the points have a shared spatial field. Defaults to \code{TRUE}.}
+\item{pointsSpatial}{Argument to determine whether the spatial field is shared between the datasets, or if each dataset has its own unique spatial field. May take on the values: \code{"shared"}, \code{"individual"} or \code{NULL} if no spatial field is required for the model. Defaults to \code{"shared"}.}
 
 \item{marksSpatial}{Logical argument: should the marks have their own spatial field. Defaults to \code{TRUE}.}
 

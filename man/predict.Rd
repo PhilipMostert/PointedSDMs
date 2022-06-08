@@ -42,7 +42,7 @@
 
 \item{intercepts}{Logical: include intercept terms in prediction. Defaults to \code{FALSE}.}
 
-\item{datasets}{Names of the datasets to include intercept term. Default of \code{NULL} results in all datasets being predicted.}
+\item{datasets}{Names of the datasets to include intercept and spatial term.}
 
 \item{species}{Names of the species to predict. Default of \code{NULL} results in all species being predicted.}
 
