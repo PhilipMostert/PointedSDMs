@@ -1,4 +1,5 @@
 test_that('makeLhoods makes a list of likelihoods', {
+  skip_on_cran()
   
   ##Set up a model
   ##Set up arbitrary data

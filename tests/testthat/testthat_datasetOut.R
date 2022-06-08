@@ -2,6 +2,7 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
   
   ##First generate a model:
    ##Just import a model??
+  skip_on_cran()
   
   projection <- CRS('+proj=tmerc')
   x <- c(16.48438,  17.49512,  24.74609, 22.59277, 16.48438)

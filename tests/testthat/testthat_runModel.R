@@ -1,4 +1,5 @@
 test_that('runModel runs a dataSDM object, and produces an INLA model with extra metadata.', {
+  skip_on_cran()
   
   ##Set up a model
   ##Set up arbitrary data
