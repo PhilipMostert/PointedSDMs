@@ -279,7 +279,7 @@ test_that('makeComponents is able to make the correct components for all the pro
     
     ## Change arguments
     #spatial and intercepts == FALSE
-    comps2 <- Check$makeComponents(spatial = FALSE, intercepts = FALSE, datanames = c('PO','PA'),
+    comps2 <- Check$makeComponents(spatial = NULL, intercepts = FALSE, datanames = c('PO','PA'),
                                   marks = c('numvar', 'factvar', 'binommark'), marksspatial = FALSE, offsetname = NULL,
                                   multinomnames = 'factvar', pointcovariates = 'pointcov', marksintercept = FALSE,
                                   speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = TRUE,
