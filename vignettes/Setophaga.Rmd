@@ -2,7 +2,7 @@
 title: "Setophaga multispecies example"
 author: "Philip Mostert"
 date: "`r Sys.Date()`"
-bibliography: References.bib
+bibliography: '`r system.file("References.bib", package="PointedSDMs")`'
 biblio-style: authoryear
 output: rmarkdown::html_vignette
 vignette: >
