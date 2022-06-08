@@ -1,5 +1,5 @@
 ##Load in the necessary data
-Check <- dataOrganize$new()
+Check <- dataOrganize$new() 
 
 projection <- CRS('+proj=tmerc')
 
@@ -162,7 +162,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', markintercept = TRUE,
                                paresp = 'PAresp', countresp = 'counts', marksspatial = TRUE, speciesspatial = TRUE,
                                marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
-                               spatial = TRUE, intercept = TRUE, pointcovs = 'pointcov')
+                               spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov')
             
             expect_setequal(names(Check$Formulas), c('PO', 'PA'))
             expect_setequal(names(Check$Formulas$PO), c('fish1','fish2'))
@@ -204,7 +204,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', temporalname = 'temp',
                                paresp = 'PAresp', countresp = 'counts', marksspatial = FALSE, speciesspatial = FALSE,
                                marks = c('numvar', 'factvar', 'binommark'), markintercept = FALSE,
-                               spatial = FALSE, intercept = FALSE, pointcovs = 'pointcov')
+                               spatial = NULL, intercept = FALSE, pointcovs = 'pointcov')
           
             
             expect_setequal(Check$Formulas$PO$fish1$coordinates$RHS,
@@ -224,7 +224,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             Check$makeFormulas(spatcovs = NULL, speciesname = 'species', marksspatial = TRUE, speciesspatial = TRUE,
                                paresp = 'PAresp', countresp = 'counts', markintercept = FALSE,
                                marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
-                               spatial = TRUE, intercept = TRUE, pointcovs = 'pointcov')
+                               spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov')
             
             expect_setequal(Check$Formulas$PO$fish1$coordinates$RHS,
                             c("fish1_spatial", "shared_spatial", "fish1_intercept"))
@@ -244,12 +244,12 @@ test_that('makeFormulas is able to make the correct formulas for the different p
 Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', marksspatial = TRUE,
                    paresp = 'PAresp', countresp = 'counts', markintercept = TRUE, speciesspatial = TRUE,
                    marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
-                   spatial = TRUE, intercept = TRUE, pointcovs = 'pointcov')
+                   spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov')
 
 test_that('makeComponents is able to make the correct components for all the processes
           based on the predictors and spatial effects available.', {
             
-    comps <- Check$makeComponents(spatial = TRUE, intercepts = TRUE, datanames = c('PO','PA'), marksintercept = TRUE,
+    comps <- Check$makeComponents(spatial = 'shared', intercepts = TRUE, datanames = c('PO','PA'), marksintercept = TRUE,
                          marks = c('numvar', 'factvar', 'binommark'), temporalmodel = deparse(list(model = "ar1")),
                          multinomnames = 'factvar', pointcovariates = 'pointcov', marksspatial = TRUE, offsetname = NULL,
                          speciesname = 'species', covariatenames = 'spatcovs', temporalname = 'temp', speciesspatial = TRUE,

@@ -328,11 +328,13 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           }
         
           if (!is.null(spatial)) {
-            if (spatial == 'shared') spat <- 'shared_spatial'
+            
+            
+           if (spatial == 'shared') spat <- 'shared_spatial'
             else 
               if (spatial == 'individual') spat <- paste0(names(self$Data)[[dataset]], '_spatial')
-        }
-            else spat <- NULL
+              
+              } else spat <- NULL
             
           
 
@@ -363,7 +365,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             }
             else {
               
-              if (spatial) spat <- NULL
+              if (!is.null(spatial)) spat <- NULL
               
               if (marksspatial) {
                 
