@@ -10,14 +10,15 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 
 ```
 
 ## Introduction
 
-This vignette illustrates the various functions of *PointedSDMs* by using three datasets of the solitary tinamou (*Tinamus solitarius) --* a species of ground bird found on the eastern side of Brazil.
+This vignette illustrates the various functions of *PointedSDMs* by using three datasets of the solitary tinamou (*Tinamus solitarius) --* a species of ground bird found on the eastern side of Brazil. Due to package dependencies, this vignette is not run. However the data and *R* script are available such that the user may carry out inference.
 
 ```{r setup, warning = FALSE, message = FALSE}
 
