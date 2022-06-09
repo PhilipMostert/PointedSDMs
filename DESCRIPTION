@@ -1,7 +1,7 @@
 Package: PointedSDMs
 Type: Package
 Title: Fit Models Derived from Point Processes to Species Distributions using Inlabru
-Version: 1.00
+Version: 1.05
 Authors@R: c(
   person(given = "Philip", family = "Mostert", email = "philip.s.mostert@ntnu.no",
           role = c("aut", "cre")),
@@ -10,7 +10,8 @@ Authors@R: c(
 Maintainer: Philip Mostert <philip.s.mostert@ntnu.no>
 URL: https://github.com/PhilipMostert/PointedSDMs
 BugReports: https://github.com/PhilipMostert/PointedSDMs/issues
-Description: A package to fit integrated species distribution models using a variety of heterogeneous datasets.
+Description: Integrated species distribution modeling is a rising field in quantitative ecology thanks to significant rises in the quantity of data available, increases in computational speed and the proven benefits of using such models. Despite this, the general software to help ecologists construct such models in an easy-to-use framework is lacking. We therefore introduce the R package PointedSDMs: which provides the tools to help ecologists set up integrated models and perform inference on them. There are also functions within the package to help run spatial cross-validation for model selection, as well as generic plotting and predicting functions.  
+
 Depends:
     R (>= 3.5),  
     stats,
