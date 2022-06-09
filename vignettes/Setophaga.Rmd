@@ -33,12 +33,14 @@ A major handicap to integrated modeling lies in the fact that the tools required
 In light of this impediment to the field of integrated modelling, we decided to make *PointedSDMs*, an *R* package to help simplify the modelling process of integrated species distribution models (ISDMs) for ecologists. It does so by using the *INLA* framework [@rue2009approximate] to approximate the models and by constructing wrapper functions around those provided in the *R* package, *inlabru* [@bachl2019inlabru].
 
 This *R markdown* file illustrates an example of modelling an ISDM with *PointedSDMs,* using five disparate datasets containing species *Setophaga* collected around Pennsylvania state (United States of America). The first part of this file contains a brief introduction to the statistical model used in ISDMs, as well as an introduction to the included functions in the package. The second part of this file uses *PointedSDMs* to run the ISDM for the provided data. We note that, for this particular vignette, no inference was made due to computational intensity of the model. However the *R* script and data are provided below so that the user may carry out inference.
+
 ```{r Install PointedSDMs, warning = FALSE, message = FALSE, eval = TRUE}
 
 ##Install if need be
 library(PointedSDMs)
 
 ```
+
 ### Statistical model
 
 The goal of our statistical model is to infer the "true" distribution of our species' using the observations we have at hand, as well as environmental covariates describing the studied area, $\boldsymbol{X}$, and other parameters describing the species, $\boldsymbol{\theta}$. To do so, we construct a hierarchical state-space model composing of two parts: the underlying process model as well as observation models.
@@ -140,19 +142,13 @@ Their script was slightly adapted to obtain observations from the species, *magn
 
 The github repository noted above also contains two additional structured datasets (*BBA, BBS*), which were both assumed to be presence absence datasets in the study conducted by @isaac2020data, containing the variable, *NPres*, denoting the presence (or number of presences in the *BBS* dataset) at each sampling location. However, we changed the *NPres* variable name of the *BBS* dataset to *Counts* in order to consider it a counts dataset for illustrative purposes. No additional changes were made to the *BBA* dataset, and so it was considered a presence absence dataset as originally intended.\
 
-+----------------------+------------------------+----------------------------+------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Dataset name**     | Sampling protocol      | **Number of observations** | **Species name** | **Source**                                                                                                                                     |
-+:====================:+:======================:+:==========================:+:================:+:==============================================================================================================================================:+
-| *BBS*                | Counts                 | 45                         | *Caerulescens*   | [North American Breeding Bird Survey](https://www.pwrc.usgs.gov/bbs/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
-+----------------------+------------------------+----------------------------+------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
-| *BBA*                | Detection/nondetection | 5165                       | *Caerulescens*   | [Pennsylvania Breeding Bird Atlas](http://www.pabirdatlas.psu.edu/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}   |
-+----------------------+------------------------+----------------------------+------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
-| *eBird_caerulescens* | Present only           | 264                        | *Caerulescens*   | [eBird](https://ebird.org/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                                           |
-+----------------------+------------------------+----------------------------+------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
-| *eBird_magnolia*     | Present only           | 354                        | *Magnolia*       | [eBird](https://ebird.org/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                                           |
-+----------------------+------------------------+----------------------------+------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
-| *eBird_fusca*        | Present only           | 217                        | *Fusca*          | [eBird](https://ebird.org/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                                           |
-+----------------------+------------------------+----------------------------+------------------+------------------------------------------------------------------------------------------------------------------------------------------------+
+|   **Dataset name**   |   Sampling protocol    | **Number of observations** | **Species name** |                                                                   **Source**                                                                   |
+|:--------:|:--------:|:--------:|:--------:|:-------------------------------:|
+|        *BBS*         |         Counts         |             45             |  *Caerulescens*  | [North American Breeding Bird Survey](https://www.pwrc.usgs.gov/bbs/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
+|        *BBA*         | Detection/nondetection |            5165            |  *Caerulescens*  |  [Pennsylvania Breeding Bird Atlas](http://www.pabirdatlas.psu.edu/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}  |
+| *eBird_caerulescens* |      Present only      |            264             |  *Caerulescens*  |                    [eBird](https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                    |
+|   *eBird_magnolia*   |      Present only      |            354             |    *Magnolia*    |                      [eBird](https://ebird.org/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                      |
+|    *eBird_fusca*     |      Present only      |            217             |     *Fusca*      |                      [eBird](https://ebird.org/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                      |
 
 Table 1: Table illustrating the different datasets used in the analysis.
 

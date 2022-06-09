@@ -16,7 +16,7 @@ species distribution models (ISDMs) for large collections of
 heterogeneous data. It does so by building wrapper functions around
 [inlabru](https://doi.org/10.1111/2041-210X.13168),
 which uses the [INLA
-methodology](https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-9868.2008.00700.x)
+methodology](https://doi.org/10.1111/j.1467-9868.2008.00700.x)
 to estimate a class of latent Gaussian models.
 
 ## Installation
