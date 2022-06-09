@@ -450,7 +450,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (missing(pointCovariates)) pointCovariates <- private$pointCovariates
     else private$pointCovariates <- pointCovariates <- unique(c(private$pointCovariates, pointCovariates))
     
-    if (!is.null(private$pointCovariates) && class(pointCovariates) != 'character') stop('pointCovariates is required to be a vector containing the names of the covariates found in the datasets.')
+    if (!is.null(private$pointCovariates) && !inherits(pointCovariates, 'character')) stop('pointCovariates is required to be a vector containing the names of the covariates found in the datasets.')
     
     if (!missing(Coordinates) && Coordinates != private$Coordinates) {
       
@@ -815,9 +815,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (!missing(Formula) && !missing(newFormula)) stop ('Please provide only one of Formula and newFormula. \n Use Formula to update the current formula; use newFormula to make a completely new formula.')
     
-    if (!missing(Formula) && class(Formula) != 'formula') stop ('Formula must be of class "formula".')
+    if (!missing(Formula) && !inherits(Formula, 'formula')) stop ('Formula must be of class "formula".')
     
-    if (!missing(newFormula) && class(newFormula) != 'formula') stop('newFormula must be of class "formula".')
+    if (!missing(newFormula) && !inherits(newFormula, 'formula')) stop('newFormula must be of class "formula".')
     
     if (!missing(Formula) && length(as.character(Formula)) == 3) stop ("Please remove the response variable of the formula.")
     
@@ -1526,9 +1526,9 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   if (missing(projection)) stop('projection needs to be given.')
   if (missing(Inlamesh)) stop('Mesh needs to be given.')
   
-  if (class(Inlamesh) != 'inla.mesh') stop('Mesh needs to be an inla.mesh object.')
+  if (!inherits(Inlamesh, 'inla.mesh')) stop('Mesh needs to be an inla.mesh object.')
   
-  if (class(projection)[1] != 'CRS') stop('Projection needs to be a CRS object.')
+  if (!inherits(projection[1], 'CRS')) stop('Projection needs to be a CRS object.')
   
   if (length(coordinates) != 2) stop('Coordinates needs to be a vector of length 2 containing the coordinate names.')
   
