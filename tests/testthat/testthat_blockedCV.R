@@ -45,19 +45,10 @@ test_that('blockedCV completes spatial block cross-validation.', {
   pointCovs <- 'pointcov'
   speciesName <- 'species'
   
-  cov <- sp::spsample(x = SpatialPoly, n = 1000, type = 'stratified')
-  cov$covariate <- rgamma(n = nrow(cov@coords), shape = 2)
-  cov <- sp::SpatialPixelsDataFrame(points = cov@coords,
-                                    data = data.frame(covariate = cov$covariate),
-                                    proj4string = projection,
-                                    tolerance = 0.585235)
-  cov <- raster::raster(cov)
-  
-  
   obj <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
                   IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                   responsePA = responsePA, markNames = NULL, markFamily = NULL,
-                  speciesName = speciesName, spatialCovariates = cov)
+                  speciesName = speciesName)
   
   obj$spatialBlock(k = 2, rows = 2, cols = 1)
   
