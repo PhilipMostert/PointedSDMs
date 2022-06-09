@@ -1528,7 +1528,7 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   
   if (!inherits(Inlamesh, 'inla.mesh')) stop('Mesh needs to be an inla.mesh object.')
   
-  if (!inherits(projection[1], 'CRS')) stop('Projection needs to be a CRS object.')
+  if (!inherits(projection, 'CRS')) stop('Projection needs to be a CRS object.')
   
   if (length(coordinates) != 2) stop('Coordinates needs to be a vector of length 2 containing the coordinate names.')
   
