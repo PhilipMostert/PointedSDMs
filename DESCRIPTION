@@ -14,7 +14,7 @@ Description: Integrated species distribution modeling is a rising field in quant
   Despite this, the general software to help ecologists construct such models in an easy-to-use framework is lacking. 
   We therefore introduce the R package 'PointedSDMs': which provides the tools to help ecologists set up integrated models and perform inference on them.
   There are also functions within the package to help run spatial cross-validation for model selection, as well as generic plotting and predicting functions.
-  An introduction to these methods is disccused in Issac, Jarzyna, Keil, Dambly, Boersch-Supan, Browning, Freeman, Golding, Guillera-Arroita, Henrys, Jarvis, Lahoz-Monfort, Pagel, Pescott, Schmucki, Simmonds and O’Hara (2020) <doi:10.1016/j.tree.2019.08.006>.
+  An introduction to these methods is discussed in Issac, Jarzyna, Keil, Dambly, Boersch-Supan, Browning, Freeman, Golding, Guillera-Arroita, Henrys, Jarvis, Lahoz-Monfort, Pagel, Pescott, Schmucki, Simmonds and O’Hara (2020) <doi:10.1016/j.tree.2019.08.006>.
 Depends:
     R (>= 3.5),  
     stats,
