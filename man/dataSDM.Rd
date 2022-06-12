@@ -136,8 +136,7 @@ organizedData$addBias(datasetNames = 'eBird')
  #Set model up
  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
                            spatialCovariates = Forest,
-                           Projection = proj, responsePA = 'Present',
-                           pointsSpatial = 'individual')
+                           Projection = proj, responsePA = 'Present')
 
  #Remove Forest from components
  organizedData$changeComponents(removeComponent = 'Forest')
@@ -570,8 +569,7 @@ Function to add and specify custom components to model, which are required by \p
  #Set model up
  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
                            spatialCovariates = Forest,
-                           Projection = proj, responsePA = 'Present',
-                           pointsSpatial = 'individual')
+                           Projection = proj, responsePA = 'Present')
 
  #Remove Forest from components
  organizedData$changeComponents(removeComponent = 'Forest')
