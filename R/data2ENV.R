@@ -4,7 +4,7 @@
 #' @param data bruSDM data file to be used in the integrated model.
 #' @param env Environment where the objects should be assigned.
 #' 
-#' @return Assignment of the relevent spatial fields to the specified environment.
+#' @return Assignment of the relevant spatial fields to the specified environment.
 
 data2ENV <- function(data, env) {
   

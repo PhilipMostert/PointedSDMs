@@ -176,7 +176,7 @@ test_that('dataSDMs initialize works as expected.', {
 
 })
 
-test_that('addData can correctly add and store the relevent metadata properly.', {
+test_that('addData can correctly add and store the relevant metadata properly.', {
   skip_on_cran()
   
   ##Add the datasets
@@ -218,7 +218,7 @@ test_that('addData can correctly add and store the relevent metadata properly.',
   
   })
 
-test_that('addBias is able to add bias fields to the model as well as succesfully update the relevent formulas and components of the model.', {
+test_that('addBias is able to add bias fields to the model as well as succesfully update the relevant formulas and components of the model.', {
   skip_on_cran()
   
   #Check adding bias to the present only dataset

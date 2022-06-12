@@ -38,7 +38,7 @@ PA <- data.frame(PA)
 spData <- list(PO, PA)
 
 test_that('The internal function makeData returns a list of SpatialPointDataFrame objects as
-          well as the relevent metadata to be used in the integrated model.', {
+          well as the relevant metadata to be used in the integrated model.', {
     
     Check$makeData(datapoints = spData, datanames = c('PO', 'PA'),
                    coords = colnames(PO@coords), proj = projection, offsetname = NULL,
