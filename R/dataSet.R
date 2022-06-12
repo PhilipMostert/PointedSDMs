@@ -15,7 +15,7 @@
 #' @param markfamily A vector describing the distribution of the marks.
 #' @param offsetname Name of the offset column in the datasets.
 #' 
-#' @return A list of relevent metadata
+#' @return A list of relevant metadata
 #' 
 #' @export
 
@@ -47,7 +47,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
      #Name the list by dataset
     
     #Keep the get family for multinomial marks here
-    
+
     dataOrganized <- vector(mode = 'list', length = length(datapoints))
     names(dataOrganized) <- datanames
     
@@ -66,7 +66,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
     #Keep multinomVars
     multinomVars <- c()
     varsIn <- list()
-
+    
     for (dat in 1:length(datapoints)) {
       
       datasetname <- datanames[dat]
@@ -91,12 +91,12 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
       else MTrialssub <- NULL
       
       if (!is.null(marksin)) {
-        
+
         markstype <- paste0(gsub("^(\\w)(\\w+)", 
                                  "\\U\\1\\L\\2",
                                  markfamily[marks %in% marksin],
                                  perl = TRUE),' mark')
-     
+   
         if (length(marksin) == 1) classMarks <- class(data[, marksin])
         else classMarks <- sapply(data[, marksin], class)
 
@@ -136,7 +136,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
       else {
         
       classMarks <- NULL
-      markfamily <- NULL
+      #markfamily <- NULL
       markstype <- NULL
       phiVars <- NULL
       responseVars <- NULL
