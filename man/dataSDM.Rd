@@ -189,8 +189,7 @@ organizedData$addBias(datasetNames = 'eBird')
  #Set model up
  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
                            spatialCovariates = Forest,
-                           Projection = proj, responsePA = 'Present',
-                           pointsSpatial = 'individual')
+                           Projection = proj, responsePA = 'Present')
 
  #Specify the shared spatial field
  organizedData$specifySpatial(sharedSpatial = TRUE, PC = TRUE, 
@@ -697,8 +696,7 @@ Function to specify random fields in the model using penalizing complexity (PC) 
  #Set model up
  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
                            spatialCovariates = Forest,
-                           Projection = proj, responsePA = 'Present',
-                           pointsSpatial = 'individual')
+                           Projection = proj, responsePA = 'Present')
 
  #Specify the shared spatial field
  organizedData$specifySpatial(sharedSpatial = TRUE, PC = TRUE, 
