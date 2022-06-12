@@ -40,24 +40,30 @@ Plot for preduct_bru_sdm
 }
 \examples{
 \dontrun{
-
-#Make data object
-dataObj <- intModel(...)
-
-#Run model
-intModel <- intModel(dataObj, ...)
-
-#Predict
-predictions <- predict(object = intModel, mask = spatialPolygons,
-                       mesh = inlaMesh, predictor = TRUE)
-                       
-#Plot variance of predictions
-plot(predictions, whattoplt = 'var')
-
-#Obtain ggplot object
-
-plotObj <- plot(predictions, plot = FALSE)                              
-
+ 
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                             Projection = proj, responsePA = 'Present')
+ 
+  ##Run the model
+  modelRun <- runModel(organizedData, options = list(control.inla = list(int.strategy = 'eb')))
+   
+  #Predict spatial field on linear scale
+  predictions <- predict(modelRun, mesh = mesh, spatial = TRUE, fun = 'linear')
+   
+  #Make generic plot of predictions
+  plot(predictions, colourHigh = 'red', colourLow = 'orange')
+ 
+ }
 }
 
 }

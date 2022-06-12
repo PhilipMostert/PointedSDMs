@@ -31,29 +31,30 @@ setClass('bruSDM_predict')
 #' @export
 #' 
 #' @examples 
+#'
 #' \dontrun{
-#' 
-#' #Make data object
-#' dataObj <- intModel(...)
-#' 
-#' ##Run model
-#' intModel <- runModel(dataObj, ...)
-#' 
-#' #Predict
-#' predictions <- predict(object = intModel, mask = spatialPolygons,
-#'                        mesh = inlaMesh, spatial = TRUE, covariates = 'covariates',
-#'                        fun = 'linear')
-#'                        
-#'#Predict linear predictor
-#'predictions <- predict(object = intModel, data = spatialPolygons,
-#'                       mesh = inlaMesh, predictor = TRUE)
-#'                       
-#'#Predict bias field
-#'predictions <- predict(object = intModel, data = spatialPolygons,
-#'                       mesh = inlaMesh, bias = 'datasetName')
-#'                        
-#' 
-#' }
+#'  
+#'  if (requireNamespace('INLA')) {
+#'    
+#'  #Get Data
+#'  data("SolitaryTinamou")
+#'  proj <- CRS("+proj=longlat +ellps=WGS84")
+#'  data <- SolitaryTinamou$datasets
+#'  mesh <- SolitaryTinamou$mesh
+#'  mesh$crs <- proj
+#'  
+#'  #Set model up
+#'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+#'                              Projection = proj, responsePA = 'Present')
+#'  
+#'   ##Run the model
+#'   modelRun <- runModel(organizedData, options = list(control.inla = list(int.strategy = 'eb')))
+#'    
+#'   #Predict spatial field on linear scale
+#'   predictions <- predict(modelRun, mesh = mesh, spatial = TRUE, fun = 'linear')
+#'    
+#'  }
+#'}
 #' 
 
 predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL, 
@@ -299,25 +300,31 @@ print.bruSDM_predict <- function(x, ...) {
 #' 
 #' @examples 
 #' \dontrun{
-#' 
-#' #Make data object
-#' dataObj <- intModel(...)
-#' 
-#' #Run model
-#' intModel <- intModel(dataObj, ...)
-#' 
-#' #Predict
-#' predictions <- predict(object = intModel, mask = spatialPolygons,
-#'                        mesh = inlaMesh, predictor = TRUE)
-#'                        
-#'#Plot variance of predictions
-#'plot(predictions, whattoplt = 'var')
-#'
-#'#Obtain ggplot object
-#'
-#'plotObj <- plot(predictions, plot = FALSE)                              
-#' 
-#' }
+#'  
+#'  if (requireNamespace('INLA')) {
+#'    
+#'  #Get Data
+#'  data("SolitaryTinamou")
+#'  proj <- CRS("+proj=longlat +ellps=WGS84")
+#'  data <- SolitaryTinamou$datasets
+#'  mesh <- SolitaryTinamou$mesh
+#'  mesh$crs <- proj
+#'  
+#'  #Set model up
+#'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+#'                              Projection = proj, responsePA = 'Present')
+#'  
+#'   ##Run the model
+#'   modelRun <- runModel(organizedData, options = list(control.inla = list(int.strategy = 'eb')))
+#'    
+#'   #Predict spatial field on linear scale
+#'   predictions <- predict(modelRun, mesh = mesh, spatial = TRUE, fun = 'linear')
+#'    
+#'   #Make generic plot of predictions
+#'   plot(predictions, colourHigh = 'red', colourLow = 'orange')
+#'  
+#'  }
+#'}
 #' 
 
 plot.bruSDM_predict <- function(x,

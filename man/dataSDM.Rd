@@ -16,19 +16,21 @@ The arguments of this function may be missing (ie not provided) if they have alr
 ## ------------------------------------------------
 
 
-\dontrun{
-
-#Make data object
-dataObj <- intModel(...)
-
-#Plot a specific datasets
-dataObj$plot(Datasets = c('dataset1', 'dataset2'))
-
-#Plot all datasets
-dataObj$plot()
-
-#If speciesName specified in intModel, plot species
-dataObj(Species = TRUE)
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                             Projection = proj, responsePA = 'Present')
+ 
+  #Create plot of data
+  organizedData$plot()
 
 }
 
@@ -36,31 +38,53 @@ dataObj(Species = TRUE)
 ## Method `dataSDM$addData`
 ## ------------------------------------------------
 
-\dontrun{
-
-#Make data object with specified components
-dataObj <- intModel(...)
-
-#Add new data with non-standardized names
-dataObj$addData(dataset, responseCounts = responseCounts,
-                responsePA = responsePA, trialsPA = trialsPA,
-                markNames = markNames, markFamily = markFamily,
-                pointCovariates = pointCovariates,
-                speciesName = speciesName, Coordinates = Coordinates)
-
-}
+ 
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ 
+ #Only select eBird data
+ ebird <- SolitaryTinamou$datasets$eBird
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ 
+ #Set model up
+ organizedData <- intModel(ebird, Mesh = mesh, Coordinates = c('X', 'Y'),
+                             Projection = proj)
+                             
+ #Print summary
+ organizedData
+ 
+ #Add new dataset
+ Parks = SolitaryTinamou$datasets$Parks
+ organizedData$addData(Parks, responsePA = 'Present')
+ 
+ #Print summary
+ organizedData
+   
+ }
 
 ## ------------------------------------------------
 ## Method `dataSDM$addBias`
 ## ------------------------------------------------
 
-\dontrun{
-
-#Make dataObject
-dataObj <- intModel(...)
-
-#Add biasfield for a dataset
-dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                             Projection = proj, responsePA = 'Present')
+ 
+#Add bias field to eBird records
+organizedData$addBias(datasetNames = 'eBird')
 
 }
 
@@ -69,29 +93,27 @@ dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
 ## ------------------------------------------------
 
 
-\dontrun{
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ Forest <- SolitaryTinamou$covariates$Forest
+ 
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                           spatialCovariates = Forest,
+                           Projection = proj, responsePA = 'Present',
+                           pointsSpatial = 'individual')
 
-#Make data object
-dataObj <- intModel(...)
+ #Remove Forest from eBird
+ organizedData$updateFormula(datasetName = 'eBird', Formula = ~ . - Forest)
 
-#View formulas for a dataset
-dataObj$updateFormula(datasetName = 'dataset')
-#View formula for a species if speciesName is non-null in intModel
-dataObj$updateFormula(datasetName = 'dataset', speciesName = 'species')
-
-#Change formula across a dataset
-#Main purpose is to remove terms for a specific process
-#So start with full model with intModel()
-#And thin terms out with .$updateFormula()
-dataObj$updateFormula(datasetName = 'dataset', Formula = ~ . -covariate)
-dataObj$updateFormula(datasetName = 'dataset', Formula = ~ . -shared_spatial)
-
-#If you would like to add a special term to the model, use the NewFormula argument
-dataObj$updateFormula(datasetName = 'dataset', Formula ~ . + (covariate+1e-5)*scaling)
-#And then also add that term to the components
-dataObj$changeComponents(newComponent = 'scaling')
-
- }
+}
 
 
 ## ------------------------------------------------
@@ -100,17 +122,27 @@ dataObj$changeComponents(newComponent = 'scaling')
 
 \dontrun{
 
-#Make data object first
-dataObj <- intModel(...)
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ Forest <- SolitaryTinamou$covariates$Forest
+ 
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                           spatialCovariates = Forest,
+                           Projection = proj, responsePA = 'Present',
+                           pointsSpatial = 'individual')
 
-#Change a component
-newcomp <- 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)'
-dataObj$changeComponent(addComponent = newcomp)
-#Should update the bias field
+ #Remove Forest from components
+ organizedData$changeComponents(removeComponent = 'Forest')
 
-#Remove a component
-datasetObj$changeComponent(removeComponent = 'shared_spatial')
-#Will remove shared_spatial from the components + all the formulas it is in
+}
 
 }
 
@@ -118,17 +150,25 @@ datasetObj$changeComponent(removeComponent = 'shared_spatial')
 ## Method `dataSDM$priorsFixed`
 ## ------------------------------------------------
 
-\dontrun{
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ Forest <- SolitaryTinamou$covariates$Forest
+ 
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                           spatialCovariates = Forest,
+                           Projection = proj, responsePA = 'Present',
+                           pointsSpatial = 'individual')
 
-#Make data object
-dataObj <- intModel(...)
-
-#Change priors for the fixed effect
-dataObj$priorsFixed(Effect = 'covariate', mean.linear = 2, prec.linear = 0.05)
-
-#Change priors for intercept
-dataObj$priorsFixed(Effect = 'intercept', datasetName = 'datasetname',
-                    mean.linear = 2, prec.linear = 0.005)
+ #Add prior to Forest
+ organizedData$priorsFixed(Effect = 'Forest', mean.linear = 2, prec.linear = 0.1)
 
 }
 
@@ -136,23 +176,29 @@ dataObj$priorsFixed(Effect = 'intercept', datasetName = 'datasetname',
 ## Method `dataSDM$specifySpatial`
 ## ------------------------------------------------
 
-\dontrun{
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ Forest <- SolitaryTinamou$covariates$Forest
+ 
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                           spatialCovariates = Forest,
+                           Projection = proj, responsePA = 'Present',
+                           pointsSpatial = 'individual')
 
-#Create data object
-dataObj <- intModel(...)
-
-#Specify spatial field
-dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, 
+ #Specify the shared spatial field
+ organizedData$specifySpatial(sharedSpatial = TRUE, PC = TRUE, 
                        prior.range = c(1,0.001),
                        prior.sigma = c(1,0.001))
-#Specify for a species
-dataObj$specifySpatial(species = 'species', alpha = 1, PC = FALSE)
 
-#Remove a spatial field
-dataObj$specifySpatial(species = 'species', remove = TRUE)
-#Which will also update the components and relevant formulas
-
-}
+} 
 
 ## ------------------------------------------------
 ## Method `dataSDM$changeLink`
@@ -177,15 +223,27 @@ dataObj$changeLink(Dataset = Dataset, Species = Species,
 ## Method `dataSDM$spatialBlock`
 ## ------------------------------------------------
 
-\dontrun{
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ Forest <- SolitaryTinamou$covariates$Forest
+ 
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                           spatialCovariates = Forest,
+                           Projection = proj, responsePA = 'Present',
+                           pointsSpatial = 'individual')
 
-#Make data object
-dataObj <- intModel(...)
+ #Specify the spatial block
+ organizedData$spatialBlock(k = 2, rows = 2, cols = 1, plot = TRUE)
 
-#Block the points spatially
-dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
-
-}
+} 
 
 }
 \section{Methods}{
@@ -250,19 +308,21 @@ A ggplot object.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{
-\dontrun{
-
-#Make data object
-dataObj <- intModel(...)
-
-#Plot a specific datasets
-dataObj$plot(Datasets = c('dataset1', 'dataset2'))
-
-#Plot all datasets
-dataObj$plot()
-
-#If speciesName specified in intModel, plot species
-dataObj(Species = TRUE)
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                             Projection = proj, responsePA = 'Present')
+ 
+  #Create plot of data
+  organizedData$plot()
 
 }
 }
@@ -324,19 +384,33 @@ Function used to add additional datasets to the \code{dataSDM} object. This func
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-
-#Make data object with specified components
-dataObj <- intModel(...)
-
-#Add new data with non-standardized names
-dataObj$addData(dataset, responseCounts = responseCounts,
-                responsePA = responsePA, trialsPA = trialsPA,
-                markNames = markNames, markFamily = markFamily,
-                pointCovariates = pointCovariates,
-                speciesName = speciesName, Coordinates = Coordinates)
-
-}
+\preformatted{ 
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ 
+ #Only select eBird data
+ ebird <- SolitaryTinamou$datasets$eBird
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ 
+ #Set model up
+ organizedData <- intModel(ebird, Mesh = mesh, Coordinates = c('X', 'Y'),
+                             Projection = proj)
+                             
+ #Print summary
+ organizedData
+ 
+ #Add new dataset
+ Parks = SolitaryTinamou$datasets$Parks
+ organizedData$addData(Parks, responsePA = 'Present')
+ 
+ #Print summary
+ organizedData
+   
+ }
 }
 \if{html}{\out{</div>}}
 
@@ -365,13 +439,21 @@ Function used to add additional spatial fields (called \emph{bias fields}) to a 
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-
-#Make dataObject
-dataObj <- intModel(...)
-
-#Add biasfield for a dataset
-dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
+\preformatted{ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                             Projection = proj, responsePA = 'Present')
+ 
+#Add bias field to eBird records
+organizedData$addBias(datasetNames = 'eBird')
 
 }
 }
@@ -422,29 +504,27 @@ If \code{Formula} and \code{newFormula} are missing, will print out the formula 
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{
-\dontrun{
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ Forest <- SolitaryTinamou$covariates$Forest
+ 
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                           spatialCovariates = Forest,
+                           Projection = proj, responsePA = 'Present',
+                           pointsSpatial = 'individual')
 
-#Make data object
-dataObj <- intModel(...)
+ #Remove Forest from eBird
+ organizedData$updateFormula(datasetName = 'eBird', Formula = ~ . - Forest)
 
-#View formulas for a dataset
-dataObj$updateFormula(datasetName = 'dataset')
-#View formula for a species if speciesName is non-null in intModel
-dataObj$updateFormula(datasetName = 'dataset', speciesName = 'species')
-
-#Change formula across a dataset
-#Main purpose is to remove terms for a specific process
-#So start with full model with intModel()
-#And thin terms out with .$updateFormula()
-dataObj$updateFormula(datasetName = 'dataset', Formula = ~ . -covariate)
-dataObj$updateFormula(datasetName = 'dataset', Formula = ~ . -shared_spatial)
-
-#If you would like to add a special term to the model, use the NewFormula argument
-dataObj$updateFormula(datasetName = 'dataset', Formula ~ . + (covariate+1e-5)*scaling)
-#And then also add that term to the components
-dataObj$changeComponents(newComponent = 'scaling')
-
- }
+}
 
 }
 \if{html}{\out{</div>}}
@@ -476,17 +556,27 @@ Function to add and specify custom components to model, which are required by \p
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 
-#Make data object first
-dataObj <- intModel(...)
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ Forest <- SolitaryTinamou$covariates$Forest
+ 
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                           spatialCovariates = Forest,
+                           Projection = proj, responsePA = 'Present',
+                           pointsSpatial = 'individual')
 
-#Change a component
-newcomp <- 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)'
-dataObj$changeComponent(addComponent = newcomp)
-#Should update the bias field
+ #Remove Forest from components
+ organizedData$changeComponents(removeComponent = 'Forest')
 
-#Remove a component
-datasetObj$changeComponent(removeComponent = 'shared_spatial')
-#Will remove shared_spatial from the components + all the formulas it is in
+}
 
 }
 }
@@ -527,17 +617,25 @@ Function to change priors for the fixed (and possibly random) effects of the mod
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
+\preformatted{ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ Forest <- SolitaryTinamou$covariates$Forest
+ 
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                           spatialCovariates = Forest,
+                           Projection = proj, responsePA = 'Present',
+                           pointsSpatial = 'individual')
 
-#Make data object
-dataObj <- intModel(...)
-
-#Change priors for the fixed effect
-dataObj$priorsFixed(Effect = 'covariate', mean.linear = 2, prec.linear = 0.05)
-
-#Change priors for intercept
-dataObj$priorsFixed(Effect = 'intercept', datasetName = 'datasetname',
-                    mean.linear = 2, prec.linear = 0.005)
+ #Add prior to Forest
+ organizedData$priorsFixed(Effect = 'Forest', mean.linear = 2, prec.linear = 0.1)
 
 }
 }
@@ -587,23 +685,29 @@ Function to specify random fields in the model using penalizing complexity (PC) 
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
+\preformatted{ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ Forest <- SolitaryTinamou$covariates$Forest
+ 
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                           spatialCovariates = Forest,
+                           Projection = proj, responsePA = 'Present',
+                           pointsSpatial = 'individual')
 
-#Create data object
-dataObj <- intModel(...)
-
-#Specify spatial field
-dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, 
+ #Specify the shared spatial field
+ organizedData$specifySpatial(sharedSpatial = TRUE, PC = TRUE, 
                        prior.range = c(1,0.001),
                        prior.sigma = c(1,0.001))
-#Specify for a species
-dataObj$specifySpatial(species = 'species', alpha = 1, PC = FALSE)
 
-#Remove a spatial field
-dataObj$specifySpatial(species = 'species', remove = TRUE)
-#Which will also update the components and relevant formulas
-
-}
+} 
 }
 \if{html}{\out{</div>}}
 
@@ -684,15 +788,27 @@ Function to spatially block the datasets, which will then be used for model cros
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
+\preformatted{ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ Forest <- SolitaryTinamou$covariates$Forest
+ 
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                           spatialCovariates = Forest,
+                           Projection = proj, responsePA = 'Present',
+                           pointsSpatial = 'individual')
 
-#Make data object
-dataObj <- intModel(...)
+ #Specify the spatial block
+ organizedData$spatialBlock(k = 2, rows = 2, cols = 1, plot = TRUE)
 
-#Block the points spatially
-dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
-
-}
+} 
 
 }
 \if{html}{\out{</div>}}

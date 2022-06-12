@@ -23,27 +23,34 @@
 #' 
 #' @examples 
 #' 
-#' \dontrun{
-#' 
-#' #Set up a dataSDM object
-#' 
-#' object <- intModel(...)
-#' 
-#' #Run a joint model
-#' 
-#' joint_model <- runModel(object)
-#' 
-#' #Leave dataset out, cross-validation
-#' 
-#' dataset_out <- datasetOut(model = joint_model,
-#'                           dataset = unique(joint_model$source),
-#'                           predictions = TRUE)
-#'                           
-#'#Print summary of reduced models
-#'
-#'dataset_out
-#' 
-#' }
+#'\dontrun{
+#'  if (requireNamespace('INLA')) {
+#'    
+#'  #Get Data
+#'  data("SolitaryTinamou")
+#'  proj <- CRS("+proj=longlat +ellps=WGS84")
+#'  data <- SolitaryTinamou$datasets
+#'  mesh <- SolitaryTinamou$mesh
+#'  mesh$crs <- proj
+#'  
+#'  #Set model up
+#'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+#'                              Projection = proj, responsePA = 'Present')
+#'  
+#'   ##Run the model
+#'   modelRun <- runModel(organizedData,
+#'               options = list(control.inla = list(int.strategy = 'eb')))
+#'    
+#'   #Choose dataset to leave out
+#'   eBirdOut <- datasetOut(modelRun, dataset = 'eBird')
+#'   
+#'   #Print datasetOut summary
+#'   eBirdOut
+#'   
+#'   
+#'    
+#'  }
+#'}
 
 datasetOut <- function(model, dataset,
                        predictions = TRUE) {

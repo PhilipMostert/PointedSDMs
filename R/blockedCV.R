@@ -10,26 +10,31 @@
 #' 
 #' @examples 
 #' 
-#' \dontrun{
-#' 
-#' #Create dataSDM object
-#' 
-#' dataObject <- intModel(...)
-#' 
-#' #Create the spatial block
-#' 
-#' dataObject$spatialBlock(...)
-#' 
-#' #Perform spatial blocked cross-validation
-#' 
-#' cv_scores <- blockedCV(dataObject, 
-#'                        options = list(control.inla = list(int.strategy = 'eb')))
-#' 
-#' #Print summary of the scores
-#' 
-#' cv_scores
-#' 
-#' }
+#'\dontrun{
+#'  if(requireNamespace('INLA')) {
+#'    
+#'  #Get Data
+#'  data("SolitaryTinamou")
+#'  proj <- CRS("+proj=longlat +ellps=WGS84")
+#'  data <- SolitaryTinamou$datasets
+#'  mesh <- SolitaryTinamou$mesh
+#'  mesh$crs <- proj
+#'  
+#'  #Set model up
+#'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+#'                              Projection = proj)
+#'  
+#'  #Set up spatial block
+#'  organizedData$spatialBlock(k = 2, rows = 2, cols = 1)
+#'  
+#'  #Run spatial block cross-validation
+#'  blocked <- blockedCV(organizedData)
+#'  
+#'  #Print summary
+#'  blocked
+#'    
+#'  }
+#'}
 #' 
 #' @return An object of class \code{blockedCV}, which is essentially a list of DIC values obtained from each iteration of the model.
 #' 

@@ -74,19 +74,21 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @import ggplot2
   #' @examples
   #' 
-  #' \dontrun{
-  #' 
-  #' #Make data object
-  #' dataObj <- intModel(...)
-  #' 
-  #' #Plot a specific datasets
-  #' dataObj$plot(Datasets = c('dataset1', 'dataset2'))
-  #' 
-  #' #Plot all datasets
-  #' dataObj$plot()
-  #' 
-  #' #If speciesName specified in intModel, plot species
-  #' dataObj(Species = TRUE)
+  #'  if (requireNamespace('INLA')) {
+  #'    
+  #'  #Get Data
+  #'  data("SolitaryTinamou")
+  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  data <- SolitaryTinamou$datasets
+  #'  mesh <- SolitaryTinamou$mesh
+  #'  mesh$crs <- proj
+  #'  
+  #'  #Set model up
+  #'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+  #'                              Projection = proj, responsePA = 'Present')
+  #'  
+  #'   #Create plot of data
+  #'   organizedData$plot()
   #' 
   #' }
   
@@ -180,19 +182,33 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @import methods
   #' 
   #' @examples
-  #' \dontrun{
-  #' 
-  #' #Make data object with specified components
-  #' dataObj <- intModel(...)
-  #' 
-  #' #Add new data with non-standardized names
-  #' dataObj$addData(dataset, responseCounts = responseCounts,
-  #'                 responsePA = responsePA, trialsPA = trialsPA,
-  #'                 markNames = markNames, markFamily = markFamily,
-  #'                 pointCovariates = pointCovariates,
-  #'                 speciesName = speciesName, Coordinates = Coordinates)
-  #' 
-  #' }
+  #'  
+  #'  if (requireNamespace('INLA')) {
+  #'    
+  #'  #Get Data
+  #'  data("SolitaryTinamou")
+  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  
+  #'  #Only select eBird data
+  #'  ebird <- SolitaryTinamou$datasets$eBird
+  #'  mesh <- SolitaryTinamou$mesh
+  #'  mesh$crs <- proj
+  #'  
+  #'  #Set model up
+  #'  organizedData <- intModel(ebird, Mesh = mesh, Coordinates = c('X', 'Y'),
+  #'                              Projection = proj)
+  #'                              
+  #'  #Print summary
+  #'  organizedData
+  #'  
+  #'  #Add new dataset
+  #'  Parks = SolitaryTinamou$datasets$Parks
+  #'  organizedData$addData(Parks, responsePA = 'Present')
+  #'  
+  #'  #Print summary
+  #'  organizedData
+  #'    
+  #'  }
   addData = function(..., responseCounts, responsePA, trialsPA,
                      markNames, markFamily, pointCovariates,
                      trialsMarks, speciesName, temporalName,
@@ -705,13 +721,22 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #' 
   #' @examples
-  #' \dontrun{
-  #' 
-  #' #Make dataObject
-  #' dataObj <- intModel(...)
-  #' 
-  #' #Add biasfield for a dataset
-  #' dataObj$addBias(datasetNames = 'dataset', biasField = inla.spde2.pcmatern(...))
+  
+  #'  if (requireNamespace('INLA')) {
+  #'    
+  #'  #Get Data
+  #'  data("SolitaryTinamou")
+  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  data <- SolitaryTinamou$datasets
+  #'  mesh <- SolitaryTinamou$mesh
+  #'  mesh$crs <- proj
+  #'  
+  #'  #Set model up
+  #'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+  #'                              Projection = proj, responsePA = 'Present')
+  #'  
+  #' #Add bias field to eBird records
+  #' organizedData$addBias(datasetNames = 'eBird')
   #' 
   #' }
   addBias = function(datasetNames = NULL,
@@ -770,29 +795,27 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #' @examples
   #' 
-  #' \dontrun{
+  #'  if (requireNamespace('INLA')) {
+  #'    
+  #'  #Get Data
+  #'  data("SolitaryTinamou")
+  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  data <- SolitaryTinamou$datasets
+  #'  mesh <- SolitaryTinamou$mesh
+  #'  mesh$crs <- proj
+  #'  Forest <- SolitaryTinamou$covariates$Forest
+  #'  
+  #'  
+  #'  #Set model up
+  #'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+  #'                            spatialCovariates = Forest,
+  #'                            Projection = proj, responsePA = 'Present',
+  #'                            pointsSpatial = 'individual')
   #' 
-  #' #Make data object
-  #' dataObj <- intModel(...)
-  #' 
-  #' #View formulas for a dataset
-  #' dataObj$updateFormula(datasetName = 'dataset')
-  #' #View formula for a species if speciesName is non-null in intModel
-  #' dataObj$updateFormula(datasetName = 'dataset', speciesName = 'species')
-  #' 
-  #' #Change formula across a dataset
-  #' #Main purpose is to remove terms for a specific process
-  #' #So start with full model with intModel()
-  #' #And thin terms out with .$updateFormula()
-  #' dataObj$updateFormula(datasetName = 'dataset', Formula = ~ . -covariate)
-  #' dataObj$updateFormula(datasetName = 'dataset', Formula = ~ . -shared_spatial)
-  #' 
-  #' #If you would like to add a special term to the model, use the NewFormula argument
-  #' dataObj$updateFormula(datasetName = 'dataset', Formula ~ . + (covariate+1e-5)*scaling)
-  #' #And then also add that term to the components
-  #' dataObj$changeComponents(newComponent = 'scaling')
-  #' 
-  #'  }
+  #'  #Remove Forest from eBird
+  #'  organizedData$updateFormula(datasetName = 'eBird', Formula = ~ . - Forest)
+  #'
+  #' }
   #' 
   #' @return If \code{Formula} and \code{newFormula} are missing, will print out the formula for the specified processes. 
   #' 
@@ -956,7 +979,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
             
             #print(oldForm)
             #cat('New formula: ')
-            
             ## Maybe I should do a check: if cov in newFormula then paste0(species, _ , covariate) ## how else does it work within a for loop
             newForm <- update(oldForm, newFormula)
             #newForm <- update(private$modelData[[dataset]]$formula, newFormula)
@@ -991,17 +1013,27 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @examples 
   #' \dontrun{
   #' 
-  #' #Make data object first
-  #' dataObj <- intModel(...)
+  #'  if (requireNamespace('INLA')) {
+  #'    
+  #'  #Get Data
+  #'  data("SolitaryTinamou")
+  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  data <- SolitaryTinamou$datasets
+  #'  mesh <- SolitaryTinamou$mesh
+  #'  mesh$crs <- proj
+  #'  Forest <- SolitaryTinamou$covariates$Forest
+  #'  
+  #'  
+  #'  #Set model up
+  #'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+  #'                            spatialCovariates = Forest,
+  #'                            Projection = proj, responsePA = 'Present',
+  #'                            pointsSpatial = 'individual')
   #' 
-  #' #Change a component
-  #' newcomp <- 'dataset_bias(main = coordinates, model = dataset_bias_field, copy = "shared_spatial)'
-  #' dataObj$changeComponent(addComponent = newcomp)
-  #' #Should update the bias field
-  #' 
-  #' #Remove a component
-  #' datasetObj$changeComponent(removeComponent = 'shared_spatial')
-  #' #Will remove shared_spatial from the components + all the formulas it is in
+  #'  #Remove Forest from components
+  #'  organizedData$changeComponents(removeComponent = 'Forest')
+  #'
+  #' }
   #' 
   #' }
   changeComponents = function(addComponent, removeComponent, print = TRUE) {
@@ -1039,18 +1071,26 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param mean.linear Mean value for the prior of the fixed effect. Defaults to \code{0}.
   #' @param prec.linear Precision value for the prior of the fixed effect. Defaults to \code{0.001}.
   #' @examples
-  #' \dontrun{
+  #'  if (requireNamespace('INLA')) {
+  #'    
+  #'  #Get Data
+  #'  data("SolitaryTinamou")
+  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  data <- SolitaryTinamou$datasets
+  #'  mesh <- SolitaryTinamou$mesh
+  #'  mesh$crs <- proj
+  #'  Forest <- SolitaryTinamou$covariates$Forest
+  #'  
+  #'  
+  #'  #Set model up
+  #'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+  #'                            spatialCovariates = Forest,
+  #'                            Projection = proj, responsePA = 'Present',
+  #'                            pointsSpatial = 'individual')
   #' 
-  #' #Make data object
-  #' dataObj <- intModel(...)
-  #' 
-  #' #Change priors for the fixed effect
-  #' dataObj$priorsFixed(Effect = 'covariate', mean.linear = 2, prec.linear = 0.05)
-  #' 
-  #' #Change priors for intercept
-  #' dataObj$priorsFixed(Effect = 'intercept', datasetName = 'datasetname',
-  #'                     mean.linear = 2, prec.linear = 0.005)
-  #' 
+  #'  #Add prior to Forest
+  #'  organizedData$priorsFixed(Effect = 'Forest', mean.linear = 2, prec.linear = 0.1)
+  #'
   #' }
   
   priorsFixed = function(Effect, Species = NULL, datasetName = NULL,
@@ -1126,23 +1166,29 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #' 
   #' @examples 
-  #' \dontrun{
+  #'  if (requireNamespace('INLA')) {
+  #'    
+  #'  #Get Data
+  #'  data("SolitaryTinamou")
+  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  data <- SolitaryTinamou$datasets
+  #'  mesh <- SolitaryTinamou$mesh
+  #'  mesh$crs <- proj
+  #'  Forest <- SolitaryTinamou$covariates$Forest
+  #'  
+  #'  
+  #'  #Set model up
+  #'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+  #'                            spatialCovariates = Forest,
+  #'                            Projection = proj, responsePA = 'Present',
+  #'                            pointsSpatial = 'individual')
   #' 
-  #' #Create data object
-  #' dataObj <- intModel(...)
-  #' 
-  #' #Specify spatial field
-  #' dataObj$specifySpatial(sharedSpatial = TRUE, PC = TRUE, 
+  #'  #Specify the shared spatial field
+  #'  organizedData$specifySpatial(sharedSpatial = TRUE, PC = TRUE, 
   #'                        prior.range = c(1,0.001),
   #'                        prior.sigma = c(1,0.001))
-  #' #Specify for a species
-  #' dataObj$specifySpatial(species = 'species', alpha = 1, PC = FALSE)
-  #' 
-  #' #Remove a spatial field
-  #' dataObj$specifySpatial(species = 'species', remove = TRUE)
-  #' #Which will also update the components and relevant formulas
-  #' 
-  #' }
+  #'
+  #' } 
   
   specifySpatial = function(sharedSpatial = FALSE,
                             datasetName,
@@ -1295,15 +1341,27 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @importFrom blockCV spatialBlock
   #' 
   #' @examples
-  #' \dontrun{
+  #'  if (requireNamespace('INLA')) {
+  #'    
+  #'  #Get Data
+  #'  data("SolitaryTinamou")
+  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  data <- SolitaryTinamou$datasets
+  #'  mesh <- SolitaryTinamou$mesh
+  #'  mesh$crs <- proj
+  #'  Forest <- SolitaryTinamou$covariates$Forest
+  #'  
+  #'  
+  #'  #Set model up
+  #'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+  #'                            spatialCovariates = Forest,
+  #'                            Projection = proj, responsePA = 'Present',
+  #'                            pointsSpatial = 'individual')
   #' 
-  #' #Make data object
-  #' dataObj <- intModel(...)
-  #' 
-  #' #Block the points spatially
-  #' dataObj$spatialBlock(k = 5, rows = 2, cols = 5, plot = TRUE)
-  #' 
-  #' }
+  #'  #Specify the spatial block
+  #'  organizedData$spatialBlock(k = 2, rows = 2, cols = 1, plot = TRUE)
+  #'
+  #' } 
   #'
   spatialBlock =  function(k, rows, cols, plot = FALSE, seed = 1234, ...) {
     

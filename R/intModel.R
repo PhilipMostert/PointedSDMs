@@ -37,29 +37,37 @@
 #' 
 #' @examples 
 #' 
-#' \dontrun{
-#' 
-#' #Specify whats needed
-#' 
-#' dataset1 <- data.frame(...)
-#' dataset2 <- sp::SpatialPointsDataFrame(...)
-#' 
-#' mesh <- inla.mesh.2d(...)
-#' spatiialCovariates <- raster::raster(...)
-#' Projection <- CRS(...)
-#' Coords <- c('Long', 'Lat')
-#' 
-#' #Run function
-#' 
-#' object <- intModel(dataset1, dataset2, Mesh = Mesh,
-#'                   spatialCovariates = spatialCovariates, Coords = Coords,
-#'                   Projection = Projection)
-#'                  
-#' #Return summary of data
-#' 
-#' object
-#' 
-#' }
+#'  if (requireNamespace('INLA')) {
+#'    
+#'  #Get Data
+#'  data("SolitaryTinamou")
+#'  proj <- CRS("+proj=longlat +ellps=WGS84")
+#'  data <- SolitaryTinamou$datasets
+#'  mesh <- SolitaryTinamou$mesh
+#'  mesh$crs <- proj
+#'  
+#'  #Set base model up
+#'  baseModel <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+#'                              Projection = proj, responsePA = 'Present')
+#'  
+#'  #Print summary
+#'  organizedData
+#'  
+#'  #Set up model with dataset specific spatial fields
+#'  
+#'  indSpat <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+#'                      Projection = proj, pointsSpatial = 'individual', responsePA = 'Present')
+#'                      
+#'  #Model with offset variable
+#'  offSet <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+#'                      Projection = proj, Offset = 'area', responsePA = 'Present')
+#'                      
+#'  #Assume area as a mark
+#'  markModel <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+#'                      Projection = proj, markNames = 'area', markFamily = 'gamma',
+#'                      responsePA = 'Present')
+#'                       
+#'  }
 #' 
 #' @export
 

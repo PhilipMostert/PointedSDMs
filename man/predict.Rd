@@ -66,28 +66,29 @@ Predict function for the object produced by \code{\link{runModel}}. Should act i
 Predict for bru_sdm
 }
 \examples{
+
 \dontrun{
-
-#Make data object
-dataObj <- intModel(...)
-
-##Run model
-intModel <- runModel(dataObj, ...)
-
-#Predict
-predictions <- predict(object = intModel, mask = spatialPolygons,
-                       mesh = inlaMesh, spatial = TRUE, covariates = 'covariates',
-                       fun = 'linear')
-                       
-#Predict linear predictor
-predictions <- predict(object = intModel, data = spatialPolygons,
-                      mesh = inlaMesh, predictor = TRUE)
-                      
-#Predict bias field
-predictions <- predict(object = intModel, data = spatialPolygons,
-                      mesh = inlaMesh, bias = 'datasetName')
-                       
-
+ 
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- CRS("+proj=longlat +ellps=WGS84")
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ 
+ #Set model up
+ organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+                             Projection = proj, responsePA = 'Present')
+ 
+  ##Run the model
+  modelRun <- runModel(organizedData, options = list(control.inla = list(int.strategy = 'eb')))
+   
+  #Predict spatial field on linear scale
+  predictions <- predict(modelRun, mesh = mesh, spatial = TRUE, fun = 'linear')
+   
+ }
 }
 
 }

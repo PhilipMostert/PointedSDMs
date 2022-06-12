@@ -13,21 +13,29 @@
 #' @examples 
 #' 
 #' \dontrun{
-#' 
-#' #Create dataSDM object
-#' 
-#' dataObject <- intModel(...)
-#' 
-#' #Run the joint model
-#' 
-#' joint_model <- runModel(dataObject, 
-#'                         options = list(control.inla = list(int.strategy = 'eb')))
-#' 
-#' #Print summary of model
-#' 
-#' joint_model
-#' 
-#' }
+#'  
+#'  if (requireNamespace('INLA')) {
+#'    
+#'  #Get Data
+#'  data("SolitaryTinamou")
+#'  proj <- CRS("+proj=longlat +ellps=WGS84")
+#'  data <- SolitaryTinamou$datasets
+#'  mesh <- SolitaryTinamou$mesh
+#'  mesh$crs <- proj
+#'  
+#'  #Set model up
+#'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+#'                              Projection = proj, responsePA = 'Present')
+#'  
+#'   ##Run the model
+#'   modelRun <- runModel(organizedData, 
+#'   options = list(control.inla = list(int.strategy = 'eb')))
+#'    
+#'   #Print summary of model
+#'   modelRun
+#'    
+#'  }
+#'}
 #' 
 #' @export
 
