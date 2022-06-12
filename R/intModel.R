@@ -51,7 +51,7 @@
 #'                              Projection = proj, responsePA = 'Present')
 #'  
 #'  #Print summary
-#'  organizedData
+#'  baseModel
 #'  
 #'  #Set up model with dataset specific spatial fields
 #'  

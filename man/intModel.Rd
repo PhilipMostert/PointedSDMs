@@ -105,7 +105,7 @@ Note: the point covariate and mark terms will only be included in the formulas f
                              Projection = proj, responsePA = 'Present')
  
  #Print summary
- organizedData
+ baseModel
  
  #Set up model with dataset specific spatial fields
  
