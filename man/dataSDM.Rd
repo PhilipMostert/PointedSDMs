@@ -113,6 +113,12 @@ organizedData$addBias(datasetNames = 'eBird')
  #Remove Forest from eBird
  organizedData$updateFormula(datasetName = 'eBird', Formula = ~ . - Forest)
  
+ #Add some scaling to Forest for Parks
+ organizedData$updateFormula('Parks', newFormula = ~ I(. +(Forest+1e-6)*scaling))
+ 
+ #Now dd scaling to components
+ organizedData$changeComponents(addComponent = 'scaling') 
+ 
 }
 
 
@@ -521,6 +527,12 @@ If \code{Formula} and \code{newFormula} are missing, will print out the formula 
 
  #Remove Forest from eBird
  organizedData$updateFormula(datasetName = 'eBird', Formula = ~ . - Forest)
+ 
+ #Add some scaling to Forest for Parks
+ organizedData$updateFormula('Parks', newFormula = ~ I(. +(Forest+1e-6)*scaling))
+ 
+ #Now dd scaling to components
+ organizedData$changeComponents(addComponent = 'scaling') 
  
 }
 

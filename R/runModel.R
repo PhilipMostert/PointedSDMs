@@ -58,12 +58,23 @@ runModel <- function(data, options = list()) {
 
   formula_terms <- unique(unlist(lapply(unlist(unlist(data$.__enclos_env__$private$Formulas, recursive = F), recursive = F), function(x) {
     
-    if (is.null(x$RHS))  attributes(terms(x$LHS))[['term.labels']]
+    if (is.null(x$RHS)) {
+      
+      if (length(attributes(terms(x$LHS))[['term.labels']]) != 1) x$RHS
+      else {
+        
+        getTerms <- gsub('^.|[()]','',as.character(x$LHS)[3], perl = F)
+        getTerms <- unlist(strsplit(getTerms, split = ' '))
+        getTerms[!getTerms %in% c('+', '-', '/', '*', ':')]
+        
+      }
+      
+    }
     else x$RHS
     
   }))
   )
-  
+
   comp_terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)
   
   #Will need to change this to say comp_terms %in% c(formula_terms, bias_terms)

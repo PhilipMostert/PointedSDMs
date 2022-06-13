@@ -815,6 +815,12 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'  #Remove Forest from eBird
   #'  organizedData$updateFormula(datasetName = 'eBird', Formula = ~ . - Forest)
   #'  
+  #'  #Add some scaling to Forest for Parks
+  #'  organizedData$updateFormula('Parks', newFormula = ~ I(. +(Forest+1e-6)*scaling))
+  #'  
+  #'  #Now dd scaling to components
+  #'  organizedData$changeComponents(addComponent = 'scaling') 
+  #'  
   #' }
   #' 
   #' @return If \code{Formula} and \code{newFormula} are missing, will print out the formula for the specified processes. 
@@ -979,6 +985,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
             
             #print(oldForm)
             #cat('New formula: ')
+  
             ## Maybe I should do a check: if cov in newFormula then paste0(species, _ , covariate) ## how else does it work within a for loop
             newForm <- update(oldForm, newFormula)
             #newForm <- update(private$modelData[[dataset]]$formula, newFormula)
