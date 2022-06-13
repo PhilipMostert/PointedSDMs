@@ -814,7 +814,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #'  #Remove Forest from eBird
   #'  organizedData$updateFormula(datasetName = 'eBird', Formula = ~ . - Forest)
-  #'
+  #'  
   #' }
   #' 
   #' @return If \code{Formula} and \code{newFormula} are missing, will print out the formula for the specified processes. 

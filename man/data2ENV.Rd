@@ -12,7 +12,7 @@ data2ENV(data, env)
 \item{env}{Environment where the objects should be assigned.}
 }
 \value{
-Assignment of the relevent spatial fields to the specified environment.
+Assignment of the relevant spatial fields to the specified environment.
 }
 \description{
 Internal function: used to assign objects specified in bruSDM to the dataSDM/blockedCV function environments.

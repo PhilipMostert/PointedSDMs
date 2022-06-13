@@ -112,7 +112,7 @@ organizedData$addBias(datasetNames = 'eBird')
 
  #Remove Forest from eBird
  organizedData$updateFormula(datasetName = 'eBird', Formula = ~ . - Forest)
-
+ 
 }
 
 
@@ -521,7 +521,7 @@ If \code{Formula} and \code{newFormula} are missing, will print out the formula 
 
  #Remove Forest from eBird
  organizedData$updateFormula(datasetName = 'eBird', Formula = ~ . - Forest)
-
+ 
 }
 
 }

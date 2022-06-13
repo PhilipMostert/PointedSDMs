@@ -51,7 +51,7 @@ dataSet(
 \item{offsetname}{Name of the offset column in the datasets.}
 }
 \value{
-A list of relevent metadata
+A list of relevant metadata
 }
 \description{
 Internal function used to assist in structuring the data.
