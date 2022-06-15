@@ -14,9 +14,9 @@ coverage](https://codecov.io/gh/PhilipMostert/PointedSDMs/branch/ChangingToR6/gr
 The goal of *PointedSDMs* is to simplify the construction of integrated
 species distribution models (ISDMs) for large collections of
 heterogeneous data. It does so by building wrapper functions around
-[inlabru](https://doi.org/10.1111/2041-210X.13168),
+[inlabru](https://besjournals.onlinelibrary.wiley.com/doi/abs/10.1111/2041-210X.13168),
 which uses the [INLA
-methodology](https://doi.org/10.1111/j.1467-9868.2008.00700.x)
+methodology](https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-9868.2008.00700.x)
 to estimate a class of latent Gaussian models.
 
 ## Installation
@@ -27,6 +27,12 @@ You can install the development version of PointedSDMs from
 ``` r
 # install.packages("devtools")
 devtools::install_github("PhilipMostert/PointedSDMs")
+```
+
+or directly through CRAN using:
+
+``` r
+install.packages('PointedSDMs')
 ```
 
 ## Package functionality
@@ -118,7 +124,7 @@ summary(modelRun)
 #> Summary of 'bruSDM' object:
 #> 
 #> inlabru version: 2.5.2
-#> INLA version: 22.05.18-2
+#> INLA version: 22.06.03
 #> 
 #> Types of data modelled:
 #>                                     
@@ -126,7 +132,7 @@ summary(modelRun)
 #> Parks                Present absence
 #> Gbif                    Present only
 #> Time used:
-#>     Pre = 1.74, Running = 17.1, Post = 0.0217, Total = 18.8 
+#>     Pre = 1.45, Running = 16.7, Post = 0.0202, Total = 18.1 
 #> Fixed effects:
 #>                   mean    sd 0.025quant 0.5quant 0.975quant mode   kld
 #> Forest          -0.002 0.001     -0.005   -0.002      0.000   NA 0.099
@@ -139,9 +145,9 @@ summary(modelRun)
 #>     shared_spatial SPDE2 model
 #> 
 #> Model hyperparameters:
-#>                            mean    sd 0.025quant 0.5quant 0.975quant mode
-#> Theta1 for shared_spatial -3.39 0.004      -3.39    -3.39      -3.38   NA
-#> Theta2 for shared_spatial -8.00 0.004      -8.01    -8.00      -7.99   NA
+#>                            mean    sd 0.025quant 0.5quant 0.975quant  mode
+#> Theta1 for shared_spatial -3.39 0.004      -3.39    -3.39      -3.38 -3.39
+#> Theta2 for shared_spatial -8.00 0.004      -8.01    -8.00      -7.99 -8.00
 #> 
 #> Deviance Information Criterion (DIC) ...............: 4204.54
 #> Deviance Information Criterion (DIC, saturated) ....: -23256.48
