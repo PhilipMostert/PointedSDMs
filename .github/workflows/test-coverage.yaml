@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ChangingToR6]
 
-name: R-CMD-check
+name: test-coverage
 
 jobs:
   R-CMD-check:
