@@ -64,6 +64,7 @@ test_that('makeLhoods makes a list of likelihoods', {
                        family = obj$.__enclos_env__$private$Family,
                        mesh = obj$.__enclos_env__$private$INLAmesh,
                        ips = obj$.__enclos_env__$private$IPS,
+                       samplers = obj$.__enclos_env__$private$Samplers,
                        paresp = obj$.__enclos_env__$private$responsePA,
                        ntrialsvar = trialName,
                        markstrialsvar = markTrial,
