@@ -10,10 +10,11 @@
 #' @param markstrialsvar The trial variable name for the binomial marks.
 #' @param speciesname The name of the species variable used.
 #' @param speciesindex A vector containing the numeric index of where the species occurs in the data
+#' @param samplers A list of integration domains for the datasets.
 
 makeLhoods <- function(data, formula, family, mesh, ips,
                        paresp, ntrialsvar, markstrialsvar,
-                       speciesname, speciesindex) {
+                       speciesname, speciesindex, samplers) {
   
   Likelihoods <- list()
 
@@ -82,6 +83,7 @@ makeLhoods <- function(data, formula, family, mesh, ips,
                                                  Ntrials = Ntrials,
                                                  mesh = mesh,
                                                  ips = IPS,
+                                                 samplers = samplers[[names(data)[[dataset]]]],
                                                  family = family[[dataset]][process])
         
         if (is.null(names(data[[dataset]])[species])) nameGive <- names(data)[[dataset]]

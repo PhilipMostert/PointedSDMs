@@ -93,6 +93,7 @@ runModel <- function(data, options = list()) {
                      family = data$.__enclos_env__$private$Family,
                      mesh = data$.__enclos_env__$private$INLAmesh,
                      ips = data$.__enclos_env__$private$IPS,
+                     samplers = data$.__enclos_env__$private$Samplers,
                      paresp = data$.__enclos_env__$private$responsePA,
                      ntrialsvar = data$.__enclos_env__$private$trialsPA,
                      markstrialsvar = data$.__enclos_env__$private$trialsMarks,

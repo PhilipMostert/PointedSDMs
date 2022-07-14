@@ -70,6 +70,7 @@ The arguments of this function may be missing (ie not provided) if they have alr
 ## Method `dataSDM$addBias`
 ## ------------------------------------------------
 
+ 
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -263,6 +264,7 @@ dataObj$changeLink(Dataset = Dataset, Species = Species,
 \item \href{#method-dataSDM-specifySpatial}{\code{dataSDM$specifySpatial()}}
 \item \href{#method-dataSDM-changeLink}{\code{dataSDM$changeLink()}}
 \item \href{#method-dataSDM-spatialBlock}{\code{dataSDM$spatialBlock()}}
+\item \href{#method-dataSDM-addSamplers}{\code{dataSDM$addSamplers()}}
 \item \href{#method-dataSDM-new}{\code{dataSDM$new()}}
 \item \href{#method-dataSDM-samplingBias}{\code{dataSDM$samplingBias()}}
 }
@@ -443,7 +445,8 @@ Function used to add additional spatial fields (called \emph{bias fields}) to a 
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{ if (requireNamespace('INLA')) {
+\preformatted{ 
+ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -823,6 +826,25 @@ Function to spatially block the datasets, which will then be used for model cros
 
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-dataSDM-addSamplers"></a>}}
+\if{latex}{\out{\hypertarget{method-dataSDM-addSamplers}{}}}
+\subsection{Method \code{addSamplers()}}{
+Function to add an integration domain for the PO datasets.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$addSamplers(datasetName, Samplers)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{datasetName}}{Name of the dataset for the samplers.}
+
+\item{\code{Samplers}}{A \code{Spatial*} object representing the integration domain.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-dataSDM-new"></a>}}

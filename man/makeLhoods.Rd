@@ -14,7 +14,8 @@ makeLhoods(
   ntrialsvar,
   markstrialsvar,
   speciesname,
-  speciesindex
+  speciesindex,
+  samplers
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ makeLhoods(
 \item{speciesname}{The name of the species variable used.}
 
 \item{speciesindex}{A vector containing the numeric index of where the species occurs in the data}
+
+\item{samplers}{A list of integration domains for the datasets.}
 }
 \description{
 Function to make the datasets into likelihoods.

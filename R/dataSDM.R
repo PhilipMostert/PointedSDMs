@@ -721,7 +721,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' 
   #' 
   #' @examples
-  
+  #'  
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -1502,6 +1502,42 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
     
   }
+  ,
+  #' @description Function to add an integration domain for the PO datasets.
+  #' @param datasetName Name of the dataset for the samplers.
+  #' @param Samplers A \code{Spatial*} object representing the integration domain.
+  #' 
+  #' @example
+  #' 
+  #'  if (requireNamespace('INLA')) {
+  #'    
+  #'  #Get Data
+  #'  data("SolitaryTinamou")
+  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  data <- SolitaryTinamou$datasets
+  #'  mesh <- SolitaryTinamou$mesh
+  #'  mesh$crs <- proj
+  #'  
+  #'  #Set model up
+  #'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+  #'                              Projection = proj, responsePA = 'Present')
+  #'  
+  #' #Add integration domain for the eBird records
+  #' organizedData$addSamplers(datasetName = 'eBird', Samplers = SolitaryTinamou$region)
+  #' 
+  #' }
+  #' 
+  addSamplers = function(datasetName, Samplers) {
+    
+    if (!datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
+    
+    if (!inherits(Samplers, 'Spatial')) stop ('Samplers needs to be a Spatial* object.')
+    
+    Samplers@proj4string <- private$Projection
+    
+    private$Samplers[[datasetName]] <- Samplers
+    
+  }
   
 ))
 
@@ -1554,6 +1590,7 @@ dataSDM$set('private', 'multinomIndex', list())
 dataSDM$set('private', 'optionsINLA', list())
 
 dataSDM$set('private', 'spatialBlockCall', NULL)
+dataSDM$set('private', 'Samplers', list())
 
 #' @description Initialize function for dataSDM: used to store some compulsory arguments. Please refer to the wrapper function, \code{intModel} for creating new dataSDM objects.
 #' @param coordinates A vector of length 2 containing the names of the coordinates.
