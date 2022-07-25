@@ -16,28 +16,28 @@ NULL
 #' @name eBird_caerulescens
 #' @docType data
 #' @keywords data
-#' @references \url{https://ebird.org/home}.
+#' @references \url{https://ebird.org/home}
 NULL
 
 #' Dataset of setophaga fusca across Pennsylvania state.
 #' @name eBird_fusca
 #' @docType data
 #' @keywords data
-#' @references \url{https://ebird.org/home}.
+#' @references \url{https://ebird.org/home}
 NULL
 
 #' Dataset of setophaga magnolia across Pennsylvania state.
 #' @name eBird_magnolia
 #' @docType data
 #' @keywords data
-#' @references \url{https://ebird.org/home}.
+#' @references \url{https://ebird.org/home}
 NULL
 
 #' Dataset of setophaga caerulescens obtained from the Pennsylvania Atlas of Breeding Birds.
 #' @name BBA
 #' @docType data
 #' @keywords data
-#' @references \url{http://www.pabirdatlas.psu.edu}.
+#' @references \url{http://www.pabirdatlas.psu.edu}
 NULL
 
 
@@ -45,6 +45,6 @@ NULL
 #' @name BBS
 #' @docType data
 #' @keywords data
-#' @references \url{https://www.pwrc.usgs.gov/bbs/}.
+#' @references \url{https://www.pwrc.usgs.gov/bbs/}
 NULL
 
