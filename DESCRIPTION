@@ -16,7 +16,7 @@ Description: Integrated species distribution modeling is a rising field in quant
   There are also functions within the package to help run spatial cross-validation for model selection, as well as generic plotting and predicting functions.
   An introduction to these methods is discussed in Issac, Jarzyna, Keil, Dambly, Boersch-Supan, Browning, Freeman, Golding, Guillera-Arroita, Henrys, Jarvis, Lahoz-Monfort, Pagel, Pescott, Schmucki, Simmonds and O’Hara (2020) <doi:10.1016/j.tree.2019.08.006>.
 Depends:
-    R (>= 3.5),  
+    R (>= 4.2),  
     stats,
     methods,
     ggplot2,
