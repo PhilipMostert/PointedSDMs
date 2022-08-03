@@ -62,6 +62,7 @@ include:
 | `` `.$priorsFixed()` ``      | Change the specification of the prior distribution for the fixed effects in the model.                                                                          |
 | `` `.$specifySpatial()` ``   | Specify the spatial field in the model using penalizing complexity (PC) priors.                                                                                 |
 | `` `.$spatialBlock()` ``     | Used to specify how the points are spatially blocked. Spatial cross-validation is subsequently performed using `blockedCV()`.                                   |
+| `` `.$addSamplers()` ``      | Function to add an integration domain for the PO datasets.                                                                                                      |
 
 ## Example
 
@@ -124,7 +125,7 @@ summary(modelRun)
 #> Summary of 'bruSDM' object:
 #> 
 #> inlabru version: 2.5.2
-#> INLA version: 22.06.03
+#> INLA version: 22.07.01
 #> 
 #> Types of data modelled:
 #>                                     
@@ -132,7 +133,7 @@ summary(modelRun)
 #> Parks                Present absence
 #> Gbif                    Present only
 #> Time used:
-#>     Pre = 1.45, Running = 16.7, Post = 0.0202, Total = 18.1 
+#>     Pre = 1.43, Running = 16.5, Post = 0.02, Total = 17.9 
 #> Fixed effects:
 #>                   mean    sd 0.025quant 0.5quant 0.975quant mode   kld
 #> Forest          -0.002 0.001     -0.005   -0.002      0.000   NA 0.099
