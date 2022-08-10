@@ -1,3 +1,9 @@
+#' List of all data objects used for the Setophaga vignette.
+#' @name SetophagaData
+#' @docType data
+#' @keywords data
+NULL
+
 #' Raster object containing the elevation across Pennsylvania state.
 #' @name elev_raster
 #' @docType data
@@ -25,4 +31,3 @@ NULL
 #' @keywords data
 #' @references \url{https://www.pwrc.usgs.gov/bbs/}
 NULL
-
