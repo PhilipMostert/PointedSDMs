@@ -126,21 +126,62 @@ library(dplyr)
 
 ```
 
+Finally, additional objects required by *PointedSDMs* and the *R-INLA* [@martins2013bayesian] and *inlabru* [@bachl2019inlabru] packages need to be assembled.
+
+A *SpatialPolygons* object of Pennsylvania (obtained using the *USAboundaries* [@USABoundaries] package) is the first of these objects required, and it will be used to construct an *inla.mesh* object as well as help with the plotting of graphics. In order to create one of these polygons objects, we are first required to define the projection reference system (see `?CRS` ).
+
+```{r Map of PA}
+
+proj <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+
+PA <- USAboundaries::us_states(states = "Pennsylvania")
+PA <- PA$geometry[1]
+PA <- as(PA, "Spatial")
+
+```
+
 #### Species occurrence data
 
-The data necessary for this example is located within the package, and can be obtained with:
+For our analysis, we used five datasets containing the geocoded locations of our studed species'. The first three of these datasets are present only datasets obtained via *eBird* through the *spocc* package [@spocc], which is a toolkit used to obtain species' observation data from a selection of popular online data repositories (*GBIF*, *Vernet*, *BISON*, *iNaturalist* and *eBird*). These data were obtained using the following script:
+
+```{r, get_eBird}
+
+species <- c('caerulescens', 'fusca', 'magnolia')
+
+dataSets <- list()
+for (bird in species) {
+  
+  raw_data <- spocc::occ(
+              query = paste('Setophaga', bird),
+              from = "gbif",
+              date = c("2005-01-01", "2005-12-31"),
+              geometry = PA@bbox)$gbif
+  
+  rows <- grep("EBIRD", raw_data$data[[paste0('Setophaga_', bird)]]$collectionCode)
+  cols <- c("longitude", "latitude")
+  raw_coords <- data.frame(raw_data$data[[paste0('Setophaga_', bird)]][rows, cols])
+  
+  colnames(raw_coords) <- c("X", "Y")
+  
+  data_sp <- SpatialPointsDataFrame(coords = raw_coords[, c('X', 'Y')], 
+                                               data = data.frame(Species_name = rep(bird, nrow(raw_coords))),
+                                               proj4string = proj)
+  dataSets[[paste0('eBird_', bird)]] <- data_sp[!is.na(over(data_sp, PA)),]
+  
+  }
+
+```
+
+The *PointedSDMs* package also contains two additional structured datasets (*BBA, BBS*), which were both assumed to be presence absence datasets in the study conducted by @isaac2020data, containing the variable, *NPres*, denoting the presence (or number of presences in the *BBS* dataset) at each sampling location. However, we changed the *NPres* variable name of the *BBS* dataset to *Counts* in order to consider it a counts dataset for illustrative purposes. No additional changes were made to the *BBA* dataset, and so it was considered a presence absence dataset as originally intended. These datasets may be loaded using the following script:
 
 ```{r Load points}
 
 data('SetophagaData')
+dataSets[['BBA']] <- BBA
+dataSets[['BBS']] <- BBS
 
 ```
 
-For our analysis, we used five datasets containing the geocoded locations of our studed species'. The three present only datasets were obtained from the following github repository: <https://github.com/oharar/IM_warbler>, who in turn obtained their data via the *spocc* [@spocc] package, which is a toolkit to obtain species' observation data from a selection of popular online data repositories (*GBIF*, *Vernet*, *BISON*, *iNaturalist* and *eBird*).
-
-Their script was slightly adapted to obtain observations from the species, *magnolia* and *fusca*; however the script to obtain the presence only datasets (*eBird_caerulescens*, *eBird_fusca, eBird_magnolia)* remains fundamentally the same otherwise.
-
-The github repository noted above also contains two additional structured datasets (*BBA, BBS*), which were both assumed to be presence absence datasets in the study conducted by @isaac2020data, containing the variable, *NPres*, denoting the presence (or number of presences in the *BBS* dataset) at each sampling location. However, we changed the *NPres* variable name of the *BBS* dataset to *Counts* in order to consider it a counts dataset for illustrative purposes. No additional changes were made to the *BBA* dataset, and so it was considered a presence absence dataset as originally intended.\
 
 |   **Dataset name**   |   Sampling protocol    | **Number of observations** | **Species name** |                                                                   **Source**                                                                   |
 |:--------:|:--------:|:--------:|:--------:|:-------------------------------:|
@@ -164,20 +205,6 @@ names(covariates) <- c('elevation', 'canopy')
 ```
 
 #### Additional objects
-
-Finally, additional objects required by *PointedSDMs* and the *R-INLA* [@martins2013bayesian] and *inlabru* [@bachl2019inlabru] packages need to be assembled.
-
-A *SpatialPolygons* object of Pennsylvania (obtained using the *USAboundaries* [@USABoundaries] package) is the first of these objects required, and it will be used to construct an *inla.mesh* object as well as help with the plotting of graphics. In order to create one of these polygons objects, we are first required to define the projection reference system (see `?CRS` ).
-
-```{r Map of PA}
-
-proj <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-
-PA <- USAboundaries::us_states(states = "Pennsylvania")
-PA <- PA$geometry[1]
-PA <- as(PA, "Spatial")
-
-```
 
 The *R-INLA* package requires a Delaunay triangulated mesh used to approximate our spatial random fields, which is created by supplying the `max.edge`*,* `offset` and `cutoff` arguments as well as our *SpatialPolygons* map of Pennsylvania to the `inla.mesh.2d` function. With this mesh, `intModel` will create integration points required by our model using *inlabru*'s `ipoints` function.
 
@@ -205,8 +232,7 @@ The `intModel` function is the first step in the modeling of our species data. T
 
 ```{r Model prep, warning = FALSE, message = FALSE}
 
-spatial_data <- intModel(BBS, BBA, eBird_fusca, 
-                        eBird_caerulescens, eBird_magnolia,
+spatial_data <- intModel(dataSets,
                         Coordinates = c('X', 'Y'), 
                         Projection = proj, Mesh = mesh,
                         responsePA = 'NPres', responseCounts = 'Counts',
@@ -319,8 +345,7 @@ More so, we can compare the cross-validation score from this model to one withou
 
 ```{r No fields model, message = FALSE, warning = FALSE}
 
-no_fields <- intModel(BBS, BBA, eBird_fusca, 
-                      eBird_caerulescens, eBird_magnolia,
+no_fields <- intModel(dataSets,
                       Coordinates = c('X', 'Y'), 
                       pointsSpatial = FALSE,
                       Projection = proj, Mesh = mesh,
