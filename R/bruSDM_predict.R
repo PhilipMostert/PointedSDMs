@@ -360,7 +360,7 @@ plot.bruSDM_predict <- function(x,
     names(x[[1]]@data)[names(x[[1]]@data) == temporalName] <- '..temporal_variable_index..'
 
     ##Would be nice to get full temporal variable names in here ...
-    plot_grid <- ggplot() + inlabru::gg(x[[1]], aes_string(fill = whattoplot)) + facet_grid(~ ..temporal_variable_index..) + ggtitle('Plot of the temporal predictions')
+    plot_grid <- ggplot() + inlabru::gg(x[[1]], aes_string(fill = whattoplot)) + facet_wrap(~ ..temporal_variable_index..) + ggtitle('Plot of the temporal predictions')
     return(plot_grid)
     
   }
