@@ -12,34 +12,12 @@ NULL
 #' @references \url{https://cran.r-project.org/package=FedData}
 NULL
 
-#' Dataset of setophaga caerulescens across Pennsylvania state.
-#' @name eBird_caerulescens
-#' @docType data
-#' @keywords data
-#' @references \url{https://ebird.org/home}
-NULL
-
-#' Dataset of setophaga fusca across Pennsylvania state.
-#' @name eBird_fusca
-#' @docType data
-#' @keywords data
-#' @references \url{https://ebird.org/home}
-NULL
-
-#' Dataset of setophaga magnolia across Pennsylvania state.
-#' @name eBird_magnolia
-#' @docType data
-#' @keywords data
-#' @references \url{https://ebird.org/home}
-NULL
-
 #' Dataset of setophaga caerulescens obtained from the Pennsylvania Atlas of Breeding Birds.
 #' @name BBA
 #' @docType data
 #' @keywords data
 #' @references \url{http://www.pabirdatlas.psu.edu}
 NULL
-
 
 #' Dataset of setophaga caerulescens obtained from the North American Breeding Bird survey across Pennsylvania state.
 #' @name BBS

@@ -8,6 +8,6 @@
 Dataset of setophaga caerulescens obtained from the North American Breeding Bird survey across Pennsylvania state.
 }
 \references{
-\url{https://www.pwrc.usgs.gov/bbs/}.
+\url{https://www.pwrc.usgs.gov/bbs/}
 }
 \keyword{data}

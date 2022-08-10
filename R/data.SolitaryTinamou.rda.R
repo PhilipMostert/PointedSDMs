@@ -4,7 +4,6 @@
 #' @keywords data
 NULL
 
-
 #' data.frame object containing solitary tinamou observations from eBird
 #' @name eBird
 #' @docType data
