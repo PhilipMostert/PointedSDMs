@@ -163,7 +163,7 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
     
   } else initialnames <- NULL
   
-  if (!is.null(temporalName)) temporalModel <- deparse(temporalModel)
+  if (!is.null(temporalName)) temporalModel <- deparse1(temporalModel)
   
   bruData <- dataSDM$new(coordinates = Coordinates, projection = Projection,
                          Inlamesh = Mesh, initialnames = initialnames,
