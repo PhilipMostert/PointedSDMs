@@ -178,8 +178,8 @@ The *PointedSDMs* package also contains two additional structured datasets (*BBA
 ```{r Load points}
 
 data('SetophagaData')
-dataSets[['BBA']] <- BBA
-dataSets[['BBS']] <- BBS
+dataSets[['BBA']] <- SetophagaData$BBA
+dataSets[['BBS']] <- SetophagaData$BBS
 
 ```
 
@@ -200,7 +200,7 @@ Species distribution models study the relationship between our in-situ species o
 
 ```{r Covariate data, message = FALSE, warning = FALSE}
 
-covariates <- scale(stack(elev_raster, NLCD_canopy_raster))
+covariates <- scale(stack(SetophagaData$elev_raster, SetophagaData$NLCD_canopy_raster))
 names(covariates) <- c('elevation', 'canopy')
 
 ```
@@ -348,7 +348,7 @@ More so, we can compare the cross-validation score from this model to one withou
 
 no_fields <- intModel(dataSets,
                       Coordinates = c('X', 'Y'), 
-                      pointsSpatial = FALSE,
+                      pointsSpatial = NULL,
                       Projection = proj, Mesh = mesh,
                       responsePA = 'NPres', responseCounts = 'Counts',
                       spatialCovariates = covariates, speciesName = 'Species_name')
