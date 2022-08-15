@@ -120,9 +120,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       for (i in 1:length(index)) {
         
-        points[[data]][[i]] <- private$modelData[[data]][[i]][, names(private$modelData[[data]][[i]]) %in% c(private$speciesName, private$responseCounts,
+        points[[data]][[i]] <- private$modelData[[data]][[i]][, names(private$modelData[[data]][[i]]) %in% c(private$temporalName, private$speciesName, private$responseCounts,
                                                                                                              private$responsePA,'BRU_aggregate')]
-        
+       
         if ('BRU_aggregate' %in% names(points[[data]][[i]])) points[[data]][[i]] <- points[[data]][[i]][points[[data]][[i]]$BRU_aggregate,]
         
         if (!Species) points[[data]][[i]]@data[,'..Dataset_placeholder_var..'] <- rep(data, nrow(points[[data]][[i]]@data))
@@ -134,10 +134,31 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    plotData <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(points), function(x) x[, names(x) %in% c('..Dataset_placeholder_var..', private$speciesName)]))
+    plotData <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(points), function(x) x[, names(x) %in% c('..Dataset_placeholder_var..', private$speciesName, private$temporalName)]))
     
     if (Boundary) bound <- gg(private$polyfromMesh())
     else bound <- NULL
+    
+    if (!is.null(private$temporalName)) {
+      
+      if (Species) {
+       
+        plotData@data[, private$speciesName] <- unlist(private$speciesIndex) 
+        
+        colOption <- gg(plotData, aes(col = eval(parse(text = private$speciesName))))
+        stop('No')
+        ggplot() + colOption + bound + guides(col = guide_legend(title = 'Species Name')) + facet_wrap(formula(paste('~', private$temporalName)))
+        
+      }
+      else {
+        
+        colOption <- gg(plotData, aes(col = eval(parse(text = '..Dataset_placeholder_var..'))))
+  
+        ggplot() + colOption + bound + guides(col = guide_legend(title = 'Dataset Name')) + facet_wrap(formula(paste('~', private$temporalName)))
+        
+      }
+      
+    } else {
     
     if (Species) {
       
@@ -158,7 +179,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    
+    }
     
     
   }
