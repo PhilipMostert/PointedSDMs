@@ -429,7 +429,12 @@ Function used to add additional datasets to the \code{dataSDM} object. This func
 \subsection{Method \code{addBias()}}{
 Function used to add additional spatial fields (called \emph{bias fields}) to a selected dataset present in the integrated model. \emph{Bias fields} are typically used to account for sampling biases in opportunistic citizen science data in the absence of any covariate to do such.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataSDM$addBias(datasetNames = NULL, allPO = FALSE, biasField = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataSDM$addBias(
+  datasetNames = NULL,
+  allPO = FALSE,
+  biasField = NULL,
+  temporalModel = list(model = "ar1")
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -440,6 +445,8 @@ Function used to add additional spatial fields (called \emph{bias fields}) to a 
 \item{\code{allPO}}{Logical: should a bias field be added to all datasets classified as presence only in the integrated model. Defaults to \code{FALSE}.}
 
 \item{\code{biasField}}{An \code{inla.spde} object used to describe the bias field. Defaults to \code{NULL} which uses \code{\link[INLA]{inla.spde2.matern}} to create a Matern model for the field.}
+
+\item{\code{temporalModel}}{List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details. \code{temporalName} needs to be specified in \code{intModel} prior.}
 }
 \if{html}{\out{</div>}}
 }
