@@ -234,8 +234,7 @@ test_that('addBias is able to add bias fields to the model as well as succesfull
     
   }))[1])
 
-  expect_true('PO_biasField(main = coordinates, model = PO_bias_field)' %in% check$.__enclos_env__$private$Components)
-  
+  expect_true("PO_biasField(main = coordinates, model = PO_bias_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))"  %in% check$.__enclos_env__$private$Components)
   
 })
 
