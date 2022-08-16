@@ -1,0 +1,159 @@
+---
+title: "Spatiotemporal example"
+author: "Philip Mostert"
+date: "`r Sys.Date()`"
+bibliography: '`r system.file("References.bib", package="PointedSDMs")`'
+biblio-style: authoryear
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Spatiotemporal example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+
+```
+
+Studying the complex ecological systems across both space and time is imperative in understanding the full dynamics of species. This vignette illustrates the construction of a spatiotemporal ISDM using *PointedSDMs*, using data of species *Colinus virginianus* across Alabama (United States of America). The first step in this vignette is to load the required packages:
+
+```{r, load_packages}
+
+library(PointedSDMs)
+library(inlabru)
+library(ggplot2)
+library(spocc)
+library(INLA)
+library(dplyr)
+library(sp)
+library(sf)
+
+```
+
+as well as define some objects required by the model to run.
+
+```{r, Alabama_map}
+
+proj <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+
+AL <- USAboundaries::us_states(states = "Alabama")
+AL <- as(AL, "Spatial")
+
+mesh <- inla.mesh.2d(boundary = inla.sp2segment(AL), 
+                     cutoff = 0.1,
+                     max.edge = c(0.2, 0.8), 
+                     offset = c(0.1, 0.2))
+
+mesh$crs <- proj
+
+```
+
+The first dataset we consider is obtained from the North American Breeding Bird Survey. This dataset may be loaded directly from the package, and contains observations of the species between 2015 and 2017. This dataset is treated as replicate present-absent, where every point is assumed to be a visited site (or *route*).
+
+```{r, get_routes_data}
+
+data("BBSColinusVirginianus")
+
+```
+
+The second dataset considered is obtained via the citizen science program, *eBird*. These data are obtained via the R package, *spocc* using the script below, where a separate object of data points was created for each year to ensure that the number of records per year is equal.
+
+```{r, get_eBird_data}
+
+eBird2015 <- spocc::occ(
+  query = 'Colinus virginianus',
+  from = 'gbif',
+  date = c("2015-01-01", "2015-12-31"),
+  geometry = AL@bbox
+)$gbif
+
+eBird2016 <- spocc::occ(
+  query = 'Colinus virginianus',
+  from = 'gbif',
+  date = c("2016-01-01", "2016-12-31"),
+  geometry = AL@bbox
+)$gbif
+
+eBird2017 <- spocc::occ(
+  query = 'Colinus virginianus',
+  from = 'gbif',
+  date = c("2017-01-01", "2017-12-31"),
+  geometry = AL@bbox
+)$gbif
+
+eBird <- data.frame(eBird2015$data[[1]]) %>% 
+  bind_rows(data.frame(eBird2016$data[[1]])) %>% 
+  bind_rows(data.frame(eBird2017$data[[1]]))
+
+
+eBird <- SpatialPointsDataFrame(coords = cbind(Longitude = eBird$longitude, Latitude = eBird$latitude),
+                                data = data.frame(Year = eBird$year),
+                                proj4string = proj)
+
+eBird <- eBird[c(!is.na(over(eBird, AL[1]))),]
+
+```
+
+We then get onto the model description, which in this case includes a shared spatial field between the two datasets. This shared spatial field is characterized by an *ar1* process. To add this structure into the model, we specify the parameter *temporalModel* in the function `intModel` appropriately, Furthermore we specified the hyper parameters for both the random field and the temporal effect.
+
+```{r, setup_model}
+
+hyperParams <- list(rho = list(prior = "pc.prec", param = c(0.01, 0.01)))
+
+modelSetup <- intModel(eBird, BBSColinusVirginianus,
+                       Coordinates = c('Longitude', 'Latitude'),                                                    temporalName = 'Year', 
+                       Projection =  proj, Mesh = mesh, 
+                       responsePA =  'NPres', trialsPA = 'Ntrials',
+                       temporalModel = list(model = 'ar1', hyper = hyperParams))
+
+modelSetup$specifySpatial(sharedSpatial = TRUE, prior.sigma = c(0.2, 0.01), 
+                          prior.range = c(0.4, 0.01))
+
+```
+
+The data is spread across the map like this
+
+```{r, data_plot,fig.width=8, fig.height=5}
+
+modelSetup$plot()
+
+```
+
+The components for this model look like this:
+
+```{r, model_components}
+
+modelSetup$changeComponents()
+
+```
+
+Next we run the model, using the function `runModel`. Due to time considerations, inference for this model is not completed in the vignette. However, both the data and script is provided for the user to complete the analysis.
+
+```{r, run_model}
+
+mod <- runModel(modelSetup,
+                options = list(control.inla = list(int.strategy = 'eb')))
+ 
+```
+
+And finally create predictions for the three time periods, and plot them.
+
+```{r, predictions, fig.width=8, fig.height=5, message = FALSE}
+
+mesh$crs <- proj
+
+preds <- predict(mod, mask = AL, mesh = mesh, temporal = TRUE, fun = '')
+
+plot_preds <- plot(preds, whattoplot = 'median', plot = FALSE)
+
+plot_preds + 
+  gg(AL, lwd = 1.2) + 
+  scico::scale_fill_scico(palette = "lajolla") + 
+  theme_minimal()
+
+```
