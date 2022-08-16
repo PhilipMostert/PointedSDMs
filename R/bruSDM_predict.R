@@ -68,7 +68,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   ## if datasets !is.null but at least one not in model stop
   # else datasets <- all datasets in the model.
   ##Need another defense: only one of predictor; biasfield; temporal
-  if (sum(predictor, temporal, biasfield) > 1) stop('Please only choose one of: predictor, temporal and biasfield.')
+  if (sum(predictor, temporal) > 1 || sum(predictor, biasfield) > 1) stop('You cannot combine predictor with either "temporal" or "biasfield".')
   ## if non-null biasfields ## if no bias fields in stop: if biasnames not in biasfields stop
   if (biasfield && spatial) stop('Please choose one of biasfield and spatial.')
   
@@ -127,10 +127,28 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       timeData <- inlabru::cprod(data, data.frame(time_data))
       names(timeData@data) <- c(time_variable, 'weight')  
       
-      if (!is.null(covariates) && speciespreds) covariates <- as.vector(outer(paste0(unlist(object[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))
-      if (intercepts) intercept_terms <- paste0(unlist(object[['species']][['speciesIn']]), '_intercept')
+      #bias
       
-      time_formula <- paste0(fun,'(',paste0(c(covariates, intercept_terms, 'shared_spatial'), collapse = ' + '),')')
+      if (biasfield) {
+        
+        if (is.null(biasnames)) biasnames <- object$biasData
+        
+        biasnames <- paste0(biasnames,'_biasField')
+        
+        if (!all(biasnames %in% names(object$summary.random))) stop('Either no bias field has been used or an incorrect dataset name was given.')
+        
+        
+      } else biasnames <- NULL
+      
+      if (!is.null(covariates) && speciespreds) covariates <- as.vector(outer(paste0(unlist(object[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))
+      if (intercepts) {
+        
+      if (!is.null(object$species$speciesIn)) intercept_terms <- paste0(unlist(object[['species']][['speciesIn']]), '_intercept')
+      else intercept_terms <- paste0(object$source, '_intercept')
+        
+      }
+      
+      time_formula <- paste0(fun,'(',paste0(c(covariates, biasnames, intercept_terms, 'shared_spatial'), collapse = ' + '),')')
 
       formula = formula(paste('~',paste0('data.frame(', time_variable,' = ', time_variable, ',formula =', time_formula,')')))
 
