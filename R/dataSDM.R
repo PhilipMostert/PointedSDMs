@@ -591,7 +591,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       pointData$makeMultinom(multinomVars = private$temporalName,
                              return = 'time', oldVars = NULL)
       
-      private$temporalVars <- pointData$timeIndex #??
+      private$temporalVars <- pointData$timeIndex
       
     }
     
@@ -741,8 +741,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param datasetNames A vector of dataset names (class \code{character}) for which a bias field needs to be added to. If \code{NULL} (default), then \code{allPO} has to be \code{TRUE}.
   #' @param allPO Logical: should a bias field be added to all datasets classified as presence only in the integrated model. Defaults to \code{FALSE}.
   #' @param biasField An \code{inla.spde} object used to describe the bias field. Defaults to \code{NULL} which uses \code{\link[INLA]{inla.spde2.matern}} to create a Matern model for the field.
-  #' 
-  #' 
+  #' @param temporalModel List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details. \code{temporalName} needs to be specified in \code{intModel} prior.
   #' @examples
   #'  
   #'  if (requireNamespace('INLA')) {
@@ -764,7 +763,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' }
   addBias = function(datasetNames = NULL,
                      allPO = FALSE,
-                     biasField = NULL) {
+                     biasField = NULL,
+                     temporalModel = list(model = 'ar1')) {
     
     if (allPO) datasetNames <- names(private$printSummary)[private$printSummary == 'Present Only']
     else
@@ -795,7 +795,22 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     
     #Should I copy the bias fields for the marks?
-    private$Components <- c(private$Components, paste0(datasetNames ,'_biasField(main = coordinates, model = ', datasetNames, '_bias_field)'))
+    
+    if (!is.null(private$temporalName)) {
+
+      temporalModel <- deparse1(temporalModel)
+      
+      private$Components <- c(private$Components, paste0(datasetNames ,'_biasField(main = coordinates, model = ', datasetNames, '_bias_field, group = ', private$temporalName, ', ngroup = ', length(unique(unlist(private$temporalVars))),', control.group = ', temporalModel,')'))
+      
+      
+    }
+    else {
+      
+      private$Components <- c(private$Components, paste0(datasetNames ,'_biasField(main = coordinates, model = ', datasetNames, '_bias_field)'))
+      
+    }
+    
+    
     ##Things to do here:
     #Go into the liks of PO datasets and add the biasfield
     #Go inth the components and add the bias field component
