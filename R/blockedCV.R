@@ -60,6 +60,22 @@ blockedCV <- function(data, options = list()) {
   
   block_index <- lapply(unlist(data$.__enclos_env__$private$modelData), function(x) x@data[,'.__block_index__'])
   
+  if (!is.null(data$.__enclos_env__$private$temporalName)) {
+    
+    numTime <- length(unique(unlist(data$.__enclos_env__$private$temporalVars)))
+    
+    newIPS <- rep(list(data$.__enclos_env__$private$IPS), numTime)
+    
+    newIPS <- do.call(rbind.SpatialPointsDataFrame, newIPS)
+    
+    newIPS@data[, data$.__enclos_env__$private$temporalName] <- rep((1:length(numTime)), each = nrow(data$.__enclos_env__$private$IPS@data))
+    
+    newIPS@proj4string <- data$.__enclos_env__$private$Projection
+    
+    data$.__enclos_env__$private$IPS <- newIPS
+    
+  }
+  
   for (fold in unique(unlist(block_index))) {
     
     ##Maybe make block_index in dataSDM as a list such that we can see which datasets are not in block i to easily remove them.

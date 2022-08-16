@@ -87,6 +87,22 @@ runModel <- function(data, options = list()) {
   ##in case there are duplicates, will it cause an error??
   componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
   
+  if (!is.null(data$.__enclos_env__$private$temporalName)) {
+    
+    numTime <- length(unique(unlist(data$.__enclos_env__$private$temporalVars)))
+    
+    newIPS <- rep(list(data$.__enclos_env__$private$IPS), numTime)
+    
+    newIPS <- do.call(rbind.SpatialPointsDataFrame, newIPS)
+    
+    newIPS@data[, data$.__enclos_env__$private$temporalName] <- rep((1:length(numTime)), each = nrow(data$.__enclos_env__$private$IPS@data))
+    
+    newIPS@proj4string <- data$.__enclos_env__$private$Projection
+    
+    data$.__enclos_env__$private$IPS <- newIPS
+    
+    }
+  
   allLiks <- do.call(inlabru::like_list,
                      makeLhoods(data = data$.__enclos_env__$private$modelData,
                      formula = data$.__enclos_env__$private$Formulas,
