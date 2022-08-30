@@ -134,7 +134,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    plotData <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(points), function(x) x[, names(x) %in% c('..Dataset_placeholder_var..', private$speciesName, private$temporalName)]))
+    plotData <- do.call(sp::rbind.SpatialPointsDataFrame, lapply(unlist(points), function(x) x[, names(x) %in% c('..Dataset_placeholder_var..', private$speciesName, private$temporalName)]))
     
     if (Boundary) bound <- gg(private$polyfromMesh())
     else bound <- NULL
@@ -1411,7 +1411,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     private$spatialBlockCall <- paste0(gsub('.*\\(', 'self$spatialBlock(', deparse(match.call())))
 
-    blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
+    blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(sp::rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
                                                                 k = k, rows = rows, cols = cols, selection = 'random',
                                                                 verbose = FALSE, progress = FALSE, seed = seed, ...))
     
@@ -1444,7 +1444,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
           
         })
         
-        private$modelData[[data]][[process]] <- do.call(rbind.SpatialPointsDataFrame, blocked_data[[data]][[process]])
+        private$modelData[[data]][[process]] <- do.call(sp::rbind.SpatialPointsDataFrame, blocked_data[[data]][[process]])
         
       }
       
@@ -1460,7 +1460,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       if (nrow(blocked_ips[[i]]) !=0) blocked_ips[[i]]$.__block_index__ <- as.character(folds[i])
       
     }
-    private$IPS <- do.call(rbind.SpatialPointsDataFrame, blocked_ips)
+    private$IPS <- do.call(sp::rbind.SpatialPointsDataFrame, blocked_ips)
     
     if (length(private$biasData) > 0) {
       
@@ -1489,7 +1489,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
            
          })
          
-         private$biasData[[samplers]] <- do.call(rbind.SpatialPointsDataFrame, blocked_samplers[[samplers]])
+         private$biasData[[samplers]] <- do.call(sp::rbind.SpatialPointsDataFrame, blocked_samplers[[samplers]])
          
        } else 
          if (class(private$biasData[[sampler]] %in% c('SpatialPolygons', 'SpatialPolygonsDataFrame'))) {
@@ -1520,7 +1520,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       spatPolys <- private$polyfromMesh()
       
-      all_data <- do.call(rbind.SpatialPointsDataFrame, lapply(unlist(private$modelData, recursive = FALSE), function(x) {
+      all_data <- do.call(sp::rbind.SpatialPointsDataFrame, lapply(unlist(private$modelData, recursive = FALSE), function(x) {
         
         x[, '.__block_index__']
         
@@ -1845,7 +1845,7 @@ dataSDM$set('public', 'samplingBias', function(datasetName, Samplers) {
     private$biasData[[datasetName]] <- samplers
 
   }
-  else private$biasData[[datasetName]] <- do.call(rbind.SpatialPointsDataFrame, private$modelData[[datasetName]])
+  else private$biasData[[datasetName]] <- do.call(sp::rbind.SpatialPointsDataFrame, private$modelData[[datasetName]])
     
   self$changeComponents(addComponent = paste0(datasetName, '_samplers_field(main = coordinates, copy = "shared_spatial", fixed = FALSE)'), print = FALSE)
   self$changeComponents(addComponent = paste0(datasetName,'_samplers(1)'), print = FALSE)
