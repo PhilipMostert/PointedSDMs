@@ -51,7 +51,7 @@ intModel(
 
 \item{markFamily}{A vector with the statistical families (class \code{character}) assumed for the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".}
 
-\item{pointCovariates}{The non-spatial covariates to be included in the integrated model (for example, in the field of ecology the distance to the nearest road or time spemt sampling could be considered). These covariates must be included in the same data object as the points.}
+\item{pointCovariates}{The non-spatial covariates to be included in the integrated model (for example, in the field of ecology the distance to the nearest road or time spent sampling could be considered). These covariates must be included in the same data object as the points.}
 
 \item{pointsIntercept}{Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.}
 
