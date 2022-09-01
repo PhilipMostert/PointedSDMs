@@ -43,7 +43,7 @@ install.packages('PointedSDMs')
 *PointedSDMs* includes a selection of functions used to streamline the construction of ISDMs as well and perform model cross-validation. The core functions of the package are:
 
 | Function name  | Function description                                                                                          |
-|--------------|----------------------------------------------------------|
+|----------------|---------------------------------------------------------------------------------------------------------------|
 | `intModel()`   | Initialize and specify the components used in the integrated model.                                           |
 | `blockedCV()`  | Perform spatial blocked cross-validation.                                                                     |
 | `fitISDM()`    | Estimate and preform inference on the integrated model.                                                       |
@@ -52,7 +52,7 @@ install.packages('PointedSDMs')
 The function `intModel()` produces an [R6](https://github.com/r-lib/R6) object, and as a result there are various *slot functions* available to further specify the components of the model. These *slot functions* include:
 
 | `intModel()` slot function   | Function description                                                                                                                                            |
-|----------------|--------------------------------------------------------|
+|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `` `.$plot()` ``             | Used to create a plot of the available data. The output of this function is an object of class [`gg`](https://github.com/tidyverse/ggplot2).                    |
 | `` `.$addBias()` ``          | Add an additional spatial field to a dataset to account for sampling bias in unstructured datasets.                                                             |
 | `` `.$updateFormula()` ``    | Used to update a formula for a process. The idea is to start specify the full model with `intModel()`, and then thin components per dataset with this function. |

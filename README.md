@@ -45,7 +45,7 @@ core functions of the package are:
 |----------------|---------------------------------------------------------------------------------------------------------------|
 | `intModel()`   | Initialize and specify the components used in the integrated model.                                           |
 | `blockedCV()`  | Perform spatial blocked cross-validation.                                                                     |
-| `runModel()`   | Estimate and preform inference on the integrated model.                                                       |
+| `fitISDM()`    | Estimate and preform inference on the integrated model.                                                       |
 | `datasetOut()` | Perform dataset-out cross-validation, which calculates the impact individual datasets have on the full model. |
 
 The function `intModel()` produces an [R6](https://github.com/r-lib/R6)
@@ -114,13 +114,13 @@ model$plot(Boundary = FALSE) + gg(region)
 
 <img src="man/figures/README-plot-1.png" width="100%" />
 
-We can estimate the parameters in the model using the `runModel()`
+We can estimate the parameters in the model using the `fitISDM()`
 function:
 
 ``` r
 #Run the integrated model
 
-modelRun <- runModel(model, options = list(control.inla = list(int.strategy = 'eb')))
+modelRun <- fitISDM(model, options = list(control.inla = list(int.strategy = 'eb')))
 summary(modelRun)
 #> Summary of 'bruSDM' object:
 #> 
@@ -133,7 +133,7 @@ summary(modelRun)
 #> Parks                Present absence
 #> Gbif                    Present only
 #> Time used:
-#>     Pre = 1.43, Running = 16.5, Post = 0.02, Total = 17.9 
+#>     Pre = 1.54, Running = 16.7, Post = 0.0203, Total = 18.3 
 #> Fixed effects:
 #>                   mean    sd 0.025quant 0.5quant 0.975quant mode   kld
 #> Forest          -0.002 0.001     -0.005   -0.002      0.000   NA 0.099
