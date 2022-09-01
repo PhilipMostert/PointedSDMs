@@ -55,7 +55,7 @@ Plot for preduct_bru_sdm
                              Projection = proj, responsePA = 'Present')
  
   ##Run the model
-  modelRun <- runModel(organizedData, options = list(control.inla = list(int.strategy = 'eb')))
+  modelRun <- fitISDM(organizedData, options = list(control.inla = list(int.strategy = 'eb')))
    
   #Predict spatial field on linear scale
   predictions <- predict(modelRun, mesh = mesh, spatial = TRUE, fun = 'linear')

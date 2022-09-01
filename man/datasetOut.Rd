@@ -44,7 +44,7 @@ This function calculates the difference in covariate values between a full integ
                              Projection = proj, responsePA = 'Present')
  
   ##Run the model
-  modelRun <- runModel(organizedData,
+  modelRun <- fitISDM(organizedData,
               options = list(control.inla = list(int.strategy = 'eb')))
    
   #Choose dataset to leave out

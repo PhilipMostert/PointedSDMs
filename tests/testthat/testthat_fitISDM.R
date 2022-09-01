@@ -1,4 +1,4 @@
-test_that('runModel runs a dataSDM object, and produces an INLA model with extra metadata.', {
+test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra metadata.', {
   skip_on_cran()
   
   ##Set up a model
@@ -60,7 +60,7 @@ test_that('runModel runs a dataSDM object, and produces an INLA model with extra
                 speciesName = speciesName, spatialCovariates = cov)
   
   ##run model
-  spatMod <- runModel(data = obj, options  = list(control.inla=list(int.strategy='eb')))
+  spatMod <- fitISDM(data = obj, options  = list(control.inla=list(int.strategy='eb')))
   
   expect_setequal(class(spatMod), c('bruSDM', 'bru', 'iinla', 'inla'))
   expect_setequal(row.names(spatMod$summary.fixed), c( "fish_covariate", "bird_covariate",'fish_intercept', 'bird_intercept'))
@@ -83,7 +83,7 @@ test_that('runModel runs a dataSDM object, and produces an INLA model with extra
                 responsePA = responsePA, markNames = c('factvar', 'binommark'), markFamily = c('multinomial', 'binomial'),
                 speciesName = speciesName, spatialCovariates = cov, trialsMarks = 'marktrial')
 
-  spatMod2 <- runModel(data = obj2,
+  spatMod2 <- fitISDM(data = obj2,
                        options  = list(control.inla=list(int.strategy='eb')))
   
   expect_setequal(spatMod2[['source']], c('PO', 'PO', 'PA', 'PA'))

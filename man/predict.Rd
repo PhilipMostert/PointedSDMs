@@ -60,7 +60,7 @@
 A list of inlabru predict objects.
 }
 \description{
-Predict function for the object produced by \code{\link{runModel}}. Should act identically to \pkg{inlabru}'s generic predict function if wanted, but has additional arguments to help predict certain components created by the model. This is needed since \code{\link{intModel}} creates variable names which might not be directly apparent to the user.
+Predict function for the object produced by \code{\link{fitISDM}}. Should act identically to \pkg{inlabru}'s generic predict function if wanted, but has additional arguments to help predict certain components created by the model. This is needed since \code{\link{intModel}} creates variable names which might not be directly apparent to the user.
 }
 \details{
 Predict for bru_sdm
@@ -83,7 +83,7 @@ Predict for bru_sdm
                              Projection = proj, responsePA = 'Present')
  
   ##Run the model
-  modelRun <- runModel(organizedData, options = list(control.inla = list(int.strategy = 'eb')))
+  modelRun <- fitISDM(organizedData, options = list(control.inla = list(int.strategy = 'eb')))
    
   #Predict spatial field on linear scale
   predictions <- predict(modelRun, mesh = mesh, spatial = TRUE, fun = 'linear')

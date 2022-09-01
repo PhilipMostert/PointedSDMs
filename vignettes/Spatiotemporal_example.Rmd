@@ -132,11 +132,11 @@ modelSetup$changeComponents()
 
 ```
 
-Next we run the model, using the function `runModel`. Due to time considerations, inference for this model is not completed in the vignette. However, both the data and script is provided for the user to complete the analysis.
+Next we run the model, using the function `fitISDM`. Due to time considerations, inference for this model is not completed in the vignette. However, both the data and script is provided for the user to complete the analysis.
 
 ```{r, run_model}
 
-mod <- runModel(modelSetup,
+mod <- fitISDM(modelSetup,
                 options = list(control.inla = list(int.strategy = 'eb')))
  
 ```

@@ -7,7 +7,7 @@ setClass('bruSDM_predict')
 
 #' Predict for bru_sdm
 #' @title Generic predict function for \code{bru_SDM} objects.
-#' @description Predict function for the object produced by \code{\link{runModel}}. Should act identically to \pkg{inlabru}'s generic predict function if wanted, but has additional arguments to help predict certain components created by the model. This is needed since \code{\link{intModel}} creates variable names which might not be directly apparent to the user.
+#' @description Predict function for the object produced by \code{\link{fitISDM}}. Should act identically to \pkg{inlabru}'s generic predict function if wanted, but has additional arguments to help predict certain components created by the model. This is needed since \code{\link{intModel}} creates variable names which might not be directly apparent to the user.
 #' @param object A \code{bru_sdm} objects.
 #' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
 #' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.
@@ -48,7 +48,7 @@ setClass('bruSDM_predict')
 #'                              Projection = proj, responsePA = 'Present')
 #'  
 #'   ##Run the model
-#'   modelRun <- runModel(organizedData, options = list(control.inla = list(int.strategy = 'eb')))
+#'   modelRun <- fitISDM(organizedData, options = list(control.inla = list(int.strategy = 'eb')))
 #'    
 #'   #Predict spatial field on linear scale
 #'   predictions <- predict(modelRun, mesh = mesh, spatial = TRUE, fun = 'linear')
@@ -333,7 +333,7 @@ print.bruSDM_predict <- function(x, ...) {
 #'                              Projection = proj, responsePA = 'Present')
 #'  
 #'   ##Run the model
-#'   modelRun <- runModel(organizedData, options = list(control.inla = list(int.strategy = 'eb')))
+#'   modelRun <- fitISDM(organizedData, options = list(control.inla = list(int.strategy = 'eb')))
 #'    
 #'   #Predict spatial field on linear scale
 #'   predictions <- predict(modelRun, mesh = mesh, spatial = TRUE, fun = 'linear')

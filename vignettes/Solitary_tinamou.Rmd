@@ -114,11 +114,11 @@ base$priorsFixed(Effect = 'Forest', mean.linear = 0.5, prec.linear = 0.01)
 
 ```
 
-To run the integrated model, we use the `runModel` function with the `data` argument as the object created with the `intModel` function above.
+To run the integrated model, we use the `fitISDM` function with the `data` argument as the object created with the `intModel` function above.
 
 ```{r run base model, warning = FALSE, message = FALSE}
 
-baseModel <- runModel(data = base)
+baseModel <- fitISDM(data = base)
 baseModel
 
 ```
@@ -154,11 +154,11 @@ fields$addBias('eBird')
 
 ```
 
-Finally we run the integrated model, again with `runModel` but this time we specify options with *R-INLA*'s *empirical Bayes* integration strategy to help with computation time.
+Finally we run the integrated model, again with `fitISDM` but this time we specify options with *R-INLA*'s *empirical Bayes* integration strategy to help with computation time.
 
 ```{r run fields model, warning = FALSE, message = FALSE}
 
-fieldsModel <- runModel(fields, options = list(control.inla = list(int.strategy = 'eb')))
+fieldsModel <- fitISDM(fields, options = list(control.inla = list(int.strategy = 'eb')))
 
 ```
 

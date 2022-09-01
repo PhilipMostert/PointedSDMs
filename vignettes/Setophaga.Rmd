@@ -73,11 +73,11 @@ args(intModel)
 
 The output of this function is an *R6* object, and so there are several slot functions included to help specify the model at a finer scale. Use `?dataSDM` to get a comprehensive description of these slot functions.
 
-The next function used is `runModel` which takes the data object created with `intModel` and runs the integrated model. The output of this function is in essence an *inlabru* model output with additional information to be used by the sequential functions.
+The next function used is `fitISDM` which takes the data object created with `intModel` and runs the integrated model. The output of this function is in essence an *inlabru* model output with additional information to be used by the sequential functions.
 
-```{r runModel}
+```{r fitISDM}
 
-args(runModel)
+args(fitISDM)
 
 ```
 
@@ -371,13 +371,13 @@ spatialBlocked_no_fields
 
 Based on the DIC scores, we conclude that the model with the shared spatial field provides a better fit of the data.
 
-##### `runModel`
+##### `fitISDM`
 
-The integrated model is easily run with the `runModel` function as seen below by supplying the occurrence and *R-INLA* objects (created above with `intModel`).
+The integrated model is easily run with the `fitISDM` function as seen below by supplying the occurrence and *R-INLA* objects (created above with `intModel`).
 
 ```{r Running model, message=FALSE, warning=FALSE, eval = FALSE}
 
-joint_model <- runModel(data = spatial_data, 
+joint_model <- fitISDM(data = spatial_data, 
                        options = list(control.inla = list(int.strategy = 'eb')))
 
 ```
@@ -430,7 +430,7 @@ dataset_out
 
 ##### `predict`
 
-A significant part of SDMs is creating prediction maps to understand the species' spread. Predictions of the integrated SDM's from `runModel` are made easy using the `predict` function. By supplying the relevant components, the predict function will create the formula required by *inlabru*'s `predict` function to make predictive maps. In this example, we made predictions for the spatial fields of the species, on the linear scale using 1000 samples.
+A significant part of SDMs is creating prediction maps to understand the species' spread. Predictions of the integrated SDM's from `fitISDM` are made easy using the `predict` function. By supplying the relevant components, the predict function will create the formula required by *inlabru*'s `predict` function to make predictive maps. In this example, we made predictions for the spatial fields of the species, on the linear scale using 1000 samples.
 
 ```{r Projections, message = FALSE, warning = FALSE, eval = FALSE}
 

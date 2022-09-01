@@ -43,16 +43,16 @@ install.packages('PointedSDMs')
 *PointedSDMs* includes a selection of functions used to streamline the construction of ISDMs as well and perform model cross-validation. The core functions of the package are:
 
 | Function name  | Function description                                                                                          |
-|----------------|---------------------------------------------------------------------------------------------------------------|
+|--------------|----------------------------------------------------------|
 | `intModel()`   | Initialize and specify the components used in the integrated model.                                           |
 | `blockedCV()`  | Perform spatial blocked cross-validation.                                                                     |
-| `runModel()`   | Estimate and preform inference on the integrated model.                                                       |
+| `fitISDM()`    | Estimate and preform inference on the integrated model.                                                       |
 | `datasetOut()` | Perform dataset-out cross-validation, which calculates the impact individual datasets have on the full model. |
 
 The function `intModel()` produces an [R6](https://github.com/r-lib/R6) object, and as a result there are various *slot functions* available to further specify the components of the model. These *slot functions* include:
 
 | `intModel()` slot function   | Function description                                                                                                                                            |
-|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|----------------|--------------------------------------------------------|
 | `` `.$plot()` ``             | Used to create a plot of the available data. The output of this function is an object of class [`gg`](https://github.com/tidyverse/ggplot2).                    |
 | `` `.$addBias()` ``          | Add an additional spatial field to a dataset to account for sampling bias in unstructured datasets.                                                             |
 | `` `.$updateFormula()` ``    | Used to update a formula for a process. The idea is to start specify the full model with `intModel()`, and then thin components per dataset with this function. |
@@ -118,13 +118,13 @@ model$plot(Boundary = FALSE) + gg(region)
 
 ```
 
-We can estimate the parameters in the model using the `runModel()` function:
+We can estimate the parameters in the model using the `fitISDM()` function:
 
-```{r runModel, warning = FALSE, message = FALSE}
+```{r fitISDM, warning = FALSE, message = FALSE}
 
 #Run the integrated model
 
-modelRun <- runModel(model, options = list(control.inla = list(int.strategy = 'eb')))
+modelRun <- fitISDM(model, options = list(control.inla = list(int.strategy = 'eb')))
 summary(modelRun)
 
 ```

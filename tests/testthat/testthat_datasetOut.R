@@ -59,7 +59,7 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
                  responsePA = responsePA, markNames = c('factvar'), markFamily = c('multinomial'),
                  speciesName = speciesName, spatialCovariates = cov, pointsSpatial = NULL)
   
-  spatMod <- runModel(data = obj,
+  spatMod <- fitISDM(data = obj,
                       options  = list(control.inla=list(int.strategy='eb')))
   
   ##Remove PO from the model
