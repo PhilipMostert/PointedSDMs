@@ -43,7 +43,7 @@ runModel <- function(data, options = list()) {
   
   .Deprecated(new = 'fitISDM', package = 'PointedSDMs')
   
-  model <- fitISDMs(data = data, options = options)
+  model <- fitISDM(data = data, options = options)
   
   model
      
