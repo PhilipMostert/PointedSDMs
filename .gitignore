@@ -25,6 +25,7 @@ vignettes/*.pdf
 *.utf8.md
 *.knit.md
 # R Environment Variables
+._*
 .Renviron
 .DS_Store
 inst/doc
