@@ -143,7 +143,7 @@ PA <- as(PA, "Spatial")
 
 #### Species occurrence data
 
-For our analysis, we used five datasets containing the geocoded locations of our studed species'. The first three of these datasets are present only datasets obtained via *eBird* through the *spocc* package [@spocc], which is a toolkit used to obtain species' observation data from a selection of popular online data repositories (*GBIF*, *Vernet*, *BISON*, *iNaturalist* and *eBird*). These data were obtained using the following script:
+For our analysis, we used five datasets containing the geocoded locations of our studied species'. The first three of these datasets are present only datasets obtained via *eBird* through the *spocc* package [@spocc], which is a toolkit used to obtain species' observation data from a selection of popular online data repositories (*GBIF*, *Vernet*, *BISON*, *iNaturalist* and *eBird*). These data were obtained using the following script:
 
 ```{r, get_eBird}
 
