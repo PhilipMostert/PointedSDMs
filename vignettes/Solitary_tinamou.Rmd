@@ -125,6 +125,8 @@ baseModel
 
 ### Model with spatial fields
 
+#### Shared spatial field
+
 Spatial fields are fundamental in our spatial species distribution models, and so we include them in the model by setting `pointsSpatial = TRUE` in `intModel`. Furthermore, we will remove the intercept terms by specifying `pointsIntercept = FALSE`
 
 ```{r set up model with fields, warning = FALSE, message = FALSE}
@@ -159,6 +161,26 @@ Finally we run the integrated model, again with `fitISDM` but this time we speci
 ```{r run fields model, warning = FALSE, message = FALSE}
 
 fieldsModel <- fitISDM(fields, options = list(control.inla = list(int.strategy = 'eb')))
+
+```
+
+#### Copy field
+
+If we would like to share the spatial fields across the linear predictors using *INLA*'s `copy` feature, we can specify `pointsSpatial = 'copy` in `intModel()`:
+
+```{r copy model}
+
+copy <- intModel(datasets, Coordinates = c('X', 'Y'),
+                 Projection = projection, Mesh = mesh, responsePA = 'Present', 
+                 Offset = 'area', pointsSpatial = 'copy')
+
+copy$changeComponents()
+
+```
+
+```{r run copy model}
+
+copyModel <- fitISDM(copy, options = list(control.inla = list(int.strategy = 'eb')))
 
 ```
 

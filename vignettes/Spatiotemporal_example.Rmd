@@ -106,7 +106,7 @@ We then get onto the model description, which in this case includes a shared spa
 hyperParams <- list(rho = list(prior = "pc.prec", param = c(0.01, 0.01)))
 
 modelSetup <- intModel(eBird, BBSColinusVirginianus,
-                       Coordinates = c('Longitude', 'Latitude'),                                                    temporalName = 'Year', 
+                       Coordinates = c('Longitude', 'Latitude'),                                                    temporalName = 'Year',
                        Projection =  proj, Mesh = mesh, 
                        responsePA =  'NPres', trialsPA = 'Ntrials',
                        temporalModel = list(model = 'ar1', hyper = hyperParams))
