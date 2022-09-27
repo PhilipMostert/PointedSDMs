@@ -148,9 +148,14 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
         
       }
       
-      time_formula <- paste0(fun,'(',paste0(c(covariates, biasnames, intercept_terms, 'shared_spatial'), collapse = ' + '),')')
+      if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
+      else
+      if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in intModel.')
+      else spatial_obj <- paste0(datasets, '_spatial')
+      
+      time_formula <- paste0(fun,'(',paste0(c(covariates, biasnames, intercept_terms, spatial_obj), collapse = ' + '),')')
 
-      formula = formula(paste('~',paste0('data.frame(', time_variable,' = ', time_variable, ',formula =', time_formula,')')))
+      formula <- formula(paste('~',paste0('data.frame(', time_variable,' = ', time_variable, ',formula =', time_formula,')')))
 
       #int[['temporalPredictions']] <- predict(object, timeData, ~ data.frame(..temporal_variable_index.. = eval(parse(text = time_variable)), formula = eval(parse(text = time_formula))))
       int[['temporalPredictions']] <- predict(object, timeData, formula)
@@ -159,8 +164,8 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
       class(int) <- c('bruSDM_predict', class(int))
       
-      return(int)  
-      
+      return(int) 
+
     }
     
     if (biasfield) {
@@ -212,7 +217,9 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     if (spatial) {
       
       if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
-      else 
+      else
+        if (object$spatial$points == 'copy') spatial_obj <- paste0(object$source[1], '_spatial')
+      else
         if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in intModel.')
       else spatial_obj <- paste0(datasets, '_spatial')
       
