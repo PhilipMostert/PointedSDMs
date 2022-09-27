@@ -9,9 +9,9 @@ intModel(
   spatialCovariates = NULL,
   Coordinates,
   Projection,
-  Boundary = NULL,
   Mesh,
   IPS = NULL,
+  Boundary = NULL,
   speciesSpatial = TRUE,
   markNames = NULL,
   markFamily = NULL,
@@ -27,7 +27,8 @@ intModel(
   trialsMarks = NULL,
   speciesName = NULL,
   temporalName = NULL,
-  temporalModel = list(model = "ar1")
+  temporalModel = list(model = "ar1"),
+  copyModel = list(beta = list(fixed = FALSE))
 )
 }
 \arguments{
@@ -39,11 +40,11 @@ intModel(
 
 \item{Projection}{The coordinate reference system used by both the spatial points and spatial covariates. Must be of class \code{\link[sp]{CRS}} (see \code{CRS} from the \pkg{sp} package for more details).}
 
-\item{Boundary}{##NOT USED YET.}
-
 \item{Mesh}{An \code{inla.mesh} object required for the spatial random fields and the integration points in the model (see \code{\link[INLA]{inla.mesh.2d}} from the \pkg{INLA} package for more details).}
 
 \item{IPS}{The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[inlabru]{ipoints}} from the \pkg{inlabru} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} object.}
+
+\item{Boundary}{A \code{SpatialPolygonsDataFrame} object of the study area. If not missing, this object is used to help create the integration points.}
 
 \item{speciesSpatial}{Logical argument: should the species have their own individual spatial fields in the integrated model. Defaults to \code{TRUE}.}
 
@@ -59,7 +60,7 @@ intModel(
 
 \item{Offset}{Name of the offset variable (class \code{character}) in the datasets. Defaults to \code{NULL}; if the argument is non-\code{NULL}, the variable name needs to be standardized across datasets (but does not need to be included in all datasets). The offset variable will be transformed onto the log-scale in the integrated model.}
 
-\item{pointsSpatial}{Argument to determine whether the spatial field is shared between the datasets, or if each dataset has its own unique spatial field. May take on the values: \code{"shared"}, \code{"individual"} or \code{NULL} if no spatial field is required for the model. Defaults to \code{"shared"}.}
+\item{pointsSpatial}{Argument to determine whether the spatial field is shared between the datasets, or if each dataset has its own unique spatial field. The datasets may share a spatial field with \pkg{INLA}'s "copy" feature if the argument is set to \code{copy}. May take on the values: \code{"shared"}, \code{"individual"}, \code{"copy"} or \code{NULL} if no spatial field is required for the model. Defaults to \code{"shared"}.}
 
 \item{marksSpatial}{Logical argument: should the marks have their own spatial field. Defaults to \code{TRUE}.}
 
@@ -76,6 +77,8 @@ intModel(
 \item{temporalName}{Name of the temporal variable (class \code{character}) in the model. This variable is required to be in all the datasets. Defaults to \code{NULL}.}
 
 \item{temporalModel}{List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details.}
+
+\item{copyModel}{List of model specifications given to the hyper parameters for the  \code{"copy"} model. Defaults to \code{list(beta = list(fixed = FALSE))}.}
 }
 \value{
 A \code{\link{dataSDM}} object (class \code{R6}). Use \code{?dataSDM} to get a comprehensive description of the slot functions associated with this object.

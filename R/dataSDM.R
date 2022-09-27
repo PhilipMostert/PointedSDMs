@@ -280,7 +280,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
             
             cat("\n")
             dataNames <- paste0("dataset_", seq_len(length(dataList)))
-            
+            private$initialNames <- dataNames
           }
           
         }
@@ -290,7 +290,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       dataNames <- setdiff(as.character(match.call(expand.dots = TRUE)), 
                            as.character(match.call(expand.dots = FALSE)))
-    }
+      private$initialNames <- dataNames
+    
+      }
     
     if (!is.null(private$speciesName)) {
       
@@ -318,6 +320,14 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       if (private$Spatial == 'shared' && is.null(self$spatialFields$sharedField[['sharedField']])) self$spatialFields$sharedField[['sharedField']] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
       
+      else 
+        if (private$Spatial == 'copy') {
+          
+          mainName <- dataNames[[1]]
+          
+          if (is.null(self$spatialFields$datasetFields[[mainName]])) self$spatialFields$datasetFields[[mainName]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+          
+          } 
       else {
         
         for (dataset in dataNames) {
@@ -636,7 +646,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                                                      numtime = length(unique(unlist(private$temporalVars))),
                                                      temporalmodel = private$temporalModel,
                                                      speciesspatial = private$speciesSpatial,
-                                                     offsetname = private$Offset)
+                                                     offsetname = private$Offset,
+                                                     copymodel = private$copyModel)
       
     }
     else {
@@ -660,14 +671,14 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                                                 temporalmodel = private$temporalModel,
                                                 temporalname = private$temporalName,
                                                 speciesspatial = private$speciesSpatial,
-                                                offsetname = private$Offset)
+                                                offsetname = private$Offset,
+                                                copymodel = private$copyModel)
       
       
       private$Components <- union(private$Components, newComponents)
       
       
     }
-    
     
     if (!is.null(private$pointCovariates)) {
       
@@ -1247,14 +1258,23 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (sharedSpatial) {
       
-      if (is.null(private$Spatial)) stop('Shared spatial field not included in the model. Please use pointsSpatial = "shared" in intModel.')
+      if (is.null(private$Spatial)) stop('Shared spatial field not included in the model. Please use pointsSpatial = "shared" or pointsSpatial = "copy" in intModel.')
       else 
         if (private$Spatial == 'individual') stop('pointsSpatial specified as "individual" in intModel. Please specify a dataset spatial effect to specify with datasetName.')
       
       
+      if (private$Spatial == 'shared') {
+        
       field_type <- 'sharedField'
       if (!Remove) index <- 'sharedField'
       else index <- 'shared_spatial'
+      
+      } else {
+        
+        field_type <- 'datasetFields'
+        if (!Remove) index <- private$initialNames[[1]]
+        else index <- private$initialNames[[1]]
+      }
       
     }
     
@@ -1629,6 +1649,8 @@ dataSDM$set('private', 'optionsINLA', list())
 
 dataSDM$set('private', 'spatialBlockCall', NULL)
 dataSDM$set('private', 'Samplers', list())
+dataSDM$set('private', 'copyModel', NULL)
+dataSDM$set('private', 'datasetNames', NULL)
 
 #' @description Initialize function for dataSDM: used to store some compulsory arguments. Please refer to the wrapper function, \code{intModel} for creating new dataSDM objects.
 #' @param coordinates A vector of length 2 containing the names of the coordinates.
@@ -1647,18 +1669,20 @@ dataSDM$set('private', 'Samplers', list())
 #' @param spatial Logical argument describing if spatial effects should be included.
 #' @param intercepts Logical argument describing if intercepts should be included in the model.
 #' @param spatialcovariates Spatial covariates object used in the model.
-#' @param marksintercept Logical argument describing if the marks should have interceptes.
+#' @param marksintercept Logical argument describing if the marks should have intercepts.
 #' @param boundary A polygon map of the study area.
 #' @param ips Integration points and their respective weights to be used in the model.
 #' @param temporal Name of the temporal variable used in the model.
 #' @param offset Name of the offset column in the datasets.
+#' @param copymodel List of the specifications for the hyper parameters for the \code{"copy"} model.
 
 dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh, initialnames,
                                               responsecounts, responsepa, 
                                               marksnames, marksfamily, pointcovariates,
                                               trialspa, trialsmarks, speciesname, marksspatial,
                                               spatial, intercepts, spatialcovariates, marksintercepts,
-                                              boundary, ips, temporal, temporalmodel, speciesspatial, offset) {
+                                              boundary, ips, temporal, temporalmodel, speciesspatial, offset,
+                                              copymodel) {
   
   if (missing(coordinates)) stop('Coordinates need to be given.')
   if (missing(projection)) stop('projection needs to be given.')
@@ -1686,7 +1710,10 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   if (!missing(temporal)) private$temporalName <- temporal
   private$temporalModel <- temporalmodel
   
+  if (!is.null(copymodel)) private$copyModel <- copymodel
+  
   if (!missing(initialnames)) private$initialnames <- initialnames
+    
   if (!missing(boundary)) private$Boundary <- boundary
   
   if (!missing(offset)) private$Offset <- offset

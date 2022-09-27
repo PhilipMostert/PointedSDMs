@@ -57,6 +57,8 @@ datasetOut <- function(model, dataset,
   
   if (!inherits(model, 'bruSDM')) stop('Model needs to be of class "bru_sdm".')
   
+  if (model$spatial$points == 'copy') stop('copy model does not work with datasetOut.')
+  
   if (missing(dataset)) dataset <- unique(model[['source']])
   
   if (!all(dataset%in%model[['source']])) stop('Dataset provided not run in initial model.')

@@ -103,7 +103,8 @@ Internal functions used to temporarily store data and other information before a
   speciesspatial,
   numtime,
   temporalmodel,
-  offsetname
+  offsetname,
+  copymodel
 )}\if{html}{\out{</div>}}
 }
 

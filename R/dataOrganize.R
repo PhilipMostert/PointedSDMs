@@ -332,7 +332,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             
            if (spatial == 'shared') spat <- 'shared_spatial'
             else 
-              if (spatial == 'individual') spat <- paste0(names(self$Data)[[dataset]], '_spatial')
+              if (spatial %in% c('individual', 'copy')) spat <- paste0(names(self$Data)[[dataset]], '_spatial')
               
               } else spat <- NULL
             
@@ -442,6 +442,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
 #' @param numtime Number of time increments included in the model.
 #' @param speciesspatial Logical: Should the species be run with spatial fields.
 #' @param offsetname Name of the offset column in the datasets.
+#' @param copymodel List of the hyper parameters for the \code{copy} model.
 
 dataOrganize$set('public', 'makeComponents', function(spatial, intercepts, 
                                                       datanames, marks, speciesname,
@@ -452,7 +453,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
                                                       temporalname,
                                                       speciesspatial,
                                                       numtime,temporalmodel,
-                                                      offsetname) {
+                                                      offsetname,
+                                                      copymodel) {
   ##Copy for marks fields???
   if (length(self$SpeciesInData) != 0) species <- unique(unlist(self$SpeciesInData))
   else species = NULL
@@ -465,9 +467,21 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     else spat <- paste0('shared_spatial(main = coordinates, model = shared_field)')
     
     }
+    else 
+      if (spatial == 'copy') {
+      
+     mainName <- datanames[[1]]
+     
+     if (!is.null(temporalname)) spatMain <- paste0(mainName, '_spatial(main = coordinates, model = ', paste0(mainName,'_field'), ', group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
+     else spatMain <-  paste0(mainName, '_spatial(main = coordinates, model = ', paste0(mainName,'_field'),')')
+     spatCopy <-  paste0(datanames[datanames != mainName], '_spatial(main = coordinates, copy = \"', paste0(mainName,'_spatial'),'\", hyper = ', copymodel,')')
+     spat <- c(spatMain, spatCopy)    
+        
+      }
     else {
       
-     spat <-  paste0(datanames, '_spatial(main = coordinates, model =', paste0(datanames,'_field'),')')
+    if (!is.null(temporalname)) spat <- paste0(datanames, '_spatial(main = coordinates, model = ', paste0(datanames,'_field'), ', group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
+    else spat <-  paste0(datanames, '_spatial(main = coordinates, model =', paste0(datanames,'_field'),')')
       
     }
     

@@ -881,7 +881,8 @@ Function to add an integration domain for the PO datasets.
   temporal,
   temporalmodel,
   speciesspatial,
-  offset
+  offset,
+  copymodel
 )}\if{html}{\out{</div>}}
 }
 
