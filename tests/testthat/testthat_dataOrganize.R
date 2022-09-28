@@ -316,8 +316,8 @@ test_that('makeComponents is able to make the correct components for all the pro
     compsCopy <- Check$makeComponents(spatial = 'copy', intercepts = FALSE, datanames = c('PO','PA'),
                          marks = c('numvar', 'factvar', 'binommark'), marksspatial = FALSE, offsetname = NULL,
                          multinomnames = 'factvar', pointcovariates = 'pointcov', marksintercept = FALSE,
-                         speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = TRUE,
-                         covariateclass = 'numeric', numtime =  2,  copymodel = "list(beta = list(fixed = FALSE))")
+                         speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = TRUE, temporalname = NULL,
+                         covariateclass = 'numeric', numtime =  NULL,  copymodel = "list(beta = list(fixed = FALSE))")
     
     expect_setequal(compsCopy,c("PO_spatial(main = coordinates, model = PO_field)",                                          
                              "PA_spatial(main = coordinates, copy = \"PO_spatial\", hyper = list(beta = list(fixed = FALSE)))",

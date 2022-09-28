@@ -52,7 +52,7 @@ speciesSpatial <- TRUE
 temporalName <- 'temp'
 temporalModel <- deparse(list(model = 'ar1'))
 projection <- CRS('+proj=tmerc')
-
+copyModel = deparse1(list(beta = list(fixed = FALSE)))
 
 cov <- sp::spsample(x = SpatialPoly, n = 100000, type = 'random')
 cov$covariate <- rgamma(n = 100000, shape = 2)
@@ -79,7 +79,7 @@ test_that('dataSDMs initialize works as expected.', {
                        marksintercept = marksIntercept,
                        spatialcovariates = cov,
                        speciesname = speciesName,
-                       ips = iPoints,
+                       ips = iPoints, copymodel = copyModel,
                        spatial = 'shared', temporal = temporalName, 
                        intercepts = TRUE, temporalmodel = temporalModel)
   ##Test private classes
