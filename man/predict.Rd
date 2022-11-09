@@ -19,7 +19,7 @@
   biasfield = FALSE,
   biasnames = NULL,
   predictor = FALSE,
-  fun = "exp",
+  fun = "linear",
   ...
 )
 }
