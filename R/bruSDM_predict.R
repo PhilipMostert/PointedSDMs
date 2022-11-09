@@ -61,7 +61,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
                            mask = NULL, temporal = FALSE, covariates = NULL, spatial = FALSE,
                            intercepts = FALSE, datasets = NULL, species = NULL,
                            biasfield = FALSE, biasnames = NULL, predictor = FALSE,
-                           fun = 'exp', ...) {
+                           fun = 'linear', ...) {
   
   if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
   
