@@ -1250,11 +1250,11 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                             Bias, PC = TRUE,
                             Remove = FALSE, ...) {
     
-    if (all(!sharedSpatial && missing(datasetName) && missing(Species)  && missing(Mark)  &&  missing(Bias))) stop('At least one of sharedSpatial, datasetName, dataset, Species or mark needs to be provided.')
+    if (all(!sharedSpatial && missing(datasetName) && missing(Species)  && missing(Mark)  &&  missing(Bias))) stop('At least one of sharedSpatial, datasetName, dataset, Species or Mark needs to be provided.')
     
-    if (sum(sharedSpatial, !missing(datasetName), !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please only choose one of sharedSpatial, datasetName, Species, mark or bias.')
+    if (sum(sharedSpatial, !missing(datasetName), !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please only choose one of sharedSpatial, datasetName, Species, Mark or Bias.')
     
-    if (Remove && sum(sharedSpatial, !missing(datasetName), !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please choose one of sharedSpatial, datasetName, Species, mark or bias to remove.')
+    if (Remove && sum(sharedSpatial, !missing(datasetName), !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please choose one of sharedSpatial, datasetName, Species, Mark or Bias to remove.')
     
     if (sharedSpatial) {
       

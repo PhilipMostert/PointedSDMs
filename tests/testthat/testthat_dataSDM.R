@@ -295,7 +295,7 @@ test_that('specifySpatial can correctly specify the spatial fields', {
   
   #Check errors:
    #give none of: sharedSpatial, species, mark, bias
-  expect_error(check$specifySpatial(prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'At least one of sharedSpatial, datasetName, dataset, species or mark needs to be provided.')
+  expect_error(check$specifySpatial(prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'At least one of sharedSpatial, datasetName, dataset, Species or Mark needs to be provided.')
    #give wrong species name
   expect_error(check$specifySpatial(Species = 'elephant', prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5)), 'Species name provided is not currently in the model.')
    #give wrong mark name
