@@ -146,7 +146,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         plotData@data[, private$speciesName] <- unlist(private$speciesIndex) 
         
         colOption <- gg(plotData, aes(col = eval(parse(text = private$speciesName))))
-        stop('No')
+        
         ggplot() + colOption + bound + guides(col = guide_legend(title = 'Species Name')) + facet_wrap(formula(paste('~', private$temporalName)))
         
       }
@@ -467,8 +467,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (!is.null(markNames)) {
       
-      namesIn <- sapply(dataPoints, function(x) names(x))
-      
+      namesIn <- unlist(sapply(dataPoints, function(x) names(x)))
+      if (length(private$modelData) != 0) namesIn <- c(namesIn,  unlist(sapply(unlist(private$modelData), function(x) names(x@data))))
+        
       if (!all(markNames %in% unlist(namesIn))) stop('At least one mark specified is not present in the datasets, please check again.')
         
       if (!missing(markFamily)) {
