@@ -468,8 +468,6 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (!is.null(markNames)) {
       
       namesIn <- sapply(dataPoints, function(x) names(x))
-      
-      marksNot <- markNames[namesIn]
 
       if (!all(markNames %in% namesIn)) stop('At least one mark specified is not present in the datasets, please check again.')
         
