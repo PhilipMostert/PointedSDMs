@@ -31,6 +31,7 @@ test_that('makeLhoods makes a list of likelihoods', {
   PA$species <- sample(x = c('bird'), nrow(PA@data), replace = TRUE)
   mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
                              max.edge = 2)
+  mesh$crs <- proj
   iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
   ##Make PA a data.frame object
   PA <- data.frame(PA)
