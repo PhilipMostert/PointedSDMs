@@ -31,7 +31,8 @@ test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra 
   PA$species <- sample(x = c('bird'), nrow(PA@data), replace = TRUE)
   mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
                              max.edge = 2)
-  iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
+  #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
+  iPoints <- inlabru::ipoints(samplers = SpatialPoly)
   ##Make PA a data.frame object
   PA <- data.frame(PA)
   

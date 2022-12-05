@@ -31,7 +31,9 @@ PA$temp <- sample(x = c(1,2), size = nrow(PA@coords), replace = TRUE)
 if (requireNamespace("INLA")) {
 mesh <<- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
                             max.edge = 2)
-iPoints <<- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
+#iPoints <<- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
+iPoints <<- inlabru::ipoints(samplers = SpatialPoly)
+
 }
 
 ##Make PA a data.frame object

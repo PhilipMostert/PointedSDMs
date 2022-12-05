@@ -32,7 +32,9 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
   PA$species <- sample(x = c('bird'), nrow(PA@data), replace = TRUE)
   mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
                              max.edge = 2)
-  iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
+  #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
+  iPoints <- inlabru::ipoints(samplers = SpatialPoly)
+  
   ##Make PA a data.frame object
   PA <- data.frame(PA)
   
