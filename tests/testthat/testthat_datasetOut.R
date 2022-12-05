@@ -34,7 +34,7 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
                              max.edge = 2)
   #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
   iPoints <- inlabru::ipoints(samplers = SpatialPoly)
-  
+
   ##Make PA a data.frame object
   PA <- data.frame(PA)
   
