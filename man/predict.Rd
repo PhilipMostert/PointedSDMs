@@ -16,6 +16,7 @@
   intercepts = FALSE,
   datasets = NULL,
   species = NULL,
+  marks = NULL,
   biasfield = FALSE,
   biasnames = NULL,
   predictor = FALSE,
@@ -45,6 +46,8 @@
 \item{datasets}{Names of the datasets to include intercept and spatial term.}
 
 \item{species}{Names of the species to predict. Default of \code{NULL} results in all species being predicted.}
+
+\item{marks}{Names of the marks to include intercept and spatial term.}
 
 \item{biasfield}{Logical include bias field in prediction. Defaults to \code{FALSE}.}
 
