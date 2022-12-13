@@ -892,6 +892,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (!Points && is.null(markName)) stop ('markNames cannot be non-null if Points is FALSE.')
     
+    if (is.null(datasetName) && !is.null(markName)) {
+      
+      if (length(private$Formulas) > 1) stop('Please supply a dataset name with the mark.')
+      else datasetName <- names(private$Formulas)
+      
+    }
+    
     if (length(datasetName) != 1) stop ('Please only provide one dataset name.')
     
     if (!datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
@@ -960,7 +967,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       if (!is.null(markName)) {
         
         if (!markName %in% names(private$Formulas[[datasetName]][[name_index[1]]])) stop('markName not provided in datasetName.')
-        else index2 <- c(index2, which(names(private$Formulas[[datasetName]][[name_index[1]]]) %in% markName)) #Since they should all be the same ...
+        else index2 <- c(which(names(private$Formulas[[datasetName]][[name_index[1]]]) %in% markName)) #Since they should all be the same ...
         
         
       }
@@ -1311,7 +1318,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       if (!Mark %in% unlist(private$markNames)) stop('Mark name provided is not currently in the model.')
       
-      if (!Remove) field_type <- 'markFields'
+      field_type <- 'markFields'
+      if (!Remove) index <- Mark
       else index <- paste0(Mark, '_spatial')
       
     } 

@@ -18,6 +18,7 @@ setClass('bruSDM_predict')
 #' @param spatial Logical: include spatial effects in prediction. Defaults to \code{FALSE}.
 #' @param intercepts Logical: include intercept terms in prediction. Defaults to \code{FALSE}.
 #' @param datasets Names of the datasets to include intercept and spatial term.
+#' @param marks Names of the marks to include intercept and spatial term.
 #' @param species Names of the species to predict. Default of \code{NULL} results in all species being predicted.
 #' @param biasfield Logical include bias field in prediction. Defaults to \code{FALSE}.
 #' @param biasnames Names of the datasets to include bias term. Defaults to \code{NULL}. Note: the chosen dataset needs to be run with a bias field first; this can be done using \code{.$addBias} with the object produced by \code{\link{intModel}}.
@@ -60,7 +61,7 @@ setClass('bruSDM_predict')
 predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL, 
                            mask = NULL, temporal = FALSE, covariates = NULL, spatial = FALSE,
                            intercepts = FALSE, datasets = NULL, species = NULL,
-                           biasfield = FALSE, biasnames = NULL, predictor = FALSE,
+                           marks = NULL, biasfield = FALSE, biasnames = NULL, predictor = FALSE,
                            fun = 'linear', ...) {
   
   if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
@@ -71,6 +72,12 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   if (sum(predictor, temporal) > 1 || sum(predictor, biasfield) > 1) stop('You cannot combine predictor with either "temporal" or "biasfield".')
   ## if non-null biasfields ## if no bias fields in stop: if biasnames not in biasfields stop
   if (biasfield && spatial) stop('Please choose one of biasfield and spatial.')
+  
+  if (!is.null(marks)) {
+
+    if (!all(marks %in% unlist(object[['marks']][['marksIn']]))) stop('Marks provided not in model.')
+    
+  }
   
   if (is.null(datasets)) datasets <- unique(object$source)
   
@@ -85,11 +92,22 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   else {
     
     speciespreds <- FALSE
-    if (intercepts) intercept_terms <- paste0(datasets, '_intercept')
+    if (intercepts) {
+      
+      if (!is.null(marks)) marks_intercepts <- paste0(marks,'intercept')
+      
+      if (!is.null(datasets)) intercept_terms <- paste0(datasets, '_intercept')
+      
+    }
     
   }
   
-  if (!intercepts) intercept_terms <- NULL
+  if (!intercepts) {
+    
+    intercept_terms <- NULL
+    marks_intercepts <- NULL
+    
+  }
   
   if (!all(covariates%in%row.names(object$summary.fixed)) && !all(as.vector(outer(paste0(unlist(object[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))%in%row.names(object$summary.fixed))) stop("Covariates provided not in model.")
   
@@ -216,6 +234,11 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (spatial) {
       
+      if (!is.null(marks)) marks_spatial <- paste0(marks,'_spatial')
+      else marks_spatial <- NULL
+      
+      if (!is.null(marks_spatial)) {
+      
       if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
       else
         if (object$spatial$points == 'copy') spatial_obj <- paste0(object$source[1], '_spatial')
@@ -223,11 +246,12 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
         if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in intModel.')
       else spatial_obj <- paste0(datasets, '_spatial')
       
-    } 
+      } 
+      }
     else spatial_obj <- NULL
     
     if (predictor) formula_components <- c(row.names(object$summary.fixed), names(object$summary.random))
-    else formula_components <- c(covariates, intercept_terms, spatial_obj)
+    else formula_components <- c(covariates, intercept_terms, spatial_obj, marks_spatial, marks_intercepts)
     
     if (all(is.null(formula_components))) stop('Please specify at least one of: covariates, spatial, intercepts or biasfield.')
     
