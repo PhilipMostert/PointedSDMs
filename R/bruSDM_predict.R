@@ -93,8 +93,8 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     speciespreds <- FALSE
     if (intercepts) {
-      
-      if (!is.null(marks)) marks_intercepts <- paste0(marks,'intercept')
+    
+      if (!is.null(marks)) marks_intercepts <- paste0(marks,'_intercept')
       
       if (!is.null(datasets)) intercept_terms <- paste0(datasets, '_intercept')
       
@@ -234,10 +234,14 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (spatial) {
       
-      if (!is.null(marks)) marks_spatial <- paste0(marks,'_spatial')
+      if (!is.null(marks)) {
+        
+        marks_spatial <- paste0(marks,'_spatial')
+        spatial_obj <- NULL
+      }
       else marks_spatial <- NULL
       
-      if (!is.null(marks_spatial)) {
+      if (is.null(marks_spatial)) {
       
       if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
       else
