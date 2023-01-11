@@ -11,10 +11,12 @@
 #' @param speciesname The name of the species variable used.
 #' @param speciesindex A vector containing the numeric index of where the species occurs in the data
 #' @param samplers A list of integration domains for the datasets.
+#' @param pointcovs A vector of the point covariates used in the model.
 
 makeLhoods <- function(data, formula, family, mesh, ips,
                        paresp, ntrialsvar, markstrialsvar,
-                       speciesname, speciesindex, samplers) {
+                       speciesname, speciesindex, samplers,
+                       pointcovs = NULL) {
   
   Likelihoods <- list()
 
@@ -67,7 +69,6 @@ makeLhoods <- function(data, formula, family, mesh, ips,
           if (length(speciesindex) != 0) {
             
             speciesRep <- data.frame(rep(unique(data[[dataset]][[species]]@data[,speciesname]), nrow(ips@coords)))
-            names(speciesRep) <- speciesname
             
             IPS <- ips
             IPS@data <- cbind(ips@data, speciesRep)
@@ -77,6 +78,15 @@ makeLhoods <- function(data, formula, family, mesh, ips,
         }
         else IPS <- ips
         
+        if (!is.null(pointcovs)) {
+        
+        if (family[[dataset]][process] == 'cp' && any(pointcovs %in% names(data[[dataset]][[species]]))) {
+          
+          pointcovsIn <- pointcovs[pointcovs %in%  names(data[[dataset]][[species]])]
+          formula[[dataset]][[species]][[process]][['LHS']] <- reformulate(deparse(formula[[dataset]][[species]][[process]][['LHS']][[3]]), paste0('coordinates + ', pointcovsIn))
+          
+        }
+        }
         Likelihoods[[Likindex]] <- inlabru::like(formula = formula[[dataset]][[species]][[process]][['LHS']], ## but obs change these in function call
                                                  include = formula[[dataset]][[species]][[process]][['RHS']],
                                                  data = data[[dataset]][[species]], 

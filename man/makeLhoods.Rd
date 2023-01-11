@@ -15,7 +15,8 @@ makeLhoods(
   markstrialsvar,
   speciesname,
   speciesindex,
-  samplers
+  samplers,
+  pointcovs = NULL
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ makeLhoods(
 \item{speciesindex}{A vector containing the numeric index of where the species occurs in the data}
 
 \item{samplers}{A list of integration domains for the datasets.}
+
+\item{pointcovs}{A vector of the point covariates used in the model.}
 }
 \description{
 Function to make the datasets into likelihoods.
