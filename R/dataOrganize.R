@@ -531,7 +531,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
     if (marksspatial) {
       
-      marksSpat <- paste0(marks, '_spatial(main = coordinates, model = ', paste0(marks,'_field)'))
+      if (!is.null(temporalname)) marksSpat <- paste0(marks, '_spatial(main = coordinates, model = ', paste0(marks,'_field'), ', group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
+      else marksSpat <- paste0(marks, '_spatial(main = coordinates, model = ', paste0(marks,'_field)'))
       
     }
     else marksSpat <- NULL
