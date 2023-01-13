@@ -1227,6 +1227,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param Species Name of which of the species' spatial field to be specified. Requires \code{speciesName} to be non-\code{NULL} in \code{\link{intModel}}.
   #' @param Mark Name of which of the mark' spatial field to be specified. Requires \code{markNames} to be non-\code{NULL} in \code{\link{intModel}}.
   #' @param Bias Name of the dataset for which the bias field to be specified.
+  #' @param Copy Name of the dataset to create a copy using \code{\link[INLA]'s copy feature for a mark or bias field. Defaults to \code{NULL} which does not copy any field. Requires one of \code{Mark} or \code{Bias} to be specified.
   #' @param PC Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}, which uses \code{\link[INLA]{inla.spde2.pcmatern}} to specify the model; otherwise uses \code{\link[INLA]{inla.spde2.matern}}.
   #' @param Remove Logical: should the chosen spatial field be removed. Requires one of \code{sharedSpatial}, \code{species}, \code{mark} or \code{bias} to be non-missing, which chooses which field to remove.
   #' @param ... Additional arguments used by \pkg{INLA}'s \code{\link[INLA]{inla.spde2.pcmatern}} or \code{\link[INLA]{inla.spde2.matern}} function, dependent on the value of \code{PC}.
@@ -1260,6 +1261,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                             datasetName,
                             Species, Mark,
                             Bias, PC = TRUE,
+                            Copy = NULL,
                             Remove = FALSE, ...) {
     
     if (all(!sharedSpatial && missing(datasetName) && missing(Species)  && missing(Mark)  &&  missing(Bias))) stop('At least one of sharedSpatial, datasetName, dataset, Species or Mark needs to be provided.')
@@ -1267,6 +1269,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (sum(sharedSpatial, !missing(datasetName), !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please only choose one of sharedSpatial, datasetName, Species, Mark or Bias.')
     
     if (Remove && sum(sharedSpatial, !missing(datasetName), !missing(Species), !missing(Mark), !missing(Bias)) != 1) stop('Please choose one of sharedSpatial, datasetName, Species, Mark or Bias to remove.')
+    
+    if (!is.null(Copy) && !Copy %in% unlist(private$dataSource)) stop('Dataset name provided is not currently in the model.')
     
     if (sharedSpatial) {
       
@@ -1318,6 +1322,12 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       if (!Mark %in% unlist(private$markNames)) stop('Mark name provided is not currently in the model.')
       
+      if (!is.null(Copy)) {
+        
+        if (Mark %in% names(private$modelData[[copy]][[1]]@data)) stop('Mark not in dataset for provided.')
+        else fieldCopied <- paste0(Mark,'_spatial(main = coordinates, copy = \"', Copy, '\")')
+      }
+      
       field_type <- 'markFields'
       if (!Remove) index <- Mark
       else index <- paste0(Mark, '_spatial')
@@ -1332,9 +1342,17 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       if (!Remove) index <- Bias
       else index <- paste0(Bias, 'biasField')
       
+      if (!is.null(Copy)) fieldCopied <- paste0(Bias,'_biasField(main = coordinates, copy = \"', Bias, '\")')
+      
     }
     
     #if (missing(prior.range) || missing(prior.sigma)) stop('Both prior.range and prior.sigma need to be spefied.')
+    
+    if (!is.null(Copy)) {
+      
+      self$changeComponents(addComponent = fieldCopied, print = FALSE)
+      
+    }
     
     if (!Remove) {
       

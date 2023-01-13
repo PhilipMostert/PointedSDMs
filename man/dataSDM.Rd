@@ -676,6 +676,7 @@ Function to specify random fields in the model using penalizing complexity (PC) 
   Mark,
   Bias,
   PC = TRUE,
+  Copy = NULL,
   Remove = FALSE,
   ...
 )}\if{html}{\out{</div>}}
