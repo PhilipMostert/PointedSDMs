@@ -8,7 +8,8 @@
 [![R-CMD-check](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/PhilipMostert/PointedSDMs/branch/ChangingToR6/graph/badge.svg)](https://app.codecov.io/gh/PhilipMostert/PointedSDMs?branch=ChangingToR6)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7509481.svg)](https://doi.org/10.5281/zenodo.7509481)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7540831.svg)](https://doi.org/10.5281/zenodo.7540831)
+
 
 
 <!-- badges: end -->
