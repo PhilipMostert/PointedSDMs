@@ -1,7 +1,7 @@
 Package: PointedSDMs
 Type: Package
 Title: Fit Models Derived from Point Processes to Species Distributions using 'inlabru'
-Version: 1.1.1
+Version: 1.2.0
 Authors@R: c(
   person(given = "Philip", family = "Mostert", email = "philip.s.mostert@ntnu.no",
           role = c("aut", "cre")),
