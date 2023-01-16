@@ -1,0 +1,148 @@
+---
+title: "Marked Point Process"
+author: "Philip Mostert"
+date: "`r Sys.Date()`"
+bibliography: '`r system.file("References.bib", package="PointedSDMs")`'
+biblio-style: authoryear
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Marked Point Process}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE,
+  warning = FALSE,
+  message = FALSE
+)
+
+```
+
+Real datasets are often fairly complex, and information on the species other than their location data may also be collected. Additional information could be the length of a specific plant, or the weight of a group of mammals, something which describes the underlying characteristics of the studied species'. Using such information results in a *marked point process (*see @illian2012toolbox for an overview); and this framework may be incorporated in the *PointedSDMs* R package*.*
+
+This vignette gives an illustration on how include marks in the model framework, by using data on Eucalyptus globulus (common name: blue gum) on the *Koala Conservation Center on Philip Island* (Australia), collected by a community group between 1993 and 2004 [@moore2010palatability]. The dataset contains a multitude of different marks, however for this study we will be focusing on two: *food*, which is some index of the food value of the tree (calculated as dry matter intake multiplied by foliage palatability), and *koala*, describing the number of koala visits to each tree. No inference of the model is completed in this vignette due to computational intensity of the model. However the *R* script and data are provided below so that the user may carry out inference.
+
+```{r, setup}
+library(spatstat)
+library(PointedSDMs)
+library(sp)
+library(inlabru)
+library(INLA)
+```
+
+```{r load_data}
+
+data(Koala)
+eucTrees <- Koala$eucTrees
+boundary <- Koala$boundary
+
+```
+
+```{r, clean_data, echo = FALSE,fig.width=7, fig.height=5}
+
+proj <- CRS("+init=epsg:27700")
+
+boundary@proj4string <- proj
+
+euc <- SpatialPointsDataFrame(coords = cbind(x = eucTrees$E, y = eucTrees$N),
+                              data = data.frame(koala = eucTrees$koala,
+                                                nitrogen = eucTrees$nitrogen,
+                                                food = eucTrees$FOOD,
+                                                dbh = eucTrees$dbh),
+                              proj4string = proj)
+euc$food <- euc$food/1000
+euc <- euc[!c(is.na(over(euc, boundary))),]
+
+
+class(trees)
+
+mesh = inla.mesh.2d(boundary = boundary, max.edge = 20)
+mesh$crs <- proj
+ggplot() + 
+  gg(boundary) + 
+  gg(euc, aes(color = koala)) + 
+  ggtitle('Plot showing number of koalas at each site')
+
+ggplot() + 
+  gg(boundary) +
+  gg(euc, aes(color = food)) +
+  ggtitle('Plot showing the food value index at each site')
+
+
+```
+
+```{r, analysis_of_data, eval = FALSE}
+
+data(euc) ##will add this in the future when data is on archive
+
+```
+
+Lets first create a model for the tree locations only: in this example, we will assume that these locations are treated as *present-only* data.
+
+```{r, points_only,fig.width=7, fig.height=5}
+
+points <- intModel(euc, Coordinates = c('x', 'y'), 
+                  Projection = proj, Mesh = mesh)
+
+pointsModel <- fitISDM(points, options = list(control.inla = list(int.strategy = 'eb')))
+
+pointsPredictions <- predict(pointsModel, mask = boundary,
+                             mesh = mesh, predictor = TRUE)
+
+plot(pointsPredictions)
+```
+
+Now lets add the marks to this framework by specifying the name of the response variable of the marks with the argument `markNames`, and the family of the marks with the argument `markFamily`. Doing so will model each marks as a separate observation process, based on the family specified.
+
+```{r, include_marks,fig.width=7, fig.height=5}
+
+marks <- intModel(euc, Coordinates = c('x', 'y'), Projection = proj,
+                  markNames = c('food', 'koala'), markFamily = c('gaussian', 'poisson'),
+                  Mesh = mesh)
+
+marksModel <- fitISDM(marks,  options = list(control.inla = list(int.strategy = 'eb')))
+
+foodPredictions <- predict(marksModel, mask = boundary, 
+                           mesh = mesh, marks = 'food', spatial = TRUE)
+
+koalaPredictions <- predict(marksModel, mask = boundary, 
+                            mesh = mesh, marks = 'koala', spatial = TRUE)
+
+plot(foodPredictions)
+plot(koalaPredictions)
+```
+
+For the second mark model we only include the *food* mark, but this time we use a *log-linear* model with additive Gaussian noise. This is specified using the `.$updateFormula` slot function, and then by adding the scaling component to the *inlabru* components with the `.$addComponents` slot function to ensure that it is actually estimated. Moreover we assume *penalizing complexity* priors for the two spatial effects, as well as specify *bru_max_iter* in the *options* argument to keep the time to estimate down.
+
+```{r, marks_add_scaling,fig.width=7, fig.height=5}
+
+marks2 <- intModel(euc, Coordinates = c('x', 'y'), Projection = proj,
+                  markNames = 'food', markFamily = 'gaussian',
+                  Mesh = mesh, pointsSpatial = 'individual')
+
+marks2$updateFormula(markName = 'food', 
+      newFormula = ~ exp(food_intercept + (euc_spatial + 1e-6)*scaling + food_spatial))
+
+marks2$changeComponents(addComponent = 'scaling')
+
+marks2$specifySpatial(datasetName = 'euc', 
+                      prior.sigma = c(0.1, 0.01), 
+                      prior.range = c(10, 0.01))
+
+marks2$specifySpatial(Mark = 'food',  
+                      prior.sigma = c(0.1, 0.01), 
+                      prior.range = c(10, 0.01))
+
+marksModel2 <- fitISDM(marks2, options = list(control.inla = list(int.strategy = 'eb'),
+                                              bru_max_iter = 2))
+
+
+predsMarks2 <- predict(marksModel2, mask = boundary, mesh = mesh,
+    formula =  ~ (food_intercept + (euc_spatial + 1e-6)*scaling + food_spatial))
+
+plot(predsMarks2)
+```
