@@ -116,7 +116,7 @@ fitISDM <- function(data, options = list()) {
                                 markstrialsvar = data$.__enclos_env__$private$trialsMarks,
                                 speciesname = data$.__enclos_env__$private$speciesName,
                                 speciesindex = data$.__enclos_env__$private$speciesIndex,
-                                pointcovs = data$.__enclos_env__$private$pointCovariates))
+                                pointcovs = c(data$.__enclos_env__$private$pointCovariates, data$.__enclos_env__$private$Offset)))
   
   if (length(data$.__enclos_env__$private$biasData) > 0) {
     
