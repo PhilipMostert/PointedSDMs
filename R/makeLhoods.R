@@ -84,7 +84,7 @@ makeLhoods <- function(data, formula, family, mesh, ips,
           
           pointcovsIn <- pointcovs[pointcovs %in%  names(data[[dataset]][[species]])]
           formula[[dataset]][[species]][[process]][['LHS']] <- reformulate(deparse(formula[[dataset]][[species]][[process]][['LHS']][[3]]), paste0('coordinates + ', pointcovsIn))
-          
+        
         }
         }
         Likelihoods[[Likindex]] <- inlabru::like(formula = formula[[dataset]][[species]][[process]][['LHS']], ## but obs change these in function call

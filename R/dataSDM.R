@@ -685,10 +685,10 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    if (!is.null(private$pointCovariates)) {
+    if (!is.null(c(private$Offset, private$pointCovariates))) {
       
-      datMatrix <- as.data.frame(matrix(0, nrow = nrow(private$IPS@coords), ncol = length(private$pointCovariates)))
-      names(datMatrix) <- private$pointCovariates
+      datMatrix <- as.data.frame(matrix(0, nrow = nrow(private$IPS@coords), ncol = length(c(private$Offset, private$pointCovariates))))
+      names(datMatrix) <- c(private$pointCovariates, private$Offset)
       private$IPS@data <- cbind(private$IPS@data, datMatrix)
       
     }
