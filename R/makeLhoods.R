@@ -99,7 +99,7 @@ makeLhoods <- function(data, formula, family, mesh, ips,
         if (is.null(names(data[[dataset]])[species])) nameGive <- names(data)[[dataset]]
         else nameGive <- names(data[[dataset]])[species]
         
-        names(Likelihoods)[[Likindex]] <- paste0(nameGive, '_', as.character(formula[[dataset]][[species]][[process]][['LHS']])[2])
+        names(Likelihoods)[[Likindex]] <- paste0(nameGive, '_', sub(' .*', '', as.character(formula[[dataset]][[species]][[process]][['LHS']])[2]))
         
       } 
       
