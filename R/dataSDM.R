@@ -405,7 +405,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    if (missing(Offset)) offsetName <- private$Offset
+    if (missing(Offset)) Offset <- private$Offset
     else {
       
       if (!is.null(Offset) && any(Offset != private$Offset)) {
