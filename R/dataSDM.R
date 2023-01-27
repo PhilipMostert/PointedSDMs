@@ -408,7 +408,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (missing(Offset)) offsetName <- private$Offset
     else {
       
-      if (!is.null(Offset) && Offset != private$Offset) {
+      if (!is.null(Offset) && any(Offset != private$Offset)) {
         
         dataPoints <- nameChanger(data = dataPoints, oldName = Offset,
                                   newName = private$Offset)
@@ -417,6 +417,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       }
       
     }
+    
+    if (!is.null(Offset) && any(Offset %in% 'offset')) stop('The offset variable cannot be called "offset". Please choose a new name.')
     
     if (!is.null(private$speciesName)) {
       

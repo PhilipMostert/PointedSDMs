@@ -75,7 +75,7 @@ fitISDM <- function(data, options = list()) {
     
   }))
   )
-  formula_terms <<- formula_terms
+  
   comp_terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)
   
   #Will need to change this to say comp_terms %in% c(formula_terms, bias_terms)
