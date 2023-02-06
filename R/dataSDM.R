@@ -1455,7 +1455,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'                            pointsSpatial = 'individual')
   #' 
   #'  #Specify the spatial block
-  #'  organizedData$spatialBlock(k = 2, rows = 2, cols = 1, plot = TRUE)
+  #'  organizedData$spatialBlock(k = 2, rows = 2, cols = 1)
   #'
   #' } 
   #'
@@ -1790,9 +1790,9 @@ dataSDM$set('private', 'polyfromMesh', function(...) {
   coords <- na.omit(data.frame(loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 1],
                                loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 2]))
   
-  Polys <- Polygon(coords = coords)
-  Polys <- Polygons(srl = list(Polys), ID = 'id')
-  SpatPolys <- SpatialPolygons(list(Polys), proj4string = private$Projection)
+  Polys <- sp::Polygon(coords = coords)
+  Polys <- sp::Polygons(srl = list(Polys), ID = 'id')
+  SpatPolys <- sp::SpatialPolygons(list(Polys), proj4string = private$Projection)
   SpatPolys
   
 })   
