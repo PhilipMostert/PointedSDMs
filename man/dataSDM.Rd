@@ -246,7 +246,7 @@ dataObj$changeLink(Dataset = Dataset, Species = Species,
                            pointsSpatial = 'individual')
 
  #Specify the spatial block
- organizedData$spatialBlock(k = 2, rows = 2, cols = 1, plot = TRUE)
+ organizedData$spatialBlock(k = 2, rows = 2, cols = 1, plot = FALSE)
 
 } 
 
@@ -825,7 +825,7 @@ Function to spatially block the datasets, which will then be used for model cros
                            pointsSpatial = 'individual')
 
  #Specify the spatial block
- organizedData$spatialBlock(k = 2, rows = 2, cols = 1, plot = TRUE)
+ organizedData$spatialBlock(k = 2, rows = 2, cols = 1, plot = FALSE)
 
 } 
 

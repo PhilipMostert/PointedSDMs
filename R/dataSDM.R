@@ -1455,7 +1455,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'                            pointsSpatial = 'individual')
   #' 
   #'  #Specify the spatial block
-  #'  organizedData$spatialBlock(k = 2, rows = 2, cols = 1)
+  #'  organizedData$spatialBlock(k = 2, rows = 2, cols = 1, plot = FALSE)
   #'
   #' } 
   #'
