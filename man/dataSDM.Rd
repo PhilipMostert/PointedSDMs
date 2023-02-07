@@ -30,7 +30,7 @@ The arguments of this function may be missing (ie not provided) if they have alr
                              Projection = proj, responsePA = 'Present')
  
   #Create plot of data
-  organizedData$plot(Boundary = FALSE)
+  organizedData$plot()
 
 }
 
@@ -328,7 +328,7 @@ A ggplot object.
                              Projection = proj, responsePA = 'Present')
  
   #Create plot of data
-  organizedData$plot(Boundary = FALSE)
+  organizedData$plot()
 
 }
 }

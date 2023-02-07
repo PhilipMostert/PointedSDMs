@@ -88,7 +88,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'                              Projection = proj, responsePA = 'Present')
   #'  
   #'   #Create plot of data
-  #'   organizedData$plot(Boundary = FALSE)
+  #'   organizedData$plot()
   #' 
   #' }
   
@@ -1468,9 +1468,20 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                                                                 k = k, rows = rows, cols = cols, selection = 'random',
                                                                 verbose = FALSE, progress = FALSE, seed = seed, ...))
     
+    #blocks <- R.devices::suppressGraphics(blockCV::cv_spatial(x = do.call(sp::rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
+    #                                                          rows_cols = rows_cols, progress = FALSE, seed = seed, report = FALSE,
+    #                                                          plot = FALSE, ...))
+    
+    ##Temporary fix
+    
+    blocks$blocks <- as(blocks$blocks, 'Spatial')
+    
     folds <- blocks$blocks$folds
     
     blocksPoly <- list(sapply(1:(rows * cols), function(s) SpatialPolygons(blocks$blocks@polygons[s], proj4string = private$Projection)))
+    
+    #blocksPoly <- list(sapply(1:(rows * cols), function(s) blocks$blocks$geometry[s])) #, proj4string = private$Projection
+    #https://github.com/r-spatial/sf/wiki/migrating read this to see how to get points over
     
     blocked_data <- list()
     in_where <- list()
