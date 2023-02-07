@@ -88,7 +88,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'                              Projection = proj, responsePA = 'Present')
   #'  
   #'   #Create plot of data
-  #'   organizedData$plot()
+  #'   organizedData$plot(Boundary = FALSE)
   #' 
   #' }
   
