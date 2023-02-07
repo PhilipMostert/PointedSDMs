@@ -1474,9 +1474,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     ##Temporary fix
     
-    blocks$blocks <- as(blocks$blocks, 'Spatial')
-    
     folds <- blocks$blocks$folds
+    
+    blocks$blocks <- as(blocks$blocks, 'Spatial')
     
     blocksPoly <- list(sapply(1:(rows * cols), function(s) SpatialPolygons(blocks$blocks@polygons[s], proj4string = private$Projection)))
     
