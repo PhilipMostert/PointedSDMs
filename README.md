@@ -8,9 +8,7 @@
 [![R-CMD-check](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/PhilipMostert/PointedSDMs/branch/ChangingToR6/graph/badge.svg)](https://app.codecov.io/gh/PhilipMostert/PointedSDMs?branch=ChangingToR6)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7540831.svg)](https://doi.org/10.5281/zenodo.7540831)
-
-
+[![DOI](https://zenodo.org/badge/368823136.svg)](https://zenodo.org/badge/latestdoi/368823136)
 
 <!-- badges: end -->
 
@@ -74,12 +72,14 @@ integrated model, using three disparate datasets containing locations of
 the solitary tinamou (*Tinamus solitarius)*.
 
 ``` r
+
 library(PointedSDMs)
 library(ggplot2)
 library(raster)
 ```
 
 ``` r
+
 #Load data in
 
 data("SolitaryTinamou")
@@ -100,6 +100,7 @@ Setting up the model is done easily with `intModel()`, where we specify
 the required components of the model:
 
 ``` r
+
 #Specify model -- here we run a model with one spatial covariate and a shared spatial field
 
 model <- intModel(species, spatialCovariates = Forest, Coordinates = c('X', 'Y'),
@@ -110,6 +111,7 @@ We can also make a quick plot of where the species are located using
 `` `.$plot()` ``:
 
 ``` r
+
 region <- SolitaryTinamou$region
 
 model$plot(Boundary = FALSE) + gg(region)
@@ -121,13 +123,14 @@ We can estimate the parameters in the model using the `fitISDM()`
 function:
 
 ``` r
+
 #Run the integrated model
 
 modelRun <- fitISDM(model, options = list(control.inla = list(int.strategy = 'eb')))
 summary(modelRun)
 #> Summary of 'bruSDM' object:
 #> 
-#> inlabru version: 2.5.2
+#> inlabru version: 2.7.0
 #> INLA version: 22.07.01
 #> 
 #> Types of data modelled:
@@ -136,31 +139,31 @@ summary(modelRun)
 #> Parks                Present absence
 #> Gbif                    Present only
 #> Time used:
-#>     Pre = 1.47, Running = 16.5, Post = 0.0198, Total = 18 
+#>     Pre = 1.4, Running = 9.37, Post = 0.0518, Total = 10.8 
 #> Fixed effects:
 #>                   mean    sd 0.025quant 0.5quant 0.975quant mode   kld
-#> Forest          -0.002 0.001     -0.005   -0.002      0.000   NA 0.099
-#> eBird_intercept -0.244 0.047     -0.336   -0.244     -0.152   NA 0.505
-#> Parks_intercept -0.536 0.178     -0.892   -0.535     -0.191   NA 0.000
-#> Gbif_intercept  -0.553 0.048     -0.647   -0.553     -0.459   NA 0.285
+#> Forest          -0.003 0.001     -0.005   -0.003      0.000   NA 0.106
+#> eBird_intercept -0.238 0.047     -0.330   -0.238     -0.145   NA 0.481
+#> Parks_intercept -0.530 0.179     -0.886   -0.529     -0.185   NA 0.000
+#> Gbif_intercept  -0.547 0.048     -0.641   -0.547     -0.453   NA 0.269
 #> 
 #> Random effects:
 #>   Name     Model
 #>     shared_spatial SPDE2 model
 #> 
 #> Model hyperparameters:
-#>                            mean    sd 0.025quant 0.5quant 0.975quant  mode
-#> Theta1 for shared_spatial -3.39 0.004      -3.39    -3.39      -3.38 -3.39
-#> Theta2 for shared_spatial -8.00 0.004      -8.01    -8.00      -7.99 -8.00
+#>                             mean   sd 0.025quant 0.5quant 0.975quant   mode
+#> Theta1 for shared_spatial  -3.38 0.00      -3.38    -3.38      -3.38  -3.38
+#> Theta2 for shared_spatial -11.70 0.00     -11.70   -11.70     -11.70 -11.70
 #> 
-#> Deviance Information Criterion (DIC) ...............: 4204.54
-#> Deviance Information Criterion (DIC, saturated) ....: -23256.48
-#> Effective number of parameters .....................: 229.82
+#> Deviance Information Criterion (DIC) ...............: 4202.85
+#> Deviance Information Criterion (DIC, saturated) ....: -23258.17
+#> Effective number of parameters .....................: 229.40
 #> 
-#> Watanabe-Akaike information criterion (WAIC) ...: 3088.50
-#> Effective number of parameters .................: 653.03
+#> Watanabe-Akaike information criterion (WAIC) ...: 3085.09
+#> Effective number of parameters .................: 652.77
 #> 
-#> Marginal log-Likelihood:  -3891.83 
+#> Marginal log-Likelihood:  -3893.68 
 #>  is computed 
 #> Posterior summaries for the linear predictor and the fitted values are computed
 #> (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')
@@ -169,6 +172,7 @@ summary(modelRun)
 *PointedSDMs* also includes generic predict and plot functions:
 
 ``` r
+
 predictions <- predict(modelRun, mesh = mesh,
                        mask = region, 
                        spatial = TRUE,
