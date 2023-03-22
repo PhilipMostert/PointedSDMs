@@ -34,7 +34,7 @@ intModel(
 \arguments{
 \item{...}{The datasets to be used in the model. May come as either \code{data.frame} or \code{SpatialPoints*} objects, or as a list of objects with these classes. The classes of the datasets do not necessarily need to be standardized, however the variable names within them often have to be.}
 
-\item{spatialCovariates}{The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{Raster*} or \code{SpatialPixelsDataFrame} object. Can be either \code{numeric} or \code{factor}\\code{character} data.}
+\item{spatialCovariates}{The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{Raster*}, \code{SpatialPixelsDataFrame} or \code{SpatialRaster} object. Can be either \code{numeric}, \code{factor} or \code{character} data.}
 
 \item{Coordinates}{A vector of length 2 containing the names (class \code{character}) of the coordinate variables used in the model.}
 

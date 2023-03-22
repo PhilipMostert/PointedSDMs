@@ -1829,17 +1829,17 @@ dataSDM$set('private', 'spatialCovariates', function(spatialCovariates) {
   else spatcovsEnv <- parent.frame()
   
   if (!class(spatialCovariates) %in% c('RasterLayer', 'RasterBrick',
-                                       'RasterStack',
+                                       'RasterStack', 'SpatRaster',
                                        'SpatialPixelsDataFrame')) stop('The spatial Covariates need to be a Raster* object or a SpatialPixelsDataFrame.')
   
   spatcovsIncl <- names(spatialCovariates)
   
-  if (!inherits(spatialCovariates, 'Spatial')) {
-    #This won't work... will have to convert in runModel
-    objSpat <- as(spatialCovariates, 'SpatialPixelsDataFrame')
-    covsClass <- sapply(objSpat@data, class)
-    
-  } else covsClass <- sapply(spatialCovariates@data, class)
+  #if (class(spatialCovariates) %in% c('RasterLayer', 'RasterBrick', 'RasterStack')) objSpat <- terra::rast(spatialCovariates)
+  
+  if (inherits(spatialCovariates, 'Spatial')) covsClass <- sapply(spatialCovariates@data, class)
+  else if (inherits(spatialCovariates, 'SpatRaster')) covsClass <- sapply(as.data.frame(spatialCovariates), class)
+  else covsClass <- sapply(as.data.frame(terra::rast(spatialCovariates)), class)
+  
   
   if (is.null(private$ptcovsClass))   private$ptcovsClass <- covsClass
   else private$ptcovsClass <- c(private$ptcovsClass, covsClass) #correct? ## maybe even do this by names...

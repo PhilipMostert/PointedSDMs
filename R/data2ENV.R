@@ -13,16 +13,25 @@ data2ENV <- function(data, env) {
     spatCovs <- get(data$.__enclos_env__$private$spatcovsObj, 
                     envir = data$.__enclos_env__$private$spatcovsEnv)
     
-    if (!inherits(spatCovs, 'Spatial')) spatCovs <- as(spatCovs, 'SpatialPixelsDataFrame')
+    #if (!inherits(spatCovs, 'Spatial')) spatCovs <- as(spatCovs, 'SpatialPixelsDataFrame')
+    if (class(spatCovs) %in% c('RasterLayer', 'RasterBrick', 'RasterStack')) spatCovs <- terra::rast(spatCovs)
     
     if (is.null(data$.__enclos_env__$private$speciesIn)) {
       
       for (name in data$.__enclos_env__$private$spatcovsNames) {
         
+        if (inherits(spatCovs, 'Spatial')) {
         pixelsDF <- sp::SpatialPixelsDataFrame(points = spatCovs@coords,
                                                data = data.frame(spatCovs@data[,name]),
                                                proj4string = data$.__enclos_env__$private$Projection)
         names(pixelsDF@data) <- name
+        }
+        else {
+          
+          pixelsDF <- spatCovs[[name]]
+          pixelsDF <- terra::project(pixelsDF, as.character(data$.__enclos_env__$private$Projection))
+          
+        }
         #Note that if species is non-null we would also need to paste the species name to this.
         assign(name, pixelsDF, envir = env)
         
@@ -34,10 +43,21 @@ data2ENV <- function(data, env) {
         
         for (name in data$.__enclos_env__$private$spatcovsNames) {
           
+          if (inherits(spatCovs, 'Spatial')) {
+          
           pixelsDF <- sp::SpatialPixelsDataFrame(points = spatCovs@coords,
                                                  data = data.frame(spatCovs@data[,name]),
                                                  proj4string = data$.__enclos_env__$private$Projection)
           names(pixelsDF@data) <- paste0(species,'_',name)
+          
+          }
+          else {
+            
+            pixelsDF <- spatCovs[[name]]
+            names(pixelsDF) <- paste0(species,'_',name)
+            pixelsDF <- terra::project(pixelsDF, as.character(data$.__enclos_env__$private$Projection))
+            
+          }
           #Note that if species is non-null we would also need to paste the species name to this.
           assign(paste0(species,'_',name), pixelsDF, envir = env)
           
