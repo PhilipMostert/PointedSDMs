@@ -408,7 +408,7 @@ plot.bruSDM_predict <- function(x,
     if (length(whattoplot) > 1) stop('Please only plot one variable at a time for species plots.')
     
     
-    temporalName <- names(x[[1]]@data)[!names(x[[1]]@data) %in% c('weight',  'mean', 'sd', 'q0.025', 'median', 'q0.975', 'smin', 'smax', 'cv','var')]
+    temporalName <- names(x[[1]]@data)[!names(x[[1]]@data) %in% c('weight', 'mean', 'sd', 'q0.025', 'median', 'q0.975', 'q0.5', 'smin', 'smax', 'cv','mean.mc_std_err', 'sd.mc_std_err')]
     class(x[[1]]@data[,temporalName]) <- 'character'
     names(x[[1]]@data)[names(x[[1]]@data) == temporalName] <- '..temporal_variable_index..'
 
