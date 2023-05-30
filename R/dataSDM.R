@@ -261,7 +261,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
     else dataList <- FALSE
     
-    if (any(!unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame"))) stop("Datasets need to be either a SpatialPoints* object or a data frame.")
+    if (any(!unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame", 'sf'))) stop("Datasets need to be either a SpatialPoints* object, sf or a data frame.")
     
     if (!is.null(private$initialnames)) dataNames <- private$initialnames
     else
@@ -1426,8 +1426,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   ,
   #' @description Function to spatially block the datasets, which will then be used for model cross-validation with \code{\link{blockedCV}}. See the \code{\link[blockCV]{spatialBlock}} function from \pkg{blockCV} for how the spatial blocking works and for further details on the function's arguments.
   #' @param k Integer value reflecting the number of folds to use.
-  #' @param rows Integer value by which the area is divided into latitudinal bins.
-  #' @param cols Integer value by which the area is divided into longitudinal bins.
+  #' @param row_cols Integer value by which the area is divided into longitudinal and latitudinal bins.
   #' @param plot Plot the cross-validation folds as well as the points across the boundary. Defaults to \code{FALSE}.
   #' @param seed Seed used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}} to make the spatial blocking reproducible across different models. Defaults to \code{1234}. 
   #' @param ... Additional arguments used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}}.
@@ -1459,72 +1458,106 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'
   #' } 
   #'
-  spatialBlock =  function(k, rows, cols, plot = FALSE, seed = 1234, ...) {
+  spatialBlock =  function(k, row_cols, plot = FALSE, seed = 1234, ...) {
     
     
     private$spatialBlockCall <- paste0(gsub('.*\\(', 'self$spatialBlock(', deparse(match.call())))
 
-    blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(sp::rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
-                                                                k = k, rows = rows, cols = cols, selection = 'random',
-                                                                verbose = FALSE, progress = FALSE, seed = seed, ...))
+    #blocks <- R.devices::suppressGraphics(blockCV::spatialBlock(speciesData = do.call(sp::rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
+    #                                                            k = k, rows = rows, cols = cols, selection = 'random',
+    #                                                            verbose = FALSE, progress = FALSE, seed = seed, ...))
     
-    #blocks <- R.devices::suppressGraphics(blockCV::cv_spatial(x = do.call(sp::rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
-    #                                                          rows_cols = rows_cols, progress = FALSE, seed = seed, report = FALSE,
-    #                                                          plot = FALSE, ...))
+    blocks <- R.devices::suppressGraphics(blockCV::cv_spatial(x = do.call(sp::rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
+                                                              k = k, rows_cols = row_cols, progress = FALSE, seed = seed, report = FALSE, plot = plot, ...))
     
+    
+    foldID <- blocks$folds_ids
+    
+    dataLength <- unlist(lapply(unlist(append(unlist(private$modelData),private$IPS)), nrow))
+                         
+    for (i in 1:length(dataLength)) {
+   
+      if (i != length(dataLength)) {
+        
+        if (i == 1) start <- 0
+        else start <- cumsum(dataLength)[i-1]
+        
+        private$modelData[[i]][[1]]$.__block_index__ <- as.character(foldID[(1 + start):cumsum(dataLength)[i]])
+        
+        if (any(is.na(private$modelData[[i]][[1]]$.__block_index__))) {
+          
+          warning('NA values found in the blocking: will remove these observations')
+          private$modelData[[i]][[1]] <-  private$modelData[[i]][[1]][!is.na(private$modelData[[i]][[1]]$.__block_index__),]
+          
+        }
+        
+      }
+      
+      else {
+        
+        start <- cumsum(dataLength)[i-1]
+        
+        private$IPS$.__block_index__ <- as.character(foldID[(1 + start): cumsum(dataLength)[i]])
+        private$IPS$.__block_index__ <- private$IPS[!is.na(private$IPS$.__block_index__), ]
+        
+        
+      }
+      
+      
+    }
     ##Temporary fix
     
-    folds <- blocks$blocks$folds
+    #folds <- blocks$blocks$folds
     
-    blocks$blocks <- as(blocks$blocks, 'Spatial')
+    #blocks$blocks <- as(blocks$blocks, 'Spatial')
     
-    blocksPoly <- list(sapply(1:(rows * cols), function(s) SpatialPolygons(blocks$blocks@polygons[s], proj4string = private$Projection)))
+    #blocksPoly <- list(sapply(1:(rows * cols), function(s) SpatialPolygons(blocks$blocks@polygons[s], proj4string = private$Projection)))
     
     #blocksPoly <- list(sapply(1:(rows * cols), function(s) blocks$blocks$geometry[s])) #, proj4string = private$Projection
     #https://github.com/r-spatial/sf/wiki/migrating read this to see how to get points over
     
-    blocked_data <- list()
-    in_where <- list()
+    #blocked_data <- list()
+    #in_where <- list()
     
-    for (data in names(private$modelData)) {
+    #for (data in names(private$modelData)) {
       
-      for (process in names(private$modelData[[data]])) {
+    #  for (process in names(private$modelData[[data]])) {
         
-        in_where[[data]][[process]] <- lapply(1:(rows * cols), function(i) !is.na(over(private$modelData[[data]][[process]], blocksPoly[[1]][[i]])))
+    #    in_where[[data]][[process]] <- lapply(1:(rows * cols), function(i) !is.na(over(private$modelData[[data]][[process]], blocksPoly[[1]][[i]])))
         
-        for (i in 1:(rows * cols)) {
+    #    for (i in 1:(rows * cols)) {
           
-          blocked_data[[data]][[process]][[i]] <- private$modelData[[data]][[process]][in_where[[data]][[process]][[i]], ]
+    #      blocked_data[[data]][[process]][[i]] <- private$modelData[[data]][[process]][in_where[[data]][[process]][[i]], ]
           
-          if (nrow(blocked_data[[data]][[process]][[i]]) !=0) blocked_data[[data]][[process]][[i]]$.__block_index__ <- as.character(folds[i])
+    #      if (nrow(blocked_data[[data]][[process]][[i]]) !=0) blocked_data[[data]][[process]][[i]]$.__block_index__ <- as.character(folds[i])
           
-        }
-        
-        blocked_data[[data]][[process]] <- lapply(blocked_data[[data]][[process]], function(x) {
-          
-          row.names(x@data) <- NULL
-          row.names(x@coords) <- NULL
-          x
-          
-        })
-        
-        private$modelData[[data]][[process]] <- do.call(sp::rbind.SpatialPointsDataFrame, blocked_data[[data]][[process]])
-        
-      }
-      
-    }
+    #    }
     
-    blocked_ips <- list()
-    where_ips <- lapply(1:(rows * cols), function(i) !is.na(over(private$IPS, blocksPoly[[1]][[i]])))
+    #    blocked_data[[data]][[process]] <- lapply(blocked_data[[data]][[process]], function(x) {
+          
+    #      row.names(x@data) <- NULL
+    #      row.names(x@coords) <- NULL
+    #      x
+          
+    #    })
+        
+    #    private$modelData[[data]][[process]] <- do.call(sp::rbind.SpatialPointsDataFrame, blocked_data[[data]][[process]])
+        
+    #  }
+      
+    #}
     
-    for (i in 1:(rows * cols)) {
+    #blocked_ips <- list()
+    #where_ips <- lapply(1:(rows * cols), function(i) !is.na(over(private$IPS, blocksPoly[[1]][[i]])))
+    
+    #for (i in 1:(rows * cols)) {
       
-      blocked_ips[[i]] <- private$IPS[where_ips[[i]], ]
+    #  blocked_ips[[i]] <- private$IPS[where_ips[[i]], ]
       
-      if (nrow(blocked_ips[[i]]) !=0) blocked_ips[[i]]$.__block_index__ <- as.character(folds[i])
+    #  if (nrow(blocked_ips[[i]]) !=0) blocked_ips[[i]]$.__block_index__ <- as.character(folds[i])
       
-    }
-    private$IPS <- do.call(sp::rbind.SpatialPointsDataFrame, blocked_ips)
+    #}
+    #private$IPS <- do.call(sp::rbind.SpatialPointsDataFrame, blocked_ips)
     
     if (length(private$biasData) > 0) {
       
@@ -1584,18 +1617,18 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       spatPolys <- private$polyfromMesh()
       
-      all_data <- do.call(sp::rbind.SpatialPointsDataFrame, lapply(unlist(private$modelData, recursive = FALSE), function(x) {
+      all_data <<- do.call(sp::rbind.SpatialPointsDataFrame, lapply(unlist(private$modelData, recursive = FALSE), function(x) {
         
         x[, '.__block_index__']
         
         
       }))
-      
-      ggplot() + 
-        gg(blocks$blocks) +
-        blocks$plot$layers[[2]] +
+
+     # ggplot() + 
+        #geom_sf(data = blocks$blocks) +
+        #blocks$plot$layers[[2]] +
+        cv_plot(blocks) +
         gg(all_data, aes(col = .__block_index__)) +
-        gg(blocks$blocks) +
         gg(spatPolys) +
         labs(col = 'Block index') +
         ggtitle('Plot of the blocked data') +
