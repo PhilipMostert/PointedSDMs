@@ -70,6 +70,15 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
     for (dat in 1:length(datapoints)) {
       
       datasetname <- datanames[dat]
+      
+      if (inherits(datapoints[[dat]], 'sf')) {
+        
+        coordsSF <- st_coordinates(datapoints[[dat]])
+        colnames(coordsSF) <- coords
+        datapoints[[dat]][, coords] <- coordsSF
+        
+      }
+      
       dtSub <- datapoints[[dat]]
       data <- as.data.frame(dtSub)
       data_vars <- names(data)

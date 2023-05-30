@@ -7,8 +7,9 @@
 checkCoords <- function(data, coords) {
   
   coords_in <- sapply(data, function(dat) {
-    if (inherits(dat,'data.frame')) 
-      coords %in% names(dat)
+    if (inherits(dat,'data.frame'))
+      if (!inherits(dat, 'sf')) coords %in% names(dat)
+      else TRUE
     else if (inherits(dat, "Spatial")) {
       x_coord <- colnames(dat@coords)[1]
       y_coord <- colnames(dat@coords)[2]
