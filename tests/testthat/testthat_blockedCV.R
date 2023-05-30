@@ -51,7 +51,7 @@ test_that('blockedCV completes spatial block cross-validation.', {
                   responsePA = responsePA, markNames = NULL, markFamily = NULL,
                   speciesName = speciesName)
   
-  obj$spatialBlock(k = 2, rows = 2, cols = 1)
+  obj$spatialBlock(k = 2, rows_cols = c(2,1))
   
   ##run model
   blocked <- blockedCV(data = obj, options  = list(control.inla=list(int.strategy='eb')))
