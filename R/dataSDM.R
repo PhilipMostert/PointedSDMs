@@ -1426,7 +1426,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   ,
   #' @description Function to spatially block the datasets, which will then be used for model cross-validation with \code{\link{blockedCV}}. See the \code{\link[blockCV]{spatialBlock}} function from \pkg{blockCV} for how the spatial blocking works and for further details on the function's arguments.
   #' @param k Integer value reflecting the number of folds to use.
-  #' @param row_cols Integer value by which the area is divided into longitudinal and latitudinal bins.
+  #' @param rows_cols Integer value by which the area is divided into longitudinal and latitudinal bins.
   #' @param plot Plot the cross-validation folds as well as the points across the boundary. Defaults to \code{FALSE}.
   #' @param seed Seed used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}} to make the spatial blocking reproducible across different models. Defaults to \code{1234}. 
   #' @param ... Additional arguments used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}}.
@@ -1468,7 +1468,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     #                                                            verbose = FALSE, progress = FALSE, seed = seed, ...))
     
     blocks <- R.devices::suppressGraphics(blockCV::cv_spatial(x = do.call(sp::rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
-                                                              k = k, rows_cols = row_cols, progress = FALSE, seed = seed, report = FALSE, plot = plot, ...))
+                                                              k = k, rows_cols = rows_cols, progress = FALSE, seed = seed, report = FALSE, plot = plot, ...))
     
     
     foldID <- blocks$folds_ids
