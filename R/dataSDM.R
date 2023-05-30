@@ -1458,7 +1458,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'
   #' } 
   #'
-  spatialBlock =  function(k, row_cols, plot = FALSE, seed = 1234, ...) {
+  spatialBlock =  function(k, rows_cols, plot = FALSE, seed = 1234, ...) {
     
     
     private$spatialBlockCall <- paste0(gsub('.*\\(', 'self$spatialBlock(', deparse(match.call())))
