@@ -22,7 +22,7 @@ setClass('bruSDM_predict')
 #' @param species Names of the species to predict. Default of \code{NULL} results in all species being predicted.
 #' @param biasfield Logical include bias field in prediction. Defaults to \code{FALSE}.
 #' @param biasnames Names of the datasets to include bias term. Defaults to \code{NULL}. Note: the chosen dataset needs to be run with a bias field first; this can be done using \code{.$addBias} with the object produced by \code{\link{intModel}}.
-#' @param predictor Should all terms run in the linear predictor be included in the predictions. Defaults to \code{FALSE}.
+#' @param predictor Should all terms (except the bias terms) included in the linear predictor be used in the predictions. Defaults to \code{FALSE}.
 #' @param fun Function used to predict. Set to \code{'linear'} if effects on the linear scale are desired.
 #' @param ... Additional arguments used by the inlabru \code{predict} function.
 #' 
@@ -254,7 +254,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       }
     else spatial_obj <- NULL
     
-    if (predictor) formula_components <- c(row.names(object$summary.fixed), names(object$summary.random))
+    if (predictor) formula_components <- c(row.names(object$summary.fixed), names(object$summary.random)[!names(object$summary.random) %in% paste0(object[['source']], '_biasField')])
     else formula_components <- c(covariates, intercept_terms, spatial_obj, marks_spatial, marks_intercepts)
     
     if (all(is.null(formula_components))) stop('Please specify at least one of: covariates, spatial, intercepts or biasfield.')
