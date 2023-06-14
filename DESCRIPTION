@@ -18,11 +18,11 @@ Description: Integrated species distribution modeling is a rising field in quant
 Depends:
     R (>= 4.1),  
     stats,
+    R6 (>= 2.5),
     methods,
-    ggplot2
-    Imports:
-    R6,
+Imports:
     terra,
+    ggplot2,
     inlabru (>= 2.5),
     sp (>= 1.4-5),
     raster,
