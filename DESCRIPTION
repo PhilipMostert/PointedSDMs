@@ -19,11 +19,11 @@ Depends:
     R (>= 4.1),  
     stats,
     methods,
-    ggplot2,
-    inlabru (>= 2.5)
-Imports:
+    ggplot2
+    Imports:
     R6,
     terra,
+    inlabru (>= 2.5),
     sp (>= 1.4-5),
     raster,
     R.devices,
