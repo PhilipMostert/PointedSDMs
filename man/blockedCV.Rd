@@ -24,7 +24,7 @@ This function is used to perform spatial blocked cross-validation with regards t
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj

@@ -78,7 +78,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj
@@ -208,7 +208,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
   #'  
   #'  #Only select eBird data
   #'  ebird <- SolitaryTinamou$datasets$eBird
@@ -766,7 +766,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj
@@ -855,7 +855,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj
@@ -1087,7 +1087,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj
@@ -1144,7 +1144,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj
@@ -1240,7 +1240,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj
@@ -1440,7 +1440,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj
@@ -1648,7 +1648,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj

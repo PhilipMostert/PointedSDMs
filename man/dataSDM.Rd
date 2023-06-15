@@ -20,7 +20,7 @@ The arguments of this function may be missing (ie not provided) if they have alr
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -43,7 +43,7 @@ The arguments of this function may be missing (ie not provided) if they have alr
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  
  #Only select eBird data
  ebird <- SolitaryTinamou$datasets$eBird
@@ -75,7 +75,7 @@ The arguments of this function may be missing (ie not provided) if they have alr
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -98,7 +98,7 @@ organizedData$addBias(datasetNames = 'eBird')
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -133,7 +133,7 @@ organizedData$addBias(datasetNames = 'eBird')
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -160,7 +160,7 @@ organizedData$addBias(datasetNames = 'eBird')
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -186,7 +186,7 @@ organizedData$addBias(datasetNames = 'eBird')
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -232,7 +232,7 @@ dataObj$changeLink(Dataset = Dataset, Species = Species,
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -318,7 +318,7 @@ A ggplot object.
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -395,7 +395,7 @@ Function used to add additional datasets to the \code{dataSDM} object. This func
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  
  #Only select eBird data
  ebird <- SolitaryTinamou$datasets$eBird
@@ -457,7 +457,7 @@ Function used to add additional spatial fields (called \emph{bias fields}) to a 
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -522,7 +522,7 @@ If \code{Formula} and \code{newFormula} are missing, will print out the formula 
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -580,7 +580,7 @@ Function to add and specify custom components to model, which are required by \p
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -640,7 +640,7 @@ Function to change priors for the fixed (and possibly random) effects of the mod
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -709,7 +709,7 @@ Function to specify random fields in the model using penalizing complexity (PC) 
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -809,7 +809,7 @@ Function to spatially block the datasets, which will then be used for model cros
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- sp::CRS("+proj=longlat +ellps=WGS84")
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
