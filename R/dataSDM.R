@@ -77,6 +77,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
+  #'  library(ggplot2)
   #'  data("SolitaryTinamou")
   #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
   #'  data <- SolitaryTinamou$datasets
