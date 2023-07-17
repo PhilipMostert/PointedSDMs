@@ -1459,7 +1459,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'
   #' } 
   #'
-  spatialBlock =  function(k, rows_cols, plot = FALSE, seed = 1234, ...) {
+  spatialBlock = function(k, rows_cols, plot = FALSE, seed = 1234, ...) {
     
     
     private$spatialBlockCall <- paste0(gsub('.*\\(', 'self$spatialBlock(', deparse(match.call())))
@@ -1499,7 +1499,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         start <- cumsum(dataLength)[i-1]
         
         private$IPS$.__block_index__ <- as.character(foldID[(1 + start): cumsum(dataLength)[i]])
-        private$IPS$.__block_index__ <- private$IPS[!is.na(private$IPS$.__block_index__), ]
+        private$IPS <- private$IPS[!is.na(private$IPS$.__block_index__), ]
         
         
       }

@@ -109,7 +109,7 @@ blockedCV <- function(data, options = list()) {
       
     formula_terms <- unique(unlist(lapply(trainLiks, function(x) {
       
-      if (!is.null(x$include_components)) x$include_components
+      if (!identical(unlist(x$used), character(0))) unlist(x$used)
       else labels(terms(x$formula))
       
     })))

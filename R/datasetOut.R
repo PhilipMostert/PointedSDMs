@@ -159,8 +159,8 @@ datasetOut <- function(model, dataset,
     
     reduced_terms <- unique(unlist(lapply(model$bru_info$lhoods[index], function(x) {
       
-      if (!is.null(x$include_components)) x$include_components
-      else labels(terms(x))
+      if (!identical(unlist(x$used), character(0))) unlist(x$used)
+      else labels(terms(x$formula))
       
     })))
     
@@ -213,7 +213,7 @@ datasetOut <- function(model, dataset,
         
         #if (!is.null(model[['species']][['speciesIn']])) covs <- as.vector(outer(paste0(reduced_species,'_'), model$spatCovs$name, FUN = 'paste0'))
         #else covs <- model$spatCovs$name
-        train <- predict(model_reduced, newdata = model$bru_info$lhoods[[data]]$data, formula = eval(parse(text = paste0('~(',paste(gsub('\\(.*$', '', labels(terms(reduced_components))), collapse = ' + '),')'))))  
+        train <- predict(model_reduced, data = model$bru_info$lhoods[[data]]$data, formula = eval(parse(text = paste0('~(',paste(gsub('\\(.*$', '', labels(terms(reduced_components))), collapse = ' + '),')'))))  
        
         reduced_lik[[data]]$data@data['offset'] <- train$predictions$mean
         #reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
