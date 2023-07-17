@@ -23,7 +23,7 @@ Depends:
 Imports:
     terra,
     ggplot2,
-    inlabru (>= 2.5),
+    inlabru (>= 2.8.0),
     sp (>= 1.4-5),
     raster,
     R.devices,

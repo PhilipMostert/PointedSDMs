@@ -73,7 +73,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
       
       if (inherits(datapoints[[dat]], 'sf')) {
         
-        coordsSF <- st_coordinates(datapoints[[dat]])
+        coordsSF <- sf::st_coordinates(datapoints[[dat]])
         colnames(coordsSF) <- coords
         datapoints[[dat]][, coords] <- coordsSF
         

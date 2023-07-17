@@ -195,7 +195,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       for (bias in biasnames) {
         
         formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(paste0(bias,'_biasField'),')')))
-        int[['biasFields']][[bias]] <- predict(object, data = data, formula = formula, ...)
+        int[['biasFields']][[bias]] <- predict(object, newdata = data, formula = formula, ...)
         
       }
       
@@ -262,7 +262,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(formula_components, collapse = ' + '),')'))
     
     #int[[i]] <- predict(object, data = data, formula = formula, ...)
-    int <- predict(object, data = data, formula = formula, ...)
+    int <- predict(object, newdata = data, formula = formula, ...)
     int <- list(int)
     names(int) <- 'predictions'
     
@@ -273,7 +273,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   else {
     
     class(object) <- c('bru','inla','iinla')
-    int <- predict(object, data = data, formula = formula, ...)
+    int <- predict(object, newdata = data, formula = formula, ...)
     int <- list(int)
     names(int) <- 'predictions'
     class(int) <- c('bruSDM_predict', class(int))
