@@ -4,7 +4,7 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
    ##Just import a model??
   skip_on_cran()
   
-  projection <- CRS('+proj=tmerc')
+  projection <- sp::CRS('+proj=tmerc')
   x <- c(16.48438,  17.49512,  24.74609, 22.59277, 16.48438)
   y <- c(59.736328125, 55.1220703125, 55.0341796875, 61.142578125, 59.736328125)
   xy <- cbind(x, y)

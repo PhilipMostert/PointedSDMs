@@ -1,7 +1,7 @@
 ##Load in the necessary data
 Check <- dataOrganize$new() 
 
-projection <- CRS('+proj=tmerc')
+projection <- sp::CRS('+proj=tmerc')
 
 #Make random shape to generate points on
 x <- c(16.48438,  17.49512,  24.74609, 22.59277, 16.48438)
