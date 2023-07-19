@@ -15,7 +15,7 @@
 #'    
 #'  #Get Data
 #'  data("SolitaryTinamou")
-#'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
+#'  proj <- "+proj=longlat +ellps=WGS84"
 #'  data <- SolitaryTinamou$datasets
 #'  mesh <- SolitaryTinamou$mesh
 #'  mesh$crs <- proj
@@ -39,8 +39,6 @@
 #' @return An object of class \code{blockedCV}, which is essentially a list of DIC values obtained from each iteration of the model.
 #' 
 #' @export
-#' 
-#' 
 #' 
 blockedCV <- function(data, options = list()) {
   

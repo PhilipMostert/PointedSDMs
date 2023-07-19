@@ -20,7 +20,7 @@ makeLhoods(
 )
 }
 \arguments{
-\item{data}{A list of sp objects containing the datasets for which likelihoods need to be constructed.}
+\item{data}{A list of sf objects containing the datasets for which likelihoods need to be constructed.}
 
 \item{formula}{A list of formulas to add to the likelihoods.}
 

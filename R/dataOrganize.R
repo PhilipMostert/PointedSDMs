@@ -33,8 +33,8 @@ dataOrganize$set('public', 'Formulas', list())
 
 dataOrganize$set('public', 'dataSource', list())
 
-#' @description Function to form the data into SpatialPointsDataFrames, as well as extract other information about the model required.
-#' @param datapoints A list of datasets as either data.frame or SpatialPoints objects.
+#' @description Function to form the data into sf objects, as well as extract other information about the model required.
+#' @param datapoints A list of datasets as either sf, data.frame or SpatialPoints objects.
 #' @param datanames A vector of the names of the datasets.
 #' @param coords Names of the coordinates used in the model.
 #' @param proj The projection reference system used in the model.

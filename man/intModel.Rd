@@ -32,13 +32,13 @@ intModel(
 )
 }
 \arguments{
-\item{...}{The datasets to be used in the model. May come as either \code{data.frame} or \code{SpatialPoints*} objects, or as a list of objects with these classes. The classes of the datasets do not necessarily need to be standardized, however the variable names within them often have to be.}
+\item{...}{The datasets to be used in the model. May come as either \code{sf}, \code{data.frame} or \code{SpatialPoints*} objects, or as a list of objects with these classes. The classes of the datasets do not necessarily need to be standardized, however the variable names within them often have to be.}
 
 \item{spatialCovariates}{The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{Raster*}, \code{SpatialPixelsDataFrame} or \code{SpatialRaster} object. Can be either \code{numeric}, \code{factor} or \code{character} data.}
 
 \item{Coordinates}{A vector of length 2 containing the names (class \code{character}) of the coordinate variables used in the model.}
 
-\item{Projection}{The coordinate reference system used by both the spatial points and spatial covariates. Must be of class \code{\link[sp]{CRS}} (see \code{CRS} from the \pkg{sp} package for more details).}
+\item{Projection}{The coordinate reference system used by both the spatial points and spatial covariates. Must be of class \code{character}.}
 
 \item{Mesh}{An \code{inla.mesh} object required for the spatial random fields and the integration points in the model (see \code{\link[INLA]{inla.mesh.2d}} from the \pkg{INLA} package for more details).}
 
@@ -98,7 +98,7 @@ Note: the point covariate and mark terms will only be included in the formulas f
    
  #Get Data
  data("SolitaryTinamou")
- proj <- sp::CRS("+proj=longlat +ellps=WGS84")
+ proj <- "+proj=longlat +ellps=WGS84"
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj

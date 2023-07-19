@@ -1,6 +1,6 @@
 #' Internal function used to standardize datasets, as well as assign metadata.
 #' @description Internal function used to assist in structuring the data.
-#' @param datapoints A list of datasets as either data.frame or SpatialPoints objects.
+#' @param datapoints A list of datasets as either sf, data.frame or SpatialPoints objects.
 #' @param datanames A vector of the names of the datasets.
 #' @param coords Names of the coordinates used in the model.
 #' @param proj The projection reference system used in the model.

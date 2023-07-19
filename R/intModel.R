@@ -3,10 +3,10 @@
 #' @description This function is used to create an object containing all the data, metadata and relevant components required for the integrated species distribution model and \pkg{INLA} to work.
 #' As a result, the arguments associated with this function are predominantly related to describing variable names within the datasets that are relevant, and arguments related to what terms should be included in the formula for the integrated model. The output of this function is an \code{R6} object, and so there are a variety of public methods within the output of this function which can be used to further specify the model (see \code{?dataSDM} for a comprehensive description of these public methods).
 #' 
-#' @param ... The datasets to be used in the model. May come as either \code{data.frame} or \code{SpatialPoints*} objects, or as a list of objects with these classes. The classes of the datasets do not necessarily need to be standardized, however the variable names within them often have to be.
+#' @param ... The datasets to be used in the model. May come as either \code{sf}, \code{data.frame} or \code{SpatialPoints*} objects, or as a list of objects with these classes. The classes of the datasets do not necessarily need to be standardized, however the variable names within them often have to be.
 #' @param spatialCovariates The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{Raster*}, \code{SpatialPixelsDataFrame} or \code{SpatialRaster} object. Can be either \code{numeric}, \code{factor} or \code{character} data.
 #' @param Coordinates A vector of length 2 containing the names (class \code{character}) of the coordinate variables used in the model.
-#' @param Projection The coordinate reference system used by both the spatial points and spatial covariates. Must be of class \code{\link[sp]{CRS}} (see \code{CRS} from the \pkg{sp} package for more details) or \code{character}.
+#' @param Projection The coordinate reference system used by both the spatial points and spatial covariates. Must be of class \code{character}.
 #' @param Mesh An \code{inla.mesh} object required for the spatial random fields and the integration points in the model (see \code{\link[INLA]{inla.mesh.2d}} from the \pkg{INLA} package for more details). 
 #' @param IPS The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[inlabru]{ipoints}} from the \pkg{inlabru} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} object.
 #' @param Boundary A \code{SpatialPolygonsDataFrame} object of the study area. If not missing, this object is used to help create the integration points.
@@ -42,7 +42,7 @@
 #'    
 #'  #Get Data
 #'  data("SolitaryTinamou")
-#'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
+#'  proj <- "+proj=longlat +ellps=WGS84"
 #'  data <- SolitaryTinamou$datasets
 #'  mesh <- SolitaryTinamou$mesh
 #'  mesh$crs <- proj
@@ -72,10 +72,6 @@
 #' 
 #' @export
 
-
-##Need to remove the field things here...
-# + everything in dataSDM and dataOrganize
-#Then go to unit tests
 intModel <- function(..., spatialCovariates = NULL, Coordinates,
                      Projection, Mesh, IPS = NULL, 
                      Boundary = NULL, speciesSpatial = TRUE,

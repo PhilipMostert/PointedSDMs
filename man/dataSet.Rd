@@ -22,7 +22,7 @@ dataSet(
 )
 }
 \arguments{
-\item{datapoints}{A list of datasets as either data.frame or SpatialPoints objects.}
+\item{datapoints}{A list of datasets as either sf, data.frame or SpatialPoints objects.}
 
 \item{datanames}{A vector of the names of the datasets.}
 

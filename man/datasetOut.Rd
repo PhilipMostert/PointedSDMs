@@ -34,7 +34,7 @@ This function calculates the difference in covariate values between a full integ
    
  #Get Data
  data("SolitaryTinamou")
- proj <- sp::CRS("+proj=longlat +ellps=WGS84")
+ proj <- "+proj=longlat +ellps=WGS84"
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj

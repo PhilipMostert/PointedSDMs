@@ -68,7 +68,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @description Makes a plot of the points surrounded by the boundary of the region where they were collected. The points may either be plotted based on which dataset they come from, or which species group they are part of (if \code{speciesName} is non-\code{NULL} in \code{\link{intModel}}).
   #' @param datasetNames Name of the datasets to plot. If this argument is missing, the function will plot all the data available to the model.
   #' @param Species Logical: should the points be plotted based on the species name. Defaults to \code{FALSE}.
-  #' @param Boundary Logical: should a boundary (created using the \code{Mesh} object) be used in the plot. Defaults to \code{TRUE}. Note that the output of this function is a \code{gg} object, and so a boundary surrounding the points may be added using standard \pkg{ggplot2} syntax and the \code{\link[inlabru]{gg}} function provided in the \pkg{inlabru} package.
+  #' @param Boundary Logical: should a boundary (created using the \code{Mesh} object) be used in the plot. Defaults to \code{TRUE}.
   #' @param ... Not used.
   #' @return A ggplot object.
   #' @import ggplot2
@@ -185,7 +185,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   }
   ,
   #' @description Function used to add additional datasets to the \code{dataSDM} object. This function should be used if the user would like to add any additional datasets to the integrated model, but do not have the same standardized variable names as those added initially with \code{\link{intModel}}. Use \code{?intModel} for a more comprehensive description on what each argument in this function is used for.
-  #' @param ... The datasets to be added to the integrated model: should be either \code{data.frame} or \code{SpatialPoints*} objects, or a list of objects from these classes.
+  #' @param ... The datasets to be added to the integrated model: should be either \code{sf}, \code{data.frame} or \code{SpatialPoints*} objects, or a list of objects from these classes.
   #' @param responseCounts The name of the response variable for the counts data.
   #' @param responsePA The name of the response variable for the presence absence data.
   #' @param trialsPA The name of the trials variable for the presence absence data.
@@ -208,7 +208,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- "+proj=longlat +ellps=WGS84"
   #'  
   #'  #Only select eBird data
   #'  ebird <- SolitaryTinamou$datasets$eBird
@@ -769,7 +769,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- "+proj=longlat +ellps=WGS84"
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj
@@ -858,7 +858,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- "+proj=longlat +ellps=WGS84"
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj
@@ -1090,7 +1090,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- "+proj=longlat +ellps=WGS84"
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj
@@ -1147,7 +1147,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- "+proj=longlat +ellps=WGS84"
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj
@@ -1243,7 +1243,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- "+proj=longlat +ellps=WGS84"
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj
@@ -1443,7 +1443,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'    
   #'  #Get Data
   #'  data("SolitaryTinamou")
-  #'  proj <- sp::CRS("+proj=longlat +ellps=WGS84")
+  #'  proj <- "+proj=longlat +ellps=WGS84"
   #'  data <- SolitaryTinamou$datasets
   #'  mesh <- SolitaryTinamou$mesh
   #'  mesh$crs <- proj
