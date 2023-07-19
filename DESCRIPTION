@@ -18,6 +18,7 @@ Description: Integrated species distribution modeling is a rising field in quant
 Depends:
     R (>= 4.1),  
     stats,
+    sf,
     inlabru (>= 2.8.0),
     R6 (>= 2.5),
     methods,
@@ -30,7 +31,6 @@ Imports:
     blockCV (>= 3.0.0)
 Suggests:
     testthat (>= 3.0.0),
-    sf,
     sn,
     INLA (>= 21.08.31),
     rasterVis,

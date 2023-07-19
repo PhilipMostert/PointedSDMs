@@ -16,7 +16,7 @@ checkCoords <- function(data, coords) {
       coords %in% c(x_coord, y_coord)
     }
   })
-  if (!all(coords_in)) OK <- FALSE
+  if (!all(unlist(coords_in))) OK <- FALSE
   else OK <- TRUE
   
   OK

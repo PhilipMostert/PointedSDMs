@@ -58,7 +58,7 @@ blockedCV <- function(data, options = list()) {
   
   deviance <- list()
   
-  block_index <- lapply(unlist(data$.__enclos_env__$private$modelData), function(x) x@data[,'.__block_index__'])
+  block_index <- lapply(unlist(data$.__enclos_env__$private$modelData, recursive = FALSE), function(x) data.frame(x)[, '.__block_index__'])
   
   if (!is.null(data$.__enclos_env__$private$temporalName)) {
     
@@ -68,9 +68,9 @@ blockedCV <- function(data, options = list()) {
     
     newIPS <- do.call(sp::rbind.SpatialPointsDataFrame, newIPS)
     
-    newIPS@data[, data$.__enclos_env__$private$temporalName] <- rep((1:length(numTime)), each = nrow(data$.__enclos_env__$private$IPS@data))
+    newIPS[, data$.__enclos_env__$private$temporalName] <- rep((1:length(numTime)), each = nrow(data$.__enclos_env__$private$IPS))
     
-    newIPS@proj4string <- data$.__enclos_env__$private$Projection
+    newIPS <- st_transform(newIPS, data$.__enclos_env__$private$Projection)
     
     data$.__enclos_env__$private$IPS <- newIPS
     
@@ -124,8 +124,8 @@ blockedCV <- function(data, options = list()) {
     
     fold_ind <- unique(unlist(block_index))[unique(unlist(block_index)) != fold]
     
-    foldOptions$control.family <- foldOptions$control.family[sapply(unlist(data$.__enclos_env__$private$modelData), 
-                                                                    function(x) any(fold_ind %in% x@data[, '.__block_index__']))]
+    foldOptions$control.family <- foldOptions$control.family[sapply(unlist(data$.__enclos_env__$private$modelData, recursive = FALSE), 
+                                                                    function(x) any(fold_ind %in% data.frame(x)[, '.__block_index__']))]
 
     optionsTrain <- append(options, foldOptions)
     

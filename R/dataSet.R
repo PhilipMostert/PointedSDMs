@@ -36,7 +36,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
       
     }
     ##Things to consider for changes here...
-    #When makeing likelihoods it goes in the order:
+    #When making likelihoods it goes in the order:
      #Dataset -> species -> process
     #Note that there can only be 2 Ntrials in a given dataset (one for points; one for marks)
     #So is it worth creating an Ntrials list here?
@@ -159,13 +159,18 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
       } 
       else subtrialname <- NULL
       
-        datSP <- sp::SpatialPointsDataFrame(coords = data[,coords], 
-                                            data = data.frame(data[, c(paresp, subtrialname, temporalvar,
-                                                                       marksin, MTrialssub, speciesname,
-                                                                       phiVars, responseVars,varsin)]),
-                                            proj4string = proj)
+        #datSP <- sp::SpatialPointsDataFrame(coords = data[,coords], 
+        #                                    data = data.frame(data[, c(paresp, subtrialname, temporalvar,
+        #                                                               marksin, MTrialssub, speciesname,
+        #                                                               phiVars, responseVars,varsin)]),
+        #                                    proj4string = proj)
+        datSP <- sf::st_as_sf(x = data.frame(data[, c(paresp, subtrialname, temporalvar,
+                              marksin, MTrialssub, speciesname, coords,
+                              phiVars, responseVars,varsin)]),
+                              coords = coords,
+                              crs = proj)
         
-        if (ncol(datSP@data) == 1) names(datSP@data) <- paresp
+        if (ncol(datSP[names(datSP) != 'geometry']) == 1) names(datSP[names(datSP) != 'geometry']) <- paresp
         
         #if (!is.null(trialname)) {
         #  
@@ -185,13 +190,19 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
       else 
         if (countsresp %in% data_vars) {
           
-          datSP <- sp::SpatialPointsDataFrame(coords = data[, coords],
-                                              data = data.frame(data[, c(countsresp, marksin, temporalvar,
-                                                                         speciesname, MTrialssub,
-                                                                         phiVars, responseVars, varsin)]),
-                                              proj4string = proj)
+          #datSP <- sp::SpatialPointsDataFrame(coords = data[, coords],
+          #                                    data = data.frame(data[, c(countsresp, marksin, temporalvar,
+          #                                                               speciesname, MTrialssub,
+          #                                                               phiVars, responseVars, varsin)]),
+          #                                    proj4string = proj)
           
-          if (ncol(datSP@data) == 1) names(datSP@data) = countsresp
+          datSP <- sf::st_as_sf(x = data.frame(data[, c(countsresp, marksin, temporalvar,
+                                speciesname, MTrialssub, coords,
+                                phiVars, responseVars, varsin)]),
+                                coords = coords,
+                                crs = proj)
+          
+          if (ncol(datSP[names(datSP) != 'geometry']) == 1) names(datSP[names(datSP) != 'geometry']) <- countsresp
           
           #Ntrials[[dat]] <- rep(1, nrow(datSP@coords))
           family <- 'poisson'
@@ -208,13 +219,19 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         
         data_vars <- c(data_vars, poresp)
     
-        datSP <- sp::SpatialPointsDataFrame(coords = data[, coords], 
-                                            data = data.frame(data[, c(poresp, marksin, temporalvar,
-                                                                       speciesname, MTrialssub,
-                                                                       phiVars, responseVars, varsin)]),
-                                            proj4string = proj)
+        #datSP <- sp::SpatialPointsDataFrame(coords = data[, coords], 
+        #                                    data = data.frame(data[, c(poresp, marksin, temporalvar,
+        #                                                               speciesname, MTrialssub,
+        #                                                               phiVars, responseVars, varsin)]),
+        #                                    proj4string = proj)
         
-        if (ncol(datSP@data) == 1) names(datSP@data) <- poresp
+        datSP <- sf::st_as_sf(x = data.frame(data[, c(poresp, marksin, temporalvar,
+                              speciesname, MTrialssub, coords,
+                              phiVars, responseVars, varsin)]),
+                              coords = coords,
+                              crs = proj)
+        
+        if (ncol(datSP[names(datSP) != 'geometry']) == 1) names(datSP[names(datSP) != 'geometry']) <-poresp
         #Ntrials[[dat]] <- rep(1, nrow(datSP@coords))
       
         #Family[dat] <- "cp"
@@ -236,7 +253,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
       #marksType[[dat]] <- list(markstype)
       #if (!is.null(MTrialssub)) marksNtrials[dat] <- datSP@data[,MTrialssub]
       #else marksNtrials[[dat]] <- rep(1, nrow(datSP@coords))
-      numobs <- nrow(datSP@coords)
+      numobs <- nrow(datSP)
       numObs[dat] <- numobs
       varsIn[[dat]] <- list(varsin)
       Family[[dat]] <- c(family, markfamily[marks %in% marksin])

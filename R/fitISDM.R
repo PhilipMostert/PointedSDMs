@@ -96,9 +96,9 @@ fitISDM <- function(data, options = list()) {
     
     newIPS <- do.call(sp::rbind.SpatialPointsDataFrame, newIPS)
     
-    newIPS@data[, data$.__enclos_env__$private$temporalName] <- rep((1:length(numTime)), each = nrow(data$.__enclos_env__$private$IPS@data))
+    newIPS[, data$.__enclos_env__$private$temporalName] <- rep((1:length(numTime)), each = nrow(data$.__enclos_env__$private$IPS@data))
     
-    newIPS@proj4string <- data$.__enclos_env__$private$Projection
+    newIPS <- st_transform(newIPS, data$.__enclos_env__$private$Projection)
     
     data$.__enclos_env__$private$IPS <- newIPS
     

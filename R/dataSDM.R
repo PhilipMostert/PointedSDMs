@@ -121,12 +121,11 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       for (i in 1:length(index)) {
         
-        points[[data]][[i]] <- private$modelData[[data]][[i]][, names(private$modelData[[data]][[i]]) %in% c(private$temporalName, private$speciesName, private$responseCounts,
-                                                                                                             private$responsePA,'BRU_aggregate')]
+        points[[data]][[i]] <- private$modelData[[data]][[i]][, names(private$modelData[[data]][[i]]) %in% c(private$temporalName, private$speciesName, 'geometry')]
        
         if ('BRU_aggregate' %in% names(points[[data]][[i]])) points[[data]][[i]] <- points[[data]][[i]][points[[data]][[i]]$BRU_aggregate,]
         
-        if (!Species) points[[data]][[i]]@data[,'..Dataset_placeholder_var..'] <- rep(data, nrow(points[[data]][[i]]@data))
+        if (!Species) points[[data]][[i]][,'..Dataset_placeholder_var..'] <- rep(data, nrow(points[[data]][[i]]))
         
         
       }
@@ -135,25 +134,25 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    plotData <- do.call(sp::rbind.SpatialPointsDataFrame, lapply(unlist(points), function(x) x[, names(x) %in% c('..Dataset_placeholder_var..', private$speciesName, private$temporalName)]))
+    plotData <- do.call(rbind, unlist(points, recursive = F)) #plotData <- do.call(rbind, lapply(unlist(points), function(x) x[, names(x) %in% c('..Dataset_placeholder_var..', private$speciesName, private$temporalName)]))
     
-    if (Boundary) bound <- gg(private$polyfromMesh())
+    if (Boundary) bound <- geom_sf(data = sf::st_boundary(private$polyfromMesh()))
     else bound <- NULL
     
     if (!is.null(private$temporalName)) {
       
       if (Species) {
        
-        plotData@data[, private$speciesName] <- unlist(private$speciesIndex) 
+        plotData[, private$speciesName] <- unlist(private$speciesIndex) 
         
-        colOption <- gg(plotData, aes(col = eval(parse(text = private$speciesName))))
+        colOption <- geom_sf(data =plotData, aes(col = eval(parse(text = private$speciesName))))#gg(plotData, aes(col = eval(parse(text = private$speciesName))))
         
         ggplot() + colOption + bound + guides(col = guide_legend(title = 'Species Name')) + facet_wrap(formula(paste('~', private$temporalName)))
         
       }
       else {
         
-        colOption <- gg(plotData, aes(col = eval(parse(text = '..Dataset_placeholder_var..'))))
+        colOption <- geom_sf(data = plotData, aes(col = eval(parse(text = '..Dataset_placeholder_var..'))))
   
         ggplot() + colOption + bound + guides(col = guide_legend(title = 'Dataset Name')) + facet_wrap(formula(paste('~', private$temporalName)))
         
@@ -165,16 +164,16 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       ## Need to add the species in here
       
-      plotData@data[, private$speciesName] <- unlist(private$speciesIndex) #unlist(lapply(1:length(plotData[,private$speciesName]), function(x,y,z) y[z[x]], y = unlist(private$speciesIn), z= plotData@data[,private$speciesName]))
+      plotData[, private$speciesName] <- unlist(private$speciesIndex) #unlist(lapply(1:length(plotData[,private$speciesName]), function(x,y,z) y[z[x]], y = unlist(private$speciesIn), z= plotData@data[,private$speciesName]))
       
-      colOption <- gg(plotData, aes(col = eval(parse(text = private$speciesName))))
+      colOption <- geom_sf(data = plotData, aes(col = eval(parse(text = private$speciesName))))
       
       ggplot() + colOption + bound + guides(col = guide_legend(title = 'Species Name')) 
       
     }
     else { 
       
-      colOption <- gg(plotData, aes(col = eval(parse(text = '..Dataset_placeholder_var..'))))
+      colOption <- geom_sf(data = plotData, aes(col = eval(parse(text = '..Dataset_placeholder_var..'))))
       
       ggplot() + colOption + bound + guides(col = guide_legend(title = 'Dataset Name')) 
       
@@ -307,7 +306,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       speciesNew <- unique(unlist(lapply(dataPoints, function(x) {
         
         if (inherits(x, 'Spatial')) x@data[,private$speciesName]
-        else x[,private$speciesName]
+        else data.frame(x)[,private$speciesName]
         
         
       })))
@@ -471,7 +470,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (!is.null(markNames)) {
       
       namesIn <- unlist(sapply(dataPoints, function(x) names(x)))
-      if (length(private$modelData) != 0) namesIn <- c(namesIn,  unlist(sapply(unlist(private$modelData), function(x) names(x@data))))
+      if (length(private$modelData) != 0) namesIn <- c(namesIn,  unlist(sapply(unlist(private$modelData, recursive = FALSE), function(x) names(x)[names(x) != 'geometry'])))
         
       if (!all(markNames %in% unlist(namesIn))) stop('At least one mark specified is not present in the datasets, please check again.')
         
@@ -558,22 +557,25 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (!is.null(speciesName)) {
       
       pointData$makeSpecies(speciesname = speciesName) 
-      
+     
       if (is.null(private$speciesIn)) private$speciesIn <- pointData$SpeciesInData
       else private$speciesIn <- c(private$speciesIn, pointData$SpeciesInData)
       
       #ADD argument common field for species
       self$spatialFields$speciesFields <- vector(mode = 'list', length = length(unique(unlist(private$speciesIn))))
-      names(self$spatialFields$speciesFields) <- unique(unlist(private$speciesIn))
       
+      names(self$spatialFields$speciesFields) <- unique(unlist(private$speciesIn))
+     
       if (private$speciesSpatial) {
         
         if (!all(speciesIn %in% names(self$spatialFields$speciesFields))) {
           ##Not species Name
+
           new_species <- vector(mode = 'list', length = sum(!speciesIn %in% names(self$spatialFields$speciesFields)))
           names(new_species) <- speciesIn[!speciesIn %in% names(self$spatialFields$speciesFields)]
-          
+     
           self$spatialFields$speciesFields <- append(self$spatialFields$speciesFields, new_species)
+          
           #self$spatialFields$markFields <- vector(mode = 'list', length = length(markNames))
           #names(self$spatialFields$markFields) <- markNames
           
@@ -690,9 +692,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (!is.null(c(private$Offset, private$pointCovariates))) {
       
-      datMatrix <- as.data.frame(matrix(NA, nrow = nrow(private$IPS@coords), ncol = length(c(private$Offset, private$pointCovariates))))
+      datMatrix <- as.data.frame(matrix(NA, nrow = nrow(private$IPS), ncol = length(c(private$Offset, private$pointCovariates))))
       names(datMatrix) <- c(private$pointCovariates, private$Offset)
-      private$IPS@data <- cbind(private$IPS@data, datMatrix)
+      private$IPS <- cbind(private$IPS, datMatrix)
       
     }
     if (length(private$Formulas) == 0)  private$Formulas <- pointData$Formulas
@@ -819,13 +821,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
 
       temporalModel <- deparse1(temporalModel)
       
-      private$Components <- c(private$Components, paste0(datasetNames ,'_biasField(main = coordinates, model = ', datasetNames, '_bias_field, group = ', private$temporalName, ', ngroup = ', length(unique(unlist(private$temporalVars))),', control.group = ', temporalModel,')'))
+      private$Components <- c(private$Components, paste0(datasetNames ,'_biasField(main = geometry, model = ', datasetNames, '_bias_field, group = ', private$temporalName, ', ngroup = ', length(unique(unlist(private$temporalVars))),', control.group = ', temporalModel,')'))
       
       
     }
     else {
       
-      private$Components <- c(private$Components, paste0(datasetNames ,'_biasField(main = coordinates, model = ', datasetNames, '_bias_field)'))
+      private$Components <- c(private$Components, paste0(datasetNames ,'_biasField(main = geometry, model = ', datasetNames, '_bias_field)'))
       
     }
     
@@ -1327,8 +1329,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       if (!is.null(Copy)) {
         
-        if (Mark %in% names(private$modelData[[copy]][[1]]@data)) stop('Mark not in dataset for provided.')
-        else fieldCopied <- paste0(Mark,'_spatial(main = coordinates, copy = \"', Copy, '\")')
+        if (Mark %in% names(private$modelData[[copy]][[1]])) stop('Mark not in dataset for provided.')
+        else fieldCopied <- paste0(Mark,'_spatial(main = geometry, copy = \"', Copy, '\")')
       }
       
       field_type <- 'markFields'
@@ -1345,7 +1347,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       if (!Remove) index <- Bias
       else index <- paste0(Bias, 'biasField')
       
-      if (!is.null(Copy)) fieldCopied <- paste0(Bias,'_biasField(main = coordinates, copy = \"', Bias, '\")')
+      if (!is.null(Copy)) fieldCopied <- paste0(Bias,'_biasField(main = geometry, copy = \"', Bias, '\")')
       
     }
     
@@ -1468,14 +1470,18 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     #                                                            k = k, rows = rows, cols = cols, selection = 'random',
     #                                                            verbose = FALSE, progress = FALSE, seed = seed, ...))
     
-    blocks <- R.devices::suppressGraphics(blockCV::cv_spatial(x = do.call(sp::rbind.SpatialPoints, append(unlist(private$modelData),private$IPS)),
+    allPoints <- append(unlist(private$modelData, recursive = FALSE), list(private$IPS))
+    
+    allPoints <- do.call(c, lapply(allPoints, st_geometry))
+    
+    blocks <- R.devices::suppressGraphics(blockCV::cv_spatial(x = allPoints,
                                                               k = k, rows_cols = rows_cols, progress = FALSE, seed = seed, report = FALSE, plot = plot, ...))
     
     
     foldID <- blocks$folds_ids
     
-    dataLength <- unlist(lapply(unlist(append(unlist(private$modelData),private$IPS)), nrow))
-                         
+    dataLength <- unlist(lapply(append(unlist(private$modelData, recursive = FALSE), list(private$IPS)), nrow))
+                  
     for (i in 1:length(dataLength)) {
    
       if (i != length(dataLength)) {
@@ -1616,9 +1622,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (plot) {
       
-      spatPolys <- private$polyfromMesh()
+      spatPolys <- geom_sf(data = sf::st_boundary(private$polyfromMesh()))
       
-      all_data <<- do.call(sp::rbind.SpatialPointsDataFrame, lapply(unlist(private$modelData, recursive = FALSE), function(x) {
+      all_data <- do.call(rbind, lapply(unlist(private$modelData, recursive = FALSE), function(x) {
         
         x[, '.__block_index__']
         
@@ -1629,8 +1635,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         #geom_sf(data = blocks$blocks) +
         #blocks$plot$layers[[2]] +
         cv_plot(blocks) +
-        gg(all_data, aes(col = .__block_index__)) +
-        gg(spatPolys) +
+        geom_sf(data = all_data, aes(col = .__block_index__)) + 
+        spatPolys +
         labs(col = 'Block index') +
         ggtitle('Plot of the blocked data') +
         theme(plot.title = element_text(hjust = 0.5))
@@ -1768,7 +1774,8 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   
   if (!inherits(Inlamesh, 'inla.mesh')) stop('Mesh needs to be an inla.mesh object.')
   
-  if (!inherits(projection, 'CRS')) stop('Projection needs to be a CRS object.')
+  if (inherits(projection, 'CRS')) projection <- as(projection, 'character')
+  else if (!inherits(projection, 'character')) stop('Projection needs to be a character object.')
   
   if (length(coordinates) != 2) stop('Coordinates needs to be a vector of length 2 containing the coordinate names.')
   
@@ -1806,11 +1813,10 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   if (!is.null(ips)) private$IPS <- ips
   else {
     
-    if (is.null(boundary)) private$IPS <- inlabru::ipoints(samplers = boundary, domain = Inlamesh)
-    else private$IPS <- inlabru::ipoints(domain = Inlamesh)
+    if (is.null(boundary)) private$IPS <- st_transform(inlabru::fm_int(samplers = boundary, domain = Inlamesh), projection)
+    else private$IPS <- st_transform(inlabru::fm_int(domain = Inlamesh), projection)
     
   }
-  private$IPS@proj4string <- projection
   
   private$Spatial <- spatial
   private$marksSpatial <- marksspatial
@@ -1835,9 +1841,10 @@ dataSDM$set('private', 'polyfromMesh', function(...) {
   coords <- na.omit(data.frame(loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 1],
                                loc[t(cbind(segm$idx[,, drop=FALSE], NA)), 2]))
   
-  Polys <- sp::Polygon(coords = coords)
-  Polys <- sp::Polygons(srl = list(Polys), ID = 'id')
-  SpatPolys <- sp::SpatialPolygons(list(Polys), proj4string = private$Projection)
+  #Polys <- sp::Polygon(coords = coords)
+  #Polys <- sp::Polygons(srl = list(Polys), ID = 'id')
+  #SpatPolys <- sp::SpatialPolygons(list(Polys), proj4string = private$Projection)
+  SpatPolys <- st_sfc(st_polygon(list(cbind(coords[,1], coords[,2]))), crs = private$Projection)
   SpatPolys
   
 })   

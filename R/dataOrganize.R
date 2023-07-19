@@ -40,7 +40,7 @@ dataOrganize$set('public', 'dataSource', list())
 #' @param proj The projection reference system used in the model.
 #' @param marktrialname Name of the trial variable used by the binomial marks.
 #' @param paresp Name of the response variable used by the presence absence datasets.
-#' @param countsresp Name of the respons variable used by the counts data.
+#' @param countsresp Name of the response variable used by the counts data.
 #' @param trialname Name of the trial variable used by the presence absence datasets.
 #' @param speciesname Name of the species name variable.
 #' @param marks Name of the marks considered in the model.
@@ -92,7 +92,7 @@ dataOrganize$set('public', 'makeSpecies', function(speciesname) {
   
   for (dataset in 1:length(self$Data)) {
     
-    allSpecies <- self$Data[[dataset]][[1]]@data[, speciesname]
+    allSpecies <- data.frame(self$Data[[dataset]][[1]])[, speciesname]
     self$SpeciesInData[[dataset]] <- uniqueSpecies <- unique(allSpecies)
     numUnique[dataset] <- length(uniqueSpecies)
     names(self$SpeciesInData)[[dataset]] <- datasetName <- names(self$Data)[[dataset]]
@@ -100,7 +100,7 @@ dataOrganize$set('public', 'makeSpecies', function(speciesname) {
     
     for (species in uniqueSpecies) {
       
-      speciesList[[species]] <- self$Data[[dataset]][[1]][self$Data[[dataset]][[1]]@data[,speciesname] == species,]
+      speciesList[[species]] <- self$Data[[dataset]][[1]][data.frame(self$Data[[dataset]][[1]])[,speciesname] == species,]
       
     }
     
@@ -150,9 +150,9 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
       
       for (species in 1:spIndex) {
         
-        if (var %in% names(self$Data[[dataset]][[species]]@data)) {
+        if (var %in% names(self$Data[[dataset]][[species]])) {
           
-          multinomIndex[[var]][[dataset]][[species]] <- as.character(self$Data[[dataset]][[species]]@data[, var])
+          multinomIndex[[var]][[dataset]][[species]] <- as.character(data.frame(self$Data[[dataset]][[species]])[, var])
           
         }
         else multinomIndex[[var]][[dataset]][[species]] <- NA 
@@ -186,7 +186,7 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
         
         if (!all(is.na((multinomNumeric[[var]][[x]][[y]])))) {
           
-          self$Data[[x]][[y]]@data[,var] <- multinomNumeric[[var]][[x]][[y]]
+          self$Data[[x]][[y]][,var] <- multinomNumeric[[var]][[x]][[y]]
           
         }
       }
@@ -249,7 +249,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
   
   for (dataset in 1:length(self$Data)) {
     
-    pointsResponse <- lapply(unlist(self$Data[[dataset]]), function(x) {
+    pointsResponse <- lapply(self$Data[[dataset]], function(x) {
       
       if (paresp %in% names(x)) names(x)[names(x) %in% c(paresp, marksResps)]
       else 
@@ -257,7 +257,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
       else {
         
         marksIn <- names(x)[names(x) %in% marksResps]
-        responses <- c('coordinates', marksIn)
+        responses <- c('geometry', marksIn)
         responses      
         
       }
@@ -273,7 +273,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
         
         ##Fix this later depending on weather we are running INLA grouped model for the species or not...
         if (length(self$speciesIndex[[speciesname]][[dataset]][[species]]) != 0) speciesIn <- unique(self$speciesIndex[[speciesname]][[dataset]][[species]])   
-        else speciesIn <- unique(self$Data[[dataset]][[species]]@data[,speciesname])
+        else speciesIn <- unique(self$Data[[dataset]][[species]][,speciesname])
         names(formulas[[dataset]])[species] <- speciesIn
         #length_index <- length(pointsResponse[[species]])
         length_index <- length(speciesIn)
@@ -296,7 +296,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           #else temp <- NULL
           
           if (!is.null(speciesIn)) {
-             if (pointsResponse[[response]][j] %in% c('coordinates', paresp, countresp)) {
+             if (pointsResponse[[response]][j] %in% c('geometry', paresp, countresp)) {
               ##Change this part ot the speciesIn: not sure what the one below does...
               if (speciesspatial) speciesspat <- paste0(speciesIn,'_spatial') ## new argument called speciesSpatial??
               else speciesspat <- NULL
@@ -341,7 +341,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           
           if (!is.na(datasetCovs)) {
             #Species specific? dataset specific?
-            if (pointsResponse[[response]][j] %in% c(paresp, countresp, 'coordinates')) addcovs <- unlist(datasetCovs)
+            if (pointsResponse[[response]][j] %in% c(paresp, countresp, 'geometry')) addcovs <- unlist(datasetCovs)
             else addcovs <- NULL
             
           }
@@ -357,7 +357,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           
           if (!is.null(marks)) {
             
-            if (pointsResponse[[response]][j] %in% c('coordinates', paresp, countresp)) {
+            if (pointsResponse[[response]][j] %in% c('geometry', paresp, countresp)) {
               
               markspat <- NULL
               marksint <- NULL
@@ -463,8 +463,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
     if (spatial == 'shared') {
     
-    if (!is.null(temporalname)) spat <- paste0('shared_spatial(main = coordinates, model = shared_field, group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
-    else spat <- paste0('shared_spatial(main = coordinates, model = shared_field)')
+    if (!is.null(temporalname)) spat <- paste0('shared_spatial(main = geometry, model = shared_field, group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
+    else spat <- paste0('shared_spatial(main = geometry, model = shared_field)')
     
     }
     else 
@@ -472,16 +472,16 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
       
      mainName <- datanames[[1]]
      
-     if (!is.null(temporalname)) spatMain <- paste0(mainName, '_spatial(main = coordinates, model = ', paste0(mainName,'_field'), ', group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
-     else spatMain <-  paste0(mainName, '_spatial(main = coordinates, model = ', paste0(mainName,'_field'),')')
-     spatCopy <-  paste0(datanames[datanames != mainName], '_spatial(main = coordinates, copy = \"', paste0(mainName,'_spatial'),'\", hyper = ', copymodel,')')
+     if (!is.null(temporalname)) spatMain <- paste0(mainName, '_spatial(main = geometry, model = ', paste0(mainName,'_field'), ', group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
+     else spatMain <-  paste0(mainName, '_spatial(main = geometry, model = ', paste0(mainName,'_field'),')')
+     spatCopy <-  paste0(datanames[datanames != mainName], '_spatial(main = geometry, copy = \"', paste0(mainName,'_spatial'),'\", hyper = ', copymodel,')')
      spat <- c(spatMain, spatCopy)    
         
       }
     else {
       
-    if (!is.null(temporalname)) spat <- paste0(datanames, '_spatial(main = coordinates, model = ', paste0(datanames,'_field'), ', group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
-    else spat <-  paste0(datanames, '_spatial(main = coordinates, model =', paste0(datanames,'_field'),')')
+    if (!is.null(temporalname)) spat <- paste0(datanames, '_spatial(main = geometry, model = ', paste0(datanames,'_field'), ', group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
+    else spat <-  paste0(datanames, '_spatial(main = geometry, model =', paste0(datanames,'_field'),')')
       
     }
     
@@ -503,7 +503,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
         ##Change the species part to model = paste0(speciesname) ##where speciesname = species
          # but keep the speciesSpat framework for the temporal part of the model
         #speciesSpat <- paste0(speciesname, '_spatial(main = coordinates, model = speciesModel, group = ',speciesname,', ngroup = ', numspecies,')')
-        speciesSpat <- paste0(species,'_spatial(main = coordinates, model = ',paste0(species,'_field)'))
+        speciesSpat <- paste0(species,'_spatial(main = geometry, model = ',paste0(species,'_field)'))
         
       }
       #else speciesSpat <- paste0(species,'_spatial(main = coordinates, model = speciesModel)', collapse = ' + ') #change this to speciesModel
@@ -531,8 +531,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
     if (marksspatial) {
       
-      if (!is.null(temporalname)) marksSpat <- paste0(marks, '_spatial(main = coordinates, model = ', paste0(marks,'_field'), ', group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
-      else marksSpat <- paste0(marks, '_spatial(main = coordinates, model = ', paste0(marks,'_field)'))
+      if (!is.null(temporalname)) marksSpat <- paste0(marks, '_spatial(main = geometry, model = ', paste0(marks,'_field'), ', group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
+      else marksSpat <- paste0(marks, '_spatial(main = geometry, model = ', paste0(marks,'_field)'))
       
     }
     else marksSpat <- NULL
@@ -558,7 +558,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
     if (!is.null(species)) {
       
-      speciesCovs <- apply(expand.grid(paste0(species,'_'), covariatenames), MARGIN = 1, FUN = paste0,collapse='')
+      speciesCovs <- apply(expand.grid(paste0(species,'_'), covariatenames), MARGIN = 1, FUN = paste0,collapse = '')
       speciesCovClass <- rep(covariateclass, each = length(species))
       covs <- paste0(speciesCovs, '(main = ', speciesCovs, ', model = \"',speciesCovClass,'\")') #, collapse = ' + '
       

@@ -215,9 +215,9 @@ datasetOut <- function(model, dataset,
         #else covs <- model$spatCovs$name
         train <- predict(model_reduced, data = model$bru_info$lhoods[[data]]$data, formula = eval(parse(text = paste0('~(',paste(gsub('\\(.*$', '', labels(terms(reduced_components))), collapse = ' + '),')'))))  
        
-        reduced_lik[[data]]$data@data['offset'] <- train$predictions$mean
+        reduced_lik[[data]]$data[,'offset'] <- train$predictions$mean
         #reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
-        reduced_lik[[data]]$include_components <- c(reduced_lik[[data]]$include_components, 'offset')
+        reduced_lik[[data]]$used$effect <- c(reduced_lik[[data]]$used$effect, 'offset')
         
       }
      

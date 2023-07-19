@@ -30,9 +30,9 @@ makeLhoods <- function(data, formula, family, mesh, ips,
       
       if (!is.null(ntrialsvar)) {
         
-        if (ntrialsvar %in% names(data[[dataset]][[species]]@data)) {
+        if (ntrialsvar %in% names(data[[dataset]][[species]])) {
           
-          Ntrialsvar[[1]] <- data[[dataset]][[species]]@data[,ntrialsvar]
+          Ntrialsvar[[1]] <- data.frame(data[[dataset]][[species]])[,ntrialsvar]
           
         } else Ntrialsvar[[1]] <- NA
         
@@ -40,9 +40,9 @@ makeLhoods <- function(data, formula, family, mesh, ips,
       
       if (!is.null(markstrialsvar)) {
         
-        if (markstrialsvar %in% names(data[[dataset]][[species]]@data)) {
+        if (markstrialsvar %in% names(data[[dataset]][[species]])) {
           
-          Ntrialsvar[[2]] <- data[[dataset]][[species]]@data[,markstrialsvar]
+          Ntrialsvar[[2]] <- data.frame(data[[dataset]][[species]])[,markstrialsvar]
           
         } else Ntrialsvar[[2]] <- NA
         
@@ -68,10 +68,10 @@ makeLhoods <- function(data, formula, family, mesh, ips,
           
           if (length(speciesindex) != 0) {
             
-            speciesRep <- data.frame(rep(unique(data[[dataset]][[species]]@data[,speciesname]), nrow(ips@coords)))
+            speciesRep <- data.frame(rep(unique(data.frame(data[[dataset]][[species]])[,speciesname]), nrow(ips)))
             
             IPS <- ips
-            IPS@data <- cbind(ips@data, speciesRep)
+            IPS <- cbind(ips, speciesRep)
             
           }
           
