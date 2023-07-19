@@ -1,38 +1,43 @@
 ##Load in the necessary data
 Check <- dataOrganize$new() 
 
-projection <- sp::CRS('+proj=tmerc')
+projection <- '+proj=tmerc'
 
 #Make random shape to generate points on
 x <- c(16.48438,  17.49512,  24.74609, 22.59277, 16.48438)
 y <- c(59.736328125, 55.1220703125, 55.0341796875, 61.142578125, 59.736328125)
 xy <- cbind(x, y)
-
-Poly = Polygon(xy)
-Poly = Polygons(list(Poly),1)
-SpatialPoly = SpatialPolygons(list(Poly), proj4string = projection)
+SpatialPoly <- st_sfc(st_polygon(list(xy)), crs = projection)
 
 ##Old coordinate names
 #Make random points
 #Random presence only dataset
-PO <- spsample(SpatialPoly, n = 100, 'random', CRSobs = projection)
+PO <- st_as_sf(st_sample(SpatialPoly, 100, crs = projection))
+st_geometry(PO) <- 'geometry'
 ##Add random variable
-PO$numvar <- runif(n = nrow(PO@coords))
-PO$factvar <- sample(x = c('a','b'), size = nrow(PO@coords), replace = TRUE)
-PO$species <- sample(x = c('fish1', 'fish2'), size = nrow(PO@coords), replace = TRUE)
-PO$temp <- sample(x = c(1,2), nrow(PO@data), replace = TRUE)
+PO$numvar <- runif(n = nrow(PO))
+PO$factvar <- sample(x = c('a','b'), size = nrow(PO), replace = TRUE)
+PO$species <- sample(x = c('fish1', 'fish2'), size = nrow(PO), replace = TRUE)
+PO$temp <- sample(x = c(1,2), nrow(PO), replace = TRUE)
 #Random presence absence dataset
-PA <- spsample(SpatialPoly, n = 100, 'random', CRSobs = projection)
-PA$PAresp <- sample(x = c(0,1), size = nrow(PA@coords), replace = TRUE)
+PA <- st_as_sf(st_sample(SpatialPoly, 100, crs = projection))
+st_geometry(PA) <- 'geometry'
+PA$PAresp <- sample(x = c(0,1), size = nrow(PA), replace = TRUE)
 #Add trial name
-PA$trial <- sample(x = c(1,2,3), size = nrow(PA@coords), replace = TRUE)
-PA$pointcov <- runif(n = nrow(PA@coords))
-PA$binommark <- sample(x = 2:5, size = nrow(PA@data), replace = TRUE)
-PA$marktrial <- sample(x = 0:1, size = nrow(PA@data), replace = TRUE)
-PA$species <- sample(x = c('bird1', 'bird2'), nrow(PA@data), replace = TRUE)
-PA$temp <- sample(x = c(1,2), nrow(PA@data), replace = TRUE)
-
+PA$trial <- sample(x = c(1,2,3), size = nrow(PA), replace = TRUE)
+PA$pointcov <- runif(n = nrow(PA))
+PA$binommark <- sample(x = 0:1, size = nrow(PA), replace = TRUE)
+PA$marktrial <- sample(x = 2:5, size = nrow(PA), replace = TRUE)
+PA$species <- sample(x = c('bird1', 'bird2'), nrow(PA), replace = TRUE)
+PA$temp <- sample(x = c(1,2), nrow(PA), replace = TRUE)
+mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
+                           max.edge = 2, crs = inlabru::fm_crs(projection))
+#iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
+iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
 ##Make PA a data.frame object
+PA$long <- st_coordinates(PA)[,1]
+PA$lat <- st_coordinates(PA)[,2]
+st_geometry(PA) <- NULL
 PA <- data.frame(PA)
 
 spData <- list(PO, PA)
@@ -41,25 +46,25 @@ test_that('The internal function makeData returns a list of SpatialPointDataFram
           well as the relevant metadata to be used in the integrated model.', {
     
     Check$makeData(datapoints = spData, datanames = c('PO', 'PA'),
-                   coords = colnames(PO@coords), proj = projection, offsetname = NULL,
+                   coords = c('long', 'lat'), proj = projection, offsetname = NULL,
                    pointcovnames = 'pointcov', paresp = 'PAresp', countsresp = 'counts', trialname = 'trial',
                    speciesname = 'species', marks = c('numvar', 'factvar', 'binommark'), temporalvar = 'temp',
                    marktrialname = 'marktrial', markfamily = c('uniform', 'multinomial', 'binomial'))
             
     expect_setequal(names(Check$Data), c('PO','PA'))
             
-    expect_true(all(sapply(unlist(Check$Data), function(x) inherits(x, 'Spatial'))))        
+    expect_true(all(unlist(sapply(unlist(Check$Data, recursive = FALSE), function(x) inherits(x, 'sf')))))
             
     ##Should create a placeholder variable for the poresp + 
     #should keep marks +
     #should create new variables for the multinomial marks.
-    expect_setequal(names(Check$Data$PO[[1]]@data), c("poresp", "numvar", "factvar", 'temp',
+    expect_setequal(names(Check$Data$PO[[1]]), c("poresp", "numvar", "factvar", 'temp', 'geometry',
                                                     "species", "factvar_phi", "factvar_response"))
-    expect_true((all(Check$Data$PO[[1]]@data$factvar_phi == 1)))
-    expect_true((all(Check$Data$PO[[1]]@data$factvar_response == 1)))
-    expect_true(class(Check$Data$PO[[1]]@data$factvar) == 'character')
+    expect_true((all(Check$Data$PO[[1]]$factvar_phi == 1)))
+    expect_true((all(Check$Data$PO[[1]]$factvar_response == 1)))
+    expect_true(class(Check$Data$PO[[1]]$factvar) == 'character')
     
-    expect_setequal(names(Check$Data$PA[[1]]@data), c("PAresp", "trial", "binommark", 'temp',
+    expect_setequal(names(Check$Data$PA[[1]]), c("PAresp", "trial", "binommark", 'temp', 'geometry',
                                                     "marktrial", "species", "pointcov"))
     #Family for PO should be:
     # cp for the points;
@@ -88,7 +93,7 @@ test_that('The internal function makeData returns a list of SpatialPointDataFram
     
     expect_true('factvar' %in% Check$multinomVars)
     
-    expect_true(Check$numObs[1] == nrow(PO@data))
+    expect_true(Check$numObs[1] == nrow(PO))
     expect_true(Check$numObs[2] == nrow(PA))
     
     #Ie there are three processes in PO: the points + 2 marks
@@ -149,7 +154,7 @@ test_that('makeMultinom is able to organize and create usable multinomial data f
   expect_true(all(as.numeric(factor(unlist(Check$multinomIndex$factvar$PO))) == unlist(Check$multinomNumeric$factvar$PO)))
   
   #The factor variable should now be numeric in the data; the index is stored in multinoIndex
-  expect_true(all(sapply(Check$Data$PO, function(x) class(x@data$factvar) == 'numeric')))
+  expect_true(all(sapply(Check$Data$PO, function(x) class(x$factvar) == 'numeric')))
   
   })
 
@@ -167,15 +172,15 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             expect_setequal(names(Check$Formulas), c('PO', 'PA'))
             expect_setequal(names(Check$Formulas$PO), c('fish1','fish2'))
             expect_setequal(names(Check$Formulas$PA), c('bird1','bird2'))
-            expect_setequal(names(Check$Formulas$PO$fish1), c('coordinates', 'numvar', 'factvar_response'))
-            expect_setequal(names(Check$Formulas$PO$fish2), c('coordinates', 'numvar', 'factvar_response'))
+            expect_setequal(names(Check$Formulas$PO$fish1), c('geometry', 'numvar', 'factvar_response'))
+            expect_setequal(names(Check$Formulas$PO$fish2), c('geometry', 'numvar', 'factvar_response'))
             expect_setequal(names(Check$Formulas$PA$bird1), c('PAresp', 'binommark'))
             expect_setequal(names(Check$Formulas$PA$bird2), c('PAresp', 'binommark'))
             
             
             
-            expect_equal(deparse1(Check$Formulas$PO$fish1$coordinates$LHS), 
-                         'coordinates ~ .')
+            expect_equal(deparse1(Check$Formulas$PO$fish1$geometry$LHS), 
+                         'geometry ~ .')
             expect_equal(deparse1(Check$Formulas$PO$fish1$numvar$LHS), 
                         'numvar ~ .')
             expect_equal(deparse1(Check$Formulas$PO$fish1$factvar_response$LHS), 
@@ -186,7 +191,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             expect_equal(deparse1(Check$Formulas$PA$bird1$binommark$LHS), 
                         'binommark ~ .')
             
-            expect_setequal(Check$Formulas$PO$fish1$coordinates$RHS,
+            expect_setequal(Check$Formulas$PO$fish1$geometry$RHS,
                           c("fish1_spatcovs", "fish1_spatial", "shared_spatial", "fish1_intercept"))
             expect_setequal(Check$Formulas$PO$fish1$numvar$RHS,
                             c("fish1_spatcovs", "numvar_intercept", "numvar_spatial"))
@@ -207,7 +212,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
                                spatial = NULL, intercept = FALSE, pointcovs = 'pointcov')
           
             
-            expect_setequal(Check$Formulas$PO$fish1$coordinates$RHS,
+            expect_setequal(Check$Formulas$PO$fish1$geometry$RHS,
                             c("fish1_spatcovs"))
             expect_setequal(Check$Formulas$PO$fish1$numvar$RHS,
                             c("fish1_spatcovs"))
@@ -226,7 +231,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
                                marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                                spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov')
             
-            expect_setequal(Check$Formulas$PO$fish1$coordinates$RHS,
+            expect_setequal(Check$Formulas$PO$fish1$geometry$RHS,
                             c("fish1_spatial", "shared_spatial", "fish1_intercept"))
             expect_setequal(Check$Formulas$PO$fish1$numvar$RHS,
                             c("numvar_spatial"))
@@ -244,9 +249,9 @@ test_that('makeFormulas is able to make the correct formulas for the different p
                                      marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                                      spatial = 'copy', intercept = TRUE, pointcovs = 'pointcov')
             
-            expect_setequal(Check$Formulas$PO$fish2$coordinates$RHS,
+            expect_setequal(Check$Formulas$PO$fish2$geometry$RHS,
                             c("PO_spatial", "fish2_intercept", "fish2_spatial"))
-            expect_setequal(Check$Formulas$PO$fish1$coordinates$RHS,
+            expect_setequal(Check$Formulas$PO$fish1$geometry$RHS,
                             c("PO_spatial", "fish1_intercept", "fish1_spatial"))
             expect_setequal(Check$Formulas$PA$bird2$PAresp$RHS,
                             c("PA_spatial", "bird2_intercept", 'pointcov', "bird2_spatial"))
@@ -270,14 +275,14 @@ test_that('makeComponents is able to make the correct components for all the pro
                          speciesname = 'species', covariatenames = 'spatcovs', temporalname = 'temp', speciesspatial = TRUE,
                          covariateclass = 'numeric', numtime = 2, copymodel = Check$.__enclos_env__$private$copyModel)
     
-    expect_setequal(comps,c("shared_spatial(main = coordinates, model = shared_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))",
-                            "fish2_spatial(main = coordinates, model = fish2_field)",                                                                   
-                            "fish1_spatial(main = coordinates, model = fish1_field)",                                                                   
-                            "bird2_spatial(main = coordinates, model = bird2_field)",                                                                   
-                            "bird1_spatial(main = coordinates, model = bird1_field)",                                                                   
-                            "numvar_spatial(main = coordinates, model = numvar_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))"  ,                                                                 
-                            "factvar_spatial(main = coordinates, model = factvar_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))",                                                               
-                            "binommark_spatial(main = coordinates, model = binommark_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))",                                                           
+    expect_setequal(comps,c("shared_spatial(main = geometry, model = shared_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))",
+                            "fish2_spatial(main = geometry, model = fish2_field)",                                                                   
+                            "fish1_spatial(main = geometry, model = fish1_field)",                                                                   
+                            "bird2_spatial(main = geometry, model = bird2_field)",                                                                   
+                            "bird1_spatial(main = geometry, model = bird1_field)",                                                                   
+                            "numvar_spatial(main = geometry, model = numvar_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))"  ,                                                                 
+                            "factvar_spatial(main = geometry, model = factvar_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))",                                                               
+                            "binommark_spatial(main = geometry, model = binommark_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))",                                                           
                             "fish2_spatcovs(main = fish2_spatcovs, model = \"numeric\")",                                                               
                             "fish1_spatcovs(main = fish1_spatcovs, model = \"numeric\")",                                                               
                             "bird2_spatcovs(main = bird2_spatcovs, model = \"numeric\")",                                                               
@@ -300,10 +305,10 @@ test_that('makeComponents is able to make the correct components for all the pro
                                   speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = TRUE,
                                   covariateclass = 'numeric', numtime =  2,  copymodel = Check$.__enclos_env__$private$copyModel)
     
-    expect_setequal(comps2,c("fish2_spatial(main = coordinates, model = fish2_field)",                       
-                             "fish1_spatial(main = coordinates, model = fish1_field)",                       
-                             "bird2_spatial(main = coordinates, model = bird2_field)",                       
-                             "bird1_spatial(main = coordinates, model = bird1_field)",                       
+    expect_setequal(comps2,c("fish2_spatial(main = geometry, model = fish2_field)",                       
+                             "fish1_spatial(main = geometry, model = fish1_field)",                       
+                             "bird2_spatial(main = geometry, model = bird2_field)",                       
+                             "bird1_spatial(main = geometry, model = bird1_field)",                       
                              "fish2_spatcovs(main = fish2_spatcovs, model = \"numeric\")",                   
                              "fish1_spatcovs(main = fish1_spatcovs, model = \"numeric\")",                   
                              "bird2_spatcovs(main = bird2_spatcovs, model = \"numeric\")",                   
@@ -319,12 +324,12 @@ test_that('makeComponents is able to make the correct components for all the pro
                          speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = TRUE, temporalname = NULL,
                          covariateclass = 'numeric', numtime =  NULL,  copymodel = "list(beta = list(fixed = FALSE))")
     
-    expect_setequal(compsCopy,c("PO_spatial(main = coordinates, model = PO_field)",                                          
-                             "PA_spatial(main = coordinates, copy = \"PO_spatial\", hyper = list(beta = list(fixed = FALSE)))",
-                             "fish1_spatial(main = coordinates, model = fish1_field)",                                  
-                             "fish2_spatial(main = coordinates, model = fish2_field)",                                       
-                             "bird1_spatial(main = coordinates, model = bird1_field)",                                       
-                             "bird2_spatial(main = coordinates, model = bird2_field)",                                       
+    expect_setequal(compsCopy,c("PO_spatial(main = geometry, model = PO_field)",                                          
+                             "PA_spatial(main = geometry, copy = \"PO_spatial\", hyper = list(beta = list(fixed = FALSE)))",
+                             "fish1_spatial(main = geometry, model = fish1_field)",                                  
+                             "fish2_spatial(main = geometry, model = fish2_field)",                                       
+                             "bird1_spatial(main = geometry, model = bird1_field)",                                       
+                             "bird2_spatial(main = geometry, model = bird2_field)",                                       
                              "fish1_spatcovs(main = fish1_spatcovs, model = \"numeric\")",                                   
                              "fish2_spatcovs(main = fish2_spatcovs, model = \"numeric\")",                                   
                              "bird1_spatcovs(main = bird1_spatcovs, model = \"numeric\")",                                   

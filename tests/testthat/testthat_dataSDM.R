@@ -1,45 +1,48 @@
-projection <- sp::CRS('+proj=tmerc')
+#Make random shape to generate points on
+projection <- '+proj=tmerc'
+
 #Make random shape to generate points on
 x <- c(16.48438,  17.49512,  24.74609, 22.59277, 16.48438)
 y <- c(59.736328125, 55.1220703125, 55.0341796875, 61.142578125, 59.736328125)
 xy <- cbind(x, y)
-
-Poly <- Polygon(xy)
-Poly <- Polygons(list(Poly),1)
-SpatialPoly <- SpatialPolygons(list(Poly), proj4string = projection)
-
+SpatialPoly <- st_sfc(st_polygon(list(xy)), crs = projection)
 ##Old coordinate names
 #Make random points
 #Random presence only dataset
-PO <- spsample(SpatialPoly, n = 100, 'random', CRSobs = projection)
+PO <- st_as_sf(st_sample(SpatialPoly, 100, crs = projection))
+st_geometry(PO) <- 'geometry'
 ##Add random variable
-PO$numvar <- runif(n = nrow(PO@coords))
-PO$factvar <- sample(x = c('a','b'), size = nrow(PO@coords), replace = TRUE)
-PO$species <- sample(x = c('fish'), size = nrow(PO@coords), replace = TRUE)
-PO$temp <- sample(x = c(1,2), size = nrow(PO@coords), replace = TRUE)
+PO$numvar <- runif(n = nrow(PO))
+PO$factvar <- sample(x = c('a','b'), size = nrow(PO), replace = TRUE)
+PO$species <- sample(x = c('fish'), size = nrow(PO), replace = TRUE)
+PO$temp <- sample(x = c(1,2), size = nrow(PO), replace = TRUE)
 #Random presence absence dataset
-PA <- spsample(SpatialPoly, n = 100, 'random', CRSobs = projection)
-PA$PAresp <- sample(x = c(0,1), size = nrow(PA@coords), replace = TRUE)
+
+PA <- st_as_sf(st_sample(SpatialPoly, 100, crs = projection))
+PA$PAresp <- sample(x = c(0,1), size = nrow(PA), replace = TRUE)
 #Add trial name
-PA$trial <- sample(x = c(1,2,3), size = nrow(PA@coords), replace = TRUE)
-PA$pointcov <- runif(n = nrow(PA@coords))
-PA$binommark <- sample(x = 2:5, size = nrow(PA@data), replace = TRUE)
-PA$marktrial <- sample(x = 0:1, size = nrow(PA@data), replace = TRUE)
-PA$species <- sample(x = c('bird'), nrow(PA@data), replace = TRUE)
-PA$temp <- sample(x = c(1,2), size = nrow(PA@coords), replace = TRUE)
+PA$trial <- sample(x = c(1,2,3), size = nrow(PA), replace = TRUE)
+PA$pointcov <- runif(n = nrow(PA))
+PA$binommark <- sample(x = 0:1, size = nrow(PA), replace = TRUE)
+PA$marktrial <- sample(x = 2:5, size = nrow(PA), replace = TRUE)
+PA$species <- sample(x = c('bird'), nrow(PA), replace = TRUE)
+PA$temp <- sample(x = c(1,2), size = nrow(PA), replace = TRUE)
 
 if (requireNamespace("INLA")) {
 mesh <<- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
-                            max.edge = 2)
+                            max.edge = 2, crs = inlabru::fm_crs(projection))
 #iPoints <<- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-iPoints <<- inlabru::ipoints(samplers = SpatialPoly)
+iPoints <<- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
 
 }
 
 ##Make PA a data.frame object
+PA$long <- st_coordinates(PA)[,1]
+PA$lat <- st_coordinates(PA)[,2]
+st_geometry(PA) <- NULL
 PA <- data.frame(PA)
 
-coordnames <- colnames(PO@coords)
+coordnames <- c('long', 'lat')
 responseCounts <- 'count'
 responsePA <- 'PAresp'
 trialName <- 'trial'
@@ -53,15 +56,12 @@ marksIntercept <- TRUE
 speciesSpatial <- TRUE
 temporalName <- 'temp'
 temporalModel <- deparse(list(model = 'ar1'))
-projection <- CRS('+proj=tmerc')
 copyModel = deparse1(list(beta = list(fixed = FALSE)))
 
-cov <- sp::spsample(x = SpatialPoly, n = 100000, type = 'random')
-cov$covariate <- rgamma(n = 100000, shape = 2)
-cov <- sp::SpatialPixelsDataFrame(points = cov@coords,
-                                   data = data.frame(covariate = cov$covariate),
-                                   proj4string = projection,
-                                   tolerance = 0.898631)
+cov <- terra::rast(st_as_sf(SpatialPoly), crs = projection)
+terra::values(cov) <- rgamma(n = terra::ncell(cov), shape = 2)
+names(cov) <- 'covariate'
+
 
 test_that('dataSDMs initialize works as expected.', {
   
@@ -173,7 +173,7 @@ test_that('dataSDMs initialize works as expected.', {
                            ips = iPoints,
                            spatial = NULL,
                            intercepts = FALSE),
-               'Projection needs to be a CRS object.')
+               'Projection needs to be a character object.')
   
 
 })
@@ -193,29 +193,30 @@ test_that('addData can correctly add and store the relevant metadata properly.',
   ##Check link functions
   expect_setequal(unlist(check$.__enclos_env__$private$optionsINLA), c('log', 'log', 'log', 'cloglog', 'cloglog'))
   ##Add a new counts dataset; first try without a species variable (compulsory since speciesName specified in the initialize...)
-  Pcount <- spsample(SpatialPoly, n = 100, 'random', CRSobs = projection)
-  Pcount$count <- rpois(n = nrow(Pcount@coords), lambda = 2)
+  Pcount <- st_as_sf(st_sample(SpatialPoly, 100, crs = projection))
+  st_geometry(Pcount) <- 'geometry'
+  Pcount$count <- rpois(n = nrow(Pcount), lambda = 2)
   expect_error(check$addData(Pcount),'The species variable name is required to be present in all the datasets.')
   
   #Generate species
   Pcount$species <- 'dog'
-  Pcount$temp <- sample(c(1,2), nrow(Pcount@data), TRUE)
+  Pcount$temp <- sample(c(1,2), nrow(Pcount), TRUE)
   check$addData(Pcount)
   ##Check that the data has been added into the model
   expect_setequal(names(check$.__enclos_env__$private$modelData), c("PO", "PA", "Pcount"))
   expect_setequal(unlist(check$.__enclos_env__$private$optionsINLA), c('log', 'log', 'log', 'cloglog', 'cloglog', 'log'))
   
   #Add a new PA dataset with a different response variable name
-  PA2 <- spsample(SpatialPoly, n = 100, 'random', CRSobs = projection)
-  PA2$newResponse <- sample(0:1, nrow(PA2@coords), replace = TRUE)
+  PA2 <- st_as_sf(st_sample(SpatialPoly, 100, crs = projection))
+  PA2$newResponse <- sample(0:1, nrow(PA2), replace = TRUE)
   PA2$species <- 'insect'
-  PA2$temp <- sample(c(1,2), nrow(PA2@data), TRUE)
+  PA2$temp <- sample(c(1,2), nrow(PA2), TRUE)
   check$addData(PA2, responsePA = 'newResponse')
   
   expect_setequal(names(check$.__enclos_env__$private$modelData), c("PO", "PA", "Pcount", "PA2"))
   expect_setequal(check$.__enclos_env__$private$dataSource, c("PO", "PO", "PO", "PA", "PA", "Pcount", "PA2"))
   ##The correct species_field is in the components, ie the object updated itself correctly
-  expect_true('shared_spatial(main = coordinates, model = shared_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))' %in% check$.__enclos_env__$private$Components)
+  expect_true('shared_spatial(main = geometry, model = shared_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))' %in% check$.__enclos_env__$private$Components)
   expect_equal(unlist(check$.__enclos_env__$private$speciesIn), c(PO = 'fish', PA = 'bird', Pcount = 'dog', PA2 = 'insect'))
   
   })
@@ -236,7 +237,7 @@ test_that('addBias is able to add bias fields to the model as well as succesfull
     
   }))[1])
 
-  expect_true("PO_biasField(main = coordinates, model = PO_bias_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))"  %in% check$.__enclos_env__$private$Components)
+  expect_true("PO_biasField(main = geometry, model = PO_bias_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))"  %in% check$.__enclos_env__$private$Components)
   
 })
 
@@ -252,7 +253,7 @@ test_that('updateFormula is able to change the formula of a dataset', {
   ##remove the covariate from the PO dataset
   check$updateFormula(datasetName = 'PO', Formula = ~ . - covariate)
   
-  expect_setequal(check$.__enclos_env__$private$Formulas$PO$fish$coordinates$RHS, c("fish_spatial", "shared_spatial", "fish_intercept", "PO_biasField"))
+  expect_setequal(check$.__enclos_env__$private$Formulas$PO$fish$geometry$RHS, c("fish_spatial", "shared_spatial", "fish_intercept", "PO_biasField"))
   expect_setequal(check$.__enclos_env__$private$Formulas$PA$bird$PAresp$RHS, c("bird_covariate", "bird_spatial", "shared_spatial", "bird_intercept", "pointcov"))
   
   })
@@ -262,16 +263,16 @@ test_that('changeComponents can change the components of the model', {
   
   #remove binmark_spatial from model
   check$changeComponents(removeComponent = 'binommark_spatial')
-  expect_false('binommark_spatial(main = coordinates, model = binommark_field)'%in%check$.__enclos_env__$private$Components)
+  expect_false('binommark_spatial(main = geometry, model = binommark_field)'%in%check$.__enclos_env__$private$Components)
   
   ##Add it back into the components
-  check$changeComponents(addComponent = 'binommark_spatial(main = coordinates, model = binommark_field)')
-  expect_true('binommark_spatial(main = coordinates, model = binommark_field)'%in%check$.__enclos_env__$private$Components)
+  check$changeComponents(addComponent = 'binommark_spatial(main = geometry, model = binommark_field)')
+  expect_true('binommark_spatial(main = geometry, model = binommark_field)'%in%check$.__enclos_env__$private$Components)
   
   #customize component for whatever reason
-  check$changeComponents(addComponent = 'binommark_spatial(main = coordinates, model = different_field)')
-  expect_false('binommark_spatial(main = coordinates, model = binommark_field)'%in%check$.__enclos_env__$private$Components)
-  expect_true('binommark_spatial(main = coordinates, model = different_field)'%in%check$.__enclos_env__$private$Components)
+  check$changeComponents(addComponent = 'binommark_spatial(main = geometry, model = different_field)')
+  expect_false('binommark_spatial(main = geometry, model = binommark_field)'%in%check$.__enclos_env__$private$Components)
+  expect_true('binommark_spatial(main = geometry, model = different_field)'%in%check$.__enclos_env__$private$Components)
   
   
 })
@@ -311,7 +312,7 @@ test_that('specifySpatial can correctly specify the spatial fields', {
   
   #remove the spatial field from all processes
   check$specifySpatial(sharedSpatial = TRUE, Remove = TRUE)
-  expect_false('shared_spatial(main = coordinates, model = shared_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))'%in%check$.__enclos_env__$private$Components)
+  expect_false('shared_spatial(main = geometry, model = shared_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))'%in%check$.__enclos_env__$private$Components)
   expect_false(any(unlist(lapply(check$.__enclos_env__$private$modelData, function(x) 'shared_spatial' %in% x$include_components))))
     
 })

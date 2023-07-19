@@ -2,43 +2,46 @@ test_that('dataSet transforms the data to SpatialPointsDataFrames, and produces 
   
   ##Generate arbitrary data:
   #Arbitrary projection
-  projection <- sp::CRS('+proj=tmerc')
+  projection <- '+proj=tmerc'
   
   #Make random shape to generate points on
   x <- c(16.48438,  17.49512,  24.74609, 22.59277, 16.48438)
   y <- c(59.736328125, 55.1220703125, 55.0341796875, 61.142578125, 59.736328125)
   xy <- cbind(x, y)
-  
-  Poly = Polygon(xy)
-  Poly = Polygons(list(Poly),1)
-  SpatialPoly = SpatialPolygons(list(Poly), proj4string = projection)
+  SpatialPoly <- st_sfc(st_polygon(list(xy)), crs = projection)
   
   ##Old coordinate names
   #Make random points
   #Random presence only dataset
-  PO <- spsample(SpatialPoly, n = 100, 'random', CRSobs = projection)
+  PO <- st_as_sf(st_sample(SpatialPoly, 100, crs = projection))
+  st_geometry(PO) <- 'geometry'
   ##Add random variable
-  PO$numvar <- runif(n = nrow(PO@coords))
-  PO$factvar <- sample(x = c('a','b'), size = nrow(PO@coords), replace = TRUE)
-  PO$species <- sample(x = c('fish1', 'fish2'), size = nrow(PO@coords), replace = TRUE)
-  PO$temp <- rpois(n = nrow(PO@coords), lambda = 5)
+  PO$numvar <- runif(n = nrow(PO))
+  PO$factvar <- sample(x = c('a','b'), size = nrow(PO), replace = TRUE)
+  PO$species <- sample(x = c('fish1', 'fish2'), size = nrow(PO), replace = TRUE)
+  PO$temp <- rpois(n = nrow(PO), lambda = 5)
   #Random presence absence dataset
-  PA <- spsample(SpatialPoly, n = 100, 'random', CRSobs = projection)
-  PA$PAresp <- sample(x = c(0,1), size = nrow(PA@coords), replace = TRUE)
+  PA <- st_as_sf(st_sample(SpatialPoly, 100, crs = projection))
+  st_geometry(PA) <- 'geometry'
+  PA$PAresp <- sample(x = c(0,1), size = nrow(PA), replace = TRUE)
   #Add trial name
-  PA$trial <- sample(x = c(1,2,3), size = nrow(PA@coords), replace = TRUE)
-  PA$pointcov <- runif(n = nrow(PA@coords))
-  PA$binommark <- sample(x = 2:5, size = nrow(PA@data), replace = TRUE)
-  PA$marktrial <- sample(x = 0:1, size = nrow(PA@data), replace = TRUE)
-  PA$species <- sample(x = c('bird1', 'bird2'), nrow(PA@data), replace = TRUE)
-  PA$temp <- rpois(n = nrow(PA@coords), lambda = 5)
+  PA$trial <- sample(x = c(1,2,3), size = nrow(PA), replace = TRUE)
+  PA$pointcov <- runif(n = nrow(PA))
+  PA$binommark <- sample(x = 0:1, size = nrow(PA), replace = TRUE)
+  PA$marktrial <- sample(x = 2:5, size = nrow(PA), replace = TRUE)
+  PA$species <- sample(x = c('bird1', 'bird2'), nrow(PA), replace = TRUE)
+  PA$temp <- rpois(n = nrow(PA), lambda = 5)
+  
+  PA$long <- st_coordinates(PA)[,1]
+  PA$lat <- st_coordinates(PA)[,2]
+  st_geometry(PA) <- NULL
   ##Make PA a data.frame object
   PA <- data.frame(PA)
   
   spData <- list(PO, PA)
   
   mod <- dataSet(datapoints = spData, datanames = c('PO', 'PA'),
-                 coords = colnames(PO@coords), proj = projection,
+                 coords = c('long', 'lat'), proj = projection,
                  pointcovnames = 'pointcov', paresp = 'PAresp', countsresp = 'counts', trialname = 'trial',
                  speciesname = 'species', marks = c('numvar', 'factvar', 'binommark'),
                  marktrialname = 'marktrial', markfamily = c('uniform', 'multinomial', 'binomial'),
@@ -48,18 +51,18 @@ test_that('dataSet transforms the data to SpatialPointsDataFrames, and produces 
                                 "marksType", "multinomVars", 'numObs'))
   expect_setequal(names(mod$Data), c('PO','PA'))
   
-  expect_true(all(lapply(unlist(mod$Data), function(x) inherits(x, 'Spatial'))))
+  expect_true(all(unlist(lapply(unlist(mod$Data, recursive = FALSE), function(x) inherits(x, 'sf')))))
   
   ##Should create a placeholder variable for the poresp + 
   #should keep marks +
   #should create new variables for the multinomial marks.
-  expect_setequal(names(mod$Data$PO[[1]]@data), c("poresp", "numvar", "factvar", 'temp',
+  expect_setequal(names(mod$Data$PO[[1]]), c("poresp", "numvar", "factvar", 'temp', 'geometry',
                                                   "species", "factvar_phi", "factvar_response"))
-  expect_true((all(mod$Data$PO[[1]]@data$factvar_phi == 1)))
-  expect_true((all(mod$Data$PO[[1]]@data$factvar_response == 1)))
-  expect_true(class(mod$Data$PO[[1]]@data$factvar) == 'character')
+  expect_true((all(mod$Data$PO[[1]]$factvar_phi == 1)))
+  expect_true((all(mod$Data$PO[[1]]$factvar_response == 1)))
+  expect_true(class(mod$Data$PO[[1]]$factvar) == 'character')
   
-  expect_setequal(names(mod$Data$PA[[1]]@data), c("PAresp", "trial", "binommark", 'temp',
+  expect_setequal(names(mod$Data$PA[[1]]), c("PAresp", "trial", "binommark", 'temp', 'geometry',
                                                   "marktrial", "species", "pointcov"))
   
   #Family for PO should be:
@@ -89,7 +92,7 @@ test_that('dataSet transforms the data to SpatialPointsDataFrames, and produces 
   
   expect_true('factvar' %in% mod$multinomVars)
   
-  expect_true(mod$numObs[1] == nrow(PO@data))
+  expect_true(mod$numObs[1] == nrow(PO))
   expect_true(mod$numObs[2] == nrow(PA))
   
   #Remove a dataset name

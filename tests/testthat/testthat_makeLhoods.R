@@ -3,41 +3,43 @@ test_that('makeLhoods makes a list of likelihoods', {
   
   ##Set up a model
   ##Set up arbitrary data
-  projection <- CRS('+proj=tmerc')
+  projection <- '+proj=tmerc'
   x <- c(16.48438,  17.49512,  24.74609, 22.59277, 16.48438)
   y <- c(59.736328125, 55.1220703125, 55.0341796875, 61.142578125, 59.736328125)
   xy <- cbind(x, y)
-  
-  Poly = Polygon(xy)
-  Poly = Polygons(list(Poly),1)
-  SpatialPoly = SpatialPolygons(list(Poly), proj4string = projection)
+  xy <- cbind(x, y)
+  SpatialPoly <- st_sfc(st_polygon(list(xy)), crs = projection)
   
   ##Old coordinate names
   #Make random points
   #Random presence only dataset
-  PO <- spsample(SpatialPoly, n = 100, 'random', CRSobs = projection)
+  PO <- st_as_sf(st_sample(SpatialPoly, size = 100, crs = projection))
+  st_geometry(PO) <- 'geometry'
   ##Add random variable
-  PO$numvar <- runif(n = nrow(PO@coords))
-  PO$factvar <- sample(x = c('a','b'), size = nrow(PO@coords), replace = TRUE)
-  PO$species <- sample(x = c('fish'), size = nrow(PO@coords), replace = TRUE)
+  PO$numvar <- runif(n = nrow(PO))
+  PO$factvar <- sample(x = c('a','b'), size = nrow(PO), replace = TRUE)
+  PO$species <- sample(x = c('fish'), size = nrow(PO), replace = TRUE)
   #Random presence absence dataset
-  PA <- spsample(SpatialPoly, n = 100, 'random', CRSobs = projection)
-  PA$PAresp <- sample(x = c(0,1), size = nrow(PA@coords), replace = TRUE)
+  PA <- st_as_sf(st_sample(SpatialPoly, size = 100, crs = projection))
+  st_geometry(PA) <- 'geometry'
+  PA$PAresp <- sample(x = c(0,1), size = nrow(PA), replace = TRUE)
   #Add trial name
-  PA$trial <- sample(x = c(1,2,3), size = nrow(PA@coords), replace = TRUE)
-  PA$pointcov <- runif(n = nrow(PA@coords))
-  PA$binommark <- sample(x = 2:3, size = nrow(PA@data), replace = TRUE)
-  PA$marktrial <- sample(x = 3:5, size = nrow(PA@data), replace = TRUE)
-  PA$species <- sample(x = c('bird'), nrow(PA@data), replace = TRUE)
+  PA$trial <- sample(x = c(1,2,3), size = nrow(PA), replace = TRUE)
+  PA$pointcov <- runif(n = nrow(PA))
+  PA$binommark <- sample(x = 2:3, size = nrow(PA), replace = TRUE)
+  PA$marktrial <- sample(x = 3:5, size = nrow(PA), replace = TRUE)
+  PA$species <- sample(x = c('bird'), nrow(PA), replace = TRUE)
   mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
-                             max.edge = 2)
-  mesh$crs <- proj
+                             max.edge = 2, crs = inlabru::fm_crs(projection))
   #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-  iPoints <- inlabru::ipoints(samplers = SpatialPoly)
+  iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
   ##Make PA a data.frame object
+  PA$x.1 <- st_coordinates(PA)[,1]
+  PA$x.2 <- st_coordinates(PA)[,2]
+  st_geometry(PA) <- NULL
   PA <- data.frame(PA)
   
-  coordnames <- colnames(PO@coords)
+  coordnames <- c('x.1', 'x.2')
   responseCounts <- 'count'
   responsePA <- 'PAresp'
   trialName <- 'trial'
@@ -47,13 +49,8 @@ test_that('makeLhoods makes a list of likelihoods', {
   pointCovs <- 'pointcov'
   speciesName <- 'species'
   
-  cov <- sp::spsample(x = SpatialPoly, n = 1000, type = 'stratified')
-  cov$covariate <- rgamma(n = nrow(cov@coords), shape = 2)
-  cov <- sp::SpatialPixelsDataFrame(points = cov@coords,
-                                    data = data.frame(covariate = cov$covariate),
-                                    proj4string = projection,
-                                    tolerance = 0.585235)
-  cov <- raster::raster(cov)
+  cov <- terra::rast(st_as_sf(SpatialPoly), crs = projection)
+  terra::values(cov) <- rgamma(n = terra::ncell(cov), shape = 2)
   
   
   obj <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
@@ -78,7 +75,7 @@ test_that('makeLhoods makes a list of likelihoods', {
   expect_true(all(unlist(lapply(Lhoods, class)) == c("bru_like", "list")))
   
   #Names should be in format: dataset_species_response
-  expect_setequal(names(Lhoods), c("PO_fish_coordinates", "PO_fish_numvar", "PA_bird_PAresp", "PA_bird_binommark"))
+  expect_setequal(names(Lhoods), c("PO_fish_geometry", "PO_fish_numvar", "PA_bird_PAresp", "PA_bird_binommark"))
 
   #Expect familus
   expect_setequal(sapply(Lhoods, function(x) x$family), c( "cp", "gaussian", "binomial", "binomial"))
@@ -90,7 +87,7 @@ test_that('makeLhoods makes a list of likelihoods', {
   expect_identical(Lhoods$PA_bird_binommark$Ntrials, PA$marktrial)
   
   #Correct formulas
-  expect_equal(deparse1(Lhoods$PO_fish_coordinates$formula), 'coordinates ~ .')
+  expect_equal(deparse1(Lhoods$PO_fish_geometry$formula), 'geometry ~ .')
   expect_equal(deparse1(Lhoods$PO_fish_numvar$formula), 'numvar ~ .')
   expect_equal(deparse1(Lhoods$PA_bird_PAresp$formula), 'PAresp ~ .')
   expect_equal(deparse1(Lhoods$PA_bird_binommark$formula), 'binommark ~ .')
