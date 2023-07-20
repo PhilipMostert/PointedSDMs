@@ -45,7 +45,7 @@ Plot for preduct_bru_sdm
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- "+proj=longlat +ellps=WGS84"
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj

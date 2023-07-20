@@ -21,6 +21,7 @@
   biasnames = NULL,
   predictor = FALSE,
   fun = "linear",
+  format = "sf",
   ...
 )
 }
@@ -57,6 +58,8 @@
 
 \item{fun}{Function used to predict. Set to \code{'linear'} if effects on the linear scale are desired.}
 
+\item{format}{Class of the data for which to predict on. Must be one of \code{'sp'}, \code{'sf'} or \code{'terra'}. Defaults to \code{'sf'}.}
+
 \item{...}{Additional arguments used by the inlabru \code{predict} function.}
 }
 \value{
@@ -76,7 +79,7 @@ Predict for bru_sdm
    
  #Get Data
  data("SolitaryTinamou")
- proj <- CRS("+proj=longlat +ellps=WGS84")
+ proj <- "+proj=longlat +ellps=WGS84"
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj

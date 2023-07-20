@@ -24,6 +24,7 @@ setClass('bruSDM_predict')
 #' @param biasnames Names of the datasets to include bias term. Defaults to \code{NULL}. Note: the chosen dataset needs to be run with a bias field first; this can be done using \code{.$addBias} with the object produced by \code{\link{intModel}}.
 #' @param predictor Should all terms (except the bias terms) included in the linear predictor be used in the predictions. Defaults to \code{FALSE}.
 #' @param fun Function used to predict. Set to \code{'linear'} if effects on the linear scale are desired.
+#' @param format Class of the data for which to predict on. Must be one of \code{'sp'}, \code{'sf'} or \code{'terra'}. Defaults to \code{'sf'}.
 #' @param ... Additional arguments used by the inlabru \code{predict} function.
 #' 
 #' @method predict bruSDM
@@ -39,7 +40,7 @@ setClass('bruSDM_predict')
 #'    
 #'  #Get Data
 #'  data("SolitaryTinamou")
-#'  proj <- CRS("+proj=longlat +ellps=WGS84")
+#'  proj <- "+proj=longlat +ellps=WGS84"
 #'  data <- SolitaryTinamou$datasets
 #'  mesh <- SolitaryTinamou$mesh
 #'  mesh$crs <- proj
@@ -62,7 +63,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
                            mask = NULL, temporal = FALSE, covariates = NULL, spatial = FALSE,
                            intercepts = FALSE, datasets = NULL, species = NULL,
                            marks = NULL, biasfield = FALSE, biasnames = NULL, predictor = FALSE,
-                           fun = 'linear', ...) {
+                           fun = 'linear', format = 'sf', ...) {
   
   if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
   
@@ -119,10 +120,10 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (!is.null(mask)) {
       
-      data <- inlabru::pixels(mesh, mask = mask)
+      data <- inlabru::fm_pixels(mesh, mask = mask, format = format)
       
     }   
-    else data <- inlabru::pixels(mesh)
+    else data <- inlabru::fm_int(mesh, format = format)
   }
   
   
@@ -142,8 +143,8 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       time_data <- data.frame(seq_len(max(numeric_time)))
       names(time_data) <- time_variable
       
-      timeData <- inlabru::cprod(data, data.frame(time_data))
-      names(timeData@data) <- c(time_variable, 'weight')  
+      timeData <- inlabru::fm_cprod(data, data.frame(time_data))
+      names(timeData)[!names(timeData) %in% c('geometry', '.block')] <- c(time_variable, 'weight')  
       
       #bias
       
@@ -301,7 +302,7 @@ print.bruSDM_predict <- function(x, ...) {
         
         cat('Predictions for', paste0(species,':'))
         cat('\n')
-        print(summary(x[[1]][[species]]@data))
+        print(summary(data.frame(x[[1]][[species]][!names(data.frame(x[[1]][[species]]) %in% c('geometry', 'coords.x1', 'coords.x2'))])))
         cat('\n')
          
         }
@@ -312,7 +313,7 @@ print.bruSDM_predict <- function(x, ...) {
         
         cat('Predictions for the temporal variable:')
         cat('\n')
-        print(summary(x[[1]]@data))
+        print(summary(data.frame(x[[1]][!names(data.frame(x[[1]]) %in% c('geometry', 'coords.x1', 'coords.x2'))])))
         
       }
     else
@@ -322,7 +323,7 @@ print.bruSDM_predict <- function(x, ...) {
           
           cat('Predictions of the bias field for', paste0(bias,':'))
           cat('\n')
-          print(summary(x[[1]][[bias]]@data))
+          print(summary(data.frame(x[[1]][[bias]][!names(data.frame(x[[1]][[bias]]) %in% c('geometry', 'coords.x1', 'coords.x2'))])))
           cat('\n')
           
         }
@@ -358,7 +359,7 @@ print.bruSDM_predict <- function(x, ...) {
 #'    
 #'  #Get Data
 #'  data("SolitaryTinamou")
-#'  proj <- CRS("+proj=longlat +ellps=WGS84")
+#'  proj <- "+proj=longlat +ellps=WGS84"
 #'  data <- SolitaryTinamou$datasets
 #'  mesh <- SolitaryTinamou$mesh
 #'  mesh$crs <- proj
@@ -408,12 +409,16 @@ plot.bruSDM_predict <- function(x,
     if (length(whattoplot) > 1) stop('Please only plot one variable at a time for species plots.')
     
     
-    temporalName <- names(x[[1]]@data)[!names(x[[1]]@data) %in% c('weight', 'mean', 'sd', 'q0.025', 'median', 'q0.975', 'q0.5', 'smin', 'smax', 'cv','mean.mc_std_err', 'sd.mc_std_err')]
-    class(x[[1]]@data[,temporalName]) <- 'character'
-    names(x[[1]]@data)[names(x[[1]]@data) == temporalName] <- '..temporal_variable_index..'
+    temporalName <- names(x[[1]])[!names(x[[1]]) %in% c('geometry', 'weight', 'mean', 'sd', 'q0.025', 'median', 'q0.975', 'q0.5', 'smin', 'smax', 'cv','mean.mc_std_err', 'sd.mc_std_err')]
+    #class(x[[1]][,temporalName]) <- 'character'
+    #names(x[[1]]@data)[names(x[[1]]@data) == temporalName] <- '..temporal_variable_index..'
+    x[[1]]$..temporal_variable_index.. <- as.character(data.frame(x[[1]])[, temporalName])
 
+    if (inherits(x[[1]], 'sf')) plot_obj <- geom_sf(data = x[[1]], aes_string(fill = whattoplot))
+    else plot_obj <- inlabru::gg(x[[1]], aes_string(fill = whattoplot))
+    
     ##Would be nice to get full temporal variable names in here ...
-    plot_grid <- ggplot() + inlabru::gg(x[[1]], aes_string(fill = whattoplot)) + facet_wrap(~ ..temporal_variable_index..) + ggtitle('Plot of the temporal predictions')
+    plot_grid <- ggplot() + plot_obj + facet_wrap(~ ..temporal_variable_index..) + ggtitle('Plot of the temporal predictions')
     return(plot_grid)
     
   }
@@ -424,15 +429,17 @@ plot.bruSDM_predict <- function(x,
     
     if (length(whattoplot) > 1) stop('Please only plot one variable at a time for species plots.')
     
-    
     all_plots <- list()
     
     for (object in names(x[[nameObj]])) {
       
       if (nameObj ==  'speciesPredictions') title <- ggtitle(paste('Plot of predictions for', object))
       else title <- ggtitle(paste('Plot of bias field for', object))
+      
+      if (inherits(x[[nameObj]][[object]], 'sf')) plot_obj <- geom_sf(data = x[[nameObj]][[object]], aes_string(fill = whattoplot))
+      else plot_obj <- inlabru::gg(x[[nameObj]][[object]], aes_string(fill = whattoplot))
 
-      all_plots[[object]] <- ggplot() + inlabru::gg(x[[nameObj]][[object]], aes_string(fill = whattoplot)) + title + colours
+      all_plots[[object]] <- ggplot() + plot_obj + title + colours
       
     }
 
@@ -465,7 +472,8 @@ plot.bruSDM_predict <- function(x,
       #title <- ggtitle(paste('Plot of',stat,'for',plotname))
       title <- ggtitle('Plot of predictions')
       
-      prediction <- inlabru::gg(x[[plotname]], aes_string(fill = stat))
+      if (inherits(x[[plotname]], 'sf')) prediction <- geom_sf(data = x[[plotname]], aes_string(fill = stat))
+      else prediction <- inlabru::gg(x[[plotname]], aes_string(fill = stat))
       
       if (!plot) prediction_list[[stat]] <- ggplot() + prediction
 
@@ -475,8 +483,9 @@ plot.bruSDM_predict <- function(x,
     }
     
     if (plot) {
-      if (is.null(cols)) cols <- length(whattoplot)
-      plot_grid <- inlabru::multiplot(plotlist = plot_list, cols = cols, layout = layout)
+    if (is.null(cols)) cols <- length(whattoplot)
+      
+    plot_grid <- inlabru::multiplot(plotlist = plot_list, cols = cols, layout = layout)
       
     }
     else{
