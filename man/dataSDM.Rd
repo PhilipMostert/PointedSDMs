@@ -21,7 +21,7 @@ The arguments of this function may be missing (ie not provided) if they have alr
  #Get Data
  library(ggplot2)
  data("SolitaryTinamou")
- proj <- sp::CRS("+proj=longlat +ellps=WGS84")
+ proj <- "+proj=longlat +ellps=WGS84"
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
@@ -320,7 +320,7 @@ A ggplot object.
  #Get Data
  library(ggplot2)
  data("SolitaryTinamou")
- proj <- sp::CRS("+proj=longlat +ellps=WGS84")
+ proj <- "+proj=longlat +ellps=WGS84"
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
