@@ -125,7 +125,8 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
     }
     else dataList <- FALSE
     
-    if (!all(unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame", 'sf'))) stop("Datasets need to be either a SpatialPoints* object, sf or a data frame.")
+    if (!all(unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame", 'sf',
+                                         'tbl', 'tbl_df'))) stop("Datasets need to be either a SpatialPoints* object, sf or a data frame.")
     
     if (dataList) {
       
