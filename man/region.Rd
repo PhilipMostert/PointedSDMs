@@ -3,11 +3,11 @@
 \docType{data}
 \name{region}
 \alias{region}
-\title{SpatialPolygons object containing the boundary region for solitary tinamouc}
+\title{sf object containing the boundary region for solitary tinamouc}
 \source{
 \url{https://github.com/oharar/PointedSDMs}
 }
 \description{
-SpatialPolygons object containing the boundary region for solitary tinamouc
+sf object containing the boundary region for solitary tinamouc
 }
 \keyword{data}
