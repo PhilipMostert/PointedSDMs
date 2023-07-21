@@ -2,9 +2,9 @@ library(sp)
 library(sf)
 library(dplyr)
 
-proj <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+proj <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 AL <- USAboundaries::us_states(states = "Alabama")
-AL <- as(AL, "Spatial")
+AL <- as(AL, "sf")
 
 if (!file.exists('data/BBS_Colinus_virginianus')) {
   
@@ -40,11 +40,12 @@ if (!file.exists('data/BBS_Colinus_virginianus')) {
   BBS_Colinus_virginianus <- BBS_Colinus_virginianus %>% left_join(routes) %>%
     filter(!is.na(Latitude), !is.na(Longitude))
   
-  BBS_Colinus_virginianus <- sp::SpatialPointsDataFrame(coords = BBS_Colinus_virginianus[, c('Longitude', 'Latitude')],
-                                                        data = BBS_Colinus_virginianus[, c('Year', 'Ntrials', 'NPres')],
-                                                        proj4string = proj)
+  BBS_Colinus_virginianus <- st_as_sf(x = BBS_Colinus_virginianus[, c('Longitude', 'Latitude', 
+                                                                      'Year', 'Ntrials', 'NPres')],
+                                      coords = c('Longitude', 'Latitude'),
+                                      crs = proj)
   
-  BBSColinusVirginianus <- BBS_Colinus_virginianus[c(!is.na(sp::over(BBS_Colinus_virginianus, AL[1]))),]
+  BBSColinusVirginianus <- BBS_Colinus_virginianus[unlist(st_intersects(AL, BBS_Colinus_virginianus)),]
   
   write.csv(BBS_Colinus_virginianus, file = "Data/BBSColinusVirginianus.csv")
   

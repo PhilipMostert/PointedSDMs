@@ -1,5 +1,6 @@
 library(raster)
 library(sf)
+library(sp)
 library(USAboundaries)
 library(elevatr)
 library(FedData)
@@ -8,12 +9,12 @@ library(censusapi)
 library(spocc)
 
 # coordinate reference system to use throughout
-proj <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-
+#proj <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+proj <- '+proj=longlat +datum=WGS84 +no_defs'
 # Get outline of PA
 PA <- USAboundaries::us_states(states = "Pennsylvania")
 PA <- PA$geometry[1]
-PA <- as(PA, "Spatial")
+st_crs(PA) <- proj
 
 if (!file.exists("Data/BBA.csv")) {
   
@@ -33,7 +34,8 @@ if (!file.exists("Data/BBA.csv")) {
   BBA_Wren <- bba %>%
     mutate(total = dplyr::select(., v1:v5) %>% rowSums(na.rm = TRUE)) %>%
     dplyr::select(-c(v1:v5)) %>%
-    mutate(present = if_else(total == 0, FALSE, TRUE)) %>%
+    mutate(NPres = if_else(total == 0, 0, 1)) %>%
+    mutate(Species_name = 'caerulescens') %>%
     dplyr::rename(X = Longitude, Y = Latitude)
   
   write.csv(BBA_Wren, file = "Data/BBA.csv")
@@ -41,10 +43,10 @@ if (!file.exists("Data/BBA.csv")) {
   BBA_Wren <- read.csv(file = "Data/BBA.csv")
 }
 
-BBA_sp <- SpatialPointsDataFrame(
-  coords = BBA_Wren[, c("X", "Y")],
-  data = BBA_Wren[, c("present", "point")],
-  proj4string = crs(proj))
+BBA <- st_as_sf(
+  x = BBA_Wren[, c("NPres", "Species_name", 'X', 'Y')],
+  coords = c("X", "Y"),
+  crs = proj)
 
 if (!file.exists("Data/BBS.csv")) {
  
@@ -71,19 +73,19 @@ if (!file.exists("Data/BBS.csv")) {
   
   BBS_Wren <- BBS_Wren %>% group_by(Route) %>%
     summarise(
-      Ntrials = sum(Ntrials),
-      NPres = sum(NPres)) 
-  
+      #Ntrials = sum(Ntrials),
+      Counts = sum(NPres)) %>%
+    mutate(Species_name = 'caerulescens')
+    
   routes_in <- intersect(BBS_Wren$Route, routes$Route)
   routes <- routes[routes$Route %in% routes_in,]
   
   BBS_Wren <- BBS_Wren %>% left_join(routes)
+  BBS_Wren$Route <- NULL
   
-  BBS_Wren <- sp::SpatialPointsDataFrame(coords = data.frame(BBS_Wren[, c('Longitude', 'Latitude')]),
-                                         data = data.frame(Ntrials = BBS_Wren$Ntrials, NPres = BBS_Wren$NPres),
-                                         proj4string = proj)
-  
-  BBS_Wren$Ntrials <- NULL; names(BBS_Wren) <- 'Counts'
+  BBS <- st_as_sf(x = BBS_Wren,
+                  coords = c('Longitude', 'Latitude'),
+                  crs = proj)
   
   write.csv(BBS_Wren, file = "Data/BBS.csv")
 
@@ -93,20 +95,28 @@ if (!file.exists("Data/BBS.csv")) {
 
   }
 
-elev_raster <- elevatr::get_elev_raster(PA, z = 6, clip = "locations")
-
-PA@proj4string <- proj
+elev_raster <- terra::rast(elevatr::get_elev_raster(PA, z = 6, clip = "locations"))
+elev_raster <- terra::project(elev_raster, proj)
+#PA@proj4string <- sp::CRS(proj)
 NLCD_canopy <- get_nlcd(
   template = PA,
   year = 2011,
-  dataset = "canopy",
+  dataset = "landcover",
   label = "PA_lc")
 
-NLCD_canopy <- projectRaster(from = NLCD_canopy, to = elev_raster)
-NLCD_canopy_raster <- mask(NLCD_canopy, PA)
+NLCD_canopy <- raster::projectRaster(from = NLCD_canopy, to = elev_raster)
+NLCD_canopy_raster <- raster::mask(NLCD_canopy, PA)
 
-SetophagaData <- list(BBS = BBS, BBA = BBA, 
-                      elev_raster = elev_raster, 
-                      NLCD_canopy_raster = NLCD_canopy_raster)
+NLCD_canopy_raster <- terra::rast(NLCD_canopy_raster)
+NLCD_canopy_raster <- terra::resample(NLCD_canopy_raster, elev_raster)
+
+terra::writeRaster(
+  c(elev_raster, NLCD_canopy_raster),
+  filename = 'inst/extdata/SetophagaCovariates.tif',
+  overwrite = TRUE,
+  gdal = c("COMPRESS=LZW")
+)
+
+SetophagaData <- list(BBS = BBS, BBA = BBA)
 
 usethis::use_data(SetophagaData, overwrite = TRUE, compress = 'xz')
