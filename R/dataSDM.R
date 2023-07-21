@@ -145,7 +145,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
        
         plotData[, private$speciesName] <- unlist(private$speciesIndex) 
         
-        colOption <- geom_sf(data =plotData, aes(col = eval(parse(text = private$speciesName))))#gg(plotData, aes(col = eval(parse(text = private$speciesName))))
+        colOption <- geom_sf(data = plotData, aes(col = eval(parse(text = private$speciesName))))#gg(plotData, aes(col = eval(parse(text = private$speciesName))))
         
         ggplot() + colOption + bound + guides(col = guide_legend(title = 'Species Name')) + facet_wrap(formula(paste('~', private$temporalName)))
         
@@ -261,7 +261,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
     else dataList <- FALSE
     
-    if (any(!unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame", 'sf'))) stop("Datasets need to be either a SpatialPoints* object, sf or a data frame.")
+    if (!all(unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame", 'sf',
+                                         'tbl', 'tbl_df'))) stop("Datasets need to be either a SpatialPoints* object, sf or a data frame.")
     
     if (!is.null(private$initialnames)) dataNames <- private$initialnames
     else
