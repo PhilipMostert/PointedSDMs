@@ -114,10 +114,10 @@ library(inlabru)
 library(USAboundaries)
 library(sp)
 library(sf)
-library(raster)
-library(rasterVis)
+library(blockCV)
 library(ggmap)
 library(sn)
+library(terra)
 library(RColorBrewer)
 library(cowplot)
 library(knitr)
@@ -133,11 +133,11 @@ A *SpatialPolygons* object of Pennsylvania (obtained using the *USAboundaries* [
 
 ```{r Map of PA}
 
-proj <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-
+proj <- '+proj=longlat +datum=WGS84 +no_defs'
 PA <- USAboundaries::us_states(states = "Pennsylvania")
-PA <- PA$geometry[1]
-PA <- as(PA, "Spatial")
+#PA <- PA$geometry
+PA <- as(PA, "sf")
+st_crs(PA) <- proj
 
 ```
 
@@ -156,18 +156,19 @@ for (bird in species) {
               query = paste('Setophaga', bird),
               from = "gbif",
               date = c("2005-01-01", "2005-12-31"),
-              geometry = PA@bbox)$gbif
+              geometry = PA)$gbif
   
   rows <- grep("EBIRD", raw_data$data[[paste0('Setophaga_', bird)]]$collectionCode)
-  cols <- c("longitude", "latitude")
-  raw_coords <- data.frame(raw_data$data[[paste0('Setophaga_', bird)]][rows, cols])
+
+  raw_data <- data.frame(raw_data$data[[1]][rows, ])
+  raw_data$Species_name <- rep(bird, nrow(raw_data))
   
-  colnames(raw_coords) <- c("X", "Y")
-  
-  data_sp <- SpatialPointsDataFrame(coords = raw_coords[, c('X', 'Y')], 
-                                               data = data.frame(Species_name = rep(bird, nrow(raw_coords))),
-                                               proj4string = proj)
-  dataSets[[paste0('eBird_', bird)]] <- data_sp[!is.na(over(data_sp, PA)),]
+  data_sp <- st_as_sf(
+    x = raw_data[, names(raw_data) %in% c("longitude", "latitude", 'Species_name')],
+    coords = c('longitude', 'latitude'),
+    crs = proj)
+
+  dataSets[[paste0('eBird_', bird)]] <- data_sp[unlist(st_intersects(PA, data_sp)),]
   
   }
 
@@ -183,40 +184,40 @@ dataSets[['BBS']] <- SetophagaData$BBS
 
 ```
 
-
 |   **Dataset name**   |   Sampling protocol    | **Number of observations** | **Species name** |                                                                   **Source**                                                                   |
-|:--------:|:--------:|:--------:|:--------:|:-------------------------------:|
+|:------------:|:------------:|:------------:|:------------:|:--------------:|
 |        *BBS*         |         Counts         |             45             |  *Caerulescens*  | [North American Breeding Bird Survey](https://www.pwrc.usgs.gov/bbs/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
 |        *BBA*         | Detection/nondetection |            5165            |  *Caerulescens*  |  [Pennsylvania Breeding Bird Atlas](http://www.pabirdatlas.psu.edu/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}  |
 | *eBird_caerulescens* |      Present only      |            264             |  *Caerulescens*  |                    [eBird](https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                    |
-|   *eBird_magnolia*   |      Present only      |            354             |    *Magnolia*    |                      [eBird]( https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                      |
-|    *eBird_fusca*     |      Present only      |            217             |     *Fusca*      |                      [eBird]( https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                      |
+|   *eBird_magnolia*   |      Present only      |            354             |    *Magnolia*    |                    [eBird](https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                    |
+|    *eBird_fusca*     |      Present only      |            217             |     *Fusca*      |                    [eBird](https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                    |
 
 Table 1: Table illustrating the different datasets used in the analysis.
 
 #### Covariate data
 
-Species distribution models study the relationship between our in-situ species observations and the underlying environment, and so in line with the study conducted by @isaac2020data, we considered two covariates: *elevation*, describing the height above sea level (meters) and *canopy*, describing the proportion of tree canopy covered in the area. These two covariates were obtained from the @hollister2017elevatr and @FEDdata R packages respectively. The script to obtain these spatial covariates is provided in the same github repository as the species occurrence data above; the only thing we did differently was keep the covariates as a *Raster* object, whereas the above script converts them to *SpatialPixelsDataFrames*.
+Species distribution models study the relationship between our in-situ species observations and the underlying environment, and so in line with the study conducted by @isaac2020data, we considered two covariates: *elevation*, describing the height above sea level (meters) and *canopy*, describing the proportion of tree canopy covered in the area. These two covariates were obtained from the @hollister2017elevatr and @FEDdata R packages respectively. The script to obtain these spatial covariates is provided in the same github repository as the species occurrence data above; the only thing we did differently was convert the covariates to a *spatRaster* object.
 
 ```{r Covariate data, message = FALSE, warning = FALSE}
 
-covariates <- scale(stack(SetophagaData$elev_raster, SetophagaData$NLCD_canopy_raster))
+covariates <- scale(terra::rast(system.file('extdata/SetophagaCovariates.tif', 
+                                      package = "PointedSDMs")))
 names(covariates) <- c('elevation', 'canopy')
+crs(covariates) <- proj
 
 ```
 
 #### Additional objects
 
-The *R-INLA* package requires a Delaunay triangulated mesh used to approximate our spatial random fields, which is created by supplying the `max.edge`*,* `offset` and `cutoff` arguments as well as our *SpatialPolygons* map of Pennsylvania to the `inla.mesh.2d` function. With this mesh, `intModel` will create integration points required by our model using *inlabru*'s `ipoints` function.
+The *R-INLA* package requires a Delaunay triangulated mesh used to approximate our spatial random fields, which is created by supplying the `max.edge`*,* `offset` and `cutoff` arguments as well as our *SpatialPolygons* map of Pennsylvania to the `inla.mesh.2d` function. With this mesh, `intModel` will create integration points required by our model using *inlabru*'s `fm_int` function.
 
 ```{r Mesh, warning = FALSE, message = FALSE, fig.width=8, fig.height=5}
 
 mesh <- inla.mesh.2d(boundary = inla.sp2segment(PA), 
                      cutoff = 0.2,
                      max.edge = c(0.1, 0.24), 
-                     offset = c(0.1, 0.4))
-
-mesh$crs <- proj
+                     offset = c(0.1, 0.4),
+                     crs = st_crs(proj))
 
 mesh_plot <- ggplot() +
              gg(mesh) +
@@ -250,7 +251,7 @@ Let's have a look at a graphical representation of the species' distribution, us
 ```{r dataset plot, fig.width=8, fig.height=5}
 
 spatial_data$plot(Boundary = FALSE) +
-  gg(PA) +
+  geom_sf(data = PA, fill = 'black', alpha = 0.15, lwd = 1.2) +
   theme_bw() +
   ggtitle('Plot of the datasets') + 
   theme(plot.title = element_text(hjust = 0.5))
@@ -262,7 +263,7 @@ This will create a plot of the location of the species based on their dataset, h
 ```{r species plot, fig.width=8, fig.height=5}
 
 spatial_data$plot(Species = TRUE, Boundary = FALSE) +
-  gg(PA) +
+  geom_sf(data = PA, fill = 'black', alpha = 0.15, lwd = 1.2) +
   theme_bw() +
   ggtitle('Plot of the species') + 
   theme(plot.title = element_text(hjust = 0.5))
@@ -322,7 +323,7 @@ This model is thus specified with: two environmental covariates, an intercept te
 
 ```{r spatialBlock, warning = FALSE, message = FALSE,  fig.width=8, fig.height=5}
 
-spatial_data$spatialBlock(k = 4, rows = 2, cols = 2, plot = TRUE) + theme_bw()
+spatial_data$spatialBlock(k = 4, rows_cols = c(2, 2), plot = TRUE) + theme_bw()
 
 ```
 

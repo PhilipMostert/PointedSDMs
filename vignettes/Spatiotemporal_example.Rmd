@@ -39,17 +39,19 @@ as well as define some objects required by the model to run.
 
 ```{r, Alabama_map}
 
-proj <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+proj <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
-AL <- USAboundaries::us_states(states = "Alabama")
-AL <- as(AL, "Spatial")
+AL <- USAboundaries::us_states(states = "Alabama", resolution = 'high')
+AL <- as(AL, "sf")
+st_crs(AL) <- proj
 
-mesh <- inla.mesh.2d(boundary = inla.sp2segment(AL), 
+mesh <- inla.mesh.2d(boundary = inla.sp2segment(AL[1]), 
                      cutoff = 0.1,
                      max.edge = c(0.2, 0.8), 
-                     offset = c(0.1, 0.2))
+                     offset = c(0.1, 0.2),
+                     crs = st_crs(proj))
 
-mesh$crs <- proj
+
 
 ```
 
@@ -69,21 +71,21 @@ eBird2015 <- spocc::occ(
   query = 'Colinus virginianus',
   from = 'gbif',
   date = c("2015-01-01", "2015-12-31"),
-  geometry = AL@bbox
+  geometry = AL
 )$gbif
 
 eBird2016 <- spocc::occ(
   query = 'Colinus virginianus',
   from = 'gbif',
   date = c("2016-01-01", "2016-12-31"),
-  geometry = AL@bbox
+  geometry = AL
 )$gbif
 
 eBird2017 <- spocc::occ(
   query = 'Colinus virginianus',
   from = 'gbif',
   date = c("2017-01-01", "2017-12-31"),
-  geometry = AL@bbox
+  geometry = AL
 )$gbif
 
 eBird <- data.frame(eBird2015$data[[1]]) %>% 
@@ -91,11 +93,13 @@ eBird <- data.frame(eBird2015$data[[1]]) %>%
   bind_rows(data.frame(eBird2017$data[[1]]))
 
 
-eBird <- SpatialPointsDataFrame(coords = cbind(Longitude = eBird$longitude, Latitude = eBird$latitude),
-                                data = data.frame(Year = eBird$year),
-                                proj4string = proj)
+eBird <- st_as_sf(x = eBird,
+                  coords = c('longitude', 'latitude'),
+                  crs = proj)
 
-eBird <- eBird[c(!is.na(over(eBird, AL[1]))),]
+eBird$Year <- eBird$year
+
+eBird <- eBird[unlist(st_intersects(AL, eBird)),]
 
 ```
 
@@ -145,14 +149,12 @@ And finally create predictions for the three time periods, and plot them.
 
 ```{r, predictions, fig.width=8, fig.height=5, message = FALSE}
 
-mesh$crs <- proj
-
 preds <- predict(mod, mask = AL, mesh = mesh, temporal = TRUE, fun = '')
 
 plot_preds <- plot(preds, whattoplot = 'median', plot = FALSE)
 
 plot_preds + 
-  gg(AL, lwd = 1.2) + 
+  geom_sf(data = st_boundary(AL), lwd = 1.2) + 
   scico::scale_fill_scico(palette = "lajolla") + 
   theme_minimal()
 

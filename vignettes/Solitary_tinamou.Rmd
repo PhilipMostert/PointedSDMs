@@ -23,7 +23,7 @@ This vignette illustrates the various functions of *PointedSDMs* by using three 
 ```{r setup, warning = FALSE, message = FALSE}
 
 library(PointedSDMs)
-library(raster)
+library(terra)
 library(ggpolypath)
 library(INLA)
 library(ggplot2)
@@ -43,13 +43,15 @@ Firstly, we load in the datasets and objects required for this vignette. The *So
 ```{r load data}
 
 data('SolitaryTinamou')
-projection <- CRS("+proj=longlat +ellps=WGS84")
+projection <- "+proj=longlat +ellps=WGS84"
+
+covariates <- terra::rast(system.file('extdata/SolitaryTinamouCovariates.tif', 
+                                      package = "PointedSDMs"))
 
 datasets <- SolitaryTinamou$datasets
-covariates <- SolitaryTinamou$covariates
 region <- SolitaryTinamou$region
 mesh <- SolitaryTinamou$mesh
-mesh$crs <- projection
+
 
 ```
 
@@ -57,7 +59,7 @@ The first item is a `list` of three datasets: *eBird*, *Gbif* and *Parks*. The f
 
 The other dataset (*Parks*) is also a `data.frame` object. It contains the two coordinate variables present in the first two datasets, but contains two additional variables: `Present`, a binary variable describing the presence (*1*) or absence (*0*) of the species at the given coordinates, and `area` describing the area of the park. Since we have information on the presences and absences of the species in this dataset, we consider it a *presence absence* dataset.
 
-`Region` is a `SpatialPolygons` object which give the boundary of the park containing the species; it was used in the *mesh* construction and for the plots in this vignette.
+`Region` is a `sf` object which give the boundary of the park containing the species; it was used in the *mesh* construction and for the plots in this vignette.
 
 ```{r look at data}
 
@@ -66,11 +68,11 @@ class(region)
 
 ```
 
-The next object is `covariates`, a `list` of `Raster` objects of the covariates (*Forest, NPP* and *Altitude*) describing the area of the parks. We stack these three objects together using the `stack` function, and then scale them.
+The next object is `covariates`, a `spatRaster` objects of the covariates (*Forest, NPP* and *Altitude*) describing the area of the parks. We stack these three objects together using the `stack` function, and then scale them.
 
 ```{r covariates, fig.width=8, fig.height=5}
 
-covariates <- scale(stack(covariates))
+covariates <- scale(covariates)
 crs(covariates) <- projection
 plot(covariates)
 
@@ -101,7 +103,7 @@ Using the `.$plot` function produces a *gg* object of the points used in this an
 ```{r data, fig.width=8, fig.height=5}
 
 base$plot(Boundary = FALSE) + 
-  gg(region) +
+  geom_sf(data = st_boundary(region)) +
   ggtitle('Plot of the species locations by dataset')
 
 ```
@@ -161,12 +163,13 @@ Finally we run the integrated model, again with `fitISDM` but this time we speci
 ```{r run fields model, warning = FALSE, message = FALSE}
 
 fieldsModel <- fitISDM(fields, options = list(control.inla = list(int.strategy = 'eb')))
+fieldsModel
 
 ```
 
 #### Copy field
 
-If we would like to share the spatial fields across the linear predictors using *INLA*'s `copy` feature, we can specify `pointsSpatial = 'copy` in `intModel()`:
+If we would like to share the spatial fields across the linear predictors using *INLA*'s `copy` feature, we can specify `pointsSpatial = 'copy'` in `intModel()`:
 
 ```{r copy model}
 
@@ -181,6 +184,7 @@ copy$changeComponents()
 ```{r run copy model}
 
 copyModel <- fitISDM(copy, options = list(control.inla = list(int.strategy = 'eb')))
+copyModel
 
 ```
 
