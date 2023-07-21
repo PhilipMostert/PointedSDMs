@@ -75,25 +75,25 @@ the solitary tinamou (*Tinamus solitarius)*.
 
 library(PointedSDMs)
 library(ggplot2)
-library(raster)
+library(terra)
 ```
 
 ``` r
+
+bru_options_set(inla.mode = "experimental")
 
 #Load data in
 
 data("SolitaryTinamou")
 
-projection <- CRS("+proj=longlat +ellps=WGS84")
+projection <- "+proj=longlat +ellps=WGS84"
 
 species <- SolitaryTinamou$datasets
 
-Forest <- SolitaryTinamou$covariates$Forest
-
-crs(Forest) <- projection
+NPP <- scale(terra::rast(system.file('extdata/SolitaryTinamouCovariates.tif', 
+                                      package = "PointedSDMs"))$NPP)
 
 mesh <- SolitaryTinamou$mesh
-mesh$crs <- projection
 ```
 
 Setting up the model is done easily with `intModel()`, where we specify
@@ -103,7 +103,7 @@ the required components of the model:
 
 #Specify model -- here we run a model with one spatial covariate and a shared spatial field
 
-model <- intModel(species, spatialCovariates = Forest, Coordinates = c('X', 'Y'),
+model <- intModel(species, spatialCovariates = NPP, Coordinates = c('X', 'Y'),
                  Projection = projection, Mesh = mesh, responsePA = 'Present')
 ```
 
@@ -114,24 +114,28 @@ We can also make a quick plot of where the species are located using
 
 region <- SolitaryTinamou$region
 
-model$plot(Boundary = FALSE) + gg(region)
+model$plot(Boundary = FALSE) + 
+  geom_sf(data = st_boundary(region))
 ```
 
 <img src="man/figures/README-plot-1.png" width="100%" />
 
-We can estimate the parameters in the model using the `fitISDM()`
+We can then estimate the parameters in the model using the `fitISDM()`
 function:
 
 ``` r
 
 #Run the integrated model
 
-modelRun <- fitISDM(model, options = list(control.inla = list(int.strategy = 'eb')))
+modelRun <- fitISDM(model, options = list(control.inla = list(int.strategy = 'eb'), 
+                                          safe = TRUE))
+#> 
+#>  *** inla.core.safe:  rerun to try to solve negative eigenvalue(s) in the Hessian
 summary(modelRun)
 #> Summary of 'bruSDM' object:
 #> 
-#> inlabru version: 2.7.0
-#> INLA version: 22.07.01
+#> inlabru version: 2.8.0
+#> INLA version: 23.06.29
 #> 
 #> Types of data modelled:
 #>                                     
@@ -139,31 +143,31 @@ summary(modelRun)
 #> Parks                Present absence
 #> Gbif                    Present only
 #> Time used:
-#>     Pre = 1.4, Running = 9.37, Post = 0.0518, Total = 10.8 
+#>     Pre = 0.633, Running = 25.4, Post = 0.0346, Total = 26.1 
 #> Fixed effects:
-#>                   mean    sd 0.025quant 0.5quant 0.975quant mode   kld
-#> Forest          -0.003 0.001     -0.005   -0.003      0.000   NA 0.106
-#> eBird_intercept -0.238 0.047     -0.330   -0.238     -0.145   NA 0.481
-#> Parks_intercept -0.530 0.179     -0.886   -0.529     -0.185   NA 0.000
-#> Gbif_intercept  -0.547 0.048     -0.641   -0.547     -0.453   NA 0.269
+#>                   mean    sd 0.025quant 0.5quant 0.975quant   mode kld
+#> NPP              0.004 0.008     -0.011    0.004      0.019  0.004   0
+#> eBird_intercept  0.004 0.006     -0.007    0.004      0.015  0.004   0
+#> Parks_intercept -0.681 0.342     -1.351   -0.681     -0.011 -0.681   0
+#> Gbif_intercept  -0.020 0.012     -0.044   -0.020      0.004 -0.020   0
 #> 
 #> Random effects:
 #>   Name     Model
 #>     shared_spatial SPDE2 model
 #> 
 #> Model hyperparameters:
-#>                             mean   sd 0.025quant 0.5quant 0.975quant   mode
-#> Theta1 for shared_spatial  -3.38 0.00      -3.38    -3.38      -3.38  -3.38
-#> Theta2 for shared_spatial -11.70 0.00     -11.70   -11.70     -11.70 -11.70
+#>                            mean    sd 0.025quant 0.5quant 0.975quant  mode
+#> Theta1 for shared_spatial -4.70 0.000      -4.70    -4.70      -4.70 -4.70
+#> Theta2 for shared_spatial -2.42 0.001      -2.42    -2.42      -2.42 -2.42
 #> 
-#> Deviance Information Criterion (DIC) ...............: 4202.85
-#> Deviance Information Criterion (DIC, saturated) ....: -23258.17
-#> Effective number of parameters .....................: 229.40
+#> Deviance Information Criterion (DIC) ...............: 28478.88
+#> Deviance Information Criterion (DIC, saturated) ....: NA
+#> Effective number of parameters .....................: 13077.42
 #> 
-#> Watanabe-Akaike information criterion (WAIC) ...: 3085.09
-#> Effective number of parameters .................: 652.77
+#> Watanabe-Akaike information criterion (WAIC) ...: 91246.11
+#> Effective number of parameters .................: 43157.68
 #> 
-#> Marginal log-Likelihood:  -3893.68 
+#> Marginal log-Likelihood:  -3289.18 
 #>  is computed 
 #> Posterior summaries for the linear predictor and the fitted values are computed
 #> (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')

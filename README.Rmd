@@ -74,26 +74,27 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 
 library(PointedSDMs)
 library(ggplot2)
-library(raster)
+library(terra)
 
 ```
 
 ```{r data}
 
+bru_options_set(inla.mode = "experimental")
+
 #Load data in
 
 data("SolitaryTinamou")
 
-projection <- CRS("+proj=longlat +ellps=WGS84")
+projection <- "+proj=longlat +ellps=WGS84"
 
 species <- SolitaryTinamou$datasets
 
-Forest <- SolitaryTinamou$covariates$Forest
-
-crs(Forest) <- projection
+NPP <- scale(terra::rast(system.file('extdata/SolitaryTinamouCovariates.tif', 
+                                      package = "PointedSDMs"))$NPP)
 
 mesh <- SolitaryTinamou$mesh
-mesh$crs <- projection
+
 
 ```
 
@@ -103,7 +104,7 @@ Setting up the model is done easily with `intModel()`, where we specify the requ
 
 #Specify model -- here we run a model with one spatial covariate and a shared spatial field
 
-model <- intModel(species, spatialCovariates = Forest, Coordinates = c('X', 'Y'),
+model <- intModel(species, spatialCovariates = NPP, Coordinates = c('X', 'Y'),
                  Projection = projection, Mesh = mesh, responsePA = 'Present')
 
 ```
@@ -114,17 +115,19 @@ We can also make a quick plot of where the species are located using `` `.$plot(
 
 region <- SolitaryTinamou$region
 
-model$plot(Boundary = FALSE) + gg(region)
+model$plot(Boundary = FALSE) + 
+  geom_sf(data = st_boundary(region))
 
 ```
 
-We can estimate the parameters in the model using the `fitISDM()` function:
+We can then estimate the parameters in the model using the `fitISDM()` function:
 
 ```{r fitISDM, warning = FALSE, message = FALSE}
 
 #Run the integrated model
 
-modelRun <- fitISDM(model, options = list(control.inla = list(int.strategy = 'eb')))
+modelRun <- fitISDM(model, options = list(control.inla = list(int.strategy = 'eb'), 
+                                          safe = TRUE))
 summary(modelRun)
 
 ```
