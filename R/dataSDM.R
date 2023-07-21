@@ -201,6 +201,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @note The arguments of this function may be missing (ie not provided) if they have already been specified in \code{\link{intModel}}, and do not need changing. Therefore this function is useful if there are some variable names not standardized across the datasets; this function will thus standardize the variable names to those provided initially in \code{\link{intModel}}.
   #' 
   #' @import methods
+  #' @import sf
   #' 
   #' @examples
   #'  
