@@ -168,7 +168,7 @@ organizedData$addBias(datasetNames = 'eBird')
  Forest <- terra::rast(
  system.file(
  'extdata/SolitaryTinamouCovariates.tif', 
- package = "PointedSDMs"))$Forest)
+ package = "PointedSDMs"))$Forest
  
  
  #Set model up
@@ -652,7 +652,7 @@ Function to change priors for the fixed (and possibly random) effects of the mod
  Forest <- terra::rast(
  system.file(
  'extdata/SolitaryTinamouCovariates.tif', 
- package = "PointedSDMs"))$Forest)
+ package = "PointedSDMs"))$Forest
  
  
  #Set model up

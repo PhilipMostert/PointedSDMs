@@ -1156,7 +1156,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #'  Forest <- terra::rast(
   #'  system.file(
   #'  'extdata/SolitaryTinamouCovariates.tif', 
-  #'  package = "PointedSDMs"))$Forest)
+  #'  package = "PointedSDMs"))$Forest
   #'  
   #'  
   #'  #Set model up
