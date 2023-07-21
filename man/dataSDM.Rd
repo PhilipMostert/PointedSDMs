@@ -165,7 +165,10 @@ organizedData$addBias(datasetNames = 'eBird')
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
- Forest <- SolitaryTinamou$covariates$Forest
+ Forest <- terra::rast(
+ system.file(
+ 'extdata/SolitaryTinamouCovariates.tif', 
+ package = "PointedSDMs"))$Forest)
  
  
  #Set model up
@@ -646,7 +649,10 @@ Function to change priors for the fixed (and possibly random) effects of the mod
  data <- SolitaryTinamou$datasets
  mesh <- SolitaryTinamou$mesh
  mesh$crs <- proj
- Forest <- SolitaryTinamou$covariates$Forest
+ Forest <- terra::rast(
+ system.file(
+ 'extdata/SolitaryTinamouCovariates.tif', 
+ package = "PointedSDMs"))$Forest)
  
  
  #Set model up
