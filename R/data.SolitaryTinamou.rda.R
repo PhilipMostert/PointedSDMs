@@ -25,28 +25,14 @@ NULL
 #' @source \url{https://www.gbif.org/}
 NULL
 
-#' SpatialPixelsDataFrame containing Forest covariate
-#' @name Forest
+#' spatRaster object containing covariate values
+#' @name SolTinCovariates
 #' @docType data
 #' @keywords data
 #' @source \url{https://github.com/oharar/PointedSDMs}
 NULL
 
-#' SpatialPixelsDataFrame containing NPP covariate
-#' @name NPP
-#' @docType data
-#' @keywords data
-#' @source \url{https://github.com/oharar/PointedSDMs}
-NULL
-
-#' SpatialPixelsDataFrame containing Altitude covariate
-#' @name Altitude
-#' @docType data
-#' @keywords data
-#' @source \url{https://github.com/oharar/PointedSDMs}
-NULL
-
-#' SpatialPolygons object containing the boundary region for solitary tinamouc 
+#' sf object containing the boundary region for solitary tinamouc 
 #' @name region
 #' @docType data
 #' @keywords data
