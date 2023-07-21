@@ -64,9 +64,9 @@ blockedCV <- function(data, options = list()) {
     
     newIPS <- rep(list(data$.__enclos_env__$private$IPS), numTime)
     
-    newIPS <- do.call(sp::rbind.SpatialPointsDataFrame, newIPS)
+    newIPS <- do.call(rbind, newIPS)
     
-    newIPS[, data$.__enclos_env__$private$temporalName] <- rep((1:length(numTime)), each = nrow(data$.__enclos_env__$private$IPS))
+    newIPS[, data$.__enclos_env__$private$temporalName] <- rep(1:numTime, each = nrow(data$.__enclos_env__$private$IPS))
     
     newIPS <- st_transform(newIPS, data$.__enclos_env__$private$Projection)
     
