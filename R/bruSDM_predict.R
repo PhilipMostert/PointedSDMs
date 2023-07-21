@@ -302,7 +302,7 @@ print.bruSDM_predict <- function(x, ...) {
         
         cat('Predictions for', paste0(species,':'))
         cat('\n')
-        print(summary(data.frame(x[[1]][[species]][!names(data.frame(x[[1]][[species]]) %in% c('geometry', 'coords.x1', 'coords.x2'))])))
+        print(summary(data.frame(x[[1]])[[species]][!names(data.frame(x[[1]][[species]])) %in% c('geometry', 'coords.x1', 'coords.x2')]))
         cat('\n')
          
         }
@@ -313,7 +313,7 @@ print.bruSDM_predict <- function(x, ...) {
         
         cat('Predictions for the temporal variable:')
         cat('\n')
-        print(summary(data.frame(x[[1]][!names(data.frame(x[[1]]) %in% c('geometry', 'coords.x1', 'coords.x2'))])))
+        print(summary(data.frame(x[[1]])[!names(data.frame(x[[1]])) %in% c('geometry', 'coords.x1', 'coords.x2')]))
         
       }
     else
@@ -323,7 +323,7 @@ print.bruSDM_predict <- function(x, ...) {
           
           cat('Predictions of the bias field for', paste0(bias,':'))
           cat('\n')
-          print(summary(data.frame(x[[1]][[bias]][!names(data.frame(x[[1]][[bias]]) %in% c('geometry', 'coords.x1', 'coords.x2'))])))
+          print(summary(data.frame(x[[1]])[[bias]][!names(data.frame(x[[1]][[bias]])) %in% c('geometry', 'coords.x1', 'coords.x2')]))
           cat('\n')
           
         }
@@ -409,13 +409,13 @@ plot.bruSDM_predict <- function(x,
     if (length(whattoplot) > 1) stop('Please only plot one variable at a time for species plots.')
     
     
-    temporalName <- names(x[[1]])[!names(x[[1]]) %in% c('geometry', 'weight', 'mean', 'sd', 'q0.025', 'median', 'q0.975', 'q0.5', 'smin', 'smax', 'cv','mean.mc_std_err', 'sd.mc_std_err')]
+    temporalName <- names(x[[1]])[!names(x[[1]]) %in% c(".block", 'geometry', 'weight', 'mean', 'sd', 'q0.025', 'median', 'q0.975', 'q0.5', 'smin', 'smax', 'cv','mean.mc_std_err', 'sd.mc_std_err')]
     #class(x[[1]][,temporalName]) <- 'character'
     #names(x[[1]]@data)[names(x[[1]]@data) == temporalName] <- '..temporal_variable_index..'
     x[[1]]$..temporal_variable_index.. <- as.character(data.frame(x[[1]])[, temporalName])
 
-    if (inherits(x[[1]], 'sf')) plot_obj <- geom_sf(data = x[[1]], aes_string(fill = whattoplot))
-    else plot_obj <- inlabru::gg(x[[1]], aes_string(fill = whattoplot))
+    if (inherits(x[[1]], 'sf')) plot_obj <- geom_sf(data = x[[1]], aes_string(col = whattoplot))
+    else plot_obj <- inlabru::gg(x[[1]], aes_string(col = whattoplot))
     
     ##Would be nice to get full temporal variable names in here ...
     plot_grid <- ggplot() + plot_obj + facet_wrap(~ ..temporal_variable_index..) + ggtitle('Plot of the temporal predictions')
@@ -436,8 +436,8 @@ plot.bruSDM_predict <- function(x,
       if (nameObj ==  'speciesPredictions') title <- ggtitle(paste('Plot of predictions for', object))
       else title <- ggtitle(paste('Plot of bias field for', object))
       
-      if (inherits(x[[nameObj]][[object]], 'sf')) plot_obj <- geom_sf(data = x[[nameObj]][[object]], aes_string(fill = whattoplot))
-      else plot_obj <- inlabru::gg(x[[nameObj]][[object]], aes_string(fill = whattoplot))
+      if (inherits(x[[nameObj]][[object]], 'sf')) plot_obj <- geom_sf(data = x[[nameObj]][[object]], aes_string(col = whattoplot))
+      else plot_obj <- inlabru::gg(x[[nameObj]][[object]], aes_string(col = whattoplot))
 
       all_plots[[object]] <- ggplot() + plot_obj + title + colours
       
@@ -472,8 +472,8 @@ plot.bruSDM_predict <- function(x,
       #title <- ggtitle(paste('Plot of',stat,'for',plotname))
       title <- ggtitle('Plot of predictions')
       
-      if (inherits(x[[plotname]], 'sf')) prediction <- geom_sf(data = x[[plotname]], aes_string(fill = stat))
-      else prediction <- inlabru::gg(x[[plotname]], aes_string(fill = stat))
+      if (inherits(x[[plotname]], 'sf')) prediction <- geom_sf(data = x[[plotname]], aes_string(col = stat))
+      else prediction <- inlabru::gg(x[[plotname]], aes_string(col = stat))
       
       if (!plot) prediction_list[[stat]] <- ggplot() + prediction
 
