@@ -1,10 +1,10 @@
-# PointedSDMs 1.2.0
+# PointedSDMs 1.3.0
 
-#### Fixes since previous version:
+#### Changes and fixes since previous version:
 
--   New vignette (*Marked_Point_Process)* which shows off the marked point process component of the model. This vignette also has a new dataset (*Koala*) which includes observations of blue gum across Phillip island (Australia) with various marks describing each sighting.
--   Fixed issue regarding adding *pointCovariates* to *PO* data in `intModel`.
--   Added `marks` to `predict` for objects of class `bruSDM`, which allows the user to make predictions for the marks in the model.
--   Added temporal model to the marks in `intModel`.
--   Added *Copy* in `.$specifySpatial`, which allows the user to use *INLA*'s copy feature for the marks and bias spatial random fields.
--   Various documentation changes.
+-   Migration away from the R packages *sp* and *Raster* towards the more up-to-date *sf* and *terra*. The default class for species occurrence data should now be *sf* objects, and the default for spatial covariates should be a *spatRaster* object. This shift has not changed the fundamentals of the package, nor has it changed any of the function's arguments.
+-   Changed all of the vignettes and their underlying data as a result of this shift.
+-   Various internal code changes as a result of changes in *inlabru* version *2.8.0*.
+-   Fixed the predict function for when `predictor = TRUE.`
+-   Fixed the `.spatialBlock()` function to work with *blockCV*'s `cv_spatial`.
+-   Various spelling and grammar fixes in documentation.

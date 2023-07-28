@@ -1,0 +1,20 @@
+citHeader("To cite PointedSDMs in publications use:")
+
+bibentry(bibtype = "Article",
+  title = "{PointedSDMs}: An {R} package to help facilitate the construction of integrated species distribution models",
+  author = "Mostert, Philip S and O'Hara, Robert B",
+  year = "2023",
+  journal = "Methods in Ecology and Evolution",
+  volume = "14",
+  number = "5",
+  pages = "1200--1207",
+  doi = "10.1111/2041-210X.14091",
+  publisher = "Wiley Online Library",
+  textVersion =
+      paste0("Mostert P.S. and O'Hara R.B. (2023). ",
+             "PointedSDMs: An R package to help facilitate the construction of integrated species distribution models. ",
+             "Methods in Ecology and Evolution, 14(5), 1200--1207. ",
+             "https://doi.org/10.1111/2041-210X.14091")
+)
+
+
