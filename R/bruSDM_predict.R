@@ -87,6 +87,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     speciespreds <- TRUE
     
     if (is.null(species)) speciesin <- unique(unlist(object[['species']][['speciesIn']]))
+    else speciesin <- species
     if (!all(species %in% unique(unlist(object[['species']][['speciesIn']])))) stop('Species provided not in model.')
     
   }
