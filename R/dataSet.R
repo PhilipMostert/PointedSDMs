@@ -123,7 +123,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
           if (countsresp %in% data_vars) charResp <- data[,countsresp]
           else charResp <- rep(1,nrow(data))
         
-        data[, paste0(mark,'_response')] <-#rep(1,nrow(data))
+        data[, paste0(mark,'_response')] <- charResp#rep(1,nrow(data))
         
         phiVars <- paste0(characterMarks, '_phi')
         responseVars <- paste0(characterMarks,'_response')
