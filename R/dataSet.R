@@ -117,7 +117,13 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
           ##Need a list to say which marks are multinomial
           #To add to the formulas.
         data[, paste0(mark, '_phi')] <- rep(1,nrow(data))
-        data[, paste0(mark,'_response')] <- rep(1,nrow(data))
+        
+        if (paresp %in% data_vars) charResp <- data[, paresp]
+        else 
+          if (countsresp %in% data_vars) charResp <- data[,countsresp]
+          else charResp <- rep(1,nrow(data))
+        
+        data[, paste0(mark,'_response')] <-#rep(1,nrow(data))
         
         phiVars <- paste0(characterMarks, '_phi')
         responseVars <- paste0(characterMarks,'_response')
