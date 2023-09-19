@@ -87,7 +87,7 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
   
   if (Coordinates[1] == Coordinates[2]) stop('Coordinates need to be unique values.')
   
-  if (inherits(Projection, 'CRS')) Projection <- as(Projection, 'character')
+  if (inherits(Projection, 'CRS') || inherits(Projection, 'crs')) Projection <- as(Projection, 'character')
   else if (!inherits(Projection, 'character')) stop('Projection needs to be a character object.')
   
   if (!inherits(Mesh, 'inla.mesh')) stop('Mesh needs to be a inla.mesh object.')
