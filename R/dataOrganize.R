@@ -298,7 +298,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           if (!is.null(speciesIn)) {
              if (pointsResponse[[response]][j] %in% c('geometry', paresp, countresp)) {
               ##Change this part ot the speciesIn: not sure what the one below does...
-              if (speciesspatial) speciesspat <- paste0(speciesIn,'_spatial') ## new argument called speciesSpatial??
+              if (!is.null(speciesspatial)) speciesspat <- paste0(speciesIn,'_spatial') ## new argument called speciesSpatial??
               else speciesspat <- NULL
 
             
@@ -489,7 +489,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (!is.null(species)) {
     
-    if (speciesspatial) {
+    if (!is.null(speciesspatial)) { ## Then if copy or individual ...
       
       #if (length(speciesspatial) > 0) {
       
@@ -503,7 +503,16 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
         ##Change the species part to model = paste0(speciesname) ##where speciesname = species
          # but keep the speciesSpat framework for the temporal part of the model
         #speciesSpat <- paste0(speciesname, '_spatial(main = coordinates, model = speciesModel, group = ',speciesname,', ngroup = ', numspecies,')')
-        speciesSpat <- paste0(species,'_spatial(main = geometry, model = ',paste0(species,'_field)'))
+        if (speciesspatial == 'individual') speciesSpat <- paste0(species,'_spatial(main = geometry, model = ',paste0(species,'_field)'))
+        else {
+          
+          speciesOne <- paste0(species[1],'_spatial(main = geometry, model = ',paste0(species[1],'_field)'))
+          if (length(species) > 1) speciesOther <- paste0(species[-1],'_spatial(main = geometry, copy = \"', species[1],'_spatial\",  hyper = list(beta = list(fixed = FALSE)))')
+          else speciesOther <- NULL
+          
+          speciesSpat <- c(speciesOne, speciesOther)
+          
+        }
         
       }
       #else speciesSpat <- paste0(species,'_spatial(main = coordinates, model = speciesModel)', collapse = ' + ') #change this to speciesModel
@@ -542,7 +551,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
       if (length(self$multinomVars) != 0)  marks_intercepts <- marks[!marks %in% self$multinomVars]
       else marks_intercepts <- marks
       
-      marksInt <- paste0(marks_intercepts, '_intercept(1)')
+      if (identical(marks_intercepts, 'character(0)')) marksInt <- NULL
+      else marksInt <- paste0(marks_intercepts, '_intercept(1)')
       
     } else marksInt <- NULL
     

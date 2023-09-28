@@ -568,7 +568,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       names(self$spatialFields$speciesFields) <- unique(unlist(private$speciesIn))
      
-      if (private$speciesSpatial) {
+      if (!is.null(private$speciesSpatial)) {
         
         if (!all(speciesIn %in% names(self$spatialFields$speciesFields))) {
           ##Not species Name

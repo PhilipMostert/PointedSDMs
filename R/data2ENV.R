@@ -68,7 +68,7 @@ data2ENV <- function(data, env) {
   
   if (!is.null(data$.__enclos_env__$private$speciesIn)) {
     
-    if (data$.__enclos_env__$private$speciesSpatial) {
+    if (!is.null(data$.__enclos_env__$private$speciesSpatial)) {
       
       for (species in names(data$spatialFields$speciesFields)) {
         

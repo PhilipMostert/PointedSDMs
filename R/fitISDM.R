@@ -53,7 +53,7 @@ fitISDM <- function(data, options = list()) {
   if (!is.null(names(data$spatialFields$markFields))) marksSpatial <- TRUE
   else marksSpatial <- FALSE
   
-  if (!is.null(names(data$spatialFields$speciesFields))) speciesSpatial <- TRUE
+  if(!is.null(data$.__enclos_env__$private$speciesSpatial)) speciesSpatial <- data$.__enclos_env__$private$speciesSpatial
   else speciesSpatial <- FALSE
   
   formula_terms <- unique(unlist(lapply(unlist(unlist(data$.__enclos_env__$private$Formulas, recursive = F), recursive = F), function(x) {

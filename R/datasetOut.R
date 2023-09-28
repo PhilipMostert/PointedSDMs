@@ -59,6 +59,8 @@ datasetOut <- function(model, dataset,
   
   if (model$spatial$points == 'copy') stop('copy model does not work with datasetOut.')
   
+  if (model$spatial$species == 'copy')  stop('copy model does not work with datasetOut.')
+  
   if (missing(dataset)) dataset <- unique(model[['source']])
   
   if (!all(dataset%in%model[['source']])) stop('Dataset provided not run in initial model.')
@@ -79,7 +81,7 @@ datasetOut <- function(model, dataset,
        
         assign(paste0(species,'_',names), model$bru_info$model$effects[[paste0(species,'_',names)]]$env[[paste0(species,'_',names)]])
         
-      if (model$spatial$species) assign(paste0(species,'_field'), model$bru_info$model$effects[[paste0(species,'_field')]]$env[[paste0(species,'_field')]])  
+      if (!is.null(model$spatial$species)) assign(paste0(species,'_field'), model$bru_info$model$effects[[paste0(species,'_field')]]$env[[paste0(species,'_field')]])  
         
       }
         

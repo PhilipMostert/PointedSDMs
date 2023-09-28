@@ -165,7 +165,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             #Spatcovs is the names of the spatial covariates
             #specnesname is the name of the species variable
             Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', markintercept = TRUE,
-                               paresp = 'PAresp', countresp = 'counts', marksspatial = TRUE, speciesspatial = TRUE,
+                               paresp = 'PAresp', countresp = 'counts', marksspatial = TRUE, speciesspatial = 'individual',
                                marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                                spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov')
             
@@ -207,7 +207,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             ##Change terms
              #Set spatial and intercept to FALSE
             Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', temporalname = 'temp',
-                               paresp = 'PAresp', countresp = 'counts', marksspatial = FALSE, speciesspatial = FALSE,
+                               paresp = 'PAresp', countresp = 'counts', marksspatial = FALSE, speciesspatial = NULL,
                                marks = c('numvar', 'factvar', 'binommark'), markintercept = FALSE,
                                spatial = NULL, intercept = FALSE, pointcovs = 'pointcov')
           
@@ -226,7 +226,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             
             ##Change terms
             #Set spatcovs to NULL
-            Check$makeFormulas(spatcovs = NULL, speciesname = 'species', marksspatial = TRUE, speciesspatial = TRUE,
+            Check$makeFormulas(spatcovs = NULL, speciesname = 'species', marksspatial = TRUE, speciesspatial = 'individual',
                                paresp = 'PAresp', countresp = 'counts', markintercept = FALSE,
                                marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                                spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov')
@@ -244,7 +244,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
                             c("binommark_spatial"))
             
             ##Try copy model
-            Check$makeFormulas(spatcovs = NULL, speciesname = 'species', marksspatial = TRUE, speciesspatial = TRUE,
+            Check$makeFormulas(spatcovs = NULL, speciesname = 'species', marksspatial = TRUE, speciesspatial = 'individual',
                                      paresp = 'PAresp', countresp = 'counts', markintercept = FALSE,
                                      marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                                      spatial = 'copy', intercept = TRUE, pointcovs = 'pointcov')
@@ -262,7 +262,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
 
 #Change back to original
 Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', marksspatial = TRUE,
-                   paresp = 'PAresp', countresp = 'counts', markintercept = TRUE, speciesspatial = TRUE,
+                   paresp = 'PAresp', countresp = 'counts', markintercept = TRUE, speciesspatial = 'individual',
                    marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                    spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov')
 
@@ -272,7 +272,7 @@ test_that('makeComponents is able to make the correct components for all the pro
     comps <- Check$makeComponents(spatial = 'shared', intercepts = TRUE, datanames = c('PO','PA'), marksintercept = TRUE,
                          marks = c('numvar', 'factvar', 'binommark'), temporalmodel = deparse(list(model = "ar1")),
                          multinomnames = 'factvar', pointcovariates = 'pointcov', marksspatial = TRUE, offsetname = NULL,
-                         speciesname = 'species', covariatenames = 'spatcovs', temporalname = 'temp', speciesspatial = TRUE,
+                         speciesname = 'species', covariatenames = 'spatcovs', temporalname = 'temp', speciesspatial = 'individual',
                          covariateclass = 'numeric', numtime = 2, copymodel = Check$.__enclos_env__$private$copyModel)
     
     expect_setequal(comps,c("shared_spatial(main = geometry, model = shared_field, group = temp, ngroup = 2, control.group = list(model = \"ar1\"))",
@@ -302,7 +302,7 @@ test_that('makeComponents is able to make the correct components for all the pro
     comps2 <- Check$makeComponents(spatial = NULL, intercepts = FALSE, datanames = c('PO','PA'),
                                   marks = c('numvar', 'factvar', 'binommark'), marksspatial = FALSE, offsetname = NULL,
                                   multinomnames = 'factvar', pointcovariates = 'pointcov', marksintercept = FALSE,
-                                  speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = TRUE,
+                                  speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = 'individual',
                                   covariateclass = 'numeric', numtime =  2,  copymodel = Check$.__enclos_env__$private$copyModel)
     
     expect_setequal(comps2,c("fish2_spatial(main = geometry, model = fish2_field)",                       
@@ -321,7 +321,7 @@ test_that('makeComponents is able to make the correct components for all the pro
     compsCopy <- Check$makeComponents(spatial = 'copy', intercepts = FALSE, datanames = c('PO','PA'),
                          marks = c('numvar', 'factvar', 'binommark'), marksspatial = FALSE, offsetname = NULL,
                          multinomnames = 'factvar', pointcovariates = 'pointcov', marksintercept = FALSE,
-                         speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = TRUE, temporalname = NULL,
+                         speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = 'individual', temporalname = NULL,
                          covariateclass = 'numeric', numtime =  NULL,  copymodel = "list(beta = list(fixed = FALSE))")
     
     expect_setequal(compsCopy,c("PO_spatial(main = geometry, model = PO_field)",                                          
