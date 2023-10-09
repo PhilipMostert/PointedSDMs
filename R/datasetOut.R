@@ -81,7 +81,15 @@ datasetOut <- function(model, dataset,
        
         assign(paste0(species,'_',names), model$bru_info$model$effects[[paste0(species,'_',names)]]$env[[paste0(species,'_',names)]])
         
-      if (!is.null(model$spatial$species)) assign(paste0(species,'_field'), model$bru_info$model$effects[[paste0(species,'_field')]]$env[[paste0(species,'_field')]])  
+      if (!is.null(model$spatial$species))  {
+        
+        for (specField in paste0(species, '_', names(model$dataType))) {
+        
+        assign(paste0(specField,'_field'), model$bru_info$model$effects[[paste0(specField,'_field')]]$env[[paste0(specField,'_field')]])
+          
+      }
+        
+      }
         
       }
         

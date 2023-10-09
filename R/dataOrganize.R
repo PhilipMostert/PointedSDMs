@@ -298,7 +298,9 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           if (!is.null(speciesIn)) {
              if (pointsResponse[[response]][j] %in% c('geometry', paresp, countresp)) {
               ##Change this part ot the speciesIn: not sure what the one below does...
-              if (!is.null(speciesspatial)) speciesspat <- paste0(speciesIn,'_spatial') ## new argument called speciesSpatial??
+              if (!is.null(speciesspatial)) speciesspat <- paste0(do.call(paste0, expand.grid(paste0(speciesIn,'_'),
+                                                                                              names(self$Data)[[dataset]])),
+                                                                  '_spatial') ## new argument called speciesSpatial??
               else speciesspat <- NULL
 
             
@@ -503,14 +505,60 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
         ##Change the species part to model = paste0(speciesname) ##where speciesname = species
          # but keep the speciesSpat framework for the temporal part of the model
         #speciesSpat <- paste0(speciesname, '_spatial(main = coordinates, model = speciesModel, group = ',speciesname,', ngroup = ', numspecies,')')
-        if (speciesspatial == 'individual') speciesSpat <- paste0(species,'_spatial(main = geometry, model = ',paste0(species,'_field)'))
+        if (speciesspatial == 'individual' || length(species) == 1) {
+          
+          speciesComps <- list()
+          
+          for (spec in species) {
+            
+          specInData <- sapply(self$SpeciesInData, FUN = function(x) spec %in% x)
+            
+          speciesComps[[spec]] <- paste0(do.call(paste0, expand.grid(paste0(spec,'_'), names(specInData[specInData]))),'_spatial(main = geometry, model = ',
+                                                                  paste0(do.call(paste0, expand.grid(paste0(spec,'_'),
+                                                                                                     names(specInData[specInData]))),'_field)'))
+          
+          }
+          
+          speciesSpat <- unlist(speciesComps)
+          
+        }
         else {
           
-          speciesOne <- paste0(species[1],'_spatial(main = geometry, model = ',paste0(species[1],'_field)'))
-          if (length(species) > 1) speciesOther <- paste0(species[-1],'_spatial(main = geometry, copy = \"', species[1],'_spatial\",  hyper = list(beta = list(fixed = FALSE)))')
-          else speciesOther <- NULL
+          speciesOne <- list()
+          speciesOther <- list()
           
-          speciesSpat <- c(speciesOne, speciesOther)
+          for (spec in species) {
+            
+            specInData <- sapply(self$SpeciesInData, FUN = function(x) spec %in% x)
+            
+            if (sum(specInData) == 1) {
+              
+              speciesOne[[spec]] <- paste0(spec,'_', names(specInData[specInData]),'_spatial(main = geometry, model = ',
+                                  paste0(spec,'_', names(specInData[specInData]),'_field)'))
+              speciesOther[[spec]] <- NULL
+              
+            }
+            
+            else {
+              
+              dataForSpec <- names(specInData[specInData])
+              
+              speciesOne[[spec]] <- paste0(paste0(spec, '_', dataForSpec[1]),'_spatial(main = geometry, model = ',
+                                           paste0(spec, '_',dataForSpec[1]),'_field)')
+              
+              speciesOther[[spec]] <- paste0(do.call(paste0, expand.grid(paste0(spec, '_'), dataForSpec[-1])),
+                                             '_spatial(main = geometry, copy = \"', do.call(paste0, expand.grid(paste0(spec, '_'), dataForSpec[1]))
+                                             ,'_spatial\",  hyper = list(beta = list(fixed = FALSE)))')
+              
+              
+            }
+            
+            
+            
+          }
+          
+          speciesSpat <- c(unlist(speciesOne), unlist(speciesOther))
+          
           
         }
         

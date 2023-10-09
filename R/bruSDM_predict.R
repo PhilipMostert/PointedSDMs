@@ -208,7 +208,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (speciespreds && ! predictor) {
       
-      int[['speciesPredictions']] <- vector(mode = 'list', length(unlist(unique(object$species$speciesIn))))
+      int[['speciesPredictions']] <- vector(mode = 'list', length(speciesin))
       names(int[['speciesPredictions']]) <- speciesin
       
       for (spec in speciesin) {
@@ -219,7 +219,14 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
         if (intercepts) species_int <- paste0(spec,'_intercept')
         else species_int <- NULL
         
-        if (spatial) species_spat <- paste0(spec,'_spatial')
+        if (spatial) {
+          
+          allSpat <- paste0(spec, '_', names(object$dataType), '_spatial')
+          
+          species_spat <- allSpat[allSpat %in% names(object$summary.random)]
+          
+          
+          }
         else species_spat <- NULL
         
         species_formula <- formula(paste0('~', fun, '(', paste0(c(species_covs, species_int, species_spat), collapse = ' + '),')'))
@@ -303,7 +310,7 @@ print.bruSDM_predict <- function(x, ...) {
         
         cat('Predictions for', paste0(species,':'))
         cat('\n')
-        print(summary(data.frame(x[[1]])[[species]][!names(data.frame(x[[1]][[species]])) %in% c('geometry', 'coords.x1', 'coords.x2')]))
+        print(summary(data.frame(x[[1]][[species]])[!names(data.frame(x[[1]][[species]])) %in% c('geometry', 'coords.x1', 'coords.x2')]))
         cat('\n')
          
         }
@@ -336,7 +343,7 @@ print.bruSDM_predict <- function(x, ...) {
   
 }
 
-#' Plot for preduct_bru_sdm
+#' Plot for predict_bru_sdm
 #' @title Generic plot function for \code{predict_bru_sdm}.
 #' @param x A bruSDM_predict object.
 #' @param whattoplot One of the following statistics to plot: "mean", "sd", "q0.025", "median","q0.975", "smin", "smax", "cv", "var" 

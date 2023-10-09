@@ -564,13 +564,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       else private$speciesIn <- c(private$speciesIn, pointData$SpeciesInData)
       
       #ADD argument common field for species
-      self$spatialFields$speciesFields <- vector(mode = 'list', length = length(unique(unlist(private$speciesIn))))
+      self$spatialFields$speciesFields <- vector(mode = 'list', length = length(unique(unlist(private$speciesIn))) * length(names(private$speciesIn)))
       
-      names(self$spatialFields$speciesFields) <- unique(unlist(private$speciesIn))
+      names(self$spatialFields$speciesFields) <- do.call(paste0, expand.grid(paste0(unique(unlist(private$speciesIn)),'_'), names(private$speciesIn)))
      
       if (!is.null(private$speciesSpatial)) {
         
-        if (!all(speciesIn %in% names(self$spatialFields$speciesFields))) {
+        if (!all(do.call(paste0, expand.grid(paste0(speciesIn,'_'), names(private$speciesIn))) %in% names(self$spatialFields$speciesFields))) {
           ##Not species Name
 
           new_species <- vector(mode = 'list', length = sum(!speciesIn %in% names(self$spatialFields$speciesFields)))
@@ -1322,7 +1322,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       field_type <- 'speciesFields'
       if (!Remove) index <- Species
-      else index <- paste0(Species, '_spatial')
+      else index <- do.call(paste0, expand.grid(paste0(Species, '_'), private$dataSource))
       
     }
     
