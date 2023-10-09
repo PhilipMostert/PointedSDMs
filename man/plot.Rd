@@ -36,7 +36,7 @@
 A ggplot2 object.
 }
 \description{
-Plot for preduct_bru_sdm
+Plot for predict_bru_sdm
 }
 \examples{
 \dontrun{

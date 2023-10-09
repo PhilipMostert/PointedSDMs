@@ -44,7 +44,7 @@ intModel(
 
 \item{IPS}{The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[inlabru]{ipoints}} from the \pkg{inlabru} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} object.}
 
-\item{Boundary}{A \code{SpatialPolygonsDataFrame} object of the study area. If not missing, this object is used to help create the integration points.}
+\item{Boundary}{A \code{sf} object of the study area. If not missing, this object is used to help create the integration points.}
 
 \item{speciesSpatial}{Argument to specify if each species should have their own spatial effect with different hyperparameters to be estimated, of if a the field's should be estimated using \pkg{INLA}'s "copy" feature. Possible values include: \code{'individual'}, \code{'copy'} or \code{NULL} if no species-specific spatial effects should be estimated.}
 
