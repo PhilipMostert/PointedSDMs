@@ -66,7 +66,7 @@ test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra 
   expect_equal(spatMod[['species']][['speciesIn']][['PO']], 'fish')
   expect_equal(spatMod[['species']][['speciesIn']][['PA']], 'bird')
   
-  expect_equal(deparse1(spatMod[['componentsJoint']]), "~-1 + shared_spatial(main = geometry, model = shared_field) + fish_spatial(main = geometry, model = fish_field) + bird_spatial(main = geometry, model = bird_field) + fish_covariate(main = fish_covariate, model = \"linear\") + bird_covariate(main = bird_covariate, model = \"linear\") + fish_intercept(1) + bird_intercept(1)")
+  expect_equal(deparse1(spatMod[['componentsJoint']]), "~-1 + shared_spatial(main = geometry, model = shared_field) + fish_PO_spatial(main = geometry, model = fish_PO_field) + bird_PA_spatial(main = geometry, model = bird_PA_field) + fish_covariate(main = fish_covariate, model = \"linear\") + bird_covariate(main = bird_covariate, model = \"linear\") + fish_intercept(1) + bird_intercept(1)")
   
   
   expect_output(summary(spatMod), 'Summary for fish:')

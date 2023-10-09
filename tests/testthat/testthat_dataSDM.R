@@ -253,8 +253,8 @@ test_that('updateFormula is able to change the formula of a dataset', {
   ##remove the covariate from the PO dataset
   check$updateFormula(datasetName = 'PO', Formula = ~ . - covariate)
   
-  expect_setequal(check$.__enclos_env__$private$Formulas$PO$fish$geometry$RHS, c("fish_spatial", "shared_spatial", "fish_intercept", "PO_biasField"))
-  expect_setequal(check$.__enclos_env__$private$Formulas$PA$bird$PAresp$RHS, c("bird_covariate", "bird_spatial", "shared_spatial", "bird_intercept", "pointcov"))
+  expect_setequal(check$.__enclos_env__$private$Formulas$PO$fish$geometry$RHS, c("fish_PO_spatial", "shared_spatial", "fish_intercept", "PO_biasField"))
+  expect_setequal(check$.__enclos_env__$private$Formulas$PA$bird$PAresp$RHS, c("bird_covariate", "bird_PA_spatial", "shared_spatial", "bird_intercept", "pointcov"))
   
   })
 
@@ -316,3 +316,4 @@ test_that('specifySpatial can correctly specify the spatial fields', {
   expect_false(any(unlist(lapply(check$.__enclos_env__$private$modelData, function(x) 'shared_spatial' %in% x$include_components))))
     
 })
+

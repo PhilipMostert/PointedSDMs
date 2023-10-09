@@ -31,7 +31,7 @@ test_that('blockedCV completes spatial block cross-validation.', {
   mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
                              max.edge = 2, crs = inlabru::fm_crs(projection))
   #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-  iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
+  iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
   ##Make PA a data.frame object
   PA$long <- st_coordinates(PA)[,1]
   PA$lat <- st_coordinates(PA)[,2]
