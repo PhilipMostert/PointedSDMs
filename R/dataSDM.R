@@ -136,7 +136,23 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     plotData <- do.call(rbind, unlist(points, recursive = F)) #plotData <- do.call(rbind, lapply(unlist(points), function(x) x[, names(x) %in% c('..Dataset_placeholder_var..', private$speciesName, private$temporalName)]))
     
-    if (Boundary) bound <- geom_sf(data = sf::st_boundary(private$polyfromMesh()))
+    if (Boundary) {
+      
+      if (!is.null(private$Boundary)) bound <- geom_sf(data = sf::st_boundary(private$Boundary))
+      else {
+        
+        bound <- try(geom_sf(data = sf::st_boundary(private$polyfromMesh())), silent = TRUE)
+        
+        if (inherts(bound, 'try-error')) {
+          
+          warning('Could not make a polygon from the mesh, polygon will be switched off.')
+          bound <- NULL
+          
+        }
+        
+      }
+      
+    }
     else bound <- NULL
     
     if (!is.null(private$temporalName)) {
