@@ -143,7 +143,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         
         bound <- try(geom_sf(data = sf::st_boundary(private$polyfromMesh())), silent = TRUE)
         
-        if (inherts(bound, 'try-error')) {
+        if (inherits(bound, 'try-error')) {
           
           warning('Could not make a polygon from the mesh, polygon will be switched off.')
           bound <- NULL
