@@ -85,6 +85,8 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
   
   if (length(Coordinates) != 2) stop('Coordinates needs to be a vector of length 2 containing the coordinate names.')
   
+  if (!is.null(Boundary) && !inherits(Boundary, 'sf')) stop('Boundary needs to be an sf object.')
+  
   if (Coordinates[1] == Coordinates[2]) stop('Coordinates need to be unique values.')
   
   if (inherits(Projection, 'CRS') || inherits(Projection, 'crs')) Projection <- as(Projection, 'character')
