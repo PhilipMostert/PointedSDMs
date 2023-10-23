@@ -1132,9 +1132,17 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (!missing(addComponent)) {
       
-      if (any(gsub('\\(.*$', '', addComponent) %in% terms)) private$Components <- private$Components[! terms %in% gsub('\\(.*$', '', addComponent)]
+      if (inherits(addComponent, 'character')) addComponent <- formula(paste('~', addComponent))
       
-      private$Components <- c(private$Components, addComponent)
+      compTerms <- attr(terms(addComponent), 'term.labels')
+      
+      for (toAdd in 1:length(compTerms)) {
+      
+      if (any(gsub('\\(.*$', '', compTerms[toAdd]) %in% terms)) private$Components <- private$Components[! terms %in% gsub('\\(.*$', '', compTerms[toAdd])]
+      
+      private$Components <- c(private$Components, compTerms[toAdd])
+      
+      }
       
     } 
     
