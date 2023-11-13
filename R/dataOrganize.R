@@ -228,10 +228,11 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
 #' @param markintercept Logical: are intercepts run for the marks in the model.
 #' @param pointcovs Name of the point covariates.
 #' @param speciesspatial Logical: should the species have spatial fields.
+#' @param speciesindependent Logical: make independent species effects.
 
 dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
                                                     paresp, countresp, marks, marksspatial,
-                                                    spatial, intercept, temporalname,
+                                                    spatial, intercept, temporalname, speciesindependent,
                                                     markintercept, pointcovs, speciesspatial) {
   
   #if (length(self$multinomVars) != 0) marks[marks %in% self$multinomVars] <- paste0(marks[marks %in% self$multinomVars],'_response')
@@ -298,9 +299,18 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           if (!is.null(speciesIn)) {
              if (pointsResponse[[response]][j] %in% c('geometry', paresp, countresp)) {
               ##Change this part ot the speciesIn: not sure what the one below does...
-              if (!is.null(speciesspatial)) speciesspat <- paste0(do.call(paste0, expand.grid(paste0(speciesIn,'_'),
+              if (!is.null(speciesspatial)) {
+                
+                if (speciesspatial == 'shared') speciesspat <- 'speciesShared'
+                else {
+                if (speciesindependent) speciesspat <- paste0(speciesIn,'_spatial')
+                else speciesspat <- paste0(do.call(paste0, expand.grid(paste0(speciesIn,'_'),
                                                                                               names(self$Data)[[dataset]])),
                                                                   '_spatial') ## new argument called speciesSpatial??
+                
+                }
+                
+              }
               else speciesspat <- NULL
 
             
@@ -445,6 +455,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
 #' @param speciesspatial Logical: Should the species be run with spatial fields.
 #' @param offsetname Name of the offset column in the datasets.
 #' @param copymodel List of the hyper parameters for the \code{copy} model.
+#' @param speciesindependent Logical: should species effects be made independent.
 
 dataOrganize$set('public', 'makeComponents', function(spatial, intercepts, 
                                                       datanames, marks, speciesname,
@@ -456,7 +467,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
                                                       speciesspatial,
                                                       numtime,temporalmodel,
                                                       offsetname,
-                                                      copymodel) {
+                                                      copymodel,
+                                                      speciesindependent) {
   ##Copy for marks fields???
   if (length(self$SpeciesInData) != 0) species <- unique(unlist(self$SpeciesInData))
   else species = NULL
@@ -494,7 +506,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     if (!is.null(speciesspatial)) { ## Then if copy or individual ...
       
       #if (length(speciesspatial) > 0) {
-      
+      if (speciesspatial == 'shared') speciesSpat <- 'speciesShared(main = geometry, model = speciesField)'
+      else {
       #speciesSpat <- paste0(species,'_spatial(main = coordinates, model = ',paste0(species,'_spdeModel'),')', collapse = ' + ')
       
       #} 
@@ -506,6 +519,9 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
          # but keep the speciesSpat framework for the temporal part of the model
         #speciesSpat <- paste0(speciesname, '_spatial(main = coordinates, model = speciesModel, group = ',speciesname,', ngroup = ', numspecies,')')
         if (speciesspatial == 'individual' || length(species) == 1) {
+          
+          if (speciesindependent) speciesSpat <- paste0(species,'_spatial(main = geometry, model = ',paste0(species,'_field)'))
+          else {
           
           speciesComps <- list()
           
@@ -521,8 +537,19 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
           
           speciesSpat <- unlist(speciesComps)
           
+          }
+          
         }
         else {
+          
+          if (speciesindependent) {
+            
+            speciesOne <- paste0(species[1],'_spatial(main = geometry, model = ',paste0(species[1],'_field)'))
+            if (length(species) > 1) speciesOther <- paste0(species[-1],'_spatial(main = geometry, copy = \"', species[1],'_spatial\",  hyper = list(beta = list(fixed = FALSE)))')
+            else speciesOther <- NULL
+          
+          }
+          else {
           
           speciesOne <- list()
           speciesOther <- list()
@@ -557,11 +584,12 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
             
           }
           
+          }
           speciesSpat <- c(unlist(speciesOne), unlist(speciesOther))
           
           
         }
-        
+      }
       }
       #else speciesSpat <- paste0(species,'_spatial(main = coordinates, model = speciesModel)', collapse = ' + ') #change this to speciesModel
       
