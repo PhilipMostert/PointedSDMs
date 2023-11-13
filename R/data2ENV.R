@@ -70,12 +70,15 @@ data2ENV <- function(data, env) {
     
     if (!is.null(data$.__enclos_env__$private$speciesSpatial)) {
       
+      if (all(names(data$spatialFields$speciesFields) %in% 'speciesField')) assign('speciesField',  data$spatialFields$speciesFields[['speciesField']], envir = env)
+      else {
       for (species in names(data$spatialFields$speciesFields)) {
         
         assign(paste0(species,'_field'), data$spatialFields$speciesFields[[species]], envir = env)
         
       }
       
+        }
       
     }
     
