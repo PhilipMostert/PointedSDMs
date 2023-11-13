@@ -75,6 +75,7 @@ Internal functions used to temporarily store data and other information before a
   spatial,
   intercept,
   temporalname,
+  speciesindependent,
   markintercept,
   pointcovs,
   speciesspatial
@@ -104,7 +105,8 @@ Internal functions used to temporarily store data and other information before a
   numtime,
   temporalmodel,
   offsetname,
-  copymodel
+  copymodel,
+  speciesindependent
 )}\if{html}{\out{</div>}}
 }
 

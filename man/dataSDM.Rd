@@ -872,6 +872,7 @@ Function to add an integration domain for the PO datasets.
   initialnames,
   responsecounts,
   responsepa,
+  speciesindependent,
   marksnames,
   marksfamily,
   pointcovariates,
