@@ -83,11 +83,18 @@ datasetOut <- function(model, dataset,
         
       if (!is.null(model$spatial$species))  {
         
-        for (specField in paste0(species, '_', names(model$dataType))) {
+        specFieldIndex <- names(model$summary.random)[names(model$summary.random) %in% c('speciesShared',
+                                                                                         paste0(species, '_spatial'),
+                                                                                         paste0(species, '_', names(model$dataType)))]
+        
+        if (all(specFieldIndex %in% 'speciesShared')) assign('speciesField', model$bru_info_model$effects[['speciesField']]$env[['speciesField']])
+        else {
+        for (specField in specFieldIndex) {
         
         assign(paste0(specField,'_field'), model$bru_info$model$effects[[paste0(specField,'_field')]]$env[[paste0(specField,'_field')]])
           
-      }
+        }
+        }
         
       }
         
