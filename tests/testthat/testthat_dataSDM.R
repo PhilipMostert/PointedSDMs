@@ -72,6 +72,7 @@ test_that('dataSDMs initialize works as expected.', {
                        Inlamesh = mesh, speciesspatial = speciesSpatial,
                        responsepa = responsePA,
                        trialspa = trialName,
+                       speciesindependent = FALSE,
                        responsecounts = responseCounts,
                        marksnames = markNames,
                        trialsmarks = markTrial,

@@ -166,7 +166,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             #specnesname is the name of the species variable
             Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', markintercept = TRUE,
                                paresp = 'PAresp', countresp = 'counts', marksspatial = TRUE, speciesspatial = 'individual',
-                               marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
+                               marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp', speciesindependent = FALSE,
                                spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov')
             
             expect_setequal(names(Check$Formulas), c('PO', 'PA'))
@@ -208,7 +208,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
              #Set spatial and intercept to FALSE
             Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', temporalname = 'temp',
                                paresp = 'PAresp', countresp = 'counts', marksspatial = FALSE, speciesspatial = NULL,
-                               marks = c('numvar', 'factvar', 'binommark'), markintercept = FALSE,
+                               marks = c('numvar', 'factvar', 'binommark'), markintercept = FALSE, speciesindependent = FALSE,
                                spatial = NULL, intercept = FALSE, pointcovs = 'pointcov')
           
             
@@ -227,7 +227,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             ##Change terms
             #Set spatcovs to NULL
             Check$makeFormulas(spatcovs = NULL, speciesname = 'species', marksspatial = TRUE, speciesspatial = 'individual',
-                               paresp = 'PAresp', countresp = 'counts', markintercept = FALSE,
+                               paresp = 'PAresp', countresp = 'counts', markintercept = FALSE, speciesindependent = FALSE,
                                marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                                spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov')
             
@@ -245,7 +245,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             
             ##Try copy model
             Check$makeFormulas(spatcovs = NULL, speciesname = 'species', marksspatial = TRUE, speciesspatial = 'individual',
-                                     paresp = 'PAresp', countresp = 'counts', markintercept = FALSE,
+                                     paresp = 'PAresp', countresp = 'counts', markintercept = FALSE, speciesindependent = FALSE,
                                      marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
                                      spatial = 'copy', intercept = TRUE, pointcovs = 'pointcov')
             
@@ -263,14 +263,14 @@ test_that('makeFormulas is able to make the correct formulas for the different p
 #Change back to original
 Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', marksspatial = TRUE,
                    paresp = 'PAresp', countresp = 'counts', markintercept = TRUE, speciesspatial = 'individual',
-                   marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp',
+                   marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp', speciesindependent = FALSE,
                    spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov')
 
 test_that('makeComponents is able to make the correct components for all the processes
           based on the predictors and spatial effects available.', {
             
     comps <- Check$makeComponents(spatial = 'shared', intercepts = TRUE, datanames = c('PO','PA'), marksintercept = TRUE,
-                         marks = c('numvar', 'factvar', 'binommark'), temporalmodel = deparse(list(model = "ar1")),
+                         marks = c('numvar', 'factvar', 'binommark'), temporalmodel = deparse(list(model = "ar1")), speciesindependent = FALSE,
                          multinomnames = 'factvar', pointcovariates = 'pointcov', marksspatial = TRUE, offsetname = NULL,
                          speciesname = 'species', covariatenames = 'spatcovs', temporalname = 'temp', speciesspatial = 'individual',
                          covariateclass = 'numeric', numtime = 2, copymodel = Check$.__enclos_env__$private$copyModel)
@@ -301,7 +301,7 @@ test_that('makeComponents is able to make the correct components for all the pro
     #spatial and intercepts == FALSE
     comps2 <- Check$makeComponents(spatial = NULL, intercepts = FALSE, datanames = c('PO','PA'),
                                   marks = c('numvar', 'factvar', 'binommark'), marksspatial = FALSE, offsetname = NULL,
-                                  multinomnames = 'factvar', pointcovariates = 'pointcov', marksintercept = FALSE,
+                                  multinomnames = 'factvar', pointcovariates = 'pointcov', marksintercept = FALSE, speciesindependent = FALSE,
                                   speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = 'individual',
                                   covariateclass = 'numeric', numtime =  2,  copymodel = Check$.__enclos_env__$private$copyModel)
     
@@ -320,7 +320,7 @@ test_that('makeComponents is able to make the correct components for all the pro
     #checkComponents with a copy model
     compsCopy <- Check$makeComponents(spatial = 'copy', intercepts = FALSE, datanames = c('PO','PA'),
                          marks = c('numvar', 'factvar', 'binommark'), marksspatial = FALSE, offsetname = NULL,
-                         multinomnames = 'factvar', pointcovariates = 'pointcov', marksintercept = FALSE,
+                         multinomnames = 'factvar', pointcovariates = 'pointcov', marksintercept = FALSE, speciesindependent = FALSE,
                          speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = 'individual', temporalname = NULL,
                          covariateclass = 'numeric', numtime =  NULL,  copymodel = "list(beta = list(fixed = FALSE))")
     
