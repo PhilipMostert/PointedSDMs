@@ -221,7 +221,9 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
         
         if (spatial) {
           
-          allSpat <- paste0(spec, '_', names(object$dataType), '_spatial')
+          allSpat <- c(paste0(spec, '_spatial'),
+                       paste0(spec, '_', names(object$dataType), '_spatial'),
+                       'speciesShared')
           
           species_spat <- allSpat[allSpat %in% names(object$summary.random)]
           
