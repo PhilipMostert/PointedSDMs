@@ -19,6 +19,7 @@ intModel(
   pointCovariates = NULL,
   pointsIntercept = TRUE,
   marksIntercept = TRUE,
+  speciesEffects = list(Intercept = TRUE, Environmental = TRUE),
   Offset = NULL,
   pointsSpatial = "shared",
   marksSpatial = TRUE,
@@ -60,6 +61,8 @@ intModel(
 \item{pointsIntercept}{Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.}
 
 \item{marksIntercept}{Logical argument: should the marks be modeled with intercepts. Defaults to \code{TRUE}.}
+
+\item{speciesEffects}{List specifying if intercept terms and environmentsl effects should be made for the species. Defaults to \code{list(Intercept = TRUE, Environmental = TRUE)}. Note that if \code{Intercept = FALSE} and \code{pointsIntercept = TRUE}, dataset specific intercept terms will be created.}
 
 \item{Offset}{Name of the offset variable (class \code{character}) in the datasets. Defaults to \code{NULL}; if the argument is non-\code{NULL}, the variable name needs to be standardized across datasets (but does not need to be included in all datasets). The offset variable will be transformed onto the log-scale in the integrated model.}
 
