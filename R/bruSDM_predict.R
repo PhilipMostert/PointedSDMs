@@ -213,10 +213,20 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       
       for (spec in speciesin) {
         
-        if (!is.null(covariates)) species_covs <- paste0(spec, '_', covariates)
+        if (!is.null(covariates)) {
+          
+          if (object[['species']][['speciesEffects']][['Environmental']]) species_covs <- paste0(spec, '_', covariates)
+          else species_covs <- covariates
+          
+        }
         else species_covs <- NULL
         
-        if (intercepts) species_int <- paste0(spec,'_intercept')
+        if (intercepts) {
+          
+          if (object[['species']][['speciesEffects']][['Intercepts']]) species_int <- paste0(spec,'_intercept')
+          else species_int <- NULL
+        
+        }
         else species_int <- NULL
         
         if (spatial) {
