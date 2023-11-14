@@ -53,7 +53,7 @@ test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra 
   names(cov) <- 'covariate'
   
   obj <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
-                IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
+                IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, speciesIndependent = FALSE,
                 responsePA = responsePA, markNames = NULL, markFamily = NULL, speciesSpatial = 'individual',
                 speciesName = speciesName, spatialCovariates = cov)
   

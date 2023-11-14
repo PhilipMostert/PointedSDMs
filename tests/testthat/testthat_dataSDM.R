@@ -53,7 +53,7 @@ pointCovs <- 'pointcov'
 speciesName <- 'species'
 markSpatial <- TRUE
 marksIntercept <- TRUE
-speciesSpatial <- TRUE
+speciesSpatial <- 'copy'
 temporalName <- 'temp'
 temporalModel <- deparse(list(model = 'ar1'))
 copyModel = deparse1(list(beta = list(fixed = FALSE)))
@@ -81,6 +81,8 @@ test_that('dataSDMs initialize works as expected.', {
                        marksspatial = markSpatial,
                        marksintercept = marksIntercept,
                        spatialcovariates = cov,
+                       speciesintercept = TRUE,
+                       speciesenvironment = TRUE,
                        speciesname = speciesName,
                        ips = iPoints, copymodel = copyModel,
                        spatial = 'shared', temporal = temporalName, 
