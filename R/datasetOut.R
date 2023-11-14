@@ -75,7 +75,8 @@ datasetOut <- function(model, dataset,
     
     for (names in model[['spatCovs']][['name']]) {
       
-      if (!is.null(model[['species']][['speciesIn']])) {
+      if (!is.null(model[['species']][['speciesIn']]) &&
+          model[['species']][['speciesEffects']]$Environmental) {
      
       for (species in unique(unlist(model[['species']][['speciesIn']]))) {
        
