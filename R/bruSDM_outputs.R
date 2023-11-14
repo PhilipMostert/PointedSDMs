@@ -56,7 +56,8 @@ summary.bruSDM <- function(object, ...) {
     }
   }
   
-  if (!is.null(object[['species']][['speciesIn']])) {
+  if (!is.null(object[['species']][['speciesIn']]) 
+      && any(unlist(object[['species']][['speciesEffects']]))) {
       
       cat('Summary of the fixed effects for the species:')
       cat('\n\n')
