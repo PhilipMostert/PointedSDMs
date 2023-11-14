@@ -16,7 +16,7 @@ data2ENV <- function(data, env) {
     #if (!inherits(spatCovs, 'Spatial')) spatCovs <- as(spatCovs, 'SpatialPixelsDataFrame')
     if (class(spatCovs) %in% c('RasterLayer', 'RasterBrick', 'RasterStack')) spatCovs <- terra::rast(spatCovs)
     
-    if (is.null(data$.__enclos_env__$private$speciesIn)) {
+    if (is.null(data$.__enclos_env__$private$speciesIn) || !data$.__enclos_env__$private$speciesEnvironment) {
       
       for (name in data$.__enclos_env__$private$spatcovsNames) {
         
