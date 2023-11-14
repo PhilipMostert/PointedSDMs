@@ -224,6 +224,8 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
 #' @param temporalname Name of the temporal variable used in the model.
 #' @param spatial Logical: are spatial effects run in the model.
 #' @param marksspatial Logical: should spatial fields be included for the marks.
+#' @param speciesintercept Logical: should specific species intercept terms be created for the species.
+#' @param speciesenvironment Logical: should species specific environmental terms be created.
 #' @param intercept Logical: are intercepts run in the model.
 #' @param markintercept Logical: are intercepts run for the marks in the model.
 #' @param pointcovs Name of the point covariates.
@@ -231,7 +233,8 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
 #' @param speciesindependent Logical: make independent species effects.
 
 dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
-                                                    paresp, countresp, marks, marksspatial,
+                                                    paresp, countresp, marks, marksspatial, 
+                                                    speciesintercept, speciesenvironment,
                                                     spatial, intercept, temporalname, speciesindependent,
                                                     markintercept, pointcovs, speciesspatial) {
   
@@ -303,6 +306,8 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
                 
                 if (speciesspatial == 'shared') speciesspat <- 'speciesShared'
                 else {
+                
+                  
                 if (speciesindependent) speciesspat <- paste0(speciesIn,'_spatial')
                 else speciesspat <- paste0(do.call(paste0, expand.grid(paste0(speciesIn,'_'),
                                                                                               names(self$Data)[[dataset]])),
@@ -320,9 +325,11 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             #  else spat <- NULL
               
             #}
-            
-            if (intercept) int <- paste0(speciesIn,'_intercept') 
+            if (speciesintercept) int <- paste0(speciesIn,'_intercept') 
+            else
+              if (intercept) int <- paste0(names(self$Data)[[dataset]],'_intercept') 
             else int <- NULL
+            
              }
             else {
               
@@ -361,7 +368,12 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           
           if (!is.null(spatcovs)) {
             
-            if (!is.null(speciesname)) covs <- paste0(speciesIn, '_', spatcovs)
+            if (!is.null(speciesname)) {
+              
+              if (speciesenvironment) covs <- paste0(speciesIn, '_', spatcovs)
+              else covs <- spatcovs
+              
+            }
             else covs <- spatcovs
             
           }
@@ -451,8 +463,10 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
 #' @param temporalname Name of the temporal variable used in the model.
 #' @param marksspatial Logical: should spatial fields be included for the marks.
 #' @param marksintercept Logical: should intercepts be included for the marks.
+#' @param speciesintercept: Logical: should intercept terms be created for each species.
 #' @param numtime Number of time increments included in the model.
 #' @param speciesspatial Logical: Should the species be run with spatial fields.
+#' @param speciesenvironment Logical: Should the species have their own environmental effects.
 #' @param offsetname Name of the offset column in the datasets.
 #' @param copymodel List of the hyper parameters for the \code{copy} model.
 #' @param speciesindependent Logical: should species effects be made independent.
@@ -465,6 +479,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
                                                       marksintercept,
                                                       temporalname,
                                                       speciesspatial,
+                                                      speciesenvironment,
+                                                      speciesintercept,
                                                       numtime,temporalmodel,
                                                       offsetname,
                                                       copymodel,
@@ -642,7 +658,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (!is.null(covariatenames)) {
     
-    if (!is.null(species)) {
+    if (!is.null(species) && speciesenvironment) {
       
       speciesCovs <- apply(expand.grid(paste0(species,'_'), covariatenames), MARGIN = 1, FUN = paste0,collapse = '')
       speciesCovClass <- rep(covariateclass, each = length(species))
@@ -678,7 +694,12 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (intercepts) {
     
-    if (!is.null(species)) int <- paste0(species, '_intercept(1)')
+    if (!is.null(species)) {
+      
+      if (speciesintercept) int <- paste0(species, '_intercept(1)')
+      else int <- paste0(datanames, '_intercept(1)')
+      
+    }
     else int <- paste0(datanames, '_intercept(1)')
     
     if (!is.null(marks)) intMarks <- paste0(marks, '_intercept(1)')
