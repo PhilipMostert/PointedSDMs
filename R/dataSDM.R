@@ -640,8 +640,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     ##Add here that if markSpatial then add mark_spatial
     #Also add markModel in the initial call.
     pointData$makeFormulas(spatcovs = private$spatcovsNames, speciesname = speciesName, temporalname = private$temporalName,
-                           paresp = responsePA, countresp = responseCounts, marksspatial = private$marksSpatial,
-                           marks = markNames, spatial = private$Spatial, speciesindependent = private$speciesIndependent, 
+                           paresp = responsePA, countresp = responseCounts, marksspatial = private$marksSpatial, speciesintercept = private$speciesIntercepts, 
+                           marks = markNames, spatial = private$Spatial, speciesindependent = private$speciesIndependent, speciesenvironment = private$speciesEnvironment,
                            intercept = private$Intercepts, markintercept = private$marksIntercepts, speciesspatial = private$speciesSpatial)
     
     if (!is.null(private$temporalName)) {
@@ -694,6 +694,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                                                      numtime = length(unique(unlist(private$temporalVars))),
                                                      temporalmodel = private$temporalModel,
                                                      speciesspatial = private$speciesSpatial,
+                                                     speciesintercept = private$speciesIntercepts,
+                                                     speciesenvironment = private$speciesEnvironment,
                                                      offsetname = private$Offset,
                                                      copymodel = private$copyModel,
                                                      speciesindependent = private$speciesIndependent)
@@ -720,6 +722,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                                                 temporalmodel = private$temporalModel,
                                                 temporalname = private$temporalName,
                                                 speciesspatial = private$speciesSpatial,
+                                                speciesintercept = private$speciesIntercepts,
+                                                speciesenvironment = private$speciesEnvironment,
                                                 offsetname = private$Offset,
                                                 copymodel = private$copyModel,
                                                 speciesindependent = private$speciesIndependent)
@@ -1256,8 +1260,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         } 
         else {
           
-          if (is.null(Species)) Effect <- paste0(unique(unlist(private$speciesIn)), '_intercept')  #this won't work, unless we run a for loop...
-          else Effect <- paste0(Species, '_intercept')
+          if (is.null(Species)) Effect <- paste0(unique(unlist(private$speciesIn)), '_intercept')
+          else {
+            
+            if (private$speciesIntercepts) Effect <- paste0(Species, '_intercept')
+            else Effect <-  paste0(unique(unlist(private$speciesIn)), '_intercept')
+            
+          }
           
           
         }
@@ -1813,6 +1822,8 @@ dataSDM$set('private', 'optionsINLA', list())
 
 dataSDM$set('private', 'spatialBlockCall', NULL)
 dataSDM$set('private', 'Samplers', list())
+dataSDM$set('private', 'speciesIntercepts', TRUE)
+dataSDM$set('private', 'speciesEnvironment', TRUE)
 dataSDM$set('private', 'copyModel', NULL)
 dataSDM$set('private', 'datasetNames', NULL)
 
@@ -1833,6 +1844,8 @@ dataSDM$set('private', 'datasetNames', NULL)
 #' @param marksspatial Should spatial fields be included for the marks
 #' @param spatial Logical argument describing if spatial effects should be included.
 #' @param intercepts Logical argument describing if intercepts should be included in the model.
+#' @param speciesintercept Logical argument indicating if species specific intercept terms should be created.
+#' @param speciesenvironment Logical argument indicating if species specific environmental terms should be created. 
 #' @param spatialcovariates Spatial covariates object used in the model.
 #' @param marksintercept Logical argument describing if the marks should have intercepts.
 #' @param boundary A polygon map of the study area.
@@ -1843,8 +1856,8 @@ dataSDM$set('private', 'datasetNames', NULL)
 
 dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh, initialnames,
                                               responsecounts, responsepa, speciesindependent,
-                                              marksnames, marksfamily, pointcovariates,
-                                              trialspa, trialsmarks, speciesname, marksspatial,
+                                              marksnames, marksfamily, pointcovariates, speciesintercept,
+                                              trialspa, trialsmarks, speciesname, marksspatial, speciesenvironment,
                                               spatial, intercepts, spatialcovariates, marksintercepts,
                                               boundary, ips, temporal, temporalmodel, speciesspatial, offset,
                                               copymodel) {
@@ -1903,9 +1916,11 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   private$marksSpatial <- marksspatial
   private$Intercepts <- intercepts
   private$marksIntercepts <- marksintercepts
+  private$speciesIntercepts <- speciesintercept
   
   private$speciesSpatial <- speciesspatial
   private$speciesIndependent <- speciesindependent
+  private$speciesEnvironment <- speciesenvironment
   #if (!private$Spatial && private$markSpatial) warning('Spatial has been set to FALSE but marksSpatial is TRUE. Spatial effects for the marks will still be run.')
   
   private$Coordinates <- coordinates
