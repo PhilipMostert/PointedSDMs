@@ -438,6 +438,7 @@ Function used to add additional spatial fields (called \emph{bias fields}) to a 
   datasetNames = NULL,
   allPO = FALSE,
   biasField = NULL,
+  copyModel = FALSE,
   temporalModel = list(model = "ar1")
 )}\if{html}{\out{</div>}}
 }
