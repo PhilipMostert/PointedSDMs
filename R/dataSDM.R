@@ -833,7 +833,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                      copyModel = FALSE,
                      temporalModel = list(model = 'ar1')) {
     
-    if (allPO) datasetNames <- names(private$printSummary)[private$printSummary == 'Present Only']
+    if (allPO) datasetNames <- names(private$printSummary$type)[private$printSummary$type == 'Present only']
     else
       if (is.null(datasetNames)) stop('Dataset names need to be given.')
     
