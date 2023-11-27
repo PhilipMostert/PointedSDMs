@@ -1399,7 +1399,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       field_type <- 'speciesFields'
       if (!Remove) {
         
-        if (private$speciesSpatial == 'shared') index <- 'speciesShared'
+        if (private$speciesSpatial == 'shared') index <- 'speciesField'
         else
           if (!private$speciesIndependent) index <- do.call(paste0, expand.grid(paste0(Species, '_'), private$dataSource))
         else index <- Species
@@ -1407,7 +1407,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       }
       else {
       
-        if (private$speciesSpatial == 'shared') index <- 'speciesShared'
+        if (private$speciesSpatial == 'shared') index <- 'speciesField'
         else
           if (!private$speciesIndependent) index <- do.call(paste0, expand.grid(paste0(Species, '_'), private$dataSource))
         else index <-  paste0(Species, '_spatial')
