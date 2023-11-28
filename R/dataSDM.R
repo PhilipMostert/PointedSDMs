@@ -294,8 +294,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (!all(unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame", 'sf',
                                          'tbl', 'tbl_df'))) stop("Datasets need to be either a SpatialPoints* object, sf or a data frame.")
     
-    if (!is.null(private$initialnames)) dataNames <- private$initialnames
-    else
+    #if (!is.null(private$initialnames)) dataNames <- private$initialnames
+    #else
       if (dataList) {
         
         if (is.null(dataNames)) {
@@ -811,7 +811,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-    if (!is.null(private$initialnames)) private$initialnames <- NULL
+   # if (!is.null(private$initialnames)) private$initialnames <- NULL
     
   }
   ,
