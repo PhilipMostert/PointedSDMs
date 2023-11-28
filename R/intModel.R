@@ -166,7 +166,12 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
                               as.character(match.call(expand.dots = FALSE)))
     }
     
-  } else initialnames <- NULL
+  } else {
+    
+    if (inherits(dataPoints, 'list')) initialNames <- names(dataPoints)
+    else initialnames <- NULL
+    
+  }
   
   if (!is.null(temporalName)) temporalModel <- deparse1(temporalModel)
   
