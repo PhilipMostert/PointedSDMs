@@ -124,13 +124,29 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
     ##Need something more here if object is list: get names from list
     if (length(datasetClass) == 1 && datasetClass == "list") {
       
+      if (!is.null(names(dataPoints[[1]]))) {
+      
+        dataList <- TRUE
+        dataNames <- names(dataPoints[[1]])
+        
+      }
+      
+      else {
+        
       dataNames <- NULL
       dataPoints <- unlist(dataPoints, recursive = FALSE)
       datasetClass <- lapply(dataPoints, class)
       dataList <- TRUE
       
+      }
+      
     }
-    else dataList <- FALSE
+    else {
+      
+      dataList <- FALSE
+      datasetNames <- NULL
+      
+    }
     
     if (!all(unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame", 'sf',
                                          'tbl', 'tbl_df'))) stop("Datasets need to be either a SpatialPoints* object, sf or a data frame.")
@@ -168,8 +184,7 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
     
   } else {
     
-    if (inherits(dataPoints, 'list')) initialNames <- names(dataPoints)
-    else initialnames <- NULL
+   initialnames <- NULL
     
   }
   
