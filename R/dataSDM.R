@@ -1374,7 +1374,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       } else {
         
         field_type <- 'datasetFields'
-        if (!Remove) index <- private$initialNames[[1]]
+        if (!Remove) index <- private$initialnames[[1]]
         else index <- private$initialNames[[1]]
       }
       
