@@ -175,6 +175,7 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
         }
         
       }
+      else initialnames <- dataNames
     }
     else {
       
