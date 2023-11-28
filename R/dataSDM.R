@@ -294,8 +294,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (!all(unlist(datasetClass) %in% c("SpatialPointsDataFrame", "SpatialPoints", "data.frame", 'sf',
                                          'tbl', 'tbl_df'))) stop("Datasets need to be either a SpatialPoints* object, sf or a data frame.")
     
-    #if (!is.null(private$initialnames)) dataNames <- private$initialnames
-    #else
+    if (!is.null(private$initialnames)) dataNames <- private$initialnames
+    else
       if (dataList) {
         
         if (is.null(dataNames)) {
@@ -811,7 +811,13 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
-   # if (!is.null(private$initialnames)) private$initialnames <- NULL
+    if (!is.null(private$initialnames)) {
+      
+      private$originalNames <- private$initialnames
+      private$initialnames <- NULL
+    
+      
+      }
     
   }
   ,
@@ -1387,8 +1393,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       } else {
         
         field_type <- 'datasetFields'
-        if (!Remove) index <- private$initialnames[[1]]
-        else index <- private$initialNames[[1]]
+        if (!Remove) index <- private$originalNames[[1]]
+        else index <- private$originalNames[[1]]
       }
       
     }
@@ -1846,6 +1852,7 @@ dataSDM$set('private', 'speciesIntercepts', TRUE)
 dataSDM$set('private', 'speciesEnvironment', TRUE)
 dataSDM$set('private', 'copyModel', NULL)
 dataSDM$set('private', 'datasetNames', NULL)
+dataSDM$set('private', 'originalNames', NULL)
 
 #' @description Initialize function for dataSDM: used to store some compulsory arguments. Please refer to the wrapper function, \code{intModel} for creating new dataSDM objects.
 #' @param coordinates A vector of length 2 containing the names of the coordinates.
