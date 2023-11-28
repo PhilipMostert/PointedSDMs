@@ -128,6 +128,8 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
       
         dataList <- TRUE
         dataNames <- names(dataPoints[[1]])
+        dataPoints <- unlist(dataPoints, recursive = FALSE)
+        datasetClass <- lapply(dataPoints, class)
         
       }
       
