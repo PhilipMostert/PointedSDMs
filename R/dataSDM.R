@@ -270,10 +270,23 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (length(datasetClass) == 1 && datasetClass == "list") {
       
-      dataNames <- NULL
-      dataPoints <- unlist(dataPoints, recursive = FALSE)
-      datasetClass <- lapply(dataPoints, class)
-      dataList <- TRUE
+      if (!is.null(names(dataPoints[[1]]))) {
+        
+        dataList <- TRUE
+        dataNames <- names(dataPoints[[1]])
+        dataPoints <- unlist(dataPoints, recursive = FALSE)
+        datasetClass <- lapply(dataPoints, class)
+        
+      }
+      
+      else {
+        
+        dataNames <- NULL
+        dataPoints <- unlist(dataPoints, recursive = FALSE)
+        datasetClass <- lapply(dataPoints, class)
+        dataList <- TRUE
+        
+      }
       
     }
     else dataList <- FALSE
@@ -301,7 +314,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
             private$initialNames <- dataNames
           }
           
-        }
+        } else private$initialnames <- dataNames
         
       }
     else {
