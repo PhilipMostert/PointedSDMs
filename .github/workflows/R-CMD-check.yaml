@@ -46,6 +46,11 @@ jobs:
           use-public-rspm: true
           extra-repositories: "https://inla.r-inla-download.org/R/testing"
           
+      - name: Install system dependencies on Linux (GL)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y libglu1-mesa-dev
+          
       - name: Install system dependencies on MacOS (X11, gdal)
         if: runner.os == 'macOS'
         run: |
