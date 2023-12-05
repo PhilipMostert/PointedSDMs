@@ -825,7 +825,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param datasetNames A vector of dataset names (class \code{character}) for which a bias field needs to be added to. If \code{NULL} (default), then \code{allPO} has to be \code{TRUE}.
   #' @param allPO Logical: should a bias field be added to all datasets classified as presence only in the integrated model. Defaults to \code{FALSE}.
   #' @param biasField An \code{inla.spde} object used to describe the bias field. Defaults to \code{NULL} which uses \code{\link[INLA]{inla.spde2.matern}} to create a Matern model for the field.
-  #' @param shareModel Share a bias field across the datasets specified with \code{datasetNames}. Defaults to \code{TRUE}.
+  #' @param shareModel Share a bias field across the datasets specified with \code{datasetNames}. Defaults to \code{FALSE}.
   #' @param copyModel Create copy models for all the of the datasets specified with either \code{datasetNames} or \code{allPO}. The first dataset in the vector will have its own spatial effect, and the other datasets will "copy" the effect with shared hyperparameters. Defaults to \code{FALSE.
   #' @param temporalModel List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details. \code{temporalName} needs to be specified in \code{intModel} prior.
   #' @examples
@@ -861,6 +861,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     if (!all(datasetNames %in% private$dataSource)) stop('Dataset provided not available.')
     
     if (copyModel && length(datasetNames) < 2) warning('Turning copyModel off since the number of datasets specified is less than 2.')
+    
+    if (copyModel && shareModel) stop('Only one of copyModel and shareModel may be TRUE.')
+    
     
     for (dat in datasetNames) {
       
