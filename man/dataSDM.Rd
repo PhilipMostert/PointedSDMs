@@ -439,6 +439,7 @@ Function used to add additional spatial fields (called \emph{bias fields}) to a 
   allPO = FALSE,
   biasField = NULL,
   copyModel = FALSE,
+  shareModel = FALSE,
   temporalModel = list(model = "ar1")
 )}\if{html}{\out{</div>}}
 }
@@ -451,6 +452,8 @@ Function used to add additional spatial fields (called \emph{bias fields}) to a 
 \item{\code{allPO}}{Logical: should a bias field be added to all datasets classified as presence only in the integrated model. Defaults to \code{FALSE}.}
 
 \item{\code{biasField}}{An \code{inla.spde} object used to describe the bias field. Defaults to \code{NULL} which uses \code{\link[INLA]{inla.spde2.matern}} to create a Matern model for the field.}
+
+\item{\code{shareModel}}{Share a bias field across the datasets specified with \code{datasetNames}. Defaults to \code{TRUE}.}
 
 \item{\code{temporalModel}}{List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details. \code{temporalName} needs to be specified in \code{intModel} prior.}
 }

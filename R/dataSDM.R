@@ -825,6 +825,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param datasetNames A vector of dataset names (class \code{character}) for which a bias field needs to be added to. If \code{NULL} (default), then \code{allPO} has to be \code{TRUE}.
   #' @param allPO Logical: should a bias field be added to all datasets classified as presence only in the integrated model. Defaults to \code{FALSE}.
   #' @param biasField An \code{inla.spde} object used to describe the bias field. Defaults to \code{NULL} which uses \code{\link[INLA]{inla.spde2.matern}} to create a Matern model for the field.
+  #' @param shareModel Share a bias field across the datasets specified with \code{datasetNames}. Defaults to \code{TRUE}.
   #' @param copyModel Create copy models for all the of the datasets specified with either \code{datasetNames} or \code{allPO}. The first dataset in the vector will have its own spatial effect, and the other datasets will "copy" the effect with shared hyperparameters. Defaults to \code{FALSE.
   #' @param temporalModel List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details. \code{temporalName} needs to be specified in \code{intModel} prior.
   #' @examples
@@ -850,9 +851,10 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                      allPO = FALSE,
                      biasField = NULL,
                      copyModel = FALSE,
+                     shareModel = FALSE,
                      temporalModel = list(model = 'ar1')) {
     
-    if (allPO) datasetNames <- names(private$printSummary$type)[private$printSummary$type == 'Present only']
+    if (allPO) datasetNames <- names(private$printSummary$Type)[private$printSummary$Type == 'Present only']
     else
       if (is.null(datasetNames)) stop('Dataset names need to be given.')
     
@@ -866,13 +868,22 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       for (lik in 1:length(private$Formulas[[dat]])) {
         
-        #private$modelData[[lik]]$formula <- update(private$modelData[[lik]]$formula, paste0(' ~ . + ', dat,'_bias_field'))
-        private$Formulas[[dat]][[lik]][[1]]$RHS <- c(private$Formulas[[dat]][[lik]][[1]]$RHS, paste0(dat, '_biasField'))
-        #private$modelData[[lik]]$include_components <- c(private$modelData[[lik]]$include_components, paste0(dat, '_biasField'))
+        if (!shareModel) private$Formulas[[dat]][[lik]][[1]]$RHS <- c(private$Formulas[[dat]][[lik]][[1]]$RHS, paste0(dat, '_biasField'))
+        else private$Formulas[[dat]][[lik]][[1]]$RHS <- c(private$Formulas[[dat]][[lik]][[1]]$RHS, paste0('sharedBias', '_biasField'))
+
       }
       
+      
+      if (!shareModel) {
       if (is.null(biasField)) self$spatialFields$biasFields[[dat]] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
       else self$spatialFields$biasFields[[dat]] <- biasField
+      }
+      else {
+        
+        if (is.null(biasField)) self$spatialFields$biasFields[['sharedBias']] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
+        else self$spatialFields$biasFields[['sharedBias']] <- biasField        
+      
+        }
       
     }
     
@@ -886,6 +897,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (!is.null(private$temporalName)) {
 
+      if (shareModel) private$Components <- c(private$Components, paste0('sharedBias_biasField(main = geometry, model = sharedBias_bias_field, group =', private$temporalName,', ngroup = ', length(unique(unlist(private$temporalVars))),', control.group = ', temporalModel,')'))
+      
       temporalModel <- deparse1(temporalModel)
       
       private$Components <- c(private$Components, paste0(datasetNames ,'_biasField(main = geometry, model = ', datasetNames, '_bias_field, group = ', private$temporalName, ', ngroup = ', length(unique(unlist(private$temporalVars))),', control.group = ', temporalModel,')'))
@@ -894,11 +907,16 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
     else {
       
-      if (!copyModel) private$Components <- c(private$Components, paste0(datasetNames ,'_biasField(main = geometry, model = ', datasetNames, '_bias_field)'))
+      if (!copyModel) {
+        
+        if (shareModel) private$Components <- c(private$Components, 'sharedBias_biasField(main = geometry, model = sharedBias_bias_field)')
+        else private$Components <- c(private$Components, paste0(datasetNames ,'_biasField(main = geometry, model = ', datasetNames, '_bias_field)'))
+        
+      }
       
       else {
         
-        biasComponents <- c()
+        biasComponents <- c() 
         
         for (bias in datasetNames) {
           
