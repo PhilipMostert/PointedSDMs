@@ -1914,7 +1914,7 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   if (missing(projection)) stop('projection needs to be given.')
   if (missing(Inlamesh)) stop('Mesh needs to be given.')
   
-  if (!inherits(Inlamesh, 'inla.mesh') && !inherits(Inlamesh, 'inla.mesh.1d')) stop('Mesh needs to be an inla.mesh object.')
+  if (!inherits(Inlamesh, 'inla.mesh')) stop('Mesh needs to be an inla.mesh object.')
   
   if (inherits(projection, 'CRS')) projection <- as(projection, 'character')
   else if (!inherits(projection, 'character')) stop('Projection needs to be a character object.')
@@ -1957,6 +1957,7 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
     
     if (is.null(boundary)) private$IPS <- st_transform(inlabru::fm_int(samplers = boundary, domain = Inlamesh), projection)
     else private$IPS <- st_transform(inlabru::fm_int(domain = Inlamesh), projection)
+    
     
   }
   
