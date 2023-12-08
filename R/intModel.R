@@ -97,7 +97,7 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
   if (inherits(Projection, 'CRS') || inherits(Projection, 'crs')) Projection <- as(Projection, 'character')
   else if (!inherits(Projection, 'character')) stop('Projection needs to be a character object.')
   
-  if (!inherits(Mesh, 'inla.mesh') && !inherits(Mesh, 'inla.mesh.1d"')) stop('Mesh needs to be a inla.mesh object.')
+  if (!inherits(Mesh, 'inla.mesh') && !inherits(Mesh, 'inla.mesh.1d')) stop('Mesh needs to be a inla.mesh object.')
   
   if (!is.null(pointsSpatial)) {
     
