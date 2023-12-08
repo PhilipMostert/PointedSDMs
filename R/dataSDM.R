@@ -1914,7 +1914,7 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   if (missing(projection)) stop('projection needs to be given.')
   if (missing(Inlamesh)) stop('Mesh needs to be given.')
   
-  if (!inherits(Inlamesh, 'inla.mesh')) stop('Mesh needs to be an inla.mesh object.')
+  if (!inherits(Inlamesh, 'inla.mesh') && !inherits(Inlamesh, 'inla.mesh.1d')) stop('Mesh needs to be an inla.mesh object.')
   
   if (inherits(projection, 'CRS')) projection <- as(projection, 'character')
   else if (!inherits(projection, 'character')) stop('Projection needs to be a character object.')
