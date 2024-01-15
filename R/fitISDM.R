@@ -163,7 +163,8 @@ fitISDM <- function(data, options = list()) {
   inlaModel[['optionsJoint']] <- optionsJoint
   inlaModel[['source']] <- as.vector(unlist(data$.__enclos_env__$private$dataSource))
   inlaModel[['spatCovs']] <- list(name = data$.__enclos_env__$private$spatcovsNames,
-                                  class = data$.__enclos_env__$private$ptcovsClass)
+                                  class = data$.__enclos_env__$private$ptcovsClass,
+                                  env = data$.__enclos_env__$private$spatcovsEnv)
   inlaModel[['species']] <- list(speciesIn = data$.__enclos_env__$private$speciesIn,
                                  speciesVar = data$.__enclos_env__$private$speciesName,
                                  speciesEffects = list(Intercepts = data$.__enclos_env__$private$speciesIntercepts,

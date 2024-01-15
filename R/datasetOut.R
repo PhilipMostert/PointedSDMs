@@ -199,7 +199,9 @@ datasetOut <- function(model, dataset,
     model_reduced[['optionsJoint']] <- reduced_options
     model_reduced[['spatCovs']] <- model[['spatCovs']]
     model_reduced[['species']] <- list(speciesIn = model[['species']][['speciesIn']][!names(model[['species']][['speciesIn']]) %in% dataset],
-                                       speciesVar = model[['species']][['speciesVar']])
+                                       speciesVar = model[['species']][['speciesVar']],
+                                       speciesEffects = list(Intercepts = model[['species']][['speciesEffects']][['Intercepts']],
+                                                             Environmental = model[['species']][['speciesEffects']][['Environmental']]))
     
     model_reduced[['dataType']] <- model[['dataType']][index]
     model_reduced[['source']] <- model[['source']][index]
