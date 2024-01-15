@@ -127,6 +127,22 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     else data <- inlabru::fm_int(mesh, format = format)
   }
   
+  if (!any(names(data) %in% object$spatCovs$name)) {
+    
+    for (spatCov in object$spatCovs$name) {
+      
+      if (!is.null(object$species$speciesIn) && object$species$speciesEffects$Environmental) covIndex <- paste0(object$species$speciesIn, '_', spatCov)
+      else covIndex <- spatCov
+      
+      data[[spatCov]] <- inlabru::eval_spatial(where =  data, 
+                                               data = get('spatialcovariates', 
+                                               envir = object$spatCov$env),
+                                               layer = spatCov)
+        
+      
+    }
+
+  }
   
   if (is.null(formula)) {
     
