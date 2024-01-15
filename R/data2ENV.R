@@ -8,6 +8,10 @@
 
 data2ENV <- function(data, env) {
   
+  spatCovs <- FALSE
+  
+  if (spatCovs) {
+  
   if (!is.null(data$.__enclos_env__$private$spatcovsNames)) {
     
     spatCovs <- get(data$.__enclos_env__$private$spatcovsObj, 
@@ -65,7 +69,7 @@ data2ENV <- function(data, env) {
       }
     }
   }
-  
+  }
   if (!is.null(data$.__enclos_env__$private$speciesIn)) {
     
     if (!is.null(data$.__enclos_env__$private$speciesSpatial)) {
