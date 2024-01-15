@@ -747,6 +747,52 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
     }
     
+    if (!is.null(private$spatcovsNames)) {
+      
+      for (data in names(pointData$Data)) {
+        
+        for (species in 1:length(pointData$Data[[data]])) {
+        
+          for (cov in private$spatcovsNames) {
+          
+          if (!is.null(private$speciesName) && private$speciesEnvironment) covIndex <- paste0(pointData$SpeciesInData[[data]][species],'_', cov)
+          else covIndex <- cov
+          
+          pointData$Data[[data]][[species]][[covIndex]] <- inlabru::eval_spatial(where = pointData$Data[[data]][[species]], 
+                                                                                 data = get('spatialcovariates', 
+                                                                                 envir = private$spatcovsEnv),
+                                                                 layer = cov)
+        
+        }
+        
+        }
+      }
+
+      if (!is.null(private$IPS)) {
+        
+        for (covIPS in private$spatcovsNames) {
+          
+          if (!is.null(private$speciesName) && private$speciesEnvironment) covIPSindex <- paste0(unique(unlist(private$speciesIn)), '_', covIPS)
+          else covIPSindex <- covIPS
+          
+          for (covADD in covIPSindex) {
+          
+          private$IPS[[covADD]] <- inlabru::eval_spatial(where =  private$IPS, 
+                                                            data = get('spatialcovariates', 
+                                                                       envir = private$spatcovsEnv),
+                                                            layer = covIPS)
+          
+          }
+          
+          
+        }
+        
+        
+      }
+      
+    }
+    
+    
     if (!is.null(c(private$Offset, private$pointCovariates))) {
       
       datMatrix <- as.data.frame(matrix(NA, nrow = nrow(private$IPS), ncol = length(c(private$Offset, private$pointCovariates))))
