@@ -82,7 +82,7 @@ Finally we require a *Delaunay triangulated mesh* for the construction of the sp
 
 ```{r mesh, fig.width=8, fig.height=5}
 
-plot(mesh)
+ggplot() + gg(mesh)
 
 ```
 
@@ -133,10 +133,8 @@ Spatial fields are fundamental in our spatial species distribution models, and s
 
 ```{r set up model with fields, warning = FALSE, message = FALSE}
 
-
 fields <- intModel(datasets, Coordinates = c('X', 'Y'),
                    Projection = projection, Mesh = mesh, responsePA = 'Present', 
-                   Offset = 'area',
                    pointsIntercept = FALSE)
 
 ```
@@ -145,8 +143,8 @@ To specify the spatial field in the model, we use the slot function `$specifySpa
 
 ```{r specifySpatial}
 
-fields$specifySpatial(sharedSpatial = TRUE, prior.range = c(1,0.01), 
-                      prior.sigma = c(0.75, 0.05))
+fields$specifySpatial(sharedSpatial = TRUE, prior.range = c(50,0.01), 
+                      prior.sigma = c(0.1, 0.01))
 
 ```
 
@@ -175,7 +173,10 @@ If we would like to share the spatial fields across the linear predictors using 
 
 copy <- intModel(datasets, Coordinates = c('X', 'Y'),
                  Projection = projection, Mesh = mesh, responsePA = 'Present', 
-                 Offset = 'area', pointsSpatial = 'copy')
+                 pointsSpatial = 'copy')
+
+copy$specifySpatial(sharedSpatial = TRUE, prior.range = c(20,0.01), 
+                      prior.sigma = c(0.1, 0.01))
 
 copy$changeComponents()
 
