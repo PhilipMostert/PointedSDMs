@@ -1978,7 +1978,13 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   if (!missing(trialspa)) private$trialsPA <- trialspa
   if (!missing(trialsmarks)) private$trialsMarks <- trialsmarks
   
-  if (!missing(speciesname)) private$speciesName <- speciesname
+  if (!missing(speciesname) && !is.null(speciesname)) {
+    
+    private$speciesName <- speciesname
+    private$speciesSpatial <- speciesspatial
+    
+    
+  }
   
   if (!missing(temporal)) private$temporalName <- temporal
   private$temporalModel <- temporalmodel
@@ -2013,7 +2019,7 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   private$marksIntercepts <- marksintercepts
   private$speciesIntercepts <- speciesintercept
   
-  private$speciesSpatial <- speciesspatial
+  #private$speciesSpatial <- speciesspatial
   private$speciesIndependent <- speciesindependent
   private$speciesEnvironment <- speciesenvironment
   #if (!private$Spatial && private$markSpatial) warning('Spatial has been set to FALSE but marksSpatial is TRUE. Spatial effects for the marks will still be run.')
