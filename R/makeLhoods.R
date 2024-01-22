@@ -82,8 +82,8 @@ makeLhoods <- function(data, formula, family, mesh, ips,
         
         if (family[[dataset]][process] == 'cp' && any(pointcovs %in% names(data[[dataset]][[species]]))) {
           
-          pointcovsIn <- pointcovs[pointcovs %in%  names(data[[dataset]][[species]])]
-          formula[[dataset]][[species]][[process]][['LHS']] <- reformulate(deparse(formula[[dataset]][[species]][[process]][['LHS']][[3]]), paste0('coordinates + ', pointcovsIn))
+          #pointcovsIn <- pointcovs[pointcovs %in%  names(data[[dataset]][[species]])]
+          #formula[[dataset]][[species]][[process]][['LHS']] <- reformulate(deparse(formula[[dataset]][[species]][[process]][['LHS']][[3]]), paste0('geometry + ', pointcovsIn))
         
         }
         }
