@@ -73,6 +73,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
       
       if (inherits(datapoints[[dat]], 'sf')) {
         
+        st_geometry(datapoints[[dat]]) <- 'geometry'
         coordsSF <- sf::st_coordinates(datapoints[[dat]])
         colnames(coordsSF) <- coords
         datapoints[[dat]][, coords] <- coordsSF
