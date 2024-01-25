@@ -2007,7 +2007,7 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   if (!is.null(ips)) private$IPS <- ips
   else {
     
-    if (is.null(boundary)) private$IPS <- st_transform(inlabru::fm_int(samplers = boundary, domain = Inlamesh), projection)
+    if (!is.null(boundary)) private$IPS <- st_transform(inlabru::fm_int(samplers = boundary, domain = Inlamesh), projection)
     else private$IPS <- st_transform(inlabru::fm_int(domain = Inlamesh), projection)
     
     
