@@ -815,8 +815,15 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     #                     markstrialsvar = trialsMarks,
     #                     speciesname = speciesName)
     
-    if (!is.null(private$speciesName)) newFamily <- mapply(function(family, number) rep(family , times = number), family = private$Family,
+    if (!is.null(private$speciesName)) {
+      
+      newFamily <- mapply(function(family, number) rep(family , times = number), family = private$Family,
                                                            number = lapply(private$speciesIn, length))
+      
+      private$speciesTable <- unique(do.call(rbind, lapply(unlist(pointData$Data, recursive = F), function(x) unique(data.frame(index = data.frame(x)[,private$speciesName], species = data.frame(x)[,paste0(private$speciesName, 'INDEX_VAR')])))))
+      private$speciesTable <- private$speciesTable[order(private$speciesTable$index),]
+      
+    }
     
     else newFamily <- pointData$Family
     
@@ -1912,6 +1919,7 @@ dataSDM$set('private', 'multinomVars', NULL)
 dataSDM$set('private', 'printSummary', NULL)
 dataSDM$set('private', 'multinomIndex', list())
 dataSDM$set('private', 'optionsINLA', list())
+dataSDM$set('private', 'speciesTable', NULL)
 
 dataSDM$set('private', 'spatialBlockCall', NULL)
 dataSDM$set('private', 'Samplers', list())

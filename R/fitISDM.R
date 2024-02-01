@@ -159,6 +159,8 @@ fitISDM <- function(data, options = list()) {
     
   }
   
+  if (data$.__enclos_env__$private$speciesIntercepts) row.names(inlaModel$summary.random[[paste0(data$.__enclos_env__$private$speciesName, '_intercepts')]]) <- data$.__enclos_env__$private$speciesTable[['species']]
+  
   inlaModel[['componentsJoint']] <- componentsJoint
   inlaModel[['optionsJoint']] <- optionsJoint
   inlaModel[['source']] <- as.vector(unlist(data$.__enclos_env__$private$dataSource))
