@@ -81,7 +81,7 @@ test_that('dataSDMs initialize works as expected.', {
                        marksspatial = markSpatial,
                        marksintercept = marksIntercept,
                        spatialcovariates = cov,
-                       speciesintercept = TRUE,
+                       speciesintercept = FALSE,
                        speciesenvironment = TRUE,
                        speciesname = speciesName,
                        ips = iPoints, copymodel = copyModel,
