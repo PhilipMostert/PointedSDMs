@@ -57,13 +57,13 @@ test_that('dataSet transforms the data to SpatialPointsDataFrames, and produces 
   #should keep marks +
   #should create new variables for the multinomial marks.
   expect_setequal(names(mod$Data$PO[[1]]), c("poresp", "numvar", "factvar", 'temp', 'geometry',
-                                                  "species", "factvar_phi", "factvar_response"))
+                                                  "species", "factvar_phi", "factvar_response", 'speciesINDEX_VAR'))
   expect_true((all(mod$Data$PO[[1]]$factvar_phi == 1)))
   expect_true((all(mod$Data$PO[[1]]$factvar_response == 1)))
   expect_true(class(mod$Data$PO[[1]]$factvar) == 'character')
   
   expect_setequal(names(mod$Data$PA[[1]]), c("PAresp", "trial", "binommark", 'temp', 'geometry',
-                                                  "marktrial", "species", "pointcov"))
+                                                  "marktrial", "species", "pointcov", 'speciesINDEX_VAR'))
   
   #Family for PO should be:
   # cp for the points;
