@@ -159,7 +159,12 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
       
       }
       
-      if (!is.null(speciesname)) data[, paste0(speciesname, 'INDEX_VAR')] <- data[, speciesname]
+      if (!is.null(speciesname)) {
+        
+        speciesIndexVAR <- paste0(speciesname, 'INDEX_VAR')
+        data[, speciesIndexVAR] <- data[, speciesname]
+        
+      } else speciesIndexVAR <- NULL
       
       if (paresp %in% data_vars) {
       if (!is.null(trialname)) {  
@@ -174,7 +179,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         #                                                               phiVars, responseVars,varsin)]),
         #                                    proj4string = proj)
         datSP <- sf::st_as_sf(x = data.frame(data[, c(paresp, subtrialname, temporalvar,
-                              marksin, MTrialssub, speciesname, coords, paste0(speciesname, 'INDEX_VAR'),
+                              marksin, MTrialssub, speciesname, coords, speciesIndexVAR,
                               phiVars, responseVars,varsin)]),
                               coords = coords,
                               crs = proj)
@@ -206,7 +211,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
           #                                    proj4string = proj)
           
           datSP <- sf::st_as_sf(x = data.frame(data[, c(countsresp, marksin, temporalvar,
-                                speciesname, MTrialssub, coords, paste0(speciesname, 'INDEX_VAR'),
+                                speciesname, MTrialssub, coords, speciesIndexVAR,
                                 phiVars, responseVars, varsin)]),
                                 coords = coords,
                                 crs = proj)
@@ -235,7 +240,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         #                                    proj4string = proj)
         
         datSP <- sf::st_as_sf(x = data.frame(data[, c(poresp, marksin, temporalvar,
-                              speciesname, MTrialssub, coords, paste0(speciesname, 'INDEX_VAR'),
+                              speciesname, MTrialssub, coords, speciesIndexVAR,
                               phiVars, responseVars, varsin)]),
                               coords = coords,
                               crs = proj)
