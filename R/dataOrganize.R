@@ -325,10 +325,16 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             #  else spat <- NULL
               
             #}
-            if (speciesintercept) int <- paste0(speciesIn,'_intercept') 
-            else
-              if (intercept) int <- paste0(names(self$Data)[[dataset]],'_intercept') 
-            else int <- NULL
+            if (!is.null(speciesintercept)) {
+              
+              if (speciesintercept) int <- paste0(speciesname, '_intercepts')
+              else int <- paste0(speciesIn,'_intercept') 
+              
+            } else if (intercept) {
+              
+              int <- paste0(names(self$Data)[[dataset]],'_intercept') 
+              
+            } else int <- NULL  
             
              }
             else {
@@ -696,8 +702,19 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
     if (!is.null(species)) {
       
-      if (speciesintercept) int <- paste0(species, '_intercept(1)')
-      else int <- paste0(datanames, '_intercept(1)')
+      if (is.null(speciesintercept)) {
+        
+        int <- paste0(datanames, '_intercept(1)')
+        
+      } else if (speciesintercept) {
+          
+        int <- paste0(speciesname, '_intercepts(main = ', speciesname, ', model = "iid")')
+        
+      } else {
+        
+        int <- paste0(species, '_intercept(1)')
+        
+        }
       
     }
     else int <- paste0(datanames, '_intercept(1)')

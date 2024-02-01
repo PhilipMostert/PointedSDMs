@@ -69,7 +69,7 @@ makeLhoods <- function(data, formula, family, mesh, ips,
           if (length(speciesindex) != 0) {
             
             speciesRep <- data.frame(rep(unique(data.frame(data[[dataset]][[species]])[,speciesname]), nrow(ips)))
-            
+            names(speciesRep) <- speciesname
             IPS <- ips
             IPS <- cbind(ips, speciesRep)
             
@@ -93,6 +93,7 @@ makeLhoods <- function(data, formula, family, mesh, ips,
                                                  Ntrials = Ntrials,
                                                  mesh = mesh,
                                                  ips = IPS,
+                                                 domain = list(geometry = mesh),
                                                  samplers = samplers[[names(data)[[dataset]]]],
                                                  family = family[[dataset]][process])
         

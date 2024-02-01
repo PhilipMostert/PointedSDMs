@@ -18,7 +18,7 @@
 #' @param Offset Name of the offset variable (class \code{character}) in the datasets. Defaults to \code{NULL}; if the argument is non-\code{NULL}, the variable name needs to be standardized across datasets (but does not need to be included in all datasets). The offset variable will be transformed onto the log-scale in the integrated model.
 #' @param pointsIntercept Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.
 #' @param marksIntercept Logical argument: should the marks be modeled with intercepts. Defaults to \code{TRUE}.
-#' @param speciesEffects List specifying if intercept terms and environmentsl effects should be made for the species. Defaults to \code{list(Intercept = TRUE, Environmental = TRUE)}. Note that if \code{Intercept = FALSE} and \code{pointsIntercept = TRUE}, dataset specific intercept terms will be created.
+#' @param speciesEffects List specifying if intercept terms and environments effects should be made for the species. Defaults to \code{list(randomIntercept = FALSE, Environmental = TRUE)}. \code{randomIntercept} may take on three values: \code{TRUE} which creates a random intercept for each species, \code{FALSE} which creates fixed intercepts for each species, of \code{NULL} which removes all species level intercepts. Note that if \code{randomIntercept = NULL} and \code{pointsIntercept = TRUE}, dataset specific intercept terms will be created.
 #' @param pointsSpatial Argument to determine whether the spatial field is shared between the datasets, or if each dataset has its own unique spatial field. The datasets may share a spatial field with \pkg{INLA}'s "copy" feature if the argument is set to \code{copy}. May take on the values: \code{"shared"}, \code{"individual"}, \code{"copy"} or \code{NULL} if no spatial field is required for the model. Defaults to \code{"shared"}.
 #' @param marksSpatial Logical argument: should the marks have their own spatial field. Defaults to \code{TRUE}.
 #' @param responseCounts Name of the response variable in the counts/abundance datasets. This variable name needs to be standardized across all counts datasets used in the integrated model. Defaults to \code{'counts'}.
@@ -81,7 +81,7 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
                      markNames = NULL, markFamily = NULL,
                      pointCovariates = NULL, 
                      pointsIntercept = TRUE, marksIntercept = TRUE, 
-                     speciesEffects = list(Intercept = TRUE, Environmental = TRUE),
+                     speciesEffects = list(randomIntercept = FALSE, Environmental = TRUE),
                      Offset = NULL, pointsSpatial = 'shared', marksSpatial = TRUE,
                      responseCounts = 'counts', responsePA = 'present', trialsPA = NULL,
                      trialsMarks = NULL, speciesName = NULL, temporalName = NULL,
@@ -196,9 +196,9 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
   if (is.null(pointsSpatial) || pointsSpatial == 'shared') copyModel <- NULL
   else copyModel <- deparse1(copyModel)
   
-  if (!all(names(speciesEffects) %in% c('Intercept', 'Environmental'))) stop ('speciesEffects needs to be a named list with two items: Intercept and Environmental.')
+  if (!all(names(speciesEffects) %in% c('randomIntercept', 'Environmental'))) stop ('speciesEffects needs to be a named list with two items: randomIntercept and Environmental.')
   
-  speciesIntercept <- speciesEffects$Intercept
+  speciesIntercept <- speciesEffects$randomIntercept
   speciesEnvironment <- speciesEffects$Environmental
   
   #if (!is.null(speciesName) && speciesIntercept) pointsIntercept <- FALSE

@@ -239,8 +239,18 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
         
         if (intercepts) {
           
-          if (object[['species']][['speciesEffects']][['Intercepts']]) species_int <- paste0(spec,'_intercept')
-          else species_int <- NULL
+          if (!object[['species']][['speciesEffects']][['Intercepts']]) {
+            
+            species_int <- paste0(spec,'_intercept')
+            
+          } else if (object[['species']][['speciesEffects']][['Intercepts']]) {
+              
+            species_int <- paste0(object[['species']][['speciesVar']], '_intercepts')
+            data <- fm_cprod(data, data.frame(speciesIndexREMOVE = 1:length(unique(unlist(object$species$speciesIn)))))
+            names(data)[names(data) == 'speciesIndexREMOVE'] <- object[['species']][['speciesVar']]
+            
+            
+            } else species_int <- NULL
         
         }
         else species_int <- NULL
