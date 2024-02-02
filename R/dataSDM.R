@@ -2074,9 +2074,8 @@ dataSDM$set('private', 'spatialCovariates', function(spatialCovariates) {
   } 
   else spatcovsEnv <- parent.frame()
   
-  if (!class(spatialCovariates) %in% c('RasterLayer', 'RasterBrick',
-                                       'RasterStack', 'SpatRaster',
-                                       'SpatialPixelsDataFrame')) stop('The spatial Covariates need to be a Raster* object or a SpatialPixelsDataFrame.')
+  if (!class(spatialCovariates) %in% c('SpatRaster',
+                                       'SpatialPixelsDataFrame')) stop('The spatial Covariates need to be a spatRaster object or a SpatialPixelsDataFrame.')
   
   spatcovsIncl <- names(spatialCovariates)
   
