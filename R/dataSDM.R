@@ -1861,9 +1861,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (!datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
     
-    if (!inherits(Samplers, 'Spatial')) stop ('Samplers needs to be a Spatial* object.')
+    if (!inherits(Samplers, 'sf')) stop ('Samplers needs to be a sf object.')
     
-    Samplers@proj4string <- private$Projection
+    Samplers <- st_transform(Samplers, private$Projection)
     
     private$Samplers[[datasetName]] <- Samplers
     
