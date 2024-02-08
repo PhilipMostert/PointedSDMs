@@ -76,7 +76,12 @@ makeLhoods <- function(data, formula, family, mesh, ips,
           }
           
         }
-        else IPS <- ips
+        else 
+          if (!is.null(samplers[[names(data)[[dataset]]]])) {
+            
+            IPS <- NULL
+            
+          } else IPS <- ips
         
         if (!is.null(pointcovs)) {
         
