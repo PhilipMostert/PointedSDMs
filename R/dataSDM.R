@@ -2061,7 +2061,14 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
     
     private$speciesName <- speciesname
     private$speciesSpatial <- speciesspatial
+    private$speciesIndependent <- speciesindependent
+    private$speciesEnvironment <- speciesenvironment
     
+    
+  } else {
+    
+    private$speciesEnvironment <- FALSE
+    private$speciesIndependent <- FALSE
     
   }
   
@@ -2101,9 +2108,6 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   private$covariateFormula <- formulas$covariateFormula
   private$biasFormula <- formulas$biasFormula
   
-  #private$speciesSpatial <- speciesspatial
-  private$speciesIndependent <- speciesindependent
-  private$speciesEnvironment <- speciesenvironment
   #if (!private$Spatial && private$markSpatial) warning('Spatial has been set to FALSE but marksSpatial is TRUE. Spatial effects for the marks will still be run.')
   
   private$Coordinates <- coordinates
