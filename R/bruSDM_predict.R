@@ -136,8 +136,18 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       
       data[, covIndex] <- inlabru::eval_spatial(where =  data, 
                                                 data = get('spatialcovariates', 
-                                                envir = object$spatCov$env),
+                                                envir = object$spatCov$env)[spatCov],
                                                 layer = spatCov)
+      
+      if (any(is.na( data[, covIndex]))) {
+        
+        data[[covIndex]] <- inlabru::bru_fill_missing(where =  data, 
+                                                      data = get('spatialcovariates', 
+                                                             envir = object$spatCov$env)[spatCov],
+                                                      layer = spatCov,
+                                                      values = data[[covIndex]])
+        
+      }
         
       
     }
