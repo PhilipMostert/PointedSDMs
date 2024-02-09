@@ -111,7 +111,11 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
   }
   
+  if (is.null(object$spatCovs$covariateFormula)) {
+    
   if (!all(covariates%in%row.names(object$summary.fixed)) && !all(as.vector(outer(paste0(unlist(object[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))%in%row.names(object$summary.fixed))) stop("Covariates provided not in model.")
+
+  }
   
   if (is.null(formula) && !intercepts && !spatial && is.null(covariates) && !temporal && !biasfield && !predictor) stop("Please provide either a formula or components of a formula to be predicted.")
   
@@ -141,11 +145,15 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       
       if (any(is.na( data[, covIndex]))) {
         
-        data[[covIndex]] <- inlabru::bru_fill_missing(where =  data, 
+        for (indFix in covIndex) {
+        
+        data[[indFix]] <- inlabru::bru_fill_missing(where =  data, 
                                                       data = get('spatialcovariates', 
                                                              envir = object$spatCov$env)[spatCov],
                                                       layer = spatCov,
-                                                      values = data[[covIndex]])
+                                                      values = data[[indFix]])
+        
+        }
         
       }
         
@@ -313,6 +321,8 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (predictor) formula_components <- c(row.names(object$summary.fixed), names(object$summary.random)[!names(object$summary.random) %in% paste0(object[['source']], '_biasField')])
     else formula_components <- c(covariates, intercept_terms, spatial_obj, marks_spatial, marks_intercepts)
+    
+    if (!is.null(object$spatCovs$biasFormula)) formula_components <- formula_components[!formula_components %in% c('Bias__Effects__Comps', paste0(unique(object$species$speciesIn),'_Bias__Effects__Comp'))]
     
     if (all(is.null(formula_components))) stop('Please specify at least one of: covariates, spatial, intercepts or biasfield.')
     
