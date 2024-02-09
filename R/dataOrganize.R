@@ -387,14 +387,19 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             
             if (!is.null(biasformula)) {
               
-              if (!pointsResponse[[response]][j] %in% c(paresp, countresp, marks)) biascov <- 'Bias__Effects__Comps'
+              if (!pointsResponse[[response]][j] %in% c(paresp, countresp, marks)) {
+                
+                if (speciesenvironment) biascov <- paste0(speciesIn, '_Bias__Effects__Comps')
+                else biascov <- 'Bias__Effects__Comps'
+              
+                } 
               else biascov <- NULL
               
             } else biascov <- NULL
             
             if (!is.null(covariateformula)) {
               
-              if (!is.null(speciesname)) covs <- paste0(speciesIn, '_Fixed__Effects__Comps')
+              if (speciesenvironment) covs <- paste0(speciesIn, '_Fixed__Effects__Comps')
               else covs <- 'Fixed__Effects__Comps'
               
             }
@@ -719,7 +724,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   if (!is.null(covariatenames)) {
     
     ##IF bias covariates
-    if (!is.null(biasformula)) bias <- makeFormulaComps(form = biasformula, species = FALSE, speciesnames = FALSE, type = 'Bias')
+    if (!is.null(biasformula)) bias <- makeFormulaComps(form = biasformula, species = speciesenvironment, speciesnames = species, type = 'Bias')
     else bias <- NULL
       
     
@@ -727,7 +732,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
     if (!is.null(covariateformula)) {
       
-      covs <-  makeFormulaComps(form = covariateformula, species = !is.null(species), speciesnames = species, type = 'Covariate')
+      covs <-  makeFormulaComps(form = covariateformula, species = speciesenvironment, speciesnames = species, type = 'Covariate')
       
     }
     
