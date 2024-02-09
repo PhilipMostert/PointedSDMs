@@ -80,7 +80,9 @@ Internal functions used to temporarily store data and other information before a
   speciesindependent,
   markintercept,
   pointcovs,
-  speciesspatial
+  speciesspatial,
+  biasformula,
+  covariateformula
 )}\if{html}{\out{</div>}}
 }
 
@@ -110,7 +112,9 @@ Internal functions used to temporarily store data and other information before a
   temporalmodel,
   offsetname,
   copymodel,
-  speciesindependent
+  speciesindependent,
+  biasformula,
+  covariateformula
 )}\if{html}{\out{</div>}}
 }
 

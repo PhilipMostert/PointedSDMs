@@ -30,7 +30,8 @@ intModel(
   speciesName = NULL,
   temporalName = NULL,
   temporalModel = list(model = "ar1"),
-  copyModel = list(beta = list(fixed = FALSE))
+  copyModel = list(beta = list(fixed = FALSE)),
+  Formulas = list(covariateFormula = NULL, biasFormula = NULL)
 )
 }
 \arguments{
@@ -85,6 +86,8 @@ intModel(
 \item{temporalModel}{List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details.}
 
 \item{copyModel}{List of model specifications given to the hyper parameters for the  \code{"copy"} model. Defaults to \code{list(beta = list(fixed = FALSE))}.}
+
+\item{Formulas}{A named list with two objects. The first one, \code{covariateFormula}, is a formula for the covariates and their transformations for the distribution part of the model. Defaults to \code{NULL} which includes all covariates specified in \code{spatialCovariates} into the model. The second, \code{biasFormula}, specifies which covariates are used for the PO datasets. Defaults to \code{NULL} which includes no covariates for the PO datasets.}
 }
 \value{
 A \code{\link{dataSDM}} object (class \code{R6}). Use \code{?dataSDM} to get a comprehensive description of the slot functions associated with this object.

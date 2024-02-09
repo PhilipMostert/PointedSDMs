@@ -346,7 +346,7 @@ A ggplot object.
 \if{html}{\out{<a id="method-dataSDM-addData"></a>}}
 \if{latex}{\out{\hypertarget{method-dataSDM-addData}{}}}
 \subsection{Method \code{addData()}}{
-Function used to add additional datasets to the \code{dataSDM} object. This function should be used if the user would like to add any additional datasets to the integrated model, but do not have the same standardized variable names as those added initially with \code{\link{intModel}}. Use \code{?intModel} for a more comprehensive description on what each argument in this function is used for.
+Function used to add additional datasets to the \code{dataSDM} object. This function should be used if the user would like to add any additional datasets to the integrated model, but do not have the same standardized variable names as those added initially with \code{\link{intModel}}. Use \code{?intModel} for a more  <- rehensive description on what each argument in this function is used for.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataSDM$addData(
   ...,
@@ -513,7 +513,7 @@ Function used to update the formula for a selected observation model. The functi
 
 \item{\code{markName}}{Name of the mark (class \code{character}) to change the formula for. Defaults to \code{NULL}. If \code{NULL} and \code{markNames} is non-\code{NULL} in \code{\link{intModel}}, will update the formula for all marks within the dataset. Cannot be non-\code{NULL} if \code{markNames} is \code{NULL} in \code{\link{intModel}}.}
 
-\item{\code{Formula}}{An updated formula to give to the process. The syntax provided for the formula in this argument should be identical to the formula specification as in base \strong{R}. Should be used to thin terms out of a formula but could be used to add terms as well. If adding new terms not specified in \code{intModel}, remember to add the associated component using \code{.$addComponents} as well.}
+\item{\code{Formula}}{An updated formula to give to the process. The syntax provided for the formula in this argument should be identical to the formula specification as in base \strong{R}. Should be used to thin terms out of a formula but could be used to add terms as well. If adding new terms not specified in \code{intModel}, remember to add the associated component using \code{.$changeComponents} as well.}
 
 \item{\code{allProcesses}}{Logical argument: if \code{TRUE} changes the formulas for all of the processes in a dataset. Defaults to \code{FALSE}.}
 
@@ -896,7 +896,8 @@ Function to add an integration domain for the PO datasets.
   temporalmodel,
   speciesspatial,
   offset,
-  copymodel
+  copymodel,
+  formulas
 )}\if{html}{\out{</div>}}
 }
 
