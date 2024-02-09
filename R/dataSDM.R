@@ -200,7 +200,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
   }
   ,
-  #' @description Function used to add additional datasets to the \code{dataSDM} object. This function should be used if the user would like to add any additional datasets to the integrated model, but do not have the same standardized variable names as those added initially with \code{\link{intModel}}. Use \code{?intModel} for a more comprehensive description on what each argument in this function is used for.
+  #' @description Function used to add additional datasets to the \code{dataSDM} object. This function should be used if the user would like to add any additional datasets to the integrated model, but do not have the same standardized variable names as those added initially with \code{\link{intModel}}. Use \code{?intModel} for a more  <- rehensive description on what each argument in this function is used for.
   #' @param ... The datasets to be added to the integrated model: should be either \code{sf}, \code{data.frame} or \code{SpatialPoints*} objects, or a list of objects from these classes.
   #' @param responseCounts The name of the response variable for the counts data.
   #' @param responsePA The name of the response variable for the presence absence data.
@@ -655,7 +655,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     pointData$makeFormulas(spatcovs = private$spatcovsNames, speciesname = speciesName, temporalname = private$temporalName,
                            paresp = responsePA, countresp = responseCounts, marksspatial = private$marksSpatial, speciesintercept = private$speciesIntercepts, 
                            marks = markNames, spatial = private$Spatial, speciesindependent = private$speciesIndependent, speciesenvironment = private$speciesEnvironment,
-                           intercept = private$Intercepts, markintercept = private$marksIntercepts, speciesspatial = private$speciesSpatial)
+                           intercept = private$Intercepts, markintercept = private$marksIntercepts, speciesspatial = private$speciesSpatial, biasformula = private$biasFormula,
+                           covariateformula = private$covariateFormula)
     
     if (!is.null(private$temporalName)) {
       
@@ -711,7 +712,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                                                      speciesenvironment = private$speciesEnvironment,
                                                      offsetname = private$Offset,
                                                      copymodel = private$copyModel,
-                                                     speciesindependent = private$speciesIndependent)
+                                                     speciesindependent = private$speciesIndependent,
+                                                     biasformula = private$biasFormula,
+                                                     covariateformula = private$covariateFormula)
       
     }
     else {
@@ -739,7 +742,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
                                                 speciesenvironment = private$speciesEnvironment,
                                                 offsetname = private$Offset,
                                                 copymodel = private$copyModel,
-                                                speciesindependent = private$speciesIndependent)
+                                                speciesindependent = private$speciesIndependent,
+                                                biasformula = private$biasFormula,
+                                                covariateformula = private$covariateFormula)
       
       
       private$Components <- union(private$Components, newComponents)
@@ -760,8 +765,19 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
           
           pointData$Data[[data]][[species]][[covIndex]] <- inlabru::eval_spatial(where = pointData$Data[[data]][[species]], 
                                                                                  data = get('spatialcovariates', 
-                                                                                 envir = private$spatcovsEnv),
+                                                                                 envir = private$spatcovsEnv)[cov],
                                                                  layer = cov)
+          
+          if (any(is.na(pointData$Data[[data]][[species]][[covIndex]]))) {
+            
+            pointData$Data[[data]][[species]][[covIndex]] <- inlabru::bru_fill_missing(where = pointData$Data[[data]][[species]], 
+                                                                                       data = get('spatialcovariates', 
+                                                                                                  envir = private$spatcovsEnv)[cov],
+                                                                                       layer = cov,
+                                                                                       values = pointData$Data[[data]][[species]][[covIndex]])
+            
+          }
+          
         
         }
         
@@ -779,8 +795,19 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
           
           private$IPS[[covADD]] <- inlabru::eval_spatial(where =  private$IPS, 
                                                             data = get('spatialcovariates', 
-                                                                       envir = private$spatcovsEnv),
-                                                            layer = covIPS)
+                                                                       envir = private$spatcovsEnv)[covADD],
+                                                            layer = covIPS
+                                                         )
+          
+          if (any(is.na(private$IPS[[covADD]]))) {
+            
+            private$IPS[[covADD]] <- inlabru::bru_fill_missing(where = private$IPS, 
+                                                               data = get('spatialcovariates', 
+                                                               envir = private$spatcovsEnv)[covADD],
+                                                               layer = covIPS,
+                                                               values = private$IPS[[covADD]])
+            
+          }
           
           }
           
@@ -1003,7 +1030,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
   #' @param Points Logical: should the formula be changed for the points (or otherwise, a marked process). Defaults to \code{TRUE}. If \code{FALSE}, then \code{markNames} needs to be non-\code{NULL} in \code{\link{intModel}}.
   #' @param speciesName Name of the species (class \code{character}) to change the formula for. Defaults to \code{NULL}. If \code{NULL} and \code{speciesName} is non-\code{NULL} in \code{\link{intModel}}, will update the formula for all species within the dataset. Cannot be non-\code{NULL} if \code{speciesName} is \code{NULL} in \code{\link{intModel}}.
   #' @param markName Name of the mark (class \code{character}) to change the formula for. Defaults to \code{NULL}. If \code{NULL} and \code{markNames} is non-\code{NULL} in \code{\link{intModel}}, will update the formula for all marks within the dataset. Cannot be non-\code{NULL} if \code{markNames} is \code{NULL} in \code{\link{intModel}}.
-  #' @param Formula An updated formula to give to the process. The syntax provided for the formula in this argument should be identical to the formula specification as in base \strong{R}. Should be used to thin terms out of a formula but could be used to add terms as well. If adding new terms not specified in \code{intModel}, remember to add the associated component using \code{.$addComponents} as well.
+  #' @param Formula An updated formula to give to the process. The syntax provided for the formula in this argument should be identical to the formula specification as in base \strong{R}. Should be used to thin terms out of a formula but could be used to add terms as well. If adding new terms not specified in \code{intModel}, remember to add the associated component using \code{.$changeComponents} as well.
   #' @param allProcesses Logical argument: if \code{TRUE} changes the formulas for all of the processes in a dataset. Defaults to \code{FALSE}.
   #' @param newFormula Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.
   #' 
@@ -1189,6 +1216,41 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
             
             ##This will be removed once we move the like construction to runModel.
             private$Formulas[[datasetName]][[dataset]][[process]]$RHS <- updated_formula
+            
+            termsIn <- labels(terms(formula_update))
+            
+            if (any(termsIn %in% names(private$modelData[[dataset]][[process]]))) {
+              
+              termsIn <- termsIn[termsIn %in% names(private$modelData[[dataset]][[process]])]
+              
+              if (identical(termsIn, character(0))) warning('Term added to formula but not present in data. If you are trying to add a non-linear transformation please use covariateFormula from the Formulas argument in intModel.')
+              else {
+              for (term in termsIn) {
+                
+                
+                if (private$modelData[[dataset]][[process]][[term]] %% 0) message('The data for the term added is integer. Please add the correct component for the term using $changeComponents()')
+                  else
+                    if (is.numeric(private$modelData[[dataset]][[process]][[term]])) {
+                      
+                      comp <- paste0(term,'(model = ', term, ', main = "linear")')
+                      self$changeComponents(comp, print = FALSE)
+                      
+                    } else {
+                      
+                      if (private$pointsIntercept) comp <- paste0(term,'(model = ', term, ', main = "factor_contrast")')
+                      else comp <-  paste0(term,'(model = ', term, ', main = "factor_full")')
+                      self$changeComponents(comp, print = FALSE)
+                      
+                      
+                    }
+                
+              }
+                
+              }
+              
+              
+              
+            }
             
           }
           
@@ -1920,6 +1982,8 @@ dataSDM$set('private', 'printSummary', NULL)
 dataSDM$set('private', 'multinomIndex', list())
 dataSDM$set('private', 'optionsINLA', list())
 dataSDM$set('private', 'speciesTable', NULL)
+dataSDM$set('private', 'covariateFormula', NULL)
+dataSDM$set('private', 'biasFormula', NULL)
 
 dataSDM$set('private', 'spatialBlockCall', NULL)
 dataSDM$set('private', 'Samplers', list())
@@ -1955,6 +2019,7 @@ dataSDM$set('private', 'originalNames', NULL)
 #' @param temporal Name of the temporal variable used in the model.
 #' @param offset Name of the offset column in the datasets.
 #' @param copymodel List of the specifications for the hyper parameters for the \code{"copy"} model.
+#' @param formulas Custom formulas to add to the model. List with two objects: covariateFormula and biasFormula.
 
 dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh, initialnames,
                                               responsecounts, responsepa, speciesindependent,
@@ -1962,7 +2027,7 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
                                               trialspa, trialsmarks, speciesname, marksspatial, speciesenvironment,
                                               spatial, intercepts, spatialcovariates, marksintercepts,
                                               boundary, ips, temporal, temporalmodel, speciesspatial, offset,
-                                              copymodel) {
+                                              copymodel, formulas) {
   
   if (missing(coordinates)) stop('Coordinates need to be given.')
   if (missing(projection)) stop('projection needs to be given.')
@@ -2026,6 +2091,9 @@ dataSDM$set('public', 'initialize',  function(coordinates, projection, Inlamesh,
   private$Intercepts <- intercepts
   private$marksIntercepts <- marksintercepts
   private$speciesIntercepts <- speciesintercept
+  
+  private$covariateFormula <- formulas$covariateFormula
+  private$biasFormula <- formulas$biasFormula
   
   #private$speciesSpatial <- speciesspatial
   private$speciesIndependent <- speciesindependent

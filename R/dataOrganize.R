@@ -231,12 +231,15 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
 #' @param pointcovs Name of the point covariates.
 #' @param speciesspatial Logical: should the species have spatial fields.
 #' @param speciesindependent Logical: make independent species effects.
+#' @param biasformula Terms to include for PO data.
+#' @param covariateformula Terms to include for the covariate formula.
 
 dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
                                                     paresp, countresp, marks, marksspatial, 
                                                     speciesintercept, speciesenvironment,
                                                     spatial, intercept, temporalname, speciesindependent,
-                                                    markintercept, pointcovs, speciesspatial) {
+                                                    markintercept, pointcovs, speciesspatial,
+                                                    biasformula, covariateformula) {
   
   #if (length(self$multinomVars) != 0) marks[marks %in% self$multinomVars] <- paste0(marks[marks %in% self$multinomVars],'_response')
   
@@ -247,6 +250,14 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
     
   }
   else marksResps <- NULL
+  
+  if (!is.null(biasformula)) {
+    
+    biasTerms <- labels(terms(biasformula))
+    spatcovs <- spatcovs[!spatcovs %in% biasTerms]
+    if (identical(spatcovs, character(0))) spatcovs <- NULL
+    
+  }
   
   formulas <- vector(mode = 'list', length = length(self$Data))
   names(formulas) <- names(self$Data)
@@ -374,7 +385,23 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           
           if (!is.null(spatcovs)) {
             
-            if (!is.null(speciesname)) {
+            if (!is.null(biasformula)) {
+              
+              if (!pointsResponse[[response]][j] %in% c(paresp, countresp, marks)) biascov <- 'Bias__Effects__Comps'
+              else biascov <- NULL
+              
+            } else biascov <- NULL
+            
+            if (!is.null(covariateformula)) {
+              
+              if (!is.null(speciesname)) covs <- paste0(speciesIn, '_Fixed__Effects__Comps')
+              else covs <- 'Fixed__Effects__Comps'
+              
+            }
+            
+            else {
+              
+              if (!is.null(speciesname)) {
               
               if (speciesenvironment) covs <- paste0(speciesIn, '_', spatcovs)
               else covs <- spatcovs
@@ -382,8 +409,14 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             }
             else covs <- spatcovs
             
+          } 
+          
+          } else {
+            
+            covs <- NULL
+            biascov <- NULL
+            
           }
-          else covs <- NULL
           
           if (!is.null(marks)) {
             
@@ -431,7 +464,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             
           }
           
-          RHS <- c(covs, spat, int, addcovs, markspat, marksint, speciesspat) # temp
+          RHS <- c(covs, spat, int, addcovs, markspat, marksint, speciesspat, biascov) # temp
           
           if (pointsResponse[[response]][j] %in% paste0(self$multinomVars,'_response')) { #paste multinomvar and phi # Need to convert multinomvar to numeric
             
@@ -476,6 +509,8 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
 #' @param offsetname Name of the offset column in the datasets.
 #' @param copymodel List of the hyper parameters for the \code{copy} model.
 #' @param speciesindependent Logical: should species effects be made independent.
+#' @param biasformula Terms to include for PO data.
+#' @param covariateformula Terms to include for the covariate formula.
 
 dataOrganize$set('public', 'makeComponents', function(spatial, intercepts, 
                                                       datanames, marks, speciesname,
@@ -490,7 +525,26 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
                                                       numtime,temporalmodel,
                                                       offsetname,
                                                       copymodel,
-                                                      speciesindependent) {
+                                                      speciesindependent,
+                                                      biasformula,
+                                                      covariateformula) {
+  
+  if (!is.null(biasformula)) {
+    
+    biasTerms <- labels(terms(biasformula))
+    removeIndex <- !covariatenames %in% biasTerms
+    covariatenames <- covariatenames[removeIndex]
+    covariateclass <- covariateclass[removeIndex]
+    
+    if (identical(covariatenames, character(0))) {
+      
+      covariatenames <- NULL
+      covariateclass <- NULL
+      
+    }
+    
+    
+  }
   ##Copy for marks fields???
   if (length(self$SpeciesInData) != 0) species <- unique(unlist(self$SpeciesInData))
   else species = NULL
@@ -664,7 +718,22 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (!is.null(covariatenames)) {
     
-    if (!is.null(species) && speciesenvironment) {
+    ##IF bias covariates
+    if (!is.null(biasformula)) bias <- makeFormulaComps(form = biasformula, species = FALSE, speciesnames = FALSE, type = 'Bias')
+    else bias <- NULL
+      
+    
+     #IF covariateFormula
+    
+    if (!is.null(covariateformula)) {
+      
+      covs <-  makeFormulaComps(form = covariateformula, species = !is.null(species), speciesnames = species, type = 'Covariate')
+      
+    }
+    
+    else {
+      
+      if (!is.null(species) && speciesenvironment) {
       
       speciesCovs <- apply(expand.grid(paste0(species,'_'), covariatenames), MARGIN = 1, FUN = paste0,collapse = '')
       speciesCovClass <- rep(covariateclass, each = length(species))
@@ -673,8 +742,14 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     }
     else covs <- paste0(covariatenames, '(main = ', covariatenames, ', model = \"',covariateclass,'\")') # , collapse = ' + '
     
+    }
   } 
-  else covs <- NULL
+  else {
+    
+    covs <- NULL
+    bias <- NULL
+    
+  }
   
   if (!is.null(pointcovariates)) {
     
@@ -743,7 +818,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
   }
   
-  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt, offsetTerm)
+  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt, offsetTerm, bias)
   
   RHS
   

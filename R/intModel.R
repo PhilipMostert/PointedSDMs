@@ -29,6 +29,7 @@
 #' @param temporalName Name of the temporal variable (class \code{character}) in the model. This variable is required to be in all the datasets. Defaults to \code{NULL}.
 #' @param temporalModel List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details.
 #' @param copyModel List of model specifications given to the hyper parameters for the  \code{"copy"} model. Defaults to \code{list(beta = list(fixed = FALSE))}.
+#' @param Formulas A named list with two objects. The first one, \code{covariateFormula}, is a formula for the covariates and their transformations for the distribution part of the model. Defaults to \code{NULL} which includes all covariates specified in \code{spatialCovariates} into the model. The second, \code{biasFormula}, specifies which covariates are used for the PO datasets. Defaults to \code{NULL} which includes no covariates for the PO datasets.
 #' 
 #' @return A \code{\link{dataSDM}} object (class \code{R6}). Use \code{?dataSDM} to get a comprehensive description of the slot functions associated with this object.
 #' 
@@ -86,11 +87,13 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
                      responseCounts = 'counts', responsePA = 'present', trialsPA = NULL,
                      trialsMarks = NULL, speciesName = NULL, temporalName = NULL,
                      temporalModel = list(model = 'ar1'), 
-                     copyModel = list(beta = list(fixed = FALSE))) {
+                     copyModel = list(beta = list(fixed = FALSE)),
+                     Formulas = list(covariateFormula = NULL,
+                                     biasFormula = NULL)) {
   
   if (length(Coordinates) != 2) stop('Coordinates needs to be a vector of length 2 containing the coordinate names.')
   
-  if (!is.null(Boundary) && !inherits(Boundary, 'sf')) stop('Boundary needs to be an sf object.')
+  if (!is.null(Boundary) && !inherits(Boundary, c('sf', 'sfc'))) stop('Boundary needs to be an sf object.')
   
   if (Coordinates[1] == Coordinates[2]) stop('Coordinates need to be unique values.')
   
@@ -203,6 +206,13 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
   
   #if (!is.null(speciesName) && speciesIntercept) pointsIntercept <- FALSE
   
+  if (!is.null(Formulas$covariateFormula) &&
+      !is.null(Formulas$biasFormula)) {
+    
+    ##Check that there is nothing overlapping here -- remove anything that is
+    
+  }
+  
   bruData <- dataSDM$new(coordinates = Coordinates, projection = Projection,
                          Inlamesh = Mesh, initialnames = initialnames,
                          responsecounts = responseCounts,
@@ -227,7 +237,8 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
                          speciesspatial = speciesSpatial,
                          speciesindependent = speciesIndependent,
                          offset = Offset,
-                         copymodel = copyModel)
+                         copymodel = copyModel,
+                         formulas = Formulas)
   
   if (length(list(...)) == 0) warning('No point data added. You can add data to this object with `$.addData()`.')
   
