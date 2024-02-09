@@ -66,6 +66,23 @@ summary.bruSDM <- function(object, ...) {
         
         cat('Summary for', paste0(species,':'))
         cat('\n')
+        
+        if (!is.null(object$spatCovs$covariateFormula)) {
+          
+          speciesCovs <- object$summary.random[[paste0(species, '_Fixed__Effects__Comps')]]
+          row.names(speciesCovs) <- speciesCovs$ID
+          speciesCovs <- speciesCovs[, -c(1)]
+          
+        } else speciesCovs <- data.frame()
+        
+        if (!is.null(object$spatCovs$biasFormula)) {
+          
+          biasCovs <- object$summary.random[[paste0(species, '_Bias__Effects__Comps')]]
+          row.names(biasCovs) <- biasCovs$ID
+          biasCovs <- biasCovs[, -c(1)]
+          
+        } else biasCovs <- data.frame()
+        
         if (any(paste0(species, '_', object$spatCovs$name) %in% names(object$summary.random))) {
           
           factorCovs <- do.call(rbind, object$summary.random[paste0(species, '_', object$spatCovs$name)])
@@ -81,7 +98,7 @@ summary.bruSDM <- function(object, ...) {
           interceptTerms$ID <- NULL
           
         } else interceptTerms <- data.frame()
-        print.data.frame(rbind(object[['summary.fixed']][grepl(paste0('\\<',species,'_'), row.names(object[['summary.fixed']])),], factorCovs, interceptTerms))   
+        print.data.frame(rbind(object[['summary.fixed']][grepl(paste0('\\<',species,'_'), row.names(object[['summary.fixed']])),], speciesCovs, factorCovs, interceptTerms, biasCovs))   
         
         cat('\n')
         
@@ -97,6 +114,25 @@ summary.bruSDM <- function(object, ...) {
   
   else {
     
+    if (!is.null(object$spatCovs$covariateFormula)) {
+      
+        fixedEffects <- object$summary.random[['Fixed__Effects__Comps']]
+        row.names(fixedEffects) <- fixedEffects$ID
+        fixedEffects <- fixedEffects[,-c(1)]
+        object$summary.fixed <- rbind(object$summary.fixed, fixedEffects)
+        
+    }
+    
+    if (!is.null(object$spatCovs$biasFormula)) {
+      
+      biasComps <- object$summary.random[['Bias__Effects__Comps']]
+      row.names(biasComps) <- biasComps$ID
+      biasComps <- biasComps[, -c(1)]
+      biasComps <- biasComps 
+      object$summary.fixed <- rbind(object$summary.fixed, biasComps)
+      
+    }
+
     class(object) = 'inla'
     object$call = NULL
     summary(object)
