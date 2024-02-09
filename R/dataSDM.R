@@ -795,7 +795,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
           
           private$IPS[[covADD]] <- inlabru::eval_spatial(where =  private$IPS, 
                                                             data = get('spatialcovariates', 
-                                                                       envir = private$spatcovsEnv)[covADD],
+                                                                       envir = private$spatcovsEnv)[covIPS],
                                                             layer = covIPS
                                                          )
           
@@ -803,7 +803,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
             
             private$IPS[[covADD]] <- inlabru::bru_fill_missing(where = private$IPS, 
                                                                data = get('spatialcovariates', 
-                                                               envir = private$spatcovsEnv)[covADD],
+                                                               envir = private$spatcovsEnv)[covIPS],
                                                                layer = covIPS,
                                                                values = private$IPS[[covADD]])
             
@@ -1211,34 +1211,40 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
               
             }
             
-            updated_formula <- update(formula(paste('~ ', paste0(private$Formulas[[datasetName]][[dataset]][[process]]$RHS, collapse = ' + '))), formula_update)
+            oldVars <- private$Formulas[[datasetName]][[dataset]][[process]]$RHS
+            
+            updated_formula <- update(formula(paste('~ ', paste0(oldVars, collapse = ' + '))), formula_update)
+            
+            termsIn <- labels(terms(updated_formula))
+            
             updated_formula <- all.vars(updated_formula)[all.vars(updated_formula) != '.']
             
             ##This will be removed once we move the like construction to runModel.
             private$Formulas[[datasetName]][[dataset]][[process]]$RHS <- updated_formula
             
-            termsIn <- labels(terms(formula_update))
+            termsIn <- termsIn[!termsIn %in% oldVars]
             
-            if (any(termsIn %in% names(private$modelData[[dataset]][[process]]))) {
+            if (any(names(private$modelData[[datasetName]][[1]]) %in% termsIn)) {
               
-              termsIn <- termsIn[termsIn %in% names(private$modelData[[dataset]][[process]])]
+              termsIn <- termsIn[termsIn %in% names(private$modelData[[datasetName]][[1]])]
               
               if (identical(termsIn, character(0))) warning('Term added to formula but not present in data. If you are trying to add a non-linear transformation please use covariateFormula from the Formulas argument in intModel.')
               else {
-              for (term in termsIn) {
+              
+                for (term in termsIn) {
                 
                 
-                if (private$modelData[[dataset]][[process]][[term]] %% 0) message('The data for the term added is integer. Please add the correct component for the term using $changeComponents()')
+                if (all(private$modelData[[datasetName]][[1]][[term]] %% 1 == 0)) message('The data for the term added is integer. Please add the correct component for the term using $changeComponents()')
                   else
-                    if (is.numeric(private$modelData[[dataset]][[process]][[term]])) {
+                    if (is.numeric(private$modelData[[datasetName]][[1]][[term]])) {
                       
-                      comp <- paste0(term,'(model = ', term, ', main = "linear")')
+                      comp <- paste0(term,'(main = ', term, ', model = "linear")')
                       self$changeComponents(comp, print = FALSE)
                       
                     } else {
                       
-                      if (private$pointsIntercept) comp <- paste0(term,'(model = ', term, ', main = "factor_contrast")')
-                      else comp <-  paste0(term,'(model = ', term, ', main = "factor_full")')
+                      if (private$pointsIntercept) comp <- paste0(term,'(main = ', term, ', model = "factor_contrast")')
+                      else comp <-  paste0(term,'(main = ', term, ', model = "factor_full")')
                       self$changeComponents(comp, print = FALSE)
                       
                       
