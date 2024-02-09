@@ -12,10 +12,10 @@ makeFormulaComps <- function(form, species, speciesnames, type) {
   
   terms <- labels(terms(form))
   
-  if (!species) {
-    
   if (type == 'Bias') frontPart <- 'Bias__Effects__Comps(main = '
   else frontPart <- 'Fixed__Effects__Comps(main = '
+  
+  if (!species) {
     
   terms <- paste(terms, collapse = ' + ')
   
@@ -51,7 +51,7 @@ makeFormulaComps <- function(form, species, speciesnames, type) {
       speciesFormula <- formula(paste('~', paste(unique(unlist(newTerms[[species]])), collapse = ' + '), '-1'))
       
       
-      newList[[species]] <- paste0(species, '_Fixed__Effects__Comps(main = ', paste(speciesFormula, collapse = ''),', model = "fixed")')
+      newList[[species]] <- paste0(species, '_', frontPart, paste(speciesFormula, collapse = ''),', model = "fixed")')
       
     }
     
