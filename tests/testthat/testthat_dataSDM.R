@@ -16,6 +16,7 @@ PO$numvar <- runif(n = nrow(PO))
 PO$factvar <- sample(x = c('a','b'), size = nrow(PO), replace = TRUE)
 PO$species <- sample(x = c('fish'), size = nrow(PO), replace = TRUE)
 PO$temp <- sample(x = c(1,2), size = nrow(PO), replace = TRUE)
+PO$otherVar <- rgamma(n = nrow(PO), shape = 12)
 #Random presence absence dataset
 
 PA <- st_as_sf(st_sample(SpatialPoly, 100, crs = projection))
@@ -81,6 +82,7 @@ test_that('dataSDMs initialize works as expected.', {
                        marksspatial = markSpatial,
                        marksintercept = marksIntercept,
                        spatialcovariates = cov,
+                       formulas = NULL,
                        speciesintercept = FALSE,
                        speciesenvironment = TRUE,
                        speciesname = speciesName,
@@ -258,6 +260,7 @@ test_that('updateFormula is able to change the formula of a dataset', {
   
   expect_setequal(check$.__enclos_env__$private$Formulas$PO$fish$geometry$RHS, c("fish_PO_spatial", "shared_spatial", "fish_intercept", "PO_biasField"))
   expect_setequal(check$.__enclos_env__$private$Formulas$PA$bird$PAresp$RHS, c("bird_covariate", "bird_PA_spatial", "shared_spatial", "bird_intercept", "pointcov"))
+
   
   })
 
