@@ -281,9 +281,9 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             
             #Bias only in PO
             expect_setequal(Check$Formulas$PO$fish2$geometry$RHS,
-                            c("fish2_spatcovs", "shared_spatial", "fish2_intercept", "fish2_PO_spatial", "Bias__Effects__Comps"))
+                            c("fish2_spatcovs", "shared_spatial", "fish2_intercept", "fish2_PO_spatial", "fish2_Bias__Effects__Comps"))
             expect_setequal(Check$Formulas$PO$fish1$geometry$RHS,
-                            c("fish1_spatcovs", "shared_spatial", "fish1_intercept", "fish1_PO_spatial", "Bias__Effects__Comps"))
+                            c("fish1_spatcovs", "shared_spatial", "fish1_intercept", "fish1_PO_spatial", "fish1_Bias__Effects__Comps"))
             
             expect_setequal(Check$Formulas$PA$bird1$PAresp$RHS,
                             c("bird1_spatcovs", "shared_spatial", "bird1_intercept", "pointcov","bird1_PA_spatial"))
@@ -475,7 +475,10 @@ test_that('makeComponents is able to make the correct components for all the pro
                       "factvar_phi(main = factvar_phi, model = \"iid\", initial = -10, fixed = TRUE)",                                            
                       "numvar_intercept(1)",                                                                                                      
                       "binommark_intercept(1)",
-                      "Bias__Effects__Comps(main = ~BiasCov - 1, model = \"fixed\")" ))
+                      "fish2_Bias__Effects__Comps(main = ~fish2_BiasCov - 1, model = \"fixed\")",
+                      "fish1_Bias__Effects__Comps(main = ~fish1_BiasCov - 1, model = \"fixed\")",
+                      "bird2_Bias__Effects__Comps(main = ~bird2_BiasCov - 1, model = \"fixed\")",
+                      "bird1_Bias__Effects__Comps(main = ~bird1_BiasCov - 1, model = \"fixed\")"))
     
     #Check covariateFormula
     compsCov <- Check$makeComponents(spatial = 'shared', intercepts = TRUE, datanames = c('PO','PA'), marksintercept = TRUE, speciesintercept = FALSE, speciesenvironment = TRUE,
