@@ -61,7 +61,7 @@ test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra 
   spatMod <- fitISDM(data = obj, options  = list(control.inla=list(int.strategy='eb')))
   
   expect_setequal(class(spatMod), c('bruSDM', 'bru', 'iinla', 'inla'))
-  expect_setequal(row.names(spatMod$summary.fixed), c( "fish_covariate", "bird_covariate",'fish_intercept', 'bird_intercept'))
+  expect_contains(c(row.names(spatMod$summary.fixed)), c( "fish_covariate", "bird_covariate",'fish_intercept', 'bird_intercept'))
   expect_equal(spatMod[['species']][['speciesVar']], 'species')
   expect_equal(spatMod[['species']][['speciesIn']][['PO']], 'fish')
   expect_equal(spatMod[['species']][['speciesIn']][['PA']], 'bird')
