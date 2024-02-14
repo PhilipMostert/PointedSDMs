@@ -71,6 +71,10 @@ makeLhoods <- function(data, formula, family, mesh, ips,
             speciesRep <- data.frame(rep(unique(data.frame(data[[dataset]][[species]])[,speciesname]), nrow(ips)))
             names(speciesRep) <- speciesname
             IPS <- ips
+            
+            namesKeep <- names(IPS)[names(IPS) %in% c('weight', '.block',names(data[[dataset]][[species]]))]
+            IPS <- IPS[, namesKeep]
+            
             IPS <- cbind(ips, speciesRep)
             
           }
