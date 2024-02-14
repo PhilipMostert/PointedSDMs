@@ -74,8 +74,7 @@ makeLhoods <- function(data, formula, family, mesh, ips,
             
             namesKeep <- names(IPS)[names(IPS) %in% c('weight', '.block',names(data[[dataset]][[species]]))]
             IPS <- IPS[, namesKeep]
-            
-            IPS <- cbind(ips, speciesRep)
+            IPS <- cbind(IPS, speciesRep)
             
           }
           
