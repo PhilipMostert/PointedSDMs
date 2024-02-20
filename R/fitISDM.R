@@ -159,6 +159,7 @@ fitISDM <- function(data, options = list()) {
     
   }
   
+  if (is.null(data$.__enclos_env__$private$speciesIntercepts)) data$.__enclos_env__$private$speciesIntercepts <- FALSE
   if (data$.__enclos_env__$private$speciesIntercepts) row.names(inlaModel$summary.random[[paste0(data$.__enclos_env__$private$speciesName, '_intercepts')]]) <- data$.__enclos_env__$private$speciesTable[['species']]
   
   
