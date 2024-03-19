@@ -70,7 +70,7 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
   expect_output(print(outPO), 'Leave-one-out cross-validation score:')
   
   #ie no fish from dataset PO
-  expect_setequal(outPO$Leaving_out_PO$names.fixed, c('bird_covariate', 'bird_intercept'))
+  expect_setequal(outPO$Leaving_out_PO$names.fixed, c('PA_intercept','bird_covariate', 'bird_intercept'))
   expect_setequal(names(outPO$Leaving_out_PO$bru_info$lhoods), 'PA_bird_PAresp')
   
   expect_setequal(outPO$Leaving_out_PO$source, 'PA')

@@ -55,7 +55,8 @@ test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra 
   obj <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
                 IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, speciesIndependent = FALSE,
                 responsePA = responsePA, markNames = NULL, markFamily = NULL, speciesSpatial = 'individual',
-                speciesName = speciesName, spatialCovariates = cov)
+                speciesName = speciesName, spatialCovariates = cov, pointsIntercept = FALSE,
+                speciesEffects = list(randomIntercept = FALSE, Environmental = TRUE))
   
   ##run model
   spatMod <- fitISDM(data = obj, options  = list(control.inla=list(int.strategy='eb')))

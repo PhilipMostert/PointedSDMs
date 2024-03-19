@@ -167,7 +167,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', markintercept = TRUE, speciesintercept = FALSE, speciesenvironment = TRUE,
                                paresp = 'PAresp', countresp = 'counts', marksspatial = TRUE, speciesspatial = 'individual',
                                marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp', speciesindependent = FALSE,
-                               spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = NULL)
+                               spatial = 'shared', intercept = FALSE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = NULL)
             
             expect_setequal(names(Check$Formulas), c('PO', 'PA'))
             expect_setequal(names(Check$Formulas$PO), c('fish1','fish2'))
@@ -229,7 +229,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             Check$makeFormulas(spatcovs = NULL, speciesname = 'species', marksspatial = TRUE, speciesspatial = 'individual',
                                paresp = 'PAresp', countresp = 'counts', markintercept = FALSE, speciesindependent = FALSE,
                                marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp', speciesintercept = FALSE, speciesenvironment = FALSE,
-                               spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = NULL)
+                               spatial = 'shared', intercept = FALSE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = NULL)
             
             expect_setequal(Check$Formulas$PO$fish1$geometry$RHS,
                             c("fish1_PO_spatial", "shared_spatial", "fish1_intercept"))
@@ -247,7 +247,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             Check$makeFormulas(spatcovs = NULL, speciesname = 'species', marksspatial = TRUE, speciesspatial = 'individual',
                                      paresp = 'PAresp', countresp = 'counts', markintercept = FALSE, speciesindependent = FALSE,
                                      marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp', speciesintercept = FALSE, speciesenvironment = TRUE,
-                                     spatial = 'copy', intercept = TRUE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = NULL)
+                                     spatial = 'copy', intercept = FALSE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = NULL)
             
             expect_setequal(Check$Formulas$PO$fish2$geometry$RHS,
                             c('PO_spatial',"fish2_PO_spatial", "fish2_intercept"))
@@ -262,7 +262,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', markintercept = TRUE, speciesintercept = TRUE, speciesenvironment = TRUE,
                                paresp = 'PAresp', countresp = 'counts', marksspatial = TRUE, speciesspatial = 'individual',
                                marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp', speciesindependent = FALSE,
-                               spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = NULL)
+                               spatial = 'shared', intercept = FALSE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = NULL)
             
             expect_setequal(Check$Formulas$PO$fish2$geometry$RHS,
                             c('shared_spatial',"fish2_PO_spatial", "species_intercepts", 'fish2_spatcovs'))
@@ -277,7 +277,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', markintercept = TRUE, speciesintercept = FALSE, speciesenvironment = TRUE,
                                paresp = 'PAresp', countresp = 'counts', marksspatial = TRUE, speciesspatial = 'individual',
                                marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp', speciesindependent = FALSE,
-                               spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov', biasformula = ~ biasVar, covariateformula = NULL)
+                               spatial = 'shared', intercept = FALSE, pointcovs = 'pointcov', biasformula = ~ biasVar, covariateformula = NULL)
             
             #Bias only in PO
             expect_setequal(Check$Formulas$PO$fish2$geometry$RHS,
@@ -294,7 +294,7 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', markintercept = TRUE, speciesintercept = FALSE, speciesenvironment = TRUE,
                                paresp = 'PAresp', countresp = 'counts', marksspatial = TRUE, speciesspatial = 'individual',
                                marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp', speciesindependent = FALSE,
-                               spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = ~ cov + I(cov^2))
+                               spatial = 'shared', intercept = FALSE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = ~ cov + I(cov^2))
             
             expect_setequal(Check$Formulas$PO$fish2$geometry$RHS,
                             c("fish2_Fixed__Effects__Comps", "shared_spatial", "fish2_intercept", "fish2_PO_spatial"))
@@ -313,12 +313,12 @@ test_that('makeFormulas is able to make the correct formulas for the different p
 Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', marksspatial = TRUE, speciesintercept = TRUE, speciesenvironment = TRUE,
                    paresp = 'PAresp', countresp = 'counts', markintercept = TRUE, speciesspatial = 'individual',
                    marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp', speciesindependent = FALSE,
-                   spatial = 'shared', intercept = TRUE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = NULL)
+                   spatial = 'shared', intercept = FALSE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = NULL)
 
 test_that('makeComponents is able to make the correct components for all the processes
           based on the predictors and spatial effects available.', {
             
-    comps <- Check$makeComponents(spatial = 'shared', intercepts = TRUE, datanames = c('PO','PA'), marksintercept = TRUE, speciesintercept = FALSE, speciesenvironment = TRUE,
+    comps <- Check$makeComponents(spatial = 'shared', intercepts = FALSE, datanames = c('PO','PA'), marksintercept = TRUE, speciesintercept = FALSE, speciesenvironment = TRUE,
                          marks = c('numvar', 'factvar', 'binommark'), temporalmodel = deparse(list(model = "ar1")), speciesindependent = FALSE,
                          multinomnames = 'factvar', pointcovariates = 'pointcov', marksspatial = TRUE, offsetname = NULL,
                          speciesname = 'species', covariatenames = 'spatcovs', temporalname = 'temp', speciesspatial = 'individual',
@@ -349,7 +349,7 @@ test_that('makeComponents is able to make the correct components for all the pro
     
     ## Change arguments
     #spatial and intercepts == FALSE
-    comps2 <- Check$makeComponents(spatial = NULL, intercepts = FALSE, datanames = c('PO','PA'), speciesintercept = FALSE, speciesenvironment = TRUE,
+    comps2 <- Check$makeComponents(spatial = NULL, intercepts = FALSE, datanames = c('PO','PA'), speciesintercept = NULL, speciesenvironment = TRUE,
                                   marks = c('numvar', 'factvar', 'binommark'), marksspatial = FALSE, offsetname = NULL,
                                   multinomnames = 'factvar', pointcovariates = 'pointcov', marksintercept = FALSE, speciesindependent = FALSE,
                                   speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = 'individual',
@@ -369,7 +369,7 @@ test_that('makeComponents is able to make the correct components for all the pro
                              "factvar_phi(main = factvar_phi, model = \"iid\", initial = -10, fixed = TRUE)"))
     
     #checkComponents with a copy model
-    compsCopy <- Check$makeComponents(spatial = 'copy', intercepts = FALSE, datanames = c('PO','PA'), speciesintercept = FALSE, speciesenvironment = TRUE,
+    compsCopy <- Check$makeComponents(spatial = 'copy', intercepts = FALSE, datanames = c('PO','PA'), speciesintercept = NULL, speciesenvironment = TRUE,
                          marks = c('numvar', 'factvar', 'binommark'), marksspatial = FALSE, offsetname = NULL,
                          multinomnames = 'factvar', pointcovariates = 'pointcov', marksintercept = FALSE, speciesindependent = FALSE,
                          speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = 'individual', temporalname = NULL,
@@ -411,8 +411,10 @@ test_that('makeComponents is able to make the correct components for all the pro
                             "fish1_spatcovs(main = fish1_spatcovs, model = \"numeric\")",                                                               
                             "bird2_spatcovs(main = bird2_spatcovs, model = \"numeric\")",                                                               
                             "bird1_spatcovs(main = bird1_spatcovs, model = \"numeric\")",                                                               
-                            "pointcov",                                                                                                                 
-                            'species_intercepts(main = species, model = "iid")',
+                            "pointcov",        
+                            "PO_intercept(1)",
+                            "PA_intercept(1)",
+                            'species_intercepts(main = species, model = "iid", constr = FALSE)',
                             "factvar(main = factvar, model = \"iid\",constr = FALSE, fixed=TRUE)",                                                      
                             "factvar_phi(main = factvar_phi, model = \"iid\", initial = -10, fixed = TRUE)",                                            
                             "numvar_intercept(1)",                                                                                                      
@@ -447,7 +449,7 @@ test_that('makeComponents is able to make the correct components for all the pro
                       "binommark_intercept(1)"))
     
     #Check biasFormula
-    compsBias <- Check$makeComponents(spatial = 'shared', intercepts = TRUE, datanames = c('PO','PA'), marksintercept = TRUE, speciesintercept = FALSE, speciesenvironment = TRUE,
+    compsBias <- Check$makeComponents(spatial = 'shared', intercepts = FALSE, datanames = c('PO','PA'), marksintercept = TRUE, speciesintercept = FALSE, speciesenvironment = TRUE,
                                   marks = c('numvar', 'factvar', 'binommark'), temporalmodel = deparse(list(model = "ar1")), speciesindependent = FALSE,
                                   multinomnames = 'factvar', pointcovariates = 'pointcov', marksspatial = TRUE, offsetname = NULL,
                                   speciesname = 'species', covariatenames = 'spatcovs', temporalname = 'temp', speciesspatial = 'individual',
@@ -481,7 +483,7 @@ test_that('makeComponents is able to make the correct components for all the pro
                       "bird1_Bias__Effects__Comps(main = ~bird1_BiasCov - 1, model = \"fixed\")"))
     
     #Check covariateFormula
-    compsCov <- Check$makeComponents(spatial = 'shared', intercepts = TRUE, datanames = c('PO','PA'), marksintercept = TRUE, speciesintercept = FALSE, speciesenvironment = TRUE,
+    compsCov <- Check$makeComponents(spatial = 'shared', intercepts = FALSE, datanames = c('PO','PA'), marksintercept = TRUE, speciesintercept = FALSE, speciesenvironment = TRUE,
                                       marks = c('numvar', 'factvar', 'binommark'), temporalmodel = deparse(list(model = "ar1")), speciesindependent = FALSE,
                                       multinomnames = 'factvar', pointcovariates = 'pointcov', marksspatial = TRUE, offsetname = NULL,
                                       speciesname = 'species', covariatenames = 'spatcovs', temporalname = 'temp', speciesspatial = 'individual',
