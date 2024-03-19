@@ -338,10 +338,13 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             #}
             if (!is.null(speciesintercept)) {
               
-              if (speciesintercept) int <- paste0(speciesname, '_intercepts')
-              else int <- paste0(speciesIn,'_intercept') 
+              if (speciesintercept) spint <- paste0(speciesname, '_intercepts')
+              else spint <- paste0(speciesIn,'_intercept') 
               
-            } else if (intercept) {
+            } else spint <- NULL
+              
+            
+            if (intercept) {
               
               int <- paste0(names(self$Data)[[dataset]],'_intercept') 
               
@@ -351,13 +354,14 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             else {
               
               speciesspat <- NULL
+              spint <- NULL
 
             }
           } 
           else {
             
             speciesspat <- NULL
-            
+            spint <- NULL
             if (intercept) int <- paste0(names(self$Data)[[dataset]], '_intercept')
             else int <- NULL
             
@@ -469,7 +473,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             
           }
           
-          RHS <- c(covs, spat, int, addcovs, markspat, marksint, speciesspat, biascov) # temp
+          RHS <- c(covs, spat, int, addcovs, markspat, marksint, speciesspat, biascov, spint) # temp
           
           if (pointsResponse[[response]][j] %in% paste0(self$multinomVars,'_response')) { #paste multinomvar and phi # Need to convert multinomvar to numeric
             
@@ -583,6 +587,15 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   } else spat <- NULL
   
   if (!is.null(species)) {
+      
+      if (!is.null(speciesintercept)) {
+        
+        if (speciesintercept) 
+        
+        spint <- paste0(speciesname, '_intercepts(main = ', speciesname, ', model = "iid", constr = FALSE)')
+        else spint <- paste0(species, '_intercept(1)')
+        
+      } else spint <- NULL
     
     if (!is.null(speciesspatial)) { ## Then if copy or individual ...
       
@@ -680,7 +693,12 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     else speciesSpat <- NULL
     
   } 
-  else speciesSpat <- NULL
+  else {
+    
+    speciesSpat <- NULL
+    spint <- NULL
+    
+  }
   
   #if (!is.null(temporalname)) {
   #  
@@ -780,27 +798,10 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (intercepts) {
     
-    if (!is.null(species)) {
-      
-      if (is.null(speciesintercept)) {
-        
-        int <- paste0(datanames, '_intercept(1)')
-        
-      } else if (speciesintercept) {
-          
-        int <- paste0(speciesname, '_intercepts(main = ', speciesname, ', model = "iid")')
-        
-      } else {
-        
-        int <- paste0(species, '_intercept(1)')
-        
-        }
-      
-    }
-    else int <- paste0(datanames, '_intercept(1)')
-    
-    if (!is.null(marks)) intMarks <- paste0(marks, '_intercept(1)')
-    else intMarks <- NULL
+  int <- paste0(datanames, '_intercept(1)')
+  
+  if (!is.null(marks)) intMarks <- paste0(marks, '_intercept(1)')
+  else intMarks <- NULL
     
   } 
   else {
@@ -823,7 +824,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
   }
   
-  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt, offsetTerm, bias)
+  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt, offsetTerm, bias, spint)
   
   RHS
   
