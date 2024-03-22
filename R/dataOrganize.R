@@ -82,8 +82,9 @@ dataOrganize$set('public', 'makeData', function(datapoints, datanames, coords, p
 
 #' @description Function used to separate the datasets by species.
 #' @param speciesname The name of the species variable.
+#' @param repl Are species effects replicate. Defaults to \code{FALSE}.
 
-dataOrganize$set('public', 'makeSpecies', function(speciesname) {
+dataOrganize$set('public', 'makeSpecies', function(speciesname, repl = FALSE) {
   
   self$SpeciesInData <- vector(mode = 'list', length = length(self$Data))
   
@@ -115,7 +116,7 @@ dataOrganize$set('public', 'makeSpecies', function(speciesname) {
   ##Make species index here ...
   
   self$makeMultinom(multinomVars = speciesname,
-                    return = 'species', oldVars = NULL)
+                    return = 'species', oldVars = NULL, repl = repl)
   
 })
 
@@ -123,8 +124,9 @@ dataOrganize$set('public', 'makeSpecies', function(speciesname) {
 #' @param multinomVars Name of the multinomial marks.
 #' @param return What to return: species or marks.
 #' @param oldVars If any multinomial marks were included in a previous iteration, what where their names.
+#' @param repl Species replicate model included. Defaults to \code{FALSE}.
 
-dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVars) {
+dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVars, repl = FALSE) {
   
   #if (return %in% c('marks','species')) stop('Something went wrong.')
   #Need to change the multinomial vars into numeric
@@ -187,6 +189,7 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
         if (!all(is.na((multinomNumeric[[var]][[x]][[y]])))) {
           
           self$Data[[x]][[y]][,var] <- multinomNumeric[[var]][[x]][[y]]
+          self$Data[[x]][[y]][,'speciesSpatialGroup'] <- multinomNumeric[[var]][[x]][[y]]
           
         }
       }
@@ -315,7 +318,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
               ##Change this part ot the speciesIn: not sure what the one below does...
               if (!is.null(speciesspatial)) {
                 
-                if (speciesspatial == 'shared') speciesspat <- 'speciesShared'
+                if (speciesspatial == 'shared' || speciesspatial == 'replicate') speciesspat <- 'speciesShared'
                 else {
                 
                   
@@ -601,7 +604,14 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
       
       #if (length(speciesspatial) > 0) {
       if (speciesspatial == 'shared') speciesSpat <- 'speciesShared(main = geometry, model = speciesField)'
-      else {
+      
+      else
+        if (speciesspatial == 'replicate') {
+          
+          speciesSpat <- 'speciesShared(main = geometry, model = speciesField, group = speciesSpatialGroup, control.group = list(model = "iid"))'
+          
+          
+        } else {
       #speciesSpat <- paste0(species,'_spatial(main = coordinates, model = ',paste0(species,'_spdeModel'),')', collapse = ' + ')
       
       #} 
