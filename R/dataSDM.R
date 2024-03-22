@@ -587,7 +587,9 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (!is.null(speciesName)) {
       
-      pointData$makeSpecies(speciesname = speciesName) 
+      if (private$speciesSpatial == 'replicate') repl = TRUE
+      else repl = FALSE
+      pointData$makeSpecies(speciesname = speciesName, repl = repl) 
      
       if (is.null(private$speciesIn)) private$speciesIn <- pointData$SpeciesInData
       else private$speciesIn <- c(private$speciesIn, pointData$SpeciesInData)
@@ -610,7 +612,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       
       if (!is.null(private$speciesSpatial)) {
         
-        if (private$speciesSpatial == 'shared') {
+        if (private$speciesSpatial == 'shared' || private$speciesSpatial == 'replicate') {
           
           self$spatialFields$speciesFields <- list()
           self$spatialFields$speciesFields[['speciesField']] <- INLA::inla.spde2.matern(mesh = private$INLAmesh)
@@ -1560,7 +1562,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
       field_type <- 'speciesFields'
       if (!Remove) {
         
-        if (private$speciesSpatial == 'shared') index <- 'speciesField'
+        if (private$speciesSpatial == 'shared' || private$speciesSpatial == 'replicate') index <- 'speciesField'
         else
           if (!private$speciesIndependent) index <- do.call(paste0, expand.grid(paste0(Species, '_'), private$dataSource))
         else index <- Species
