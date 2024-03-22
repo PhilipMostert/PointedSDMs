@@ -367,6 +367,22 @@ test_that('makeComponents is able to make the correct components for all the pro
                              "pointcov",                                                                     
                              "factvar(main = factvar, model = \"iid\",constr = FALSE, fixed=TRUE)",          
                              "factvar_phi(main = factvar_phi, model = \"iid\", initial = -10, fixed = TRUE)"))
+    #Check replicate
+    compsrep <- Check$makeComponents(spatial = NULL, intercepts = FALSE, datanames = c('PO','PA'), speciesintercept = NULL, speciesenvironment = TRUE,
+                                   marks = c('numvar', 'factvar', 'binommark'), marksspatial = FALSE, offsetname = NULL,
+                                   multinomnames = 'factvar', pointcovariates = 'pointcov', marksintercept = FALSE, speciesindependent = FALSE,
+                                   speciesname = 'species', covariatenames = 'spatcovs', speciesspatial = 'replicate',
+                                   covariateclass = 'numeric', numtime =  2,  copymodel = Check$.__enclos_env__$private$copyModel,
+                                   biasformula = NULL, covariateformula = NULL)
+    
+    expect_setequal(compsrep,c("speciesShared(main = geometry, model = speciesField, group = speciesSpatialGroup, control.group = list(model = \"iid\"))",                       
+                             "fish2_spatcovs(main = fish2_spatcovs, model = \"numeric\")",                   
+                             "fish1_spatcovs(main = fish1_spatcovs, model = \"numeric\")",                   
+                             "bird2_spatcovs(main = bird2_spatcovs, model = \"numeric\")",                   
+                             "bird1_spatcovs(main = bird1_spatcovs, model = \"numeric\")",                   
+                             "pointcov",                                                                     
+                             "factvar(main = factvar, model = \"iid\",constr = FALSE, fixed=TRUE)",          
+                             "factvar_phi(main = factvar_phi, model = \"iid\", initial = -10, fixed = TRUE)"))
     
     #checkComponents with a copy model
     compsCopy <- Check$makeComponents(spatial = 'copy', intercepts = FALSE, datanames = c('PO','PA'), speciesintercept = NULL, speciesenvironment = TRUE,
