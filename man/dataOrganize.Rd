@@ -47,7 +47,7 @@ Internal functions used to temporarily store data and other information before a
 \if{latex}{\out{\hypertarget{method-dataOrganize-makeSpecies}{}}}
 \subsection{Method \code{makeSpecies()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeSpecies(speciesname)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeSpecies(speciesname, repl = FALSE)}\if{html}{\out{</div>}}
 }
 
 }
@@ -56,7 +56,7 @@ Internal functions used to temporarily store data and other information before a
 \if{latex}{\out{\hypertarget{method-dataOrganize-makeMultinom}{}}}
 \subsection{Method \code{makeMultinom()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeMultinom(multinomVars, return, oldVars)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeMultinom(multinomVars, return, oldVars, repl = FALSE)}\if{html}{\out{</div>}}
 }
 
 }
