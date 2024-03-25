@@ -16,7 +16,7 @@
 #' @param markFamily A vector with the statistical families (class \code{character}) assumed for the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".
 #' @param pointCovariates The non-spatial covariates to be included in the integrated model (for example, in the field of ecology the distance to the nearest road or time spent sampling could be considered). These covariates must be included in the same data object as the points.
 #' @param Offset Name of the offset variable (class \code{character}) in the datasets. Defaults to \code{NULL}; if the argument is non-\code{NULL}, the variable name needs to be standardized across datasets (but does not need to be included in all datasets). The offset variable will be transformed onto the log-scale in the integrated model.
-#' @param pointsIntercept Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.
+#' @param pointsIntercept Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.  Note that if this argument is non-\code{NULL} and \code{pointsIntercepts} is missing, \code{pointsIntercepts} will be set to \code{FALSE}.
 #' @param marksIntercept Logical argument: should the marks be modeled with intercepts. Defaults to \code{TRUE}.
 #' @param speciesEffects List specifying if intercept terms and environments effects should be made for the species. Defaults to \code{list(randomIntercept = FALSE, Environmental = TRUE)}. \code{randomIntercept} may take on three values: \code{TRUE} which creates a random intercept for each species, \code{FALSE} which creates fixed intercepts for each species, of \code{NULL} which removes all species level intercepts. Note that if \code{randomIntercept = NULL} and \code{pointsIntercept = TRUE}, dataset specific intercept terms will be created.
 #' @param pointsSpatial Argument to determine whether the spatial field is shared between the datasets, or if each dataset has its own unique spatial field. The datasets may share a spatial field with \pkg{INLA}'s "copy" feature if the argument is set to \code{copy}. May take on the values: \code{"shared"}, \code{"individual"}, \code{"copy"} or \code{NULL} if no spatial field is required for the model. Defaults to \code{"shared"}.
@@ -25,7 +25,7 @@
 #' @param responsePA Name of the response variable (class \code{character}) in the presence absence/detection non-detection datasets. This variable name needs to be standardized across all present absence datasets. Defaults to \code{'present'}.
 #' @param trialsPA Name of the trials response variable (class \code{character}) for the presence absence datasets. Defaults to \code{NULL}.
 #' @param trialsMarks Name of the trials response variable (class \code{character}) for the binomial marks (if included). Defaults to \code{NULL}.
-#' @param speciesName Name of the species variable name (class \code{character}). Specifying this argument turns the model into a stacked species distribution model, and calculates covariate values for the individual species, as well as a species group model in the shared spatial field. Defaults to \code{NULL}
+#' @param speciesName Name of the species variable name (class \code{character}). Specifying this argument turns the model into a stacked species distribution model, and calculates covariate values for the individual species, as well as a species group model in the shared spatial field. Defaults to \code{NULL}. Note that if this argument is non-\code{NULL} and \code{pointsIntercepts} is missing, \code{pointsIntercepts} will be set to \code{FALSE}.
 #' @param temporalName Name of the temporal variable (class \code{character}) in the model. This variable is required to be in all the datasets. Defaults to \code{NULL}.
 #' @param temporalModel List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details.
 #' @param copyModel List of model specifications given to the hyper parameters for the  \code{"copy"} model. Defaults to \code{list(beta = list(fixed = FALSE))}.
@@ -116,6 +116,8 @@ intModel <- function(..., spatialCovariates = NULL, Coordinates,
     message('Setting pointsSpatial to "shared" since it is required for the temporalModel.')
     
   }
+  
+  if (!is.null(speciesName) && missing(pointsIntercept)) pointsIntercept <- FALSE
   
   #if (length(list(...)) > 0)  
   dataPoints <- list(...)

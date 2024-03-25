@@ -59,7 +59,7 @@ intModel(
 
 \item{pointCovariates}{The non-spatial covariates to be included in the integrated model (for example, in the field of ecology the distance to the nearest road or time spent sampling could be considered). These covariates must be included in the same data object as the points.}
 
-\item{pointsIntercept}{Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.}
+\item{pointsIntercept}{Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.  Note that if this argument is non-\code{NULL} and \code{pointsIntercepts} is missing, \code{pointsIntercepts} will be set to \code{FALSE}.}
 
 \item{marksIntercept}{Logical argument: should the marks be modeled with intercepts. Defaults to \code{TRUE}.}
 
@@ -79,7 +79,7 @@ intModel(
 
 \item{trialsMarks}{Name of the trials response variable (class \code{character}) for the binomial marks (if included). Defaults to \code{NULL}.}
 
-\item{speciesName}{Name of the species variable name (class \code{character}). Specifying this argument turns the model into a stacked species distribution model, and calculates covariate values for the individual species, as well as a species group model in the shared spatial field. Defaults to \code{NULL}}
+\item{speciesName}{Name of the species variable name (class \code{character}). Specifying this argument turns the model into a stacked species distribution model, and calculates covariate values for the individual species, as well as a species group model in the shared spatial field. Defaults to \code{NULL}. Note that if this argument is non-\code{NULL} and \code{pointsIntercepts} is missing, \code{pointsIntercepts} will be set to \code{FALSE}.}
 
 \item{temporalName}{Name of the temporal variable (class \code{character}) in the model. This variable is required to be in all the datasets. Defaults to \code{NULL}.}
 
