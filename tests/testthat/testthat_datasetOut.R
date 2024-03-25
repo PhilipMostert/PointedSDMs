@@ -55,7 +55,7 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
   
   obj <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
                  IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, speciesSpatial = 'individual',
-                 responsePA = responsePA, markNames = c('factvar'), markFamily = c('multinomial'),
+                 responsePA = responsePA, markNames = c('factvar'), markFamily = c('multinomial'), pointsIntercept = TRUE,
                  speciesName = speciesName, spatialCovariates = cov, pointsSpatial = NULL)
   
   spatMod <- fitISDM(data = obj,
