@@ -203,6 +203,7 @@ datasetOut <- function(model, dataset,
                                        speciesVar = model[['species']][['speciesVar']],
                                        speciesEffects = list(Intercepts = model[['species']][['speciesEffects']][['Intercepts']],
                                                              Environmental = model[['species']][['speciesEffects']][['Environmental']]))
+    model_reduced[['species']][['speciesTable']] <- model[['species']][['speciesTable']][model$species$speciesTable[,2] %in% unique(unlist(model_reduced$species$speciesIn)),]
     
     model_reduced[['dataType']] <- model[['dataType']][index]
     model_reduced[['source']] <- model[['source']][index]
