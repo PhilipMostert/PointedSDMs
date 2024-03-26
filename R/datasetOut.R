@@ -198,6 +198,7 @@ datasetOut <- function(model, dataset,
     model_reduced[['componentsJoint']] <- reduced_components
     model_reduced[['optionsJoint']] <- reduced_options
     model_reduced[['spatCovs']] <- model[['spatCovs']]
+    model_reduced[['spatial']] <- model[['spatial']]
     model_reduced[['species']] <- list(speciesIn = model[['species']][['speciesIn']][!names(model[['species']][['speciesIn']]) %in% dataset],
                                        speciesVar = model[['species']][['speciesVar']],
                                        speciesEffects = list(Intercepts = model[['species']][['speciesEffects']][['Intercepts']],
