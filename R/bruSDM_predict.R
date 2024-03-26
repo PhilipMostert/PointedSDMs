@@ -81,35 +81,55 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   }
   
   if (is.null(datasets)) datasets <- unique(object$source)
+
   
   if (!is.null(unlist(object[['species']][['speciesIn']]))) {
     
     speciespreds <- TRUE
+    
+    if (predictor) {
+      
+      intercepts <- TRUE
+      covariates <- object$spatCovs$name
+      spatial <- TRUE
+      
+    }
+    
+    if (intercepts) {
+      
+      if (!is.null(marks)) {
+        
+        marks_intercepts <- paste0(marks,'_intercept')
+        
+        if (identical(rownames(object$summary.fixed)[rownames(object$summary.fixed) %in% mark_intercepts], character(0))) mark_intercepts <- NULL
+        
+        
+      }
+      
+      if (!is.null(datasets)) {
+        
+        intercept_terms <- paste0(datasets, '_intercept')
+        
+        if (identical(rownames(object$summary.fixed)[rownames(object$summary.fixed) %in% intercept_terms], character(0))) intercept_terms <- NULL
+        
+      }
+      
+      
+    } 
+    else {
+      
+      intercept_terms <- NULL
+      marks_intercepts <- NULL
+      
+    }
     
     if (is.null(species)) speciesin <- unique(unlist(object[['species']][['speciesIn']]))
     else speciesin <- species
     if (!all(species %in% unique(unlist(object[['species']][['speciesIn']])))) stop('Species provided not in model.')
     
   }
-  else {
+  else speciespreds <- FALSE
     
-    speciespreds <- FALSE
-    if (intercepts) {
-    
-      if (!is.null(marks)) marks_intercepts <- paste0(marks,'_intercept')
-      
-      if (!is.null(datasets)) intercept_terms <- paste0(datasets, '_intercept')
-      
-    }
-    
-  }
-  
-  if (!intercepts) {
-    
-    intercept_terms <- NULL
-    marks_intercepts <- NULL
-    
-  }
   
   if (is.null(object$spatCovs$covariateFormula)) {
     
@@ -129,6 +149,24 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       
     }   
     else data <- inlabru::fm_int(mesh, format = format)
+  }
+  
+  if (speciespreds) {
+  
+  if (object[['species']][['speciesEffects']][['Intercepts']]) {
+    
+    data <- fm_cprod(data, data.frame(speciesIndexREMOVE = 1:length(unique(unlist(object$species$speciesIn)))))
+    names(data)[names(data) == 'speciesIndexREMOVE'] <- object[['species']][['speciesVar']]
+    
+  }
+    
+  if (object$spatial$species == 'replicate') {
+      
+  if (!object[['species']][['speciesVar']] %in% names(data)) data <- fm_cprod(data, data.frame(speciesSpatialGroup = 1:length(unique(unlist(object$species$speciesIn)))))
+  else data$speciesSpatialGroup <- data[[object[['species']][['speciesVar']]]]
+    
+  }
+    
   }
   
   if (!any(names(data) %in% object$spatCovs$name)) {
@@ -207,7 +245,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in intModel.')
       else spatial_obj <- paste0(datasets, '_spatial')
       
-      time_formula <- paste0(fun,'(',paste0(c(covariates, biasnames, intercept_terms, spatial_obj), collapse = ' + '),')')
+      time_formula <- paste0(fun,'(',paste0(c(covariates, biasnames, intercept_terms, spatial_obj, intercepts_species), collapse = ' + '),')')
 
       formula <- formula(paste('~',paste0('data.frame(', time_variable,' = ', time_variable, ',formula =', time_formula,')')))
 
@@ -240,7 +278,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       
     }
     
-    if (speciespreds && ! predictor) {
+    if (speciespreds) {
       
       int[['speciesPredictions']] <- vector(mode = 'list', length(speciesin))
       names(int[['speciesPredictions']]) <- speciesin
@@ -259,22 +297,19 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
           
           if (!object[['species']][['speciesEffects']][['Intercepts']]) {
             
-            species_int <- paste0(spec,'_intercept')
+            intercepts_species <- paste0(spec,'_intercept')
             
           } else if (object[['species']][['speciesEffects']][['Intercepts']]) {
               
-            species_int <- paste0(object[['species']][['speciesVar']], '_intercepts')
-            data <- fm_cprod(data, data.frame(speciesIndexREMOVE = 1:length(unique(unlist(object$species$speciesIn)))))
-            names(data)[names(data) == 'speciesIndexREMOVE'] <- object[['species']][['speciesVar']]
+            intercepts_species <- paste0(object[['species']][['speciesVar']], '_intercepts')
             
-            
-            } else species_int <- NULL
+            } else intercepts_species <- NULL
         
         }
-        else species_int <- NULL
+        else intercepts_species <- NULL
         
         if (spatial) {
-          
+          ##Fix this
           allSpat <- c(paste0(spec, '_spatial'),
                        paste0(spec, '_', names(object$dataType), '_spatial'),
                        'speciesShared')
@@ -285,9 +320,19 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
           }
         else species_spat <- NULL
         
-        species_formula <- formula(paste0('~', fun, '(', paste0(c(species_covs, species_int, species_spat), collapse = ' + '),')'))
+        species_formula <- formula(paste0('~', fun, '(', paste0(c(species_covs, intercepts_species, intercept_terms), collapse = ' + '),')'))
         
-        int[[1]][[spec]] <- predict(object, data, formula = species_formula, ...)
+        if (any(c('speciesSpatialGroup', object[['species']][['speciesVar']]) %in% names(data))) {
+          
+          spInd <- object$species$speciesTable[object$species$speciesTable$species == spec,]$index
+          which <- names(data)[names(data) %in% c('speciesSpatialGroup', object[['species']][['speciesVar']]) ][1]
+          dataSP <- data[data[[which]] == spInd,]
+          
+          
+        }
+        else dataSP <- data
+        
+        int[[1]][[spec]] <- predict(object, dataSP, formula = species_formula, ...)
       
         }
       
@@ -341,6 +386,19 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     class(object) <- c('bru','inla','iinla')
     int <- predict(object, newdata = data, formula = formula, ...)
+    if (any(c('speciesSpatialGroup', object[['species']][['speciesVar']]) %in% names(int))) {
+      int[['..speciesPlotVar..']] <- NA
+      which <- names(int)[names(int) %in% c('speciesSpatialGroup', object[['species']][['speciesVar']])][1]
+      
+      for (spec in speciesin) {
+      
+      spInd <- object$species$speciesTable[object$species$speciesTable$species == spec,]$index
+      try(int[int[[which]] == spInd,][[which]] <- spec, silent = TRUE)
+      try(int[int[[which]] == spec,][['..speciesPlotVar..']] <- spec, silent = TRUE)
+      
+      }
+      
+    }
     int <- list(int)
     names(int) <- 'predictions'
     class(int) <- c('bruSDM_predict', class(int))
@@ -480,8 +538,8 @@ plot.bruSDM_predict <- function(x,
     #names(x[[1]]@data)[names(x[[1]]@data) == temporalName] <- '..temporal_variable_index..'
     x[[1]]$..temporal_variable_index.. <- as.character(data.frame(x[[1]])[, temporalName])
 
-    if (inherits(x[[1]], 'sf')) plot_obj <- geom_sf(data = x[[1]], aes_string(col = whattoplot))
-    else plot_obj <- inlabru::gg(x[[1]], aes_string(col = whattoplot))
+    if (inherits(x[[1]], 'sf')) plot_obj <- geom_sf(data = x[[1]], aes(col = .data[[whattoplot]]))
+    else plot_obj <- inlabru::gg(x[[1]], aes(col = .data[[whattoplot]]))
     
     ##Would be nice to get full temporal variable names in here ...
     plot_grid <- ggplot() + plot_obj + facet_wrap(~ ..temporal_variable_index..) + ggtitle('Plot of the temporal predictions')
@@ -502,8 +560,8 @@ plot.bruSDM_predict <- function(x,
       if (nameObj ==  'speciesPredictions') title <- ggtitle(paste('Plot of predictions for', object))
       else title <- ggtitle(paste('Plot of bias field for', object))
       
-      if (inherits(x[[nameObj]][[object]], 'sf')) plot_obj <- geom_sf(data = x[[nameObj]][[object]], aes_string(col = whattoplot))
-      else plot_obj <- inlabru::gg(x[[nameObj]][[object]], aes_string(col = whattoplot))
+      if (inherits(x[[nameObj]][[object]], 'sf')) plot_obj <- geom_sf(data = x[[nameObj]][[object]], aes(col = .data[[whattoplot]]))
+      else plot_obj <- inlabru::gg(x[[nameObj]][[object]], aes(col = .data[[whattoplot]]))
 
       all_plots[[object]] <- ggplot() + plot_obj + title + colours
       
@@ -538,13 +596,16 @@ plot.bruSDM_predict <- function(x,
       #title <- ggtitle(paste('Plot of',stat,'for',plotname))
       title <- ggtitle('Plot of predictions')
       
-      if (inherits(x[[plotname]], 'sf')) prediction <- geom_sf(data = x[[plotname]], aes_string(col = stat))
-      else prediction <- inlabru::gg(x[[plotname]], aes_string(col = stat))
+      if ('..speciesPlotVar..' %in% names(x[[plotname]])) speciesTerm <- facet_wrap(~..speciesPlotVar..)
+      else speciesTerm <- NULL
       
-      if (!plot) prediction_list[[stat]] <- ggplot() + prediction
+      if (inherits(x[[plotname]], 'sf')) prediction <- geom_sf(data = x[[plotname]], aes(col = .data[[stat]]))
+      else prediction <- inlabru::gg(x[[plotname]], aes(col = .data[[stat]]))
+      
+      if (!plot) prediction_list[[stat]] <- ggplot() + prediction + speciesTerm
 
       
-      plot_list[[stat]] <- ggplot() + prediction + title + colours
+      plot_list[[stat]] <- ggplot() + prediction + title + colours + speciesTerm
       
     }
     
