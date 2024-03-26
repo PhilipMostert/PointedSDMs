@@ -189,7 +189,7 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
         if (!all(is.na((multinomNumeric[[var]][[x]][[y]])))) {
           
           self$Data[[x]][[y]][,var] <- multinomNumeric[[var]][[x]][[y]]
-          self$Data[[x]][[y]][,'speciesSpatialGroup'] <- multinomNumeric[[var]][[x]][[y]]
+          if (repl) self$Data[[x]][[y]][,'speciesSpatialGroup'] <- multinomNumeric[[var]][[x]][[y]]
           
         }
       }
