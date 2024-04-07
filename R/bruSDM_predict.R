@@ -320,7 +320,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
           }
         else species_spat <- NULL
         
-        species_formula <- formula(paste0('~', fun, '(', paste0(c(species_covs, intercepts_species, intercept_terms), collapse = ' + '),')'))
+        species_formula <- formula(paste0('~', fun, '(', paste0(c(species_spat, species_covs, intercepts_species, intercept_terms), collapse = ' + '),')'))
         
         if (any(c('speciesSpatialGroup', object[['species']][['speciesVar']]) %in% names(data))) {
           
