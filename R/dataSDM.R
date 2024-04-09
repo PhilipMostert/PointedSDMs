@@ -586,8 +586,10 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     }
     
     if (!is.null(speciesName)) {
-      
+      if (!is.null(private$speciesSpatial)) {
       if (private$speciesSpatial == 'replicate') repl = TRUE
+      else repl = FALSE
+      } 
       else repl = FALSE
       pointData$makeSpecies(speciesname = speciesName, repl = repl) 
      
@@ -1410,7 +1412,7 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
     
     if (!missing(Effect)) {
       
-      if (Effect == 'intercept') {
+      if (Effect %in% c('intercept', 'Intercept')) {
         
         intTRUE <- TRUE
         
@@ -1426,8 +1428,11 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
           if (is.null(Species)) Effect <- paste0(unique(unlist(private$speciesIn)), '_intercept')
           else {
             
-            if (private$speciesIntercepts) Effect <- paste0(Species, '_intercept')
-            else Effect <-  paste0(unique(unlist(private$speciesIn)), '_intercept')
+            if (!is.null(private$speciesIntercepts)) {
+            if (!private$speciesIntercepts) Effect <- paste0(Species, '_intercept')
+            else stop('Species intercepts are random effects in the model.')
+            
+            } else stop('Species intercepts are not in the model.')
             
           }
           
@@ -1443,8 +1448,8 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         
         
       } 
-      
-      if (Effect %in% private$spatcovsNames) cov_class <- private$spatcovsClass[Effect]
+      if (!intTRUE) {
+      if (any(Effect %in% private$spatcovsNames)) cov_class <- private$spatcovsClass[Effect]
       else cov_class <- 'linear'
       
       if (!is.null(private$speciesName)) {
@@ -1459,11 +1464,25 @@ dataSDM <- R6::R6Class(classname = 'dataSDM', lock_objects = FALSE, cloneable = 
         else Effect <- paste0(unique(unlist(private$speciesIn)), '_', Effect)
         
       }
-      
-      if (intTRUE) newComponent <- paste0(Effect, '(1, mean.linear = ', mean.linear, ', prec.linear = ', prec.linear,' )')
+      }
+      if (intTRUE) {
+        
+        newComponent <- c()
+        
+        for (eff in Effect) {
+        
+        newComponent[eff] <- paste0(eff, '(1, mean.linear = ', mean.linear, ', prec.linear = ', prec.linear,' )') 
+        
+        }
+        
+      }
       else newComponent <- paste0(Effect,'(main = ', Effect, ', model = \"', cov_class, '\", mean.linear = ', mean.linear, ', prec.linear = ', prec.linear, ')')
       
-      self$changeComponents(addComponent = newComponent, print = FALSE)
+      for (comp in newComponent) {
+      
+      self$changeComponents(addComponent = comp, print = FALSE)
+        
+      }
       
     }
     
