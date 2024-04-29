@@ -83,9 +83,8 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   if (is.null(datasets)) datasets <- unique(object$source)
 
   
-  if (!is.null(unlist(object[['species']][['speciesIn']]))) {
-    
-    speciespreds <- TRUE
+  if (!is.null(unlist(object[['species']][['speciesIn']]))) speciespreds <- TRUE
+  else speciespreds <- FALSE
     
     if (predictor) {
       
@@ -127,8 +126,6 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     else speciesin <- species
     if (!all(species %in% unique(unlist(object[['species']][['speciesIn']])))) stop('Species provided not in model.')
     
-  }
-  else speciespreds <- FALSE
     
   
   if (is.null(object$spatCovs$covariateFormula)) {
@@ -362,7 +359,12 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       
       } 
       }
-    else spatial_obj <- NULL
+    else {
+      
+      spatial_obj <- NULL
+      marks_spatial <- NULL
+      
+    }
     
     if (predictor) formula_components <- c(row.names(object$summary.fixed), names(object$summary.random)[!names(object$summary.random) %in% paste0(object[['source']], '_biasField')])
     else formula_components <- c(covariates, intercept_terms, spatial_obj, marks_spatial, marks_intercepts)
