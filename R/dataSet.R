@@ -1,6 +1,6 @@
 #' Internal function used to standardize datasets, as well as assign metadata.
 #' @description Internal function used to assist in structuring the data.
-#' @param datapoints A list of datasets as either sf, data.frame or SpatialPoints objects.
+#' @param datapoints A list of datasets as sf objects
 #' @param datanames A vector of the names of the datasets.
 #' @param coords Names of the coordinates used in the model.
 #' @param proj The projection reference system used in the model.
@@ -19,7 +19,7 @@
 #' 
 #' @export
 
-dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
+dataSet <- function(datapoints, datanames, coords = c('CoordLoc1', 'CoordLoc2'), proj, pointcovnames,
                     paresp, countsresp, trialname, speciesname,
                     marks, marktrialname, markfamily, temporalvar, offsetname) {
   
@@ -77,6 +77,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         coordsSF <- sf::st_coordinates(datapoints[[dat]])
         colnames(coordsSF) <- coords
         datapoints[[dat]][, coords] <- coordsSF
+        oldProj <- st_crs(datapoints[[dat]])
         
       }
       
@@ -166,6 +167,8 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         
       } else speciesIndexVAR <- NULL
       
+      data[, '._dataset_index_var_.'] <- dat
+      
       if (paresp %in% data_vars) {
       if (!is.null(trialname)) {  
         if (!trialname %in% data_vars) subtrialname <- NULL
@@ -180,9 +183,10 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         #                                    proj4string = proj)
         datSP <- sf::st_as_sf(x = data.frame(data[, c(paresp, subtrialname, temporalvar,
                               marksin, MTrialssub, speciesname, coords, speciesIndexVAR,
-                              phiVars, responseVars,varsin)]),
+                              phiVars, responseVars,varsin, '._dataset_index_var_.')]),
                               coords = coords,
-                              crs = proj)
+                              crs = oldProj)
+        datSP <- sf::st_transform(x = datSP, crs = proj)
         
         if (ncol(datSP[names(datSP) != 'geometry']) == 1) names(datSP[names(datSP) != 'geometry']) <- paresp
         
@@ -212,9 +216,10 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
           
           datSP <- sf::st_as_sf(x = data.frame(data[, c(countsresp, marksin, temporalvar,
                                 speciesname, MTrialssub, coords, speciesIndexVAR,
-                                phiVars, responseVars, varsin)]),
+                                phiVars, responseVars, varsin, '._dataset_index_var_.')]),
                                 coords = coords,
-                                crs = proj)
+                                crs = oldProj)
+          datSP <- sf::st_transform(x = datSP, crs = proj)
           
           if (ncol(datSP[names(datSP) != 'geometry']) == 1) names(datSP[names(datSP) != 'geometry']) <- countsresp
           
@@ -241,9 +246,10 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         
         datSP <- sf::st_as_sf(x = data.frame(data[, c(poresp, marksin, temporalvar,
                               speciesname, MTrialssub, coords, speciesIndexVAR,
-                              phiVars, responseVars, varsin)]),
+                              phiVars, responseVars, varsin, '._dataset_index_var_.')]),
                               coords = coords,
-                              crs = proj)
+                              crs = oldProj)
+        datSP <- sf::st_transform(x = datSP, crs = proj)
         
         if (ncol(datSP[names(datSP) != 'geometry']) == 1) names(datSP[names(datSP) != 'geometry']) <-poresp
         #Ntrials[[dat]] <- rep(1, nrow(datSP@coords))
@@ -253,8 +259,6 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         dataOrganized[[dat]][[1]] <- datSP
        
         }
-      
-      
       #multinomVars[[dat]] <- characterMarks
       #processIn <- c(pointsresp, marksin)
       
@@ -288,8 +292,8 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         marksType[[dat]] <- NA
       
       }
-
-
+      
+      
       dataType[dat] <- datatype
     
     }
