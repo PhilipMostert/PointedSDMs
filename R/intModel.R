@@ -1,6 +1,6 @@
 #' @title \emph{intModel}: Function used to initialize the integrated species distribution model.
 #' 
-#' @description This function is depreciated. Please use one of \textit{\link{startISDM}} or \textit{\link{startSpecies}}.
+#' @description This function is depreciated. Please use one of \code{\link{startISDM}} or \code{\link{startSpecies}}.
 #' 
 #' @param ... The datasets to be used in the model. May come as either \code{sf}, \code{data.frame} or \code{SpatialPoints*} objects, or as a list of objects with these classes. The classes of the datasets do not necessarily need to be standardized, however the variable names within them often have to be.
 #' @param spatialCovariates The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{Raster*}, \code{SpatialPixelsDataFrame} or \code{SpatialRaster} object. Can be either \code{numeric}, \code{factor} or \code{character} data.
@@ -30,7 +30,7 @@
 #' @param copyModel List of model specifications given to the hyper parameters for the  \code{"copy"} model. Defaults to \code{list(beta = list(fixed = FALSE))}.
 #' @param Formulas A named list with two objects. The first one, \code{covariateFormula}, is a formula for the covariates and their transformations for the distribution part of the model. Defaults to \code{NULL} which includes all covariates specified in \code{spatialCovariates} into the model. The second, \code{biasFormula}, specifies which covariates are used for the PO datasets. Defaults to \code{NULL} which includes no covariates for the PO datasets.
 #' 
-#' @return A \code{\link{dataSDM}} object (class \code{R6}). Use \code{?dataSDM} to get a comprehensive description of the slot functions associated with this object.
+#' @return A \code{\link{specifyISDM}} object (class \code{R6}). Use \code{?specifyISDM} to get a comprehensive description of the slot functions associated with this object.
 #' 
 #' @note The idea with this function is to describe the full model: that is, all the covariates and spatial effects will appear in all the formulas for the datasets and species.
 #' If some of these terms should not be included in certain observation models in the integrated model, they can be thinned out using the \code{.$updateFormula} function.
