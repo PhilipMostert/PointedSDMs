@@ -27,22 +27,18 @@ PA$PAresp <- sample(x = c(0,1), size = nrow(PA), replace = TRUE)
 PA$trial <- sample(x = c(1,2,3), size = nrow(PA), replace = TRUE)
 PA$pointcov <- runif(n = nrow(PA))
 PA$binommark <- sample(x = 0:1, size = nrow(PA), replace = TRUE)
-PA$marktrial <- sample(x = 2:5, size = nrow(PA), replace = TRUE)
+PA$marktrial <- sample(x = 1:3, size = nrow(PA), replace = TRUE)
 PA$species <- sample(x = c('bird1', 'bird2'), nrow(PA), replace = TRUE)
 PA$temp <- sample(x = c(1,2), nrow(PA), replace = TRUE)
 mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
                            max.edge = 2, crs = inlabru::fm_crs(projection))
 #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
 iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
-##Make PA a data.frame object
-PA$long <- st_coordinates(PA)[,1]
-PA$lat <- st_coordinates(PA)[,2]
-st_geometry(PA) <- NULL
-PA <- data.frame(PA)
+
 
 spData <- list(PO, PA)
 
-test_that('The internal function makeData returns a list of SpatialPointDataFrame objects as
+test_that('The internal function makeData returns a list of sf objects as
           well as the relevant metadata to be used in the integrated model.', {
     
     Check$makeData(datapoints = spData, datanames = c('PO', 'PA'),
@@ -58,13 +54,13 @@ test_that('The internal function makeData returns a list of SpatialPointDataFram
     ##Should create a placeholder variable for the poresp + 
     #should keep marks +
     #should create new variables for the multinomial marks.
-    expect_setequal(names(Check$Data$PO[[1]]), c("poresp", "numvar", "factvar", 'temp', 'geometry',
+    expect_setequal(names(Check$Data$PO[[1]]), c("poresp", "numvar", "factvar", 'temp', 'geometry', '._dataset_index_var_.',
                                                     "species", "factvar_phi", "factvar_response", 'speciesINDEX_VAR'))
     expect_true((all(Check$Data$PO[[1]]$factvar_phi == 1)))
     expect_true((all(Check$Data$PO[[1]]$factvar_response == 1)))
     expect_true(class(Check$Data$PO[[1]]$factvar) == 'character')
     
-    expect_setequal(names(Check$Data$PA[[1]]), c("PAresp", "trial", "binommark", 'temp', 'geometry',
+    expect_setequal(names(Check$Data$PA[[1]]), c("PAresp", "trial", "binommark", 'temp', 'geometry', '._dataset_index_var_.',
                                                     "marktrial", "species", "pointcov", 'speciesINDEX_VAR'))
     #Family for PO should be:
     # cp for the points;
@@ -281,9 +277,9 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             
             #Bias only in PO
             expect_setequal(Check$Formulas$PO$fish2$geometry$RHS,
-                            c("fish2_spatcovs", "shared_spatial", "fish2_intercept", "fish2_PO_spatial", "fish2_Bias__Effects__Comps"))
+                            c("fish2_spatcovs", "shared_spatial", "fish2_intercept", "fish2_PO_spatial", "Bias__Effects__Comps"))
             expect_setequal(Check$Formulas$PO$fish1$geometry$RHS,
-                            c("fish1_spatcovs", "shared_spatial", "fish1_intercept", "fish1_PO_spatial", "fish1_Bias__Effects__Comps"))
+                            c("fish1_spatcovs", "shared_spatial", "fish1_intercept", "fish1_PO_spatial", "Bias__Effects__Comps"))
             
             expect_setequal(Check$Formulas$PA$bird1$PAresp$RHS,
                             c("bird1_spatcovs", "shared_spatial", "bird1_intercept", "pointcov","bird1_PA_spatial"))
@@ -306,13 +302,21 @@ test_that('makeFormulas is able to make the correct formulas for the different p
             expect_setequal(Check$Formulas$PA$bird2$PAresp$RHS,
                             c("bird2_Fixed__Effects__Comps", "shared_spatial", "bird2_intercept", "pointcov","bird2_PA_spatial"))
             
+            #Check replicate
+            Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', markintercept = TRUE, speciesintercept = FALSE, speciesenvironment = TRUE,
+                               paresp = 'PAresp', countresp = 'counts', marksspatial = TRUE, speciesspatial = 'replicate',
+                               marks = NULL, temporalname = 'temp', speciesindependent = FALSE,
+                               spatial = 'correlate', intercept = FALSE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = NULL)
+            
+            expect_true(all(unlist(lapply(unlist(unlist(Check$Formulas, recursive = FALSE), recursive = FALSE), function(x) 'shared_spatial' %in% x$RHS))))
+            
             
             })
 
 #Change back to original
 Check$makeFormulas(spatcovs = 'spatcovs', speciesname = 'species', marksspatial = TRUE, speciesintercept = TRUE, speciesenvironment = TRUE,
                    paresp = 'PAresp', countresp = 'counts', markintercept = TRUE, speciesspatial = 'individual',
-                   marks = c('numvar', 'factvar', 'binommark'), temporalname = 'temp', speciesindependent = FALSE,
+                   marks = NULL, temporalname = 'temp', speciesindependent = FALSE,
                    spatial = 'shared', intercept = FALSE, pointcovs = 'pointcov', biasformula = NULL, covariateformula = NULL)
 
 test_that('makeComponents is able to make the correct components for all the processes
@@ -430,7 +434,7 @@ test_that('makeComponents is able to make the correct components for all the pro
                             "pointcov",        
                             "PO_intercept(1)",
                             "PA_intercept(1)",
-                            'species_intercepts(main = species, model = "iid", constr = FALSE)',
+                            "species_intercepts(main = species, model = \"iid\", constr = FALSE, hyper = list(prec = list(prior = \"loggamma\", param = c(1, 5e-05))))",
                             "factvar(main = factvar, model = \"iid\",constr = FALSE, fixed=TRUE)",                                                      
                             "factvar_phi(main = factvar_phi, model = \"iid\", initial = -10, fixed = TRUE)",                                            
                             "numvar_intercept(1)",                                                                                                      
@@ -493,10 +497,10 @@ test_that('makeComponents is able to make the correct components for all the pro
                       "factvar_phi(main = factvar_phi, model = \"iid\", initial = -10, fixed = TRUE)",                                            
                       "numvar_intercept(1)",                                                                                                      
                       "binommark_intercept(1)",
-                      "fish2_Bias__Effects__Comps(main = ~fish2_BiasCov - 1, model = \"fixed\")",
-                      "fish1_Bias__Effects__Comps(main = ~fish1_BiasCov - 1, model = \"fixed\")",
-                      "bird2_Bias__Effects__Comps(main = ~bird2_BiasCov - 1, model = \"fixed\")",
-                      "bird1_Bias__Effects__Comps(main = ~bird1_BiasCov - 1, model = \"fixed\")"))
+                      "Bias__Effects__Comps(main = ~BiasCov - 1, model = \"fixed\")",
+                      "Bias__Effects__Comps(main = ~BiasCov - 1, model = \"fixed\")",
+                      "Bias__Effects__Comps(main = ~BiasCov - 1, model = \"fixed\")",
+                      "Bias__Effects__Comps(main = ~BiasCov - 1, model = \"fixed\")"))
     
     #Check covariateFormula
     compsCov <- Check$makeComponents(spatial = 'shared', intercepts = FALSE, datanames = c('PO','PA'), marksintercept = TRUE, speciesintercept = FALSE, speciesenvironment = TRUE,
@@ -527,6 +531,30 @@ test_that('makeComponents is able to make the correct components for all the pro
                       "factvar_phi(main = factvar_phi, model = \"iid\", initial = -10, fixed = TRUE)",                                            
                       "numvar_intercept(1)",                                                                                                      
                       "binommark_intercept(1)"))
+    
+    compsCorrel <- Check$makeComponents(spatial = 'correlate', intercepts = FALSE, datanames = c('PO','PA'), marksintercept = TRUE, speciesintercept = FALSE, speciesenvironment = TRUE,
+                                     marks = NULL, temporalmodel = deparse(list(model = "ar1")), speciesindependent = FALSE,
+                                     multinomnames = 'factvar', pointcovariates = 'pointcov', marksspatial = TRUE, offsetname = NULL,
+                                     speciesname = 'species', covariatenames = 'spatcovs', temporalname = NULL, speciesspatial = 'individual',
+                                     covariateclass = 'numeric', numtime = 2, copymodel = Check$.__enclos_env__$private$copyModel,
+                                     biasformula = NULL, covariateformula = NULL)
+    
+    expect_setequal(compsCorrel, c("shared_spatial(main = geometry, model = shared_field, group = ._dataset_index_var_., control.group = list(model = \"exchangeable\"))",
+                                   "fish2_PO_spatial(main = geometry, model = fish2_PO_field)",
+                                   "fish1_PO_spatial(main = geometry, model = fish1_PO_field)", 
+                                   "bird1_PA_spatial(main = geometry, model = bird1_PA_field)", 
+                                   "bird2_PA_spatial(main = geometry, model = bird2_PA_field)",
+                                   "fish2_spatcovs(main = fish2_spatcovs, model = \"numeric\")",
+                                   "fish1_spatcovs(main = fish1_spatcovs, model = \"numeric\")",
+                                   "bird1_spatcovs(main = bird1_spatcovs, model = \"numeric\")", 
+                                   "bird2_spatcovs(main = bird2_spatcovs, model = \"numeric\")", 
+                                   "pointcov",
+                                   "factvar(main = factvar, model = \"iid\",constr = FALSE, fixed=TRUE)",
+                                   "factvar_phi(main = factvar_phi, model = \"iid\", initial = -10, fixed = TRUE)",
+                                   "fish2_intercept(1)",
+                                   "fish1_intercept(1)", 
+                                   "bird1_intercept(1)", 
+                                   "bird2_intercept(1)" ))
     
             
           })

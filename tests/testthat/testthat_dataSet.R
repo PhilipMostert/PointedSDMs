@@ -31,12 +31,7 @@ test_that('dataSet transforms the data to SpatialPointsDataFrames, and produces 
   PA$marktrial <- sample(x = 2:5, size = nrow(PA), replace = TRUE)
   PA$species <- sample(x = c('bird1', 'bird2'), nrow(PA), replace = TRUE)
   PA$temp <- rpois(n = nrow(PA), lambda = 5)
-  
-  PA$long <- st_coordinates(PA)[,1]
-  PA$lat <- st_coordinates(PA)[,2]
-  st_geometry(PA) <- NULL
-  ##Make PA a data.frame object
-  PA <- data.frame(PA)
+
   
   spData <- list(PO, PA)
   
@@ -56,13 +51,13 @@ test_that('dataSet transforms the data to SpatialPointsDataFrames, and produces 
   ##Should create a placeholder variable for the poresp + 
   #should keep marks +
   #should create new variables for the multinomial marks.
-  expect_setequal(names(mod$Data$PO[[1]]), c("poresp", "numvar", "factvar", 'temp', 'geometry',
+  expect_setequal(names(mod$Data$PO[[1]]), c("poresp", "numvar", "factvar", 'temp', 'geometry','._dataset_index_var_.',
                                                   "species", "factvar_phi", "factvar_response", 'speciesINDEX_VAR'))
   expect_true((all(mod$Data$PO[[1]]$factvar_phi == 1)))
   expect_true((all(mod$Data$PO[[1]]$factvar_response == 1)))
   expect_true(class(mod$Data$PO[[1]]$factvar) == 'character')
   
-  expect_setequal(names(mod$Data$PA[[1]]), c("PAresp", "trial", "binommark", 'temp', 'geometry',
+  expect_setequal(names(mod$Data$PA[[1]]), c("PAresp", "trial", "binommark", 'temp', 'geometry', '._dataset_index_var_.',
                                                   "marktrial", "species", "pointcov", 'speciesINDEX_VAR'))
   
   #Family for PO should be:
