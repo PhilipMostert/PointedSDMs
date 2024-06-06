@@ -1,7 +1,7 @@
 #' @title \emph{blockedCV}: run spatial blocked cross-validation on the integrated model.
 #' 
 #' @description This function is used to perform spatial blocked cross-validation with regards to model selection for the integrated model. It does so by leaving out a block of data in the full model, running a model with the remaining data, and then calculating the deviance information criteria (DIC) as a score of model fit.
-#' @param data An object produced by \code{\link{intModel}}. Requires the slot function, \code{.$spatialBlock} to be run first in order to specify how the data in the model is blocked.
+#' @param data An object produced by either \code{\link{startISDM}} of \code{\link{startSpecies}}. Requires the slot function, \code{.$spatialBlock} to be run first in order to specify how the data in the model is blocked.
 #' @param options A list of \pkg{INLA} or \pkg{inlabru} options to be used in the model. Defaults to \code{list()}.
 #' 
 #' @import inlabru
@@ -21,8 +21,9 @@
 #'  mesh$crs <- proj
 #'  
 #'  #Set model up
-#'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
-#'                              Projection = proj)
+#'  organizedData <- startISDM(data, Mesh = mesh,
+#'                             responsePA = 'Present',
+#'                             Projection = proj)
 #'  
 #'  #Set up spatial block
 #'  organizedData$spatialBlock(k = 2, rows = 2, cols = 1)
@@ -46,7 +47,7 @@ blockedCV <- function(data, options = list()) {
    #Should we make data a list of data files;
    # or should we make another argument for thinned formulas to test based on the full model?
   
-  if (!inherits(data, 'dataSDM')) stop('data needs to be a dataSDM object.')
+  if (!inherits(data, 'dataSDM') && !inherits(data, 'specifySpecies') && !inherits(data, 'specifyISDM')) stop('data needs to be a dataSDM object.')
   
   if (is.null(data$.__enclos_env__$private$INLAmesh)) stop('An inla.mesh object is required before any model is run.')
   
@@ -85,7 +86,22 @@ blockedCV <- function(data, options = list()) {
       
       lapply(data, function(x) {
         
-        x[x$.__block_index__ != fold,]
+        data <- x[x$.__block_index__ != fold,]
+        if (nrow(data) > 0) data
+        else NULL
+        
+      })
+      
+      
+    })
+    
+    testData <- lapply(data$.__enclos_env__$private$modelData, function(data) {
+      
+      lapply(data, function(x) {
+        
+        data <- x[x$.__block_index__ == fold,]
+        if (nrow(data) > 0) data
+        else NULL
         
       })
       
