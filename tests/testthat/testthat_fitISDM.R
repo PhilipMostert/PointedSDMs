@@ -1,5 +1,6 @@
 test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra metadata.', {
   skip_on_cran()
+  ##Re do this for startISDM + startSpecies + startMarks
   
   projection <- '+proj=tmerc'
   
@@ -26,66 +27,89 @@ test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra 
   PA$trial <- sample(x = c(1,2,3), size = nrow(PA), replace = TRUE)
   PA$pointcov <- runif(n = nrow(PA))
   PA$binommark <- sample(x = 0:1, size = nrow(PA), replace = TRUE)
-  PA$marktrial <- sample(x = 2:5, size = nrow(PA), replace = TRUE)
   PA$species <- sample(x = c('bird'), nrow(PA), replace = TRUE)
   mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
                              max.edge = 2, crs = inlabru::fm_crs(projection))
   #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
   iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
-  ##Make PA a data.frame object
-  PA$long <- st_coordinates(PA)[,1]
-  PA$lat <- st_coordinates(PA)[,2]
-  st_geometry(PA) <- NULL
-  PA <- data.frame(PA)
   
-  coordnames <- c('long', 'lat')
   responseCounts <- 'count'
   responsePA <- 'PAresp'
   trialName <- 'trial'
-  markNames <- c('numvar', 'factvar', 'binommark')
-  marksFamily <- c('gaussian', 'multinomial', 'binomial')
-  markTrial = 'marktrial'
   pointCovs <- 'pointcov'
   speciesName <- 'species'
   
   cov <- terra::rast(st_as_sf(SpatialPoly), crs = projection)
   terra::values(cov) <- rgamma(n = terra::ncell(cov), shape = 2)
   names(cov) <- 'covariate'
+  cov$cov2 <-  rgamma(n = terra::ncell(cov), shape = 2)
   
-  obj <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
-                IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, speciesIndependent = FALSE,
-                responsePA = responsePA, markNames = NULL, markFamily = NULL, speciesSpatial = 'individual',
-                speciesName = speciesName, spatialCovariates = cov, pointsIntercept = FALSE,
-                speciesEffects = list(randomIntercept = FALSE, Environmental = TRUE))
+  #Start normal ISDM
+  obj <- startISDM(PO, PA, Projection = projection, Mesh = mesh,responsePA = responsePA,
+                   IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts,
+                   spatialCovariates = cov)
   
   ##run model
-  spatMod <- fitISDM(data = obj, options  = list(control.inla=list(int.strategy='eb')))
+  spatMod <- fitISDM(data = obj, options  = list(control.inla=list(int.strategy='eb', diagonal = 100)))
   
-  expect_setequal(class(spatMod), c('bruSDM', 'bru', 'iinla', 'inla'))
-  expect_contains(c(row.names(spatMod$summary.fixed)), c( "fish_covariate", "bird_covariate",'fish_intercept', 'bird_intercept'))
-  expect_equal(spatMod[['species']][['speciesVar']], 'species')
-  expect_equal(spatMod[['species']][['speciesIn']][['PO']], 'fish')
-  expect_equal(spatMod[['species']][['speciesIn']][['PA']], 'bird')
+  expect_setequal(class(spatMod), c('modISDM', 'bru', 'iinla', 'inla'))
+  expect_contains(c(row.names(spatMod$summary.fixed)), c("covariate", "cov2", "PO_intercept", "PA_intercept"))
+  expect_equal(spatMod[['species']][['speciesVar']], NULL)
+  expect_equal(deparse1(spatMod[['componentsJoint']]),"~-1 + PO_spatial(main = geometry, model = PO_field) + PA_spatial(main = geometry, copy = \"PO_spatial\", hyper = list(beta = list(fixed = FALSE))) + covariate(main = covariate, model = \"linear\") + cov2(main = cov2, model = \"linear\") + PO_intercept(1) + PA_intercept(1)")
   
-  expect_equal(deparse1(spatMod[['componentsJoint']]), "~-1 + shared_spatial(main = geometry, model = shared_field) + fish_PO_spatial(main = geometry, model = fish_PO_field) + bird_PA_spatial(main = geometry, model = bird_PA_field) + fish_covariate(main = fish_covariate, model = \"linear\") + bird_covariate(main = bird_covariate, model = \"linear\") + fish_intercept(1) + bird_intercept(1)")
+  expect_equal(spatMod[['spatCovs']][['name']], c('covariate', 'cov2'))
+  expect_equal(spatMod[['spatCovs']][['class']], c(covariate = 'numeric', cov2 = 'numeric'))
   
-  
-  expect_output(summary(spatMod), 'Summary for fish:')
-  expect_output(summary(spatMod), 'Summary for bird:')
-  
-  expect_equal(spatMod[['spatCovs']][['name']], 'covariate')
-  expect_equal(spatMod[['spatCovs']][['class']], c(covariate = 'numeric'))
-  
-  ##Run with marks
-  obj2 <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
-                IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
-                responsePA = responsePA, markNames = c('factvar', 'binommark'), markFamily = c('multinomial', 'binomial'),
-                speciesName = speciesName, spatialCovariates = cov, trialsMarks = 'marktrial')
+  ##Try with custom formula
+  obj2 <- startISDM(PO, PA, Projection = projection, Mesh = mesh, responsePA = responsePA,
+                   IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts,
+                   spatialCovariates = cov, Formulas = list(covariateFormula = ~ covariate + I(covariate^2),
+                                                            biasFormula = ~ cov2))
+  spatMod2 <- fitISDM(data = obj2, options  = list(control.inla=list(int.strategy='eb', diagonal = 100)))
 
-  spatMod2 <- fitISDM(data = obj2,
-                       options  = list(control.inla=list(int.strategy='eb')))
+  expect_true(all(c('Fixed__Effects__Comps', 'Bias__Effects__Comps', 'PO_spatial', 'PA_spatial') %in% names(spatMod2$summary.random)))
+  expect_setequal(spatMod2$summary.random$Fixed__Effects__Comps$ID, c('covariate', 'I(covariate^2)'))
+  expect_equal(spatMod2$summary.random$Bias__Effects__Comps$ID, 'cov2')
+
+  ##Run with species
+  obj3 <- startSpecies(PO, PA, Projection = projection, Mesh = mesh, responsePA = responsePA,
+                    IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts,
+                    spatialCovariates = cov, speciesName = 'species')
+
+  spatMod3 <- fitISDM(data = obj3,
+                       options  = list(control.inla=list(int.strategy='eb', diagonal = 100)))
   
-  expect_setequal(spatMod2[['source']], c('PO', 'PO', 'PA', 'PA'))
-  expect_setequal(sapply(spatMod2$.args$control.family, function(x) x$link), c('log', 'log', 'cloglog', 'cloglog'))
+  expect_setequal(spatMod3$species$speciesIn$PO, c('fish'))
+  expect_setequal(spatMod3$species$speciesIn$PA, c('bird'))
+  expect_equal(spatMod3$species$speciesVar, 'species')
+  expect_true(spatMod3$species$speciesEffects$Intercepts)
+  expect_true(spatMod3$species$speciesEffects$Environmental)
+  
+  expect_setequal(names(spatMod3$summary.random), c('PO_spatial', 'PA_spatial', 'speciesShared', 'species_intercepts'))
+  expect_setequal(sapply(spatMod3$.args$control.family, function(x) x$link), c('log', 'log', 'cloglog', 'cloglog'))
+  
+  
+  #Try with different arguments
+  obj4 <- startSpecies(PO, PA, Projection = projection, Mesh = mesh,responsePA = responsePA,
+                       IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts,
+                       spatialCovariates = cov, speciesName = 'species', speciesIntercept = FALSE,
+                       speciesEnvironment = FALSE)
+  
+  spatMod4 <- fitISDM(data = obj4,
+                      options = list(control.inla=list(int.strategy='eb', diagonal = 100)))
+  expect_false(spatMod4$species$speciesEffects$Intercepts)
+  expect_false(spatMod4$species$speciesEffects$Environmental)
+  expect_setequal(row.names(spatMod4$summary.fixed), c('covariate', 'cov2', 'PO_intercept', 'bird_intercept', 'fish_intercept', 'PA_intercept'))
+  
+  #Try with formulas
+  obj5 <- startSpecies(PO, PA, Projection = projection, Mesh = mesh, responsePA = responsePA,
+                       IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts,
+                       spatialCovariates = cov, speciesName = 'species',  
+                       Formulas = list(covariateFormula = ~ covariate + I(covariate^2),
+                                       biasFormula = ~ cov2))
+  spatMod5 <- fitISDM(data = obj5,
+                      options = list(control.inla=list(int.strategy='eb', diagonal = 100)))
+  expect_setequal(names(spatMod5$summary.random), c("PO_spatial", "speciesShared", "Bias__Effects__Comps",
+                              "bird_Fixed__Effects__Comps","species_intercepts", "fish_Fixed__Effects__Comps", "PA_spatial"))
   
   })

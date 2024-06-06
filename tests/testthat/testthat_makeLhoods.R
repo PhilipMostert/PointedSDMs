@@ -33,12 +33,7 @@ test_that('makeLhoods makes a list of likelihoods', {
                              max.edge = 2, crs = inlabru::fm_crs(projection))
   #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
   iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
-  ##Make PA a data.frame object
-  PA$x.1 <- st_coordinates(PA)[,1]
-  PA$x.2 <- st_coordinates(PA)[,2]
-  st_geometry(PA) <- NULL
-  PA <- data.frame(PA)
-  
+
   coordnames <- c('x.1', 'x.2')
   responseCounts <- 'count'
   responsePA <- 'PAresp'
@@ -53,10 +48,9 @@ test_that('makeLhoods makes a list of likelihoods', {
   terra::values(cov) <- rgamma(n = terra::ncell(cov), shape = 2)
   
   
-  obj <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
-                  IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, trialsMarks = markTrial,
-                  responsePA = responsePA, markNames = c('numvar', 'binommark'), markFamily = c('gaussian', 'binomial'),
-                  speciesName = speciesName, spatialCovariates = cov)
+  obj <- startSpecies(PO, PA, Projection = projection, Mesh = mesh,
+                  IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts,
+                  responsePA = responsePA, speciesName = speciesName, spatialCovariates = cov)
   
   Lhoods <- makeLhoods(data = obj$.__enclos_env__$private$modelData,
                        formula = obj$.__enclos_env__$private$Formulas,
@@ -75,22 +69,17 @@ test_that('makeLhoods makes a list of likelihoods', {
   expect_true(all(unlist(lapply(Lhoods, class)) == c("bru_like", "list")))
   
   #Names should be in format: dataset_species_response
-  expect_setequal(names(Lhoods), c("PO_fish_geometry", "PO_fish_numvar", "PA_bird_PAresp", "PA_bird_binommark"))
+  expect_setequal(names(Lhoods), c("PO_fish_geometry", "PA_bird_PAresp"))
 
   #Expect familus
-  expect_setequal(sapply(Lhoods, function(x) x$family), c( "cp", "gaussian", "binomial", "binomial"))
+  expect_setequal(sapply(Lhoods, function(x) x$family), c( "cp", "binomial"))
   
   #Trials are correct for PA response
   expect_identical(Lhoods$PA_bird_PAresp$Ntrials, PA$trial)
   
-  #Trials are correct for marks
-  expect_identical(Lhoods$PA_bird_binommark$Ntrials, PA$marktrial)
-  
   #Correct formulas
   expect_equal(deparse1(Lhoods$PO_fish_geometry$formula), 'geometry ~ .')
-  expect_equal(deparse1(Lhoods$PO_fish_numvar$formula), 'numvar ~ .')
   expect_equal(deparse1(Lhoods$PA_bird_PAresp$formula), 'PAresp ~ .')
-  expect_equal(deparse1(Lhoods$PA_bird_binommark$formula), 'binommark ~ .')
   
   
   
