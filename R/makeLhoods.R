@@ -84,7 +84,8 @@ makeLhoods <- function(data, formula, family, mesh, ips,
             
             IPS <- NULL
             
-          } else IPS <- ips
+          }
+        else IPS <- ips
         
         if (!is.null(pointcovs)) {
         
@@ -95,6 +96,7 @@ makeLhoods <- function(data, formula, family, mesh, ips,
         
         }
         }
+          
         Likelihoods[[Likindex]] <- inlabru::like(formula = formula[[dataset]][[species]][[process]][['LHS']], ## but obs change these in function call
                                                  include = formula[[dataset]][[species]][[process]][['RHS']],
                                                  data = data[[dataset]][[species]], 
