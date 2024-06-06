@@ -235,7 +235,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
         time_data <- data.frame(seq_len(max(numeric_time)))
         names(time_data) <- time_variable
         
-        data <- inlabru::fm_cprod(data, data.frame(time_data))
+        timeData <- inlabru::fm_cprod(data, data.frame(time_data))
         names(data)[!names(timeData) %in% c('geometry', '.block', 'speciesSpatialGroup')] <- c(time_variable, 'weight')  
       
         }
@@ -426,19 +426,19 @@ plot.modSpecies_predict <- function(x,
                                     plot = TRUE,
                                  ...) {
   if (any(!variable%in%c("mean", "sd", "q0.025", "median","q0.975",
-                         "smin", "smax", "cv", "var" ))) stop('Whattoplot is not a valid variable to plot')
+                         "smin", "smax", "cv", "var" ))) stop('variable is not a valid variable to plot')
   
   if (length(x) == 1 && names(x) %in% 'temporalPredictions') {
     
-    if (length(whattoplot) > 1) stop('Please only plot one variable at a time for species plots.')
+    if (length(variable) > 1) stop('Please only plot one variable at a time for species plots.')
     
     ##Need to create a new var called ..temporal_variable_index.. which is the tempVar
     temporalName <- names(x[[1]])[!names(x[[1]]) %in% c(".block", 'geometry', 'weight', 'mean', 'sd', 'q0.025', 'median', 'q0.975', 'q0.5', 'smin', 'smax', 'cv','mean.mc_std_err', 'sd.mc_std_err')]
     
     x[[1]]$..temporal_variable_index.. <- as.character(data.frame(x[[1]])[, temporalName])
     
-    if (inherits(x[[1]], 'sf')) plot_obj <- geom_sf(data = x[[1]], aes(col = .data[[whattoplot]]))
-    else plot_obj <- inlabru::gg(x[[1]], aes(col = .data[[whattoplot]]))
+    if (inherits(x[[1]], 'sf')) plot_obj <- geom_sf(data = x[[1]], aes(col = .data[[variable]]))
+    else plot_obj <- inlabru::gg(x[[1]], aes(col = .data[[variable]]))
     
     plot_grid <- ggplot() + plot_obj + facet_wrap(~ ..temporal_variable_index..) + ggtitle('Plot of the temporal predictions')
     return(plot_grid)
