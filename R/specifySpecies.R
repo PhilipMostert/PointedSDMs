@@ -868,7 +868,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' \dontrun{
   #' 
   #' #Create data object
-  #' dataObj <- startISDM(...)
+  #' dataObj <- startSpecies(...)
   #' 
   #' #Print link function for a process
   #' 
@@ -920,7 +920,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #'  
   #'  
   #'  #Set model up
-  #'  organizedData <- startISDM(data, Mesh = mesh, 
+  #'  organizedData <- startSpecies(data, Mesh = mesh, 
   #'                            speciesName = 'speciesName',
   #'                            spatialCovariates = Forest,
   #'                            Projection = proj, responsePA = 'Present',
@@ -1318,8 +1318,6 @@ specifySpecies$set('public', 'initialize',  function(data, projection, Inlamesh,
                                                   boundary, ips, temporal, temporalmodel, offset,
                                                   copymodel, formulas, speciesindependent,
                                                   speciesname, speciesenvironment, speciesspatial) {
-  
-  ##MOVE THESE ALL TO startISDM
   
   if (missing(projection)) stop('projection needs to be given.')
   if (missing(Inlamesh)) stop('Mesh needs to be given.')
