@@ -61,7 +61,9 @@ Mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(Pgon),
                            offset = Meshpars$offset,
                            crs = st_crs(Projection))
 
-SolitaryTinamou <- list(datasets = list(eBird = SolTin_ebird, Parks = SolTin_parks, Gbif = SolTin_gbif),
+datasets <- list(eBird = SolTin_ebird, Parks = SolTin_parks, Gbif = SolTin_gbif)
+datasets <- lapply(datasets, function(x) {x$speciesName <- 'SolitaryTinamou'; st_as_sf(x, coords = c('X', 'Y'), crs = proj)})
+SolitaryTinamou <- list(datasets =datasets,
                         #covariates = list(Forest = Forest, NPP = NPP, Altitude = Altitude),
                         region = Pgon,
                         mesh = Mesh)
