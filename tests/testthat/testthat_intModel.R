@@ -33,11 +33,7 @@ test_that('intModel is able to initialize a dataSDM object as well as correctly 
                              max.edge = 2, crs = inlabru::fm_crs(projection))
   #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
   iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
-  ##Make PA a data.frame object
-  PA$long <- st_coordinates(PA)[,1]
-  PA$lat <- st_coordinates(PA)[,2]
-  st_geometry(PA) <- NULL
-  PA <- data.frame(PA)
+
   
   coordnames <- c('long', 'lat')
   responseCounts <- 'count'
@@ -50,42 +46,13 @@ test_that('intModel is able to initialize a dataSDM object as well as correctly 
   speciesName <- 'species'
 
   
-  obj <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
+  expect_warning(intModel(PO, PA, Projection = projection, Mesh = mesh,
                 IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
-                responsePA = responsePA, markNames = markNames, markFamily = marksFamily,
-                speciesName = speciesName)
+                responsePA = responsePA), 'This function has been depreciated for startISDM. If you wish to create a multi-species model, please use startSpecies.')
   
-  expect_true(all(class(obj) == c('dataSDM', 'R6')))
-  expect_setequal(names(obj$.__enclos_env__$private$modelData), c("PO", "PA"))
-  
-  ##Test warnings: No data added
-  expect_warning(intModel(Coordinates = coordnames, Projection = projection, Mesh = mesh,
-                        IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
-                        responsePA = responsePA, markNames = markNames, markFamily = marksFamily,
-                        speciesName = speciesName))
-  
-  ##Test error: Coordinates length > 2
-  expect_error(intModel(PO, PA, Coordinates = c('x','y','z'), Projection = projection, Mesh = mesh,
-                        IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
-                        responsePA = responsePA, markNames = markNames, markFamily = marksFamily,
-                        speciesName = speciesName))
-  
-  ##Test error: Coordinates[1] == Coordinates[2]
-  expect_error(intModel(PO, PA, Coordinates = c('x','x'), Projection = projection, Mesh = mesh,
-                      IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
-                      responsePA = responsePA, markNames = markNames, markFamily = marksFamily,
-                      speciesName = speciesName))
-  
-  ##Test error: proj not CRS
-  expect_error(intModel(PO, PA, Coordinates = coordnames, Projection = list(), Mesh = mesh,
-                      IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
-                      responsePA = responsePA, markNames = markNames, markFamily = marksFamily,
-                      speciesName = speciesName))
-  
-  ##Test error: INLAmesh not an inla.mesh object
-  expect_error(intModel(PO, PA, Coordinates = coordnames, Projection = Projection, Mesh = list(),
-                      IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
-                      responsePA = responsePA, markNames = markNames, markFamily = marksFamily,
-                      speciesName = speciesName))
+  obj <- suppressWarnings(intModel(PO, PA, Projection = projection, Mesh = mesh,
+           IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
+           responsePA = responsePA))
+  expect_true(inherits(obj, 'specifyISDM'))
   
 })
