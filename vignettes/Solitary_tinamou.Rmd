@@ -52,7 +52,6 @@ datasets <- SolitaryTinamou$datasets
 region <- SolitaryTinamou$region
 mesh <- SolitaryTinamou$mesh
 
-
 ```
 
 The first item is a `list` of three datasets: *eBird*, *Gbif* and *Parks*. The first two are `data.frame` objects containing only two variables: `X` and `Y` describing the latitude and longitude coordinates of the species location respectively. As a result of this, these two datasets are considered to be *present only* datasets in our integrated model.
@@ -88,11 +87,11 @@ ggplot() + gg(mesh)
 
 ### Base model
 
-To set up an integrated species distribution model with `PointedSDMs`, we initialize it with the `intModel` function -- which results in an *R6* objects with additional slot functions to further customize the model. The base model we run for these data comprises of the spatial covariates and an intercept term for each dataset.
+To set up an integrated species distribution model with `PointedSDMs`, we initialize it with the `startISDM` function -- which results in an *R6* objects with additional slot functions to further customize the model. The base model we run for these data comprises of the spatial covariates and an intercept term for each dataset.
 
 ```{r set up base model, warning = FALSE, message = FALSE}
 
-base <- intModel(datasets, spatialCovariates = covariates, Coordinates = c('X', 'Y'),
+base <- startISDM(datasets, spatialCovariates = covariates, 
                  Projection = projection, responsePA = 'Present', Offset = 'area',
                  Mesh = mesh, pointsSpatial = NULL)
 
@@ -116,12 +115,12 @@ base$priorsFixed(Effect = 'Forest', mean.linear = 0.5, prec.linear = 0.01)
 
 ```
 
-To run the integrated model, we use the `fitISDM` function with the `data` argument as the object created with the `intModel` function above.
+To run the integrated model, we use the `fitISDM` function with the `data` argument as the object created with the `startISDM` function above.
 
 ```{r run base model, warning = FALSE, message = FALSE}
 
 baseModel <- fitISDM(data = base)
-baseModel
+summary(baseModel)
 
 ```
 
@@ -129,11 +128,11 @@ baseModel
 
 #### Shared spatial field
 
-Spatial fields are fundamental in our spatial species distribution models, and so we include them in the model by setting `pointsSpatial = TRUE` in `intModel`. Furthermore, we will remove the intercept terms by specifying `pointsIntercept = FALSE`
+Spatial fields are fundamental in our spatial species distribution models, and so we include them in the model by setting `pointsSpatial = TRUE` in `startISDM`. Furthermore, we will remove the intercept terms by specifying `pointsIntercept = FALSE`
 
 ```{r set up model with fields, warning = FALSE, message = FALSE}
 
-fields <- intModel(datasets, Coordinates = c('X', 'Y'),
+fields <- startISDM(datasets, spatialCovariates = covariates,
                    Projection = projection, Mesh = mesh, responsePA = 'Present', 
                    pointsIntercept = FALSE)
 
@@ -160,32 +159,37 @@ Finally we run the integrated model, again with `fitISDM` but this time we speci
 
 ```{r run fields model, warning = FALSE, message = FALSE}
 
-fieldsModel <- fitISDM(fields, options = list(control.inla = list(int.strategy = 'eb')))
-fieldsModel
+fieldsModel <- fitISDM(fields, options = list(control.inla = list(int.strategy = 'eb',
+                                                                  diagonal = 0.05)))
+summary(fieldsModel)
 
 ```
 
-#### Copy field
+#### Correlate fields
 
-If we would like to share the spatial fields across the linear predictors using *INLA*'s `copy` feature, we can specify `pointsSpatial = 'copy'` in `intModel()`:
+If we would like to correlate the spatial fields across the datasets , we can specify `pointsSpatial = 'correlate'` in `startISDM()`:
 
-```{r copy model}
+```{r correlate model}
 
-copy <- intModel(datasets, Coordinates = c('X', 'Y'),
-                 Projection = projection, Mesh = mesh, responsePA = 'Present', 
-                 pointsSpatial = 'copy')
+correlate <- startISDM(datasets,
+                 Projection = projection, Mesh = mesh, 
+                 responsePA = 'Present', 
+                 pointsSpatial = 'correlate')
 
-copy$specifySpatial(sharedSpatial = TRUE, prior.range = c(20,0.01), 
+correlate$specifySpatial(sharedSpatial = TRUE, prior.range = c(50,0.01), 
                       prior.sigma = c(0.1, 0.01))
 
-copy$changeComponents()
+correlate$changeComponents()
 
 ```
 
-```{r run copy model}
+```{r run correlate model}
 
-copyModel <- fitISDM(copy, options = list(control.inla = list(int.strategy = 'eb')))
-copyModel
+correlateModel <- fitISDM(correlate, 
+                          options = list(control.inla = 
+                                           list(int.strategy = 'eb',
+                                                diagonal = 0.1)))
+summary(correlateModel)
 
 ```
 
@@ -206,7 +210,7 @@ And subsequently plot using the generic `plot` function.
 
 ```{r spatial, fig.width=8, fig.height=5}
 
-plot(spatial_predictions)
+plot(spatial_predictions, variable = c('mean', 'sd'))
 
 ```
 
@@ -217,7 +221,7 @@ However if we wanted to make predictions of the bias field, we would do this by 
 bias_predictions <- predict(fieldsModel, 
                     mesh = mesh, 
                     mask = region, 
-                    biasfield = TRUE,
+                    bias = TRUE,
                     fun = 'linear')
 
 ```
