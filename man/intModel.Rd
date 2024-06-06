@@ -21,7 +21,7 @@ intModel(
   marksIntercept = TRUE,
   speciesEffects = list(randomIntercept = FALSE, Environmental = TRUE),
   Offset = NULL,
-  pointsSpatial = "shared",
+  pointsSpatial = "copy",
   marksSpatial = TRUE,
   responseCounts = "counts",
   responsePA = "present",
@@ -67,7 +67,7 @@ intModel(
 
 \item{Offset}{Name of the offset variable (class \code{character}) in the datasets. Defaults to \code{NULL}; if the argument is non-\code{NULL}, the variable name needs to be standardized across datasets (but does not need to be included in all datasets). The offset variable will be transformed onto the log-scale in the integrated model.}
 
-\item{pointsSpatial}{Argument to determine whether the spatial field is shared between the datasets, or if each dataset has its own unique spatial field. The datasets may share a spatial field with \pkg{INLA}'s "copy" feature if the argument is set to \code{copy}. May take on the values: \code{"shared"}, \code{"individual"}, \code{"copy"} or \code{NULL} if no spatial field is required for the model. Defaults to \code{"shared"}.}
+\item{pointsSpatial}{Argument to determine whether the spatial field is shared between the datasets, or if each dataset has its own unique spatial field. The datasets may share a spatial field with \pkg{INLA}'s "copy" feature if the argument is set to \code{copy}. May take on the values: \code{"shared"}, \code{"individual"}, \code{"copy"}, \code{"correlation"} or \code{NULL} if no spatial field is required for the model. Defaults to \code{"copy"}.}
 
 \item{marksSpatial}{Logical argument: should the marks have their own spatial field. Defaults to \code{TRUE}.}
 
@@ -93,8 +93,7 @@ intModel(
 A \code{\link{dataSDM}} object (class \code{R6}). Use \code{?dataSDM} to get a comprehensive description of the slot functions associated with this object.
 }
 \description{
-This function is used to create an object containing all the data, metadata and relevant components required for the integrated species distribution model and \pkg{INLA} to work.
-As a result, the arguments associated with this function are predominantly related to describing variable names within the datasets that are relevant, and arguments related to what terms should be included in the formula for the integrated model. The output of this function is an \code{R6} object, and so there are a variety of public methods within the output of this function which can be used to further specify the model (see \code{?dataSDM} for a comprehensive description of these public methods).
+This function is depreciated. Please use one of \textit{\link{startISDM}} or \textit{\link{startSpecies}}.
 }
 \note{
 The idea with this function is to describe the full model: that is, all the covariates and spatial effects will appear in all the formulas for the datasets and species.

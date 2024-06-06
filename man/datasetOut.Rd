@@ -7,7 +7,7 @@
 datasetOut(model, dataset, predictions = TRUE)
 }
 \arguments{
-\item{model}{Model of class bru_sdm run with multiple datasets.}
+\item{model}{Model of class modISDM run with multiple datasets.}
 
 \item{dataset}{Names of the datasets to leave out. If missing, will run for all datasets used in the full model.}
 
@@ -40,8 +40,9 @@ This function calculates the difference in covariate values between a full integ
  mesh$crs <- proj
  
  #Set model up
- organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
-                             Projection = proj, responsePA = 'Present')
+ organizedData <- startISDM(data, Mesh = mesh,
+                            Projection = proj, 
+                            responsePA = 'Present')
  
   ##Run the model
   modelRun <- fitISDM(organizedData,

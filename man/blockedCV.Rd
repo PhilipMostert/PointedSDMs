@@ -7,7 +7,7 @@
 blockedCV(data, options = list())
 }
 \arguments{
-\item{data}{An object produced by \code{\link{intModel}}. Requires the slot function, \code{.$spatialBlock} to be run first in order to specify how the data in the model is blocked.}
+\item{data}{An object produced by either \code{\link{startISDM}} of \code{\link{startSpecies}}. Requires the slot function, \code{.$spatialBlock} to be run first in order to specify how the data in the model is blocked.}
 
 \item{options}{A list of \pkg{INLA} or \pkg{inlabru} options to be used in the model. Defaults to \code{list()}.}
 }
@@ -30,8 +30,9 @@ This function is used to perform spatial blocked cross-validation with regards t
  mesh$crs <- proj
  
  #Set model up
- organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
-                             Projection = proj)
+ organizedData <- startISDM(data, Mesh = mesh,
+                            responsePA = 'Present',
+                            Projection = proj)
  
  #Set up spatial block
  organizedData$spatialBlock(k = 2, rows = 2, cols = 1)
