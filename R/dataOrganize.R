@@ -46,13 +46,17 @@ dataOrganize$set('public', 'dataSource', list())
 #' @param marks Name of the marks considered in the model.
 #' @param pointcovnames Name of the point covariates used in the model.
 #' @param markfamily A vector describing the distribution of the marks.
+#' @param temporalvar The name of the temporal variable.
+#' @param offsetname The name of the offset 
 
 dataOrganize$set('public', 'makeData', function(datapoints, datanames, coords, proj, marktrialname,
                                                 paresp, countsresp, trialname, speciesname, marks,
                                                 pointcovnames, markfamily, temporalvar, offsetname) {
   
+  ##REMOVE ALL sp AND DATAFRAME METHODS
+  
   dataMade <- dataSet(datapoints = datapoints, datanames = datanames,
-                      coords = coords, proj = proj, marks = marks,
+                      coords = c('CoordLoc1', 'CoordLoc2'), proj = proj, marks = marks,
                       paresp = paresp, countsresp = countsresp, pointcovnames = pointcovnames,
                       trialname = trialname, speciesname = speciesname, temporalvar = temporalvar,
                       marktrialname = marktrialname, markfamily = markfamily, offsetname = offsetname)
@@ -373,7 +377,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
           if (!is.null(spatial)) {
             
             
-           if (spatial == 'shared') spat <- 'shared_spatial'
+           if (spatial %in% c('shared', 'correlate')) spat <- 'shared_spatial'
             else 
               if (spatial %in% c('individual', 'copy')) spat <- paste0(names(self$Data)[[dataset]], '_spatial')
               
@@ -396,7 +400,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
               
               if (!pointsResponse[[response]][j] %in% c(paresp, countresp, marks)) {
                 
-                if (speciesenvironment) biascov <- paste0(speciesIn, '_Bias__Effects__Comps')
+                if (speciesenvironment) biascov <- 'Bias__Effects__Comps'#paste0(speciesIn, '_Bias__Effects__Comps')
                 else biascov <- 'Bias__Effects__Comps'
               
                 } 
@@ -562,7 +566,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   else species = NULL
   
   if (!is.null(spatial)) {
-    
+   
     if (spatial == 'shared') {
     
     if (!is.null(temporalname)) spat <- paste0('shared_spatial(main = geometry, model = shared_field, group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
@@ -580,6 +584,12 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
      spat <- c(spatMain, spatCopy)    
         
       }
+     else
+       if (spatial == 'correlate') {
+         
+         spat <- paste0('shared_spatial(main = geometry, model = shared_field, group = ._dataset_index_var_., control.group = list(model = "exchangeable"))')
+         
+       }
     else {
       
     if (!is.null(temporalname)) spat <- paste0(datanames, '_spatial(main = geometry, model = ', paste0(datanames,'_field'), ', group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
@@ -595,13 +605,13 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
         
         if (speciesintercept) 
         
-        spint <- paste0(speciesname, '_intercepts(main = ', speciesname, ', model = "iid", constr = FALSE)')
+        spint <- paste0(speciesname, '_intercepts(main = ', speciesname, ', model = "iid", constr = FALSE, hyper = list(prec = list(prior = "loggamma", param = c(1, 5e-05))))')
         else spint <- paste0(species, '_intercept(1)')
         
       } else spint <- NULL
     
     if (!is.null(speciesspatial)) { ## Then if copy or individual ...
-      
+
       #if (length(speciesspatial) > 0) {
       if (speciesspatial == 'shared') speciesSpat <- 'speciesShared(main = geometry, model = speciesField)'
       
@@ -613,17 +623,16 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
           
         } else {
       #speciesSpat <- paste0(species,'_spatial(main = coordinates, model = ',paste0(species,'_spdeModel'),')', collapse = ' + ')
-      
+ 
       #} 
       #else {
-      
       #ie we are assuming and INLA grouped model
       if (length(self$speciesIndex) != 0) {
         ##Change the species part to model = paste0(speciesname) ##where speciesname = species
          # but keep the speciesSpat framework for the temporal part of the model
         #speciesSpat <- paste0(speciesname, '_spatial(main = coordinates, model = speciesModel, group = ',speciesname,', ngroup = ', numspecies,')')
-        if (speciesspatial == 'individual' || length(species) == 1) {
-          
+        #if (speciesspatial == 'individual' || length(species) == 1) {
+        if (speciesspatial == 'individual') {  
           if (speciesindependent) speciesSpat <- paste0(species,'_spatial(main = geometry, model = ',paste0(species,'_field)'))
           else {
           
@@ -645,7 +654,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
           
         }
         else {
-          
+        
           if (speciesindependent) {
             
             speciesOne <- paste0(species[1],'_spatial(main = geometry, model = ',paste0(species[1],'_field)'))
@@ -659,9 +668,9 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
           speciesOther <- list()
           
           for (spec in species) {
-            
+   
             specInData <- sapply(self$SpeciesInData, FUN = function(x) spec %in% x)
-            
+        
             if (sum(specInData) == 1) {
               
               speciesOne[[spec]] <- paste0(spec,'_', names(specInData[specInData]),'_spatial(main = geometry, model = ',
@@ -752,7 +761,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   if (!is.null(covariatenames)) {
     
     ##IF bias covariates
-    if (!is.null(biasformula)) bias <- makeFormulaComps(form = biasformula, species = speciesenvironment, speciesnames = species, type = 'Bias')
+    
+    if (!is.null(biasformula)) bias <- makeFormulaComps(form = biasformula, species = FALSE, speciesnames = species, type = 'Bias')
     else bias <- NULL
       
     
