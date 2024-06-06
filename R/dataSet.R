@@ -1,6 +1,6 @@
 #' Internal function used to standardize datasets, as well as assign metadata.
 #' @description Internal function used to assist in structuring the data.
-#' @param datapoints A list of datasets as either sf, data.frame or SpatialPoints objects.
+#' @param datapoints A list of datasets as sf objects
 #' @param datanames A vector of the names of the datasets.
 #' @param coords Names of the coordinates used in the model.
 #' @param proj The projection reference system used in the model.
@@ -19,7 +19,7 @@
 #' 
 #' @export
 
-dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
+dataSet <- function(datapoints, datanames, coords = c('CoordLoc1', 'CoordLoc2'), proj, pointcovnames,
                     paresp, countsresp, trialname, speciesname,
                     marks, marktrialname, markfamily, temporalvar, offsetname) {
   
@@ -37,17 +37,17 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
     }
     ##Things to consider for changes here...
     #When making likelihoods it goes in the order:
-     #Dataset -> species -> process
+    #Dataset -> species -> process
     #Note that there can only be 2 Ntrials in a given dataset (one for points; one for marks)
     #So is it worth creating an Ntrials list here?
     
     #What I think I need is:
-     #A vector of what processes are in each dataset
-     #ie points response + marks
-     #Name the list by dataset
+    #A vector of what processes are in each dataset
+    #ie points response + marks
+    #Name the list by dataset
     
     #Keep the get family for multinomial marks here
-
+    
     dataOrganized <- vector(mode = 'list', length = length(datapoints))
     names(dataOrganized) <- datanames
     
@@ -77,6 +77,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         coordsSF <- sf::st_coordinates(datapoints[[dat]])
         colnames(coordsSF) <- coords
         datapoints[[dat]][, coords] <- coordsSF
+        oldProj <- st_crs(datapoints[[dat]])
         
       }
       
@@ -89,74 +90,74 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
       if (identical(varsin, character(0))) varsin <- NULL
       
       marksin <- marks[marks %in% data_vars]
-   
+      
       if (identical(marksin, character(0))) marksin <- NULL
-        
+      
       if (!is.null(marktrialname)) {
-      
+        
         if (!marktrialname %in% data_vars) MTrialssub <- NULL
-      
+        
         else MTrialssub <- marktrialname
       }
       else MTrialssub <- NULL
       
       if (!is.null(marksin)) {
-
+        
         markstype <- paste0(gsub("^(\\w)(\\w+)", 
                                  "\\U\\1\\L\\2",
                                  markfamily[marks %in% marksin],
                                  perl = TRUE),' mark')
-   
+        
         if (length(marksin) == 1) classMarks <- class(data[, marksin])
         else classMarks <- sapply(data[, marksin], class)
-
-      if (any(classMarks == 'character' | classMarks == 'factor')) {
-
-        characterMarks <- marksin[classMarks %in% c('character', 'factor')]
-      
-        for (mark in characterMarks) {
-          ##Need a list to say which marks are multinomial
-          #To add to the formulas.
-        data[, paste0(mark, '_phi')] <- rep(1,nrow(data))
         
-        if (paresp %in% data_vars) charResp <- data[, paresp]
-        else 
-          if (countsresp %in% data_vars) charResp <- data[,countsresp]
-          else charResp <- rep(1,nrow(data))
+        if (any(classMarks == 'character' | classMarks == 'factor')) {
+          
+          characterMarks <- marksin[classMarks %in% c('character', 'factor')]
+          
+          for (mark in characterMarks) {
+            ##Need a list to say which marks are multinomial
+            #To add to the formulas.
+            data[, paste0(mark, '_phi')] <- rep(1,nrow(data))
+            
+            if (paresp %in% data_vars) charResp <- data[, paresp]
+            else 
+              if (countsresp %in% data_vars) charResp <- data[,countsresp]
+              else charResp <- rep(1,nrow(data))
+              
+              data[, paste0(mark,'_response')] <- charResp#rep(1,nrow(data))
+              
+              phiVars <- paste0(characterMarks, '_phi')
+              responseVars <- paste0(characterMarks,'_response')
+              
+              #marksin <- c(marksin, paste0(mark, '_phi'), paste0(mark,'_response')) ##Do I want these phi's here??
+              
+              markfamily[match(mark, marksin)] <- 'poisson'
+              markstype[match(mark, marksin)] <- 'Multinomial mark'
+              
+              multinomVars <- c(multinomVars, characterMarks)
+              
+          }
+          
+        }
         
-        data[, paste0(mark,'_response')] <- charResp#rep(1,nrow(data))
+        else {
+          
+          characterMarks <- NULL
+          phiVars <- NULL
+          responseVars <- NULL
+          
+        }
         
-        phiVars <- paste0(characterMarks, '_phi')
-        responseVars <- paste0(characterMarks,'_response')
-    
-        #marksin <- c(marksin, paste0(mark, '_phi'), paste0(mark,'_response')) ##Do I want these phi's here??
-        
-        markfamily[match(mark, marksin)] <- 'poisson'
-        markstype[match(mark, marksin)] <- 'Multinomial mark'
-        
-        multinomVars <- c(multinomVars, characterMarks)
-   
-      }
-
-      }
-        
-      else {
-        
-      characterMarks <- NULL
-      phiVars <- NULL
-      responseVars <- NULL
-        
-      }
-      
       } 
       else {
         
-      classMarks <- NULL
-      #markfamily <- NULL
-      markstype <- NULL
-      phiVars <- NULL
-      responseVars <- NULL
-      
+        classMarks <- NULL
+        #markfamily <- NULL
+        markstype <- NULL
+        phiVars <- NULL
+        responseVars <- NULL
+        
       }
       
       if (!is.null(speciesname)) {
@@ -166,23 +167,26 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         
       } else speciesIndexVAR <- NULL
       
-      if (paresp %in% data_vars) {
-      if (!is.null(trialname)) {  
-        if (!trialname %in% data_vars) subtrialname <- NULL
-        else subtrialname <- trialname
-      } 
-      else subtrialname <- NULL
+      data[, '._dataset_index_var_.'] <- dat
       
+      if (paresp %in% data_vars) {
+        if (!is.null(trialname)) {  
+          if (!trialname %in% data_vars) subtrialname <- NULL
+          else subtrialname <- trialname
+        } 
+        else subtrialname <- NULL
+        
         #datSP <- sp::SpatialPointsDataFrame(coords = data[,coords], 
         #                                    data = data.frame(data[, c(paresp, subtrialname, temporalvar,
         #                                                               marksin, MTrialssub, speciesname,
         #                                                               phiVars, responseVars,varsin)]),
         #                                    proj4string = proj)
         datSP <- sf::st_as_sf(x = data.frame(data[, c(paresp, subtrialname, temporalvar,
-                              marksin, MTrialssub, speciesname, coords, speciesIndexVAR,
-                              phiVars, responseVars,varsin)]),
+                                                      marksin, MTrialssub, speciesname, coords, speciesIndexVAR,
+                                                      phiVars, responseVars,varsin, '._dataset_index_var_.')]),
                               coords = coords,
-                              crs = proj)
+                              crs = oldProj)
+        datSP <- sf::st_transform(x = datSP, crs = proj)
         
         if (ncol(datSP[names(datSP) != 'geometry']) == 1) names(datSP[names(datSP) != 'geometry']) <- paresp
         
@@ -190,11 +194,11 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         #  
         #  if (trialname %in% data_vars) Ntrials[[dat]] <- data.frame(datSP@data[, trialname])[, 1]
         #  else Ntrials[[dat]] <- rep(1, nrow(datSP@coords))
-
-          
+        
+        
         #}
         #else Ntrials[[dat]] <- rep(1, nrow(datSP@coords))
-
+        
         family <- 'binomial'
         #Family[dat] <- "binomial"
         datatype <- "Present absence"
@@ -211,10 +215,11 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
           #                                    proj4string = proj)
           
           datSP <- sf::st_as_sf(x = data.frame(data[, c(countsresp, marksin, temporalvar,
-                                speciesname, MTrialssub, coords, speciesIndexVAR,
-                                phiVars, responseVars, varsin)]),
+                                                        speciesname, MTrialssub, coords, speciesIndexVAR,
+                                                        phiVars, responseVars, varsin, '._dataset_index_var_.')]),
                                 coords = coords,
-                                crs = proj)
+                                crs = oldProj)
+          datSP <- sf::st_transform(x = datSP, crs = proj)
           
           if (ncol(datSP[names(datSP) != 'geometry']) == 1) names(datSP[names(datSP) != 'geometry']) <- countsresp
           
@@ -225,14 +230,14 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
           dataOrganized[[dat]][[1]] <- datSP
           
         }
-        else {
+      else {
         
         family <- 'cp'
-
+        
         data[, poresp] <- rep(1, nrow(data))
         
         data_vars <- c(data_vars, poresp)
-    
+        
         #datSP <- sp::SpatialPointsDataFrame(coords = data[, coords], 
         #                                    data = data.frame(data[, c(poresp, marksin, temporalvar,
         #                                                               speciesname, MTrialssub,
@@ -240,21 +245,20 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         #                                    proj4string = proj)
         
         datSP <- sf::st_as_sf(x = data.frame(data[, c(poresp, marksin, temporalvar,
-                              speciesname, MTrialssub, coords, speciesIndexVAR,
-                              phiVars, responseVars, varsin)]),
+                                                      speciesname, MTrialssub, coords, speciesIndexVAR,
+                                                      phiVars, responseVars, varsin, '._dataset_index_var_.')]),
                               coords = coords,
-                              crs = proj)
+                              crs = oldProj)
+        datSP <- sf::st_transform(x = datSP, crs = proj)
         
         if (ncol(datSP[names(datSP) != 'geometry']) == 1) names(datSP[names(datSP) != 'geometry']) <-poresp
         #Ntrials[[dat]] <- rep(1, nrow(datSP@coords))
-      
+        
         #Family[dat] <- "cp"
         datatype <- "Present only"
         dataOrganized[[dat]][[1]] <- datSP
-       
-        }
-      
-      
+        
+      }
       #multinomVars[[dat]] <- characterMarks
       #processIn <- c(pointsresp, marksin)
       
@@ -280,20 +284,20 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
         if (is.null(markstype)) markstype <- NA
         marksType[[dat]] <- markstype
         names(marksType[[dat]]) <- Marks[[dat]]
-      
+        
       }
       else {
-      
+        
         Marks[[dat]] <- NA
         marksType[[dat]] <- NA
-      
+        
       }
-
-
+      
+      
       dataType[dat] <- datatype
-    
+      
     }
-
+    
     names(dataOrganized) <- datanames
     names(Family) <- datanames
     names(dataType) <- datanames
@@ -319,7 +323,7 @@ dataSet <- function(datapoints, datanames, coords, proj, pointcovnames,
     #            varsIn = varsIn))
     
     ##New return
-
+    
     return(list(Data = dataOrganized,
                 Family = Family,
                 dataType = dataType,
