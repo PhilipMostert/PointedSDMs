@@ -1,7 +1,7 @@
 Package: PointedSDMs
 Type: Package
 Title: Fit Models Derived from Point Processes to Species Distributions using 'inlabru'
-Version: 1.3
+Version: 2.0.0
 Authors@R: c(
   person(given = "Philip", family = "Mostert", email = "philip.s.mostert@ntnu.no",
           role = c("aut", "cre")),
@@ -44,7 +44,7 @@ Suggests:
     spocc,
     covr
 Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 License: GPL (>= 3)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
