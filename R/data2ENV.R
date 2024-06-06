@@ -90,7 +90,7 @@ data2ENV <- function(data, env) {
   
   if (!is.null(data$.__enclos_env__$private$Spatial)) {
     
-    if (data$.__enclos_env__$private$Spatial == 'shared') assign('shared_field', data$spatialFields$sharedField$sharedField, envir = env)
+    if (data$.__enclos_env__$private$Spatial %in% c('shared', 'correlate')) assign('shared_field', data$spatialFields$sharedField$sharedField, envir = env)
     
     else {
 
