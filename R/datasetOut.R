@@ -11,7 +11,7 @@
 #' }
 #' 
 #' 
-#' @param model Model of class bru_sdm run with multiple datasets.
+#' @param model Model of class modISDM run with multiple datasets.
 #' @param dataset Names of the datasets to leave out. If missing, will run for all datasets used in the full model.
 #' @param predictions Will new models be used for predictions. If \code{TRUE} returns marginals and bru_info in model. Defaults to \code{TRUE}. 
 #' 
@@ -34,8 +34,9 @@
 #'  mesh$crs <- proj
 #'  
 #'  #Set model up
-#'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
-#'                              Projection = proj, responsePA = 'Present')
+#'  organizedData <- startISDM(data, Mesh = mesh,
+#'                             Projection = proj, 
+#'                             responsePA = 'Present')
 #'  
 #'   ##Run the model
 #'   modelRun <- fitISDM(organizedData,
@@ -55,11 +56,7 @@
 datasetOut <- function(model, dataset,
                        predictions = TRUE) {
   
-  if (!inherits(model, 'bruSDM')) stop('Model needs to be of class "bru_sdm".')
-  
-  if (model$spatial$points == 'copy') stop('copy model does not work with datasetOut.')
-  
-  if (model$spatial$species == 'copy')  stop('copy model does not work with datasetOut.')
+  if (!inherits(model, 'bruSDM') && !inherits(model, 'modISDM')) stop('model needs to be either a bruSDM or modISDM  object.')
   
   if (missing(dataset)) dataset <- unique(model[['source']])
   
@@ -71,52 +68,15 @@ datasetOut <- function(model, dataset,
   
   model_differences <- list()
   ##re-write all of this with data2env
-  if (!is.null(model[['spatCovs']][['name']])) {
-    
-    for (names in model[['spatCovs']][['name']]) {
-      
-      if (!is.null(model[['species']][['speciesIn']]) &&
-          model[['species']][['speciesEffects']]$Environmental) {
-     
-      for (species in unique(unlist(model[['species']][['speciesIn']]))) {
-       
-        assign(paste0(species,'_',names), model$bru_info$model$effects[[paste0(species,'_',names)]]$env[[paste0(species,'_',names)]])
-        
-      if (!is.null(model$spatial$species))  {
-        
-        specFieldIndex <- names(model$summary.random)[names(model$summary.random) %in% c('speciesShared',
-                                                                                         paste0(species, '_spatial'),
-                                                                                         paste0(species, '_', names(model$dataType)))]
-        
-        if (all(specFieldIndex %in% 'speciesShared')) assign('speciesField', model$bru_info_model$effects[['speciesField']]$env[['speciesField']])
-        else {
-        for (specField in specFieldIndex) {
-        
-        assign(paste0(specField,'_field'), model$bru_info$model$effects[[paste0(specField,'_field')]]$env[[paste0(specField,'_field')]])
-          
-        }
-        }
-        
-      }
-        
-      }
-        
-      }
-      else assign(names, model$bru_info$model$effects[[names]]$env[[names]])  
-      
-    }
-    
-  }
-    
   
   if (!is.null(model$spatial$points)) {
       
-      if (model$spatial$points == 'shared') assign('shared_field', model$bru_info$model$effects[[1]]$env[['spdeModel']])
+      if (model$spatial$points %in% c('shared', 'correlate')) assign('shared_field', model$bru_info$model$effects[[1]]$env[['shared_field']])
       else {
         
         for (data in unique(model$source)) {
           
-          assign(paste0(data, '_field'),  model$bru_info$model$effects[[paste0(data,'field')]]$env[[paste0(data,'field')]])
+          assign(paste0(data, '_field'),  model$bru_info$model$effects[[paste0(data,'_spatial')]]$env[[paste0(data,'_field')]])
           
         }
         
@@ -124,25 +84,15 @@ datasetOut <- function(model, dataset,
       
     } else spdeModel <- NULL
     
-    if (!is.null(model$biasData)) {
+    if (!is.null(model$biasData)) { #if shared 
       
-      for (data in model$biasData) { 
+      for (data in model$biasData$Fields) { 
         
-      assign(paste0(data, '_bias_field'), model$bru_info$model$effects[[paste0(data,'_bias_field')]]$env[[paste0(data,'_bias_field')]])
+      assign(paste0(data, '_bias_field'), model$bru_info$model$effects[[paste0(data,'_biasField')]]$env[[paste0(data,'_bias_field')]])
         
       }
       
     }
-  
-  if (model$spatial$marks) {
-    
-    for (mark in unlist(unique(model$marks$marksIn))) {
-      
-      assign(paste0(mark,'_field'), model$bru_info$model$effects[[paste0(mark,'_field')]]$env[[paste0(mark,'_field')]])  
-      
-    }
-    
-  }
 
     validation_results <- list()  
     
@@ -174,6 +124,7 @@ datasetOut <- function(model, dataset,
       reduced_options$control.compute <- list(return.marginals = FALSE)
       
     }
+
     
     reduced_terms <- unique(unlist(lapply(model$bru_info$lhoods[index], function(x) {
       
@@ -183,6 +134,44 @@ datasetOut <- function(model, dataset,
     })))
     
     all_comp_terms <- labels(terms(model$componentsJoint))
+    #How do we do this with biascopy????
+    if (model$spatial$points == 'copy') {
+      
+      Main <- grepl('_spatial', all_comp_terms) & grepl('_field', all_comp_terms)
+      Main <- sub("\\(.*", "", all_comp_terms[Main])
+      
+      if (paste0(dataname,'_spatial') == Main) {
+      
+      Copy <-  grepl('_spatial', all_comp_terms) & grepl('copy', all_comp_terms)
+      
+      compNext <- all_comp_terms[Copy][1]
+      nextTerm <- sub("\\(.*", "", compNext)
+      compNew <- paste0(nextTerm, '(main = geometry, model = ', dataname, '_field)')
+      all_comp_terms[Copy][1] <- compNew
+      fixComps <- TRUE
+      
+      } else fixComps <- FALSE
+        
+    } else fixComps <- FALSE
+    
+    if (model$biasData$Copy) {
+      
+      MainBias <- grepl('_biasField', all_comp_terms) & grepl('_bias_field', all_comp_terms)
+      MainBias <- sub("\\(.*", "", all_comp_terms[MainBias])
+      
+      if (paste0(dataname,'_biasField') == MainBias) {
+        
+        CopyBias <-  grepl('_biasField', all_comp_terms) & grepl('copy', all_comp_terms)
+        
+        compBiasNext <- all_comp_terms[CopyBias][1]
+        nextBiasTerm <- sub("\\(.*", "", compBiasNext)
+        compBiasNew <- paste0(nextBiasTerm, '(main = geometry, model = ', dataname, '_bias_field)')
+        all_comp_terms[CopyBias][1] <- compBiasNew
+        fixBiasComps <- TRUE
+        
+      } else fixBiasComps <- FALSE
+      
+    } else fixBiasComps <- FALSE
     
     comp_terms <- gsub('\\(.*$', '', all_comp_terms)
     
@@ -191,6 +180,56 @@ datasetOut <- function(model, dataset,
     if (all(comp_out)) reduced_components <- model$componentsJoint
     else reduced_components <- update(model$componentsJoint, paste0(' ~ . -', paste0(all_comp_terms[!comp_out], collapse = ' - ')))
 
+    if (fixComps) {
+
+      reduced_components <- update.formula(reduced_components, formula(paste0( '~ . -', compNext)))
+      reduced_components <- update.formula(reduced_components, formula(paste0('~ . +', compNew)))
+      
+      if (sum(Copy) > 1) {
+        newForm <- c()
+        rmIndex <- which(Copy)[2:sum(Copy)]
+        for (change in rmIndex) {
+          
+           newForm[change] <- gsub(paste0('copy = \"', Main, '\"'),
+                                         paste0('copy = \"', nextTerm, '\"'),
+                                         all_comp_terms[change])  
+          
+          
+        }
+        newForm <- na.omit(newForm)
+        
+        reduced_components <- update.formula(reduced_components, formula(paste0( '~ . -', paste0(all_comp_terms[rmIndex], collapse = '-'))))
+        reduced_components <- update.formula(reduced_components, formula(paste0( '~ . +', paste0(newForm, collapse = '+'))))
+
+        }
+      
+    }
+    
+    if (fixBiasComps) {
+      
+      reduced_components <- update.formula(reduced_components, formula(paste0( '~ . -', compBiasNext)))
+      reduced_components <- update.formula(reduced_components, formula(paste0('~ . +', compBiasNew)))
+      
+      if (sum(CopyBias) > 1) {
+        newForm <- c()
+        rmIndex <- which(Copy)[2:sum(CopyBias)]
+        for (change in rmIndex) {
+          
+          newForm[change] <- gsub(paste0('copy = \"', MainBias, '\"'),
+                                  paste0('copy = \"', nextBiasTerm, '\"'),
+                                  all_comp_terms[change])  
+          
+          
+        }
+        newForm <- na.omit(newForm)
+        
+        reduced_components <- update.formula(reduced_components, formula(paste0( '~ . -', paste0(all_comp_terms[rmIndex], collapse = '-'))))
+        reduced_components <- update.formula(reduced_components, formula(paste0( '~ . +', paste0(newForm, collapse = '+'))))
+        
+      }
+      
+    }
+    
     model_reduced <- inlabru::bru(components = reduced_components,
                                   model$bru_info$lhoods[index],
                                   options = reduced_options)
