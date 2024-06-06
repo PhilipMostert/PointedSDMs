@@ -185,7 +185,7 @@ dataSets[['BBS']] <- SetophagaData$BBS
 ```
 
 |   **Dataset name**   |   Sampling protocol    | **Number of observations** | **Species name** |                                                                   **Source**                                                                   |
-|:------------:|:------------:|:------------:|:------------:|:--------------:|
+|:--------------------:|:----------------------:|:--------------------------:|:----------------:|:----------------------------------------------------------------------------------------------------------------------------------------------:|
 |        *BBS*         |         Counts         |             45             |  *Caerulescens*  | [North American Breeding Bird Survey](https://www.pwrc.usgs.gov/bbs/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
 |        *BBA*         | Detection/nondetection |            5165            |  *Caerulescens*  |  [Pennsylvania Breeding Bird Atlas](http://www.pabirdatlas.psu.edu/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}  |
 | *eBird_caerulescens* |      Present only      |            264             |  *Caerulescens*  |                    [eBird](https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                    |

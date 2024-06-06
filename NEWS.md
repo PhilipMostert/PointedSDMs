@@ -1,4 +1,4 @@
-# PointedSDMs 1.3.1
+# PointedSDMs 1.3.2
 
 #### Changes and fixes since previous version:
 
@@ -8,3 +8,4 @@
 -   Added *shareModel* to `$addBias`: allows the user to share bias fields across different datasets.
 -   Changed the setup of the covariates: now completed in the dataset up stage rather than the modelling stage. Covariate data is now also added to the prediction data directly.
 -   Updates to the *Solitary_tinamou* vignette to add new *pc* priors to the different models.
+-   Removed *Raster* support for the spatial covariates
