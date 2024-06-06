@@ -33,10 +33,6 @@ test_that('blockedCV completes spatial block cross-validation.', {
   #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
   iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
   ##Make PA a data.frame object
-  PA$long <- st_coordinates(PA)[,1]
-  PA$lat <- st_coordinates(PA)[,2]
-  st_geometry(PA) <- NULL
-  PA <- data.frame(PA)
   
   coordnames <- c('long', 'lat')
   responseCounts <- 'count'
@@ -48,9 +44,9 @@ test_that('blockedCV completes spatial block cross-validation.', {
   pointCovs <- 'pointcov'
   speciesName <- 'species'
   
-  obj <- intModel(PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
+  obj <- startISDM(PA, Projection = projection, Mesh = mesh,
                   IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
-                  responsePA = responsePA, markNames = NULL, markFamily = NULL, pointsSpatial = NULL)
+                  responsePA = responsePA,pointsSpatial = NULL)
   
   obj$spatialBlock(k = 2, rows_cols = c(2,1))
   
@@ -66,5 +62,21 @@ test_that('blockedCV completes spatial block cross-validation.', {
   expect_equal(class(blocked$Formula), 'formula')
   expect_output(print(blocked), 'Spatial block cross-validation score:')
   expect_output(print(blocked), 'mean DIC score:')
+  
+  obj2 <- startSpecies(PA, Projection = projection, Mesh = mesh,
+                       IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
+                       responsePA = responsePA,pointsSpatial = NULL, speciesName = speciesName)
+  
+  obj2$spatialBlock(k = 2, rows_cols = c(2,1))
+  expect_true('.__block_index__' %in% names(obj2$.__enclos_env__$private$modelData$PA$PA_bird))
+  
+  blocked2 <- blockedCV(data = obj2, options  = list(control.inla=list(int.strategy='eb')))
+  
+  expect_setequal(class(blocked2), c("blockedCV", "list"))
+  expect_setequal(names(blocked2), c( "DIC_fold_1", "DIC_fold_2",'Formula'))
+  expect_equal(class(blocked2$Formula), 'formula')
+  expect_output(print(blocked2), 'Spatial block cross-validation score:')
+  expect_output(print(blocked2), 'mean DIC score:')
+  
 
 })

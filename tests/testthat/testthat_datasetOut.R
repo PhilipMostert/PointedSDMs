@@ -33,11 +33,6 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
                              max.edge = 2, crs = inlabru::fm_crs(projection))
   #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
   iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
-  ##Make PA a data.frame object
-  PA$long <- st_coordinates(PA)[,1]
-  PA$lat <- st_coordinates(PA)[,2]
-  st_geometry(PA) <- NULL
-  PA <- data.frame(PA)
   
   coordnames <- c('long', 'lat')
   responseCounts <- 'count'
@@ -53,10 +48,9 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
   terra::values(cov) <- rgamma(n = terra::ncell(cov), shape = 2)
   names(cov) <- 'covariate'
   
-  obj <- intModel(PO, PA, Coordinates = coordnames, Projection = projection, Mesh = mesh,
-                 IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, speciesSpatial = 'individual',
-                 responsePA = responsePA, markNames = c('factvar'), markFamily = c('multinomial'), pointsIntercept = TRUE,
-                 speciesName = speciesName, spatialCovariates = cov, pointsSpatial = NULL)
+  obj <- startISDM(PO, PA, Projection = projection, Mesh = mesh, spatialCovariates = cov,
+                 IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
+                 responsePA = responsePA, pointsIntercept = TRUE,pointsSpatial = NULL)
   
   spatMod <- fitISDM(data = obj,
                       options  = list(control.inla=list(int.strategy='eb')))
@@ -70,14 +64,26 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
   expect_output(print(outPO), 'Leave-one-out cross-validation score:')
   
   #ie no fish from dataset PO
-  expect_setequal(outPO$Leaving_out_PO$names.fixed, c('PA_intercept','bird_covariate', 'bird_intercept'))
-  expect_setequal(names(outPO$Leaving_out_PO$bru_info$lhoods), 'PA_bird_PAresp')
+  expect_setequal(outPO$Leaving_out_PO$names.fixed, c("covariate", "PA_intercept"))
+  expect_setequal(names(outPO$Leaving_out_PO$bru_info$lhoods), 'PA_PAresp')
   
   expect_setequal(outPO$Leaving_out_PO$source, 'PA')
   expect_false('PO' %in% names(outPO$Leaving_out_PO$species$speciesIn))
   expect_false('PO' %in% names(outPO$Leaving_out_PO$marks$marksIn))
   expect_length(outPO$Leaving_out_PO$optionsJoint$control.family, 1)
   
+  #Try copy spatial
+  obj2 <- startISDM(PO, PA, Projection = projection, Mesh = mesh,
+                   IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
+                   responsePA = responsePA, pointsIntercept = TRUE)
+  
+  spatMod2 <- fitISDM(data = obj2,
+                     options  = list(control.inla=list(int.strategy='eb')))
+  
+  outPO2 <- datasetOut(model = spatMod2, dataset = 'PO', predictions = T)
+  
+  expect_true('PA_spatial' %in% names(outPO2$Leaving_out_PO$summary.random))
+  expect_identical(deparse1(outPO2$Leaving_out_PO$componentsJoint), '~PA_intercept(1) + PA_spatial(main = geometry, model = PO_field) - 1')
 
   })
   
