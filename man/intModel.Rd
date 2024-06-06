@@ -90,10 +90,10 @@ intModel(
 \item{Formulas}{A named list with two objects. The first one, \code{covariateFormula}, is a formula for the covariates and their transformations for the distribution part of the model. Defaults to \code{NULL} which includes all covariates specified in \code{spatialCovariates} into the model. The second, \code{biasFormula}, specifies which covariates are used for the PO datasets. Defaults to \code{NULL} which includes no covariates for the PO datasets.}
 }
 \value{
-A \code{\link{dataSDM}} object (class \code{R6}). Use \code{?dataSDM} to get a comprehensive description of the slot functions associated with this object.
+A \code{\link{specifyISDM}} object (class \code{R6}). Use \code{?specifyISDM} to get a comprehensive description of the slot functions associated with this object.
 }
 \description{
-This function is depreciated. Please use one of \textit{\link{startISDM}} or \textit{\link{startSpecies}}.
+This function is depreciated. Please use one of \code{\link{startISDM}} or \code{\link{startSpecies}}.
 }
 \note{
 The idea with this function is to describe the full model: that is, all the covariates and spatial effects will appear in all the formulas for the datasets and species.

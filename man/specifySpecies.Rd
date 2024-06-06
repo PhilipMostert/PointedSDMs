@@ -198,7 +198,7 @@ organizedData$addBias(datasetNames = 'eBird')
 \dontrun{
 
 #Create data object
-dataObj <- startISDM(...)
+dataObj <- startSpecies(...)
 
 #Print link function for a process
 
@@ -226,7 +226,7 @@ dataObj$changeLink(datasetName = Dataset, Link = link)
  
  
  #Set model up
- organizedData <- startISDM(data, Mesh = mesh, 
+ organizedData <- startSpecies(data, Mesh = mesh, 
                            speciesName = 'speciesName',
                            spatialCovariates = Forest,
                            Projection = proj, responsePA = 'Present',
@@ -705,7 +705,7 @@ A new link function for a process.
 \preformatted{\dontrun{
 
 #Create data object
-dataObj <- startISDM(...)
+dataObj <- startSpecies(...)
 
 #Print link function for a process
 
@@ -763,7 +763,7 @@ If \code{plot = TRUE}, a plot of the grid.
  
  
  #Set model up
- organizedData <- startISDM(data, Mesh = mesh, 
+ organizedData <- startSpecies(data, Mesh = mesh, 
                            speciesName = 'speciesName',
                            spatialCovariates = Forest,
                            Projection = proj, responsePA = 'Present',
