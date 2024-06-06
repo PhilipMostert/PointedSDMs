@@ -41,7 +41,7 @@
 
 fitISDM <- function(data, options = list()) {
   
-  if (!inherits(data, 'dataSDM')) stop('data needs to be a dataSDM object.')
+  if (!inherits(data, 'dataSDM') && !inherits(data, 'specifySpecies') && !inherits(data, 'specifyISDM')) stop('data needs to be a dataSDM object.')
   
   if (is.null(data$.__enclos_env__$private$INLAmesh)) stop('An inla.mesh object is required before any model is run.')
   
@@ -180,15 +180,22 @@ fitISDM <- function(data, options = list()) {
                                na.omit(unlist(unname(data$.__enclos_env__$private$printSummary$marksType))))
   inlaModel[['marks']] <- list(marksIn = data$.__enclos_env__$private$printSummary$Marks,
                                multinomVars = data$.__enclos_env__$private$multinomVars)
-  inlaModel[['biasData']] <- names(data$spatialFields$biasField)
+  inlaModel[['biasData']] <- list(Fields = names(data$spatialFields$biasField), Comps = data$.__enclos_env__$private$biasFormula,
+                                  Copy = data$.__enclos_env__$private$biasCopy)
   inlaModel[['spatial']] <- list(points = pointsSpatial,
                                  species = speciesSpatial,
                                  marks = marksSpatial)
   inlaModel[['temporal']] <- list(temporalIn = data$.__enclos_env__$private$temporalVars, # I think ... do we need all these vars??? Can we just use unique unlist( ... )
                                   temporalVar = data$.__enclos_env__$private$temporalName)
   
+  #Do a switch here to assign the correct class
   
-  class(inlaModel) <- c('bruSDM', class(inlaModel))
+  
+  class(inlaModel) <- switch(class(data)[1],
+                             specifyISDM = c('modISDM', class(inlaModel)),
+                             specifySpecies = c('modSpecies', class(inlaModel)),
+                             specifyMarks = c('modMarks', class(inlaModel)),
+                             dataSDM = c('bruSDM', class(inlaModel)))
   
   inlaModel
   
