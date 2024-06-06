@@ -1,7 +1,7 @@
 #' @title \emph{startSpecies}: Function used to initialize a multi-species integrated species distribution model.
 #' 
 #' @description This function is used to create an object containing all the data, metadata and relevant components required for the multi-species integrated species distribution model and \pkg{INLA} to work.
-#' As a result, the arguments associated with this function are predominantly related to describing variable names within the datasets that are relevant, and arguments related to what terms should be included in the formula for the integrated model. The output of this function is an \code{R6} object, and so there are a variety of public methods within the output of this function which can be used to further specify the model (see \code{?dataSDM} or \code{.$help()} for a comprehensive description of these public methods).
+#' As a result, the arguments associated with this function are predominantly related to describing variable names within the datasets that are relevant, and arguments related to what terms should be included in the formula for the integrated model. The output of this function is an \code{R6} object, and so there are a variety of public methods within the output of this function which can be used to further specify the model (see \code{?specifySpecies} or \code{.$help()} for a comprehensive description of these public methods).
 #' 
 #' @param ... The datasets to be used in the model. Must come as either \code{sf} objects, or as a list of named \code{sf} objects. 
 #' @param spatialCovariates The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{SpatialRaster} object. Can be either \code{numeric}, \code{factor} or \code{character} data. Defaults to \code{NULL} which includes no spatial effects in the model.
@@ -10,10 +10,11 @@
 #' @param IPS The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[inlabru]{fm_int}} from the \pkg{inlabru} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} object.
 #' @param Boundary A \code{sf} object of the study area. If not missing, this object is used to help create the integration points.
 #' @param speciesSpatial Argument to specify if each species should have their own spatial effect with different hyperparameters to be estimated using \pkg{INLA}'s "replicate" feature, of if a the field's should be estimated per species copied across datasets using \pkg{INLA}'s "copy" feature. Possible values include: \code{'replicate'}, \code{'copy'}, \code{'shared'} or \code{NULL} if no species-specific spatial effects should be estimated.
+#' @param speciesIntercept Argument to control the species intercept term. Defaults to \code{TRUE} which creates a random intercept term, \code{FALSE} creates a fixed intercept term, and \code{NULL} removes the intercept term.
+#' @param speciesEnvironment Argument to control the species environmental term. Defaults to \code{TRUE} which creates species level environental effects. To create shared effects across the species, use \code{FALSE}.
 #' @param pointCovariates The non-spatial covariates to be included in the integrated model (for example, in the field of ecology the distance to the nearest road or time spent sampling could be considered). These covariates must be included in the same data object as the points.
 #' @param Offset Name of the offset variable (class \code{character}) in the datasets. Defaults to \code{NULL}; if the argument is non-\code{NULL}, the variable name needs to be standardized across datasets (but does not need to be included in all datasets). The offset variable will be transformed onto the log-scale in the integrated model.
 #' @param pointsIntercept Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.  Note that if this argument is non-\code{NULL} and \code{pointsIntercepts} is missing, \code{pointsIntercepts} will be set to \code{FALSE}.
-#' @param speciesEffects List specifying if intercept terms and environments effects should be made for the species. Defaults to \code{list(randomIntercept = FALSE, Environmental = TRUE)}. \code{randomIntercept} may take on three values: \code{TRUE} which creates a random intercept for each species, \code{FALSE} which creates fixed intercepts for each species, of \code{NULL} which removes all species level intercepts. Note that if \code{randomIntercept = NULL} and \code{pointsIntercept = TRUE}, dataset specific intercept terms will be created.
 #' @param pointsSpatial Argument to determine whether the spatial field is shared between the datasets, or if each dataset has its own unique spatial field. The datasets may share a spatial field with \pkg{INLA}'s "copy" feature if the argument is set to \code{copy}. May take on the values: \code{"shared"}, \code{"individual"}, \code{"copy"}, \code{"correlate"} or \code{NULL} if no spatial field is required for the model. Defaults to \code{"copy"}.
 #' @param responseCounts Name of the response variable in the counts/abundance datasets. This variable name needs to be standardized across all counts datasets used in the integrated model. Defaults to \code{'counts'}.
 #' @param responsePA Name of the response variable (class \code{character}) in the presence absence/detection non-detection datasets. This variable name needs to be standardized across all present absence datasets. Defaults to \code{'present'}.
@@ -22,7 +23,7 @@
 #' @param temporalName Name of the temporal variable (class \code{character}) in the model. This variable is required to be in all the datasets. Defaults to \code{NULL}.
 #' @param Formulas A named list with two objects. The first one, \code{covariateFormula}, is a formula for the covariates and their transformations for the distribution part of the model. Defaults to \code{NULL} which includes all covariates specified in \code{spatialCovariates} into the model. The second, \code{biasFormula}, specifies which covariates are used for the PO datasets. Defaults to \code{NULL} which includes no covariates for the PO datasets.
 #' 
-#' @return A \code{\link{dataSDM}} object (class \code{R6}). Use \code{?dataSDM} to get a comprehensive description of the slot functions associated with this object.
+#' @return A \code{\link{specifySpecies}} object (class \code{R6}). Use \code{?specifySpecies} to get a comprehensive description of the slot functions associated with this object.
 #' 
 #' @note The idea with this function is to describe the full model: that is, all the covariates and spatial effects will appear in all the formulas for the datasets and species.
 #' If some of these terms should not be included in certain observation models in the integrated model, they can be thinned out using the \code{.$updateFormula} function.
@@ -46,7 +47,7 @@
 #'  mesh$crs <- proj
 #'  
 #'  #Set base model up
-#'  baseModel <- startSpecies(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+#'  baseModel <- startSpecies(data, Mesh = mesh,
 #'                            Projection = proj, responsePA = 'Present',
 #'                            speciesName = 'speciesName')
 #'  
@@ -57,26 +58,29 @@
 #'  
 #'  indSpat <- startSpecies(data, Mesh = mesh,
 #'                          Projection = proj, pointsSpatial = 'individual', 
-#'                          responsePA = 'Present')
+#'                          responsePA = 'Present', speciesName = 'speciesName')
 #'                      
 #'  #Model with offset variable
-#'  offSet <- intModel(data, Mesh = mesh,
+#'  offSet <- startSpecies(data, Mesh = mesh,
 #'                      Projection = proj, 
 #'                      Offset = 'area', 
-#'                      responsePA = 'Present')
+#'                      responsePA = 'Present',
+#'                      speciesName = 'speciesName')
 #'                      
 #'  #Non-random effects for the species
-#'  speciesInt <- intModel(data, Mesh = mesh,
+#'  speciesInt <- startSpecies(data, Mesh = mesh,
 #'                         Projection = proj, 
 #'                         speciesIntercept = FALSE,
-#'                         responsePA = 'Present')
+#'                         responsePA = 'Present',
+#'                         speciesName = 'speciesName')
 #'                         
 #' #Turn off species level field
 #'
-#'  speciesInt <- intModel(data, Mesh = mesh,
+#'  speciesInt <- startSpecies(data, Mesh = mesh,
 #'                         Projection = proj, 
 #'                         speciesSpatial = NULL,
-#'                         responsePA = 'Present')
+#'                         responsePA = 'Present',
+#'                         speciesName = 'speciesName')
 #'                      
 #'  }
 #' 
