@@ -133,102 +133,12 @@ datasetOut <- function(model, dataset,
       
     })))
     
-    all_comp_terms <- labels(terms(model$componentsJoint))
-    #How do we do this with biascopy????
-    if (model$spatial$points == 'copy') {
-      
-      Main <- grepl('_spatial', all_comp_terms) & grepl('_field', all_comp_terms)
-      Main <- sub("\\(.*", "", all_comp_terms[Main])
-      
-      if (paste0(dataname,'_spatial') == Main) {
-      
-      Copy <-  grepl('_spatial', all_comp_terms) & grepl('copy', all_comp_terms)
-      
-      compNext <- all_comp_terms[Copy][1]
-      nextTerm <- sub("\\(.*", "", compNext)
-      compNew <- paste0(nextTerm, '(main = geometry, model = ', dataname, '_field)')
-      all_comp_terms[Copy][1] <- compNew
-      fixComps <- TRUE
-      
-      } else fixComps <- FALSE
-        
-    } else fixComps <- FALSE
-    
-    if (model$biasData$Copy) {
-      
-      MainBias <- grepl('_biasField', all_comp_terms) & grepl('_bias_field', all_comp_terms)
-      MainBias <- sub("\\(.*", "", all_comp_terms[MainBias])
-      
-      if (paste0(dataname,'_biasField') == MainBias) {
-        
-        CopyBias <-  grepl('_biasField', all_comp_terms) & grepl('copy', all_comp_terms)
-        
-        compBiasNext <- all_comp_terms[CopyBias][1]
-        nextBiasTerm <- sub("\\(.*", "", compBiasNext)
-        compBiasNew <- paste0(nextBiasTerm, '(main = geometry, model = ', dataname, '_bias_field)')
-        all_comp_terms[CopyBias][1] <- compBiasNew
-        fixBiasComps <- TRUE
-        
-      } else fixBiasComps <- FALSE
-      
-    } else fixBiasComps <- FALSE
-    
-    comp_terms <- gsub('\\(.*$', '', all_comp_terms)
-    
-    comp_out <- comp_terms %in% reduced_terms
-
-    if (all(comp_out)) reduced_components <- model$componentsJoint
-    else reduced_components <- update(model$componentsJoint, paste0(' ~ . -', paste0(all_comp_terms[!comp_out], collapse = ' - ')))
-
-    if (fixComps) {
-
-      reduced_components <- update.formula(reduced_components, formula(paste0( '~ . -', compNext)))
-      reduced_components <- update.formula(reduced_components, formula(paste0('~ . +', compNew)))
-      
-      if (sum(Copy) > 1) {
-        newForm <- c()
-        rmIndex <- which(Copy)[2:sum(Copy)]
-        for (change in rmIndex) {
-          
-           newForm[change] <- gsub(paste0('copy = \"', Main, '\"'),
-                                         paste0('copy = \"', nextTerm, '\"'),
-                                         all_comp_terms[change])  
-          
-          
-        }
-        newForm <- na.omit(newForm)
-        
-        reduced_components <- update.formula(reduced_components, formula(paste0( '~ . -', paste0(all_comp_terms[rmIndex], collapse = '-'))))
-        reduced_components <- update.formula(reduced_components, formula(paste0( '~ . +', paste0(newForm, collapse = '+'))))
-
-        }
-      
-    }
-    
-    if (fixBiasComps) {
-      
-      reduced_components <- update.formula(reduced_components, formula(paste0( '~ . -', compBiasNext)))
-      reduced_components <- update.formula(reduced_components, formula(paste0('~ . +', compBiasNew)))
-      
-      if (sum(CopyBias) > 1) {
-        newForm <- c()
-        rmIndex <- which(Copy)[2:sum(CopyBias)]
-        for (change in rmIndex) {
-          
-          newForm[change] <- gsub(paste0('copy = \"', MainBias, '\"'),
-                                  paste0('copy = \"', nextBiasTerm, '\"'),
-                                  all_comp_terms[change])  
-          
-          
-        }
-        newForm <- na.omit(newForm)
-        
-        reduced_components <- update.formula(reduced_components, formula(paste0( '~ . -', paste0(all_comp_terms[rmIndex], collapse = '-'))))
-        reduced_components <- update.formula(reduced_components, formula(paste0( '~ . +', paste0(newForm, collapse = '+'))))
-        
-      }
-      
-    }
+    reduced_components <- reduceComps(componentsOld = model$componentsJoint,
+                          pointsCopy = ifelse(model$spatial$points == 'copy', 
+                                      TRUE, FALSE),
+                          biasCopy = model$biasData$Copy,
+                          datasetName = dataname,
+                          reducedTerms = reduced_terms)
     
     model_reduced <- inlabru::bru(components = reduced_components,
                                   model$bru_info$lhoods[index],

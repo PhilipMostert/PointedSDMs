@@ -95,6 +95,8 @@ blockedCV <- function(data, options = list()) {
       
     })
     
+    ##Check if all copy + bias Main in here
+    
     testData <- lapply(data$.__enclos_env__$private$modelData, function(data) {
       
       lapply(data, function(x) {
@@ -132,7 +134,37 @@ blockedCV <- function(data, options = list()) {
     
     comp_keep <- comp_terms %in% formula_terms
     
-    thinnedComponents <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
+    if (!all(comp_keep)) {
+      
+      if (data$.__enclos_env__$private$Spatial != 'shared' | data$.__enclos_env__$private$biasCopy) {
+        
+        Main <- grepl('_spatial', data$.__enclos_env__$private$Components) & grepl('_field', data$.__enclos_env__$private$Components)
+        if (!any(Main)) Main <- 'NOTMAIN'
+        else Main <- sub("\\(.*", "", comp_terms[Main])
+        
+        MainBias <- grepl('_biasField', data$.__enclos_env__$private$Components) & grepl('_bias_field', data$.__enclos_env__$private$Components)
+        if (!any(MainBias)) MainBias <- 'NOTALLMAINBIAS'
+        else MainBias <- sub("\\(.*", "", comp_terms[MainBias])
+        
+        whichMissing <- names(trainData)[sapply(unlist(trainData, recursive = F), is.null)]
+        warning('More than 2 datasets missing from the block with either pointsSpatial = "copy" or copyModel = TRUE for the bias field.\n Will choose the first available dataset to copy on.')
+        if(paste0(whichMissing[1],'_biasField') == MainBias | paste0(whichMissing[1],'_spatial') == Main) {
+          
+          thinnedComponents <- reduceComps(componentsOld =  formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components, collapse = ' + '))),
+                                            pointsCopy = ifelse(data$.__enclos_env__$private$Spatial == 'copy', 
+                                                                TRUE, FALSE),
+                                            biasCopy = data$.__enclos_env__$private$biasCopy,
+                                            datasetName = whichMissing[1],
+                                            reducedTerms = comp_terms[comp_keep])
+          
+        } else  thinnedComponents <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
+        
+        
+      } else thinnedComponents <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
+      
+      
+    }
+    else thinnedComponents <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
 
     foldOptions <- data$.__enclos_env__$private$optionsINLA
     
@@ -144,13 +176,18 @@ blockedCV <- function(data, options = list()) {
     optionsTrain <- append(options, foldOptions)
     
     ##Calculate DIC for just this model?
-    trainedModel <- inlabru::bru(components = thinnedComponents,
+    trainedModel <- try(inlabru::bru(components = thinnedComponents,
                                  trainLiks,
-                                 options = optionsTrain)
+                                 options = optionsTrain))
     
     ## -log(intensity)
     ## add an offset argument...
-    deviance[[paste0('DIC_fold_', fold)]] <- trainedModel$dic
+    if (inherits(trainedModel, 'try-error')) {
+      
+      warning('Model failed for a block. Please change your block layout to ensure all datasets are included in all blocks')
+      deviance[[paste0('DIC_fold_', fold)]] <- NA
+    }
+    else deviance[[paste0('DIC_fold_', fold)]] <- trainedModel$dic
     
     }
   
@@ -203,7 +240,7 @@ print.blockedCV <- function(x, ...) {
   print.data.frame(dataobj)
   
   cat('\nmean DIC score: ')
-  cat(mean(dataobj$dic))
+  cat(mean(dataobj$dic, na.rm = TRUE))
 
 
 }
