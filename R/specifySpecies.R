@@ -1357,6 +1357,8 @@ specifySpecies$set('public', 'initialize',  function(data, projection, Inlamesh,
     
   }
   
+  st_geometry(ips) <- 'geometry'
+  
   if (!is.null(spatial)) {
     if (spatial == 'correlate') ips <- fm_cprod(ips, data = data.frame(._dataset_index_var_. = 1:length(initialnames)))
   }  
