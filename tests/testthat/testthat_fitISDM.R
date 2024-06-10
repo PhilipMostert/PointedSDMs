@@ -112,4 +112,13 @@ test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra 
   expect_setequal(names(spatMod5$summary.random), c("PO_spatial", "speciesShared", "Bias__Effects__Comps",
                               "bird_Fixed__Effects__Comps","species_intercepts", "fish_Fixed__Effects__Comps", "PA_spatial"))
   
+  ##Try with Marks
+  obj6 <- startMarks(PO, Projection = projection, Mesh = mesh, responsePA = responsePA,
+                     IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts,
+                     markNames = 'numvar', markFamily = 'gaussian')
+  
+  spatMod6 <- fitISDM(obj6)
+  expect_setequal(names(spatMod6$summary.random), c('shared_spatial', 'numvar_spatial', 'PO_numvar_spatial'))
+  expect_setequal(row.names(spatMod6$summary.fixed), c('PO_intercept', 'numvar_intercept'))
+  
   })
