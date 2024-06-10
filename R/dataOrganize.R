@@ -444,7 +444,8 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             }
             else {
               
-              if (!is.null(spatial)) spat <- NULL
+              #if (!is.null(spatial)) spat <- NULL
+              spat <- paste0(names(self$Data)[[dataset]], '_', pointsResponse[[response]][j], '_spatial')
               
               if (marksspatial) {
                 
@@ -527,6 +528,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
 #' @param speciesindependent Logical: should species effects be made independent.
 #' @param biasformula Terms to include for PO data.
 #' @param covariateformula Terms to include for the covariate formula.
+#' @param marksCopy Names of where each mark occurs in the dataset.
 
 dataOrganize$set('public', 'makeComponents', function(spatial, intercepts, 
                                                       datanames, marks, speciesname,
@@ -543,7 +545,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
                                                       copymodel,
                                                       speciesindependent,
                                                       biasformula,
-                                                      covariateformula) {
+                                                      covariateformula,
+                                                      marksCopy) {
   
   if (!is.null(biasformula)) {
     
@@ -734,11 +737,41 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
     if (marksspatial) {
       
+      if (!is.null(spatial)) {
+        
+        marksCopy <- mapply(FUN = function(x, names) paste0(names,'_', x), x = marksCopy, names = names(marksCopy))
+        marksCopySpat <- list()
+        
+        if (spatial  %in% c('shared', 'correlate')) marksCopySpat <- paste0(unlist(marksCopy), '_spatial(main = geometry, copy = \"shared_spatial\")')#if shared or correlate
+        else
+          if (spatial == 'individual') {
+            for (dat in names(marksCopy)) {
+            
+            marksCopySpat[[dat]] <- paste0(unlist(marksCopy[dat]), '_spatial(main = geometry, copy = \"', dat, '_spatial\")') #xx are datasetnames
+            
+            }
+          }
+        else {
+          
+          marksCopySpat <- paste0(unlist(marksCopy), '_spatial(main = geometry, copy = \"', mainName, '_spatial\")')
+          
+          
+        }
+
+        if (inherits(marksCopySpat, 'list')) marksCopySpat <- unlist(marksCopySpat)
+        
+      } else marksCopySpat <- NULL
+      
       if (!is.null(temporalname)) marksSpat <- paste0(marks, '_spatial(main = geometry, model = ', paste0(marks,'_field'), ', group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
       else marksSpat <- paste0(marks, '_spatial(main = geometry, model = ', paste0(marks,'_field)'))
       
     }
-    else marksSpat <- NULL
+    else {
+      
+      marksSpat <- NULL
+      marksCopySpat <- NULL
+      
+    }
     
     if (marksintercept) {
       
@@ -755,7 +788,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
     marksSpat <- NULL
     marksInt <- NULL
-    
+    marksCopySpat <- NULL
   }
   
   if (!is.null(covariatenames)) {
@@ -833,8 +866,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
   
   if (!is.null(multinomnames)) {
     
-    multinomVars <- paste0(multinomnames,'(main = ', multinomnames, ', model = "iid",constr = FALSE, fixed=TRUE)', collapse = ' + ')
-    multinomPhi <- paste0(multinomnames,'_phi(main = ', multinomnames, '_phi, model = "iid", initial = -10, fixed = TRUE)', collapse = ' + ')
+    multinomVars <- paste0(unique(multinomnames),'(main = ', unique(multinomnames), ', model = "iid",constr = FALSE, fixed=TRUE)', collapse = ' + ')
+    multinomPhi <- paste0(unique(multinomnames),'_phi(main = ', unique(multinomnames), '_phi, model = "iid", initial = -10, fixed = TRUE)', collapse = ' + ')
     
   }
   else {
@@ -844,7 +877,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
   }
   
-  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt, offsetTerm, bias, spint)
+  RHS <- c(spat, speciesSpat, marksSpat, covs, covsPoints, int, multinomVars, multinomPhi, marksInt, offsetTerm, bias, spint,marksCopySpat)
   
   RHS
   
