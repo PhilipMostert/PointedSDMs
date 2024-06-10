@@ -195,17 +195,31 @@ organizedData$addBias(datasetNames = 'eBird')
 ## Method `specifySpecies$changeLink`
 ## ------------------------------------------------
 
-\dontrun{
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- "+proj=longlat +ellps=WGS84"
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ Forest <- terra::rast(
+ system.file(
+ 'extdata/SolitaryTinamouCovariates.tif', 
+ package = "PointedSDMs"))$Forest
+ 
+ 
+ #Set model up
+ organizedData <- startSpecies(data, Mesh = mesh, 
+                           speciesName = 'speciesName',
+                           spatialCovariates = Forest,
+                           Projection = proj, responsePA = 'Present')
 
-#Create data object
-dataObj <- startSpecies(...)
-
-#Print link function for a process
-
-dataObj$changeLink(datasetName = Dataset, Link = link)
-
-
-}
+ #Specify the shared spatial field
+ organizedData$changeLink('Parks', 'logit')
+ 
+ 
+} 
 
 ## ------------------------------------------------
 ## Method `specifySpecies$spatialBlock`
@@ -632,6 +646,8 @@ Function to specify random fields in the model using penalizing complexity (PC) 
 
 \item{\code{datasetName}}{Name of which of the datasets' spatial fields to be specified. Requires \code{pointsSpatial = 'individual'} in \code{\link{intModel}}.}
 
+\item{\code{Species}}{Name of the species to change the spatial effect for. If \code{TRUE} then changes the spatial effect for the shared species field.}
+
 \item{\code{Bias}}{Name of the dataset for which the bias field to be specified.}
 
 \item{\code{PC}}{Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}, which uses \code{\link[INLA]{inla.spde2.pcmatern}} to specify the model; otherwise uses \code{\link[INLA]{inla.spde2.matern}}.}
@@ -702,17 +718,31 @@ A new link function for a process.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
+\preformatted{ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- "+proj=longlat +ellps=WGS84"
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ Forest <- terra::rast(
+ system.file(
+ 'extdata/SolitaryTinamouCovariates.tif', 
+ package = "PointedSDMs"))$Forest
+ 
+ 
+ #Set model up
+ organizedData <- startSpecies(data, Mesh = mesh, 
+                           speciesName = 'speciesName',
+                           spatialCovariates = Forest,
+                           Projection = proj, responsePA = 'Present')
 
-#Create data object
-dataObj <- startSpecies(...)
-
-#Print link function for a process
-
-dataObj$changeLink(datasetName = Dataset, Link = link)
-
-
-}
+ #Specify the shared spatial field
+ organizedData$changeLink('Parks', 'logit')
+ 
+ 
+} 
 }
 \if{html}{\out{</div>}}
 

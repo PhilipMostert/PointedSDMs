@@ -114,7 +114,8 @@ Internal functions used to temporarily store data and other information before a
   copymodel,
   speciesindependent,
   biasformula,
-  covariateformula
+  covariateformula,
+  marksCopy
 )}\if{html}{\out{</div>}}
 }
 
