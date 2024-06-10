@@ -617,7 +617,6 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   specifySpatial = function(sharedSpatial = FALSE,
                             datasetName,
                             Bias, PC = TRUE,
-                            Copy = NULL,
                             Remove = FALSE, ...) {
     
     if (all(!sharedSpatial && missing(datasetName) &&  missing(Bias))) stop('At least one of sharedSpatial, datasetName or Bias needs to be provided.')
@@ -626,8 +625,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
     
     if (Remove && sum(sharedSpatial, !missing(datasetName), !missing(Bias)) != 1) stop('Please choose one of sharedSpatial, datasetName, Species, Mark or Bias to remove.')
     
-    if (!is.null(Copy) && !Copy %in% unlist(private$dataSource)) stop('Dataset name provided is not currently in the model.')
-    
+
     if (sharedSpatial) {
       
       if (is.null(private$Spatial)) stop('Shared spatial field not included in the model. Please use pointsSpatial = "shared" or pointsSpatial = "copy" in intModel.')
@@ -713,17 +711,30 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @param Link Name of the link function to add to the process. If missing, will print the link function of the specified dataset.
   #' @return A new link function for a process.
   #' @examples
-  #' \dontrun{
+  #'  if (requireNamespace('INLA')) {
+  #'    
+  #'  #Get Data
+  #'  data("SolitaryTinamou")
+  #'  proj <- "+proj=longlat +ellps=WGS84"
+  #'  data <- SolitaryTinamou$datasets
+  #'  mesh <- SolitaryTinamou$mesh
+  #'  mesh$crs <- proj
+  #'  Forest <- terra::rast(
+  #'  system.file(
+  #'  'extdata/SolitaryTinamouCovariates.tif', 
+  #'  package = "PointedSDMs"))$Forest
+  #'  
+  #'  
+  #'  #Set model up
+  #'  organizedData <- startISDM(data, Mesh = mesh, 
+  #'                            spatialCovariates = Forest,
+  #'                            Projection = proj, responsePA = 'Present')
   #' 
-  #' #Create data object
-  #' dataObj <- startISDM(...)
-  #' 
-  #' #Print link function for a process
-  #' 
-  #' dataObj$changeLink(datasetName = Dataset, Link = link)
-  #' 
-  #' 
-  #' }
+  #'  #Specify the shared spatial field
+  #'  organizedData$changeLink('Parks', 'logit')
+  #'  
+  #'  
+  #' } 
   changeLink = function(datasetName,
                         Link) {
     
@@ -1165,7 +1176,7 @@ specifyISDM$set('public', 'initialize',  function(data, projection, Inlamesh, in
 })
 
 #' @description Function used to add additional datasets to the \code{specifyISDM} object. This function should be used if the user would like to add any additional datasets to the integrated model, but do not have the same standardized variable names as those added initially with \code{\link{intModel}}. Use \code{?intModel} for a more  <- rehensive description on what each argument in this function is used for.
-#' @param ... The datasets to be added to the integrated model: should be either \code{sf}, \code{data.frame} or \code{SpatialPoints*} objects, or a list of objects from these classes.
+#' @param dataList The datasets to be added to the integrated model: should be either \code{sf}, \code{data.frame} or \code{SpatialPoints*} objects, or a list of objects from these classes.
 #' @param responseCounts The name of the response variable for the counts data.
 #' @param responsePA The name of the response variable for the presence absence data.
 #' @param trialsPA The name of the trials variable for the presence absence data.
@@ -1177,6 +1188,7 @@ specifyISDM$set('public', 'initialize',  function(data, projection, Inlamesh, in
 #' @param temporalName The name of the temporal variable in the datasets.
 #' @param Coordinates A vector of length 2 describing the names of the coordinates of the data.
 #' @param Offset Name of the offset column in the dataset.
+#' @param dataNames Names of the datasets.
 #' @return Data added to the object.
 #' 
 #' @import methods
@@ -1320,7 +1332,8 @@ specifyISDM$set('private', 'addData', function(dataList, responseCounts, respons
                                                              copymodel = private$copyModel,
                                                              speciesindependent = NULL,
                                                              biasformula = private$biasFormula,
-                                                             covariateformula = private$covariateFormula)
+                                                             covariateformula = private$covariateFormula,
+                                                             marksCopy = NULL)
               
               
               ##MAKE THIS A FUNCTION TOO
