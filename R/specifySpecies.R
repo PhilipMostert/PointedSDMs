@@ -697,6 +697,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' 
   #' @param sharedSpatial Logical: specify the shared spatial field in the model. Requires \code{pointsSpatial == 'shared'} in \code{\link{intModel}}. Defaults to \code{FALSE}.
   #' @param datasetName Name of which of the datasets' spatial fields to be specified. Requires \code{pointsSpatial = 'individual'} in \code{\link{intModel}}.
+  #' @param Species Name of the species to change the spatial effect for. If \code{TRUE} then changes the spatial effect for the shared species field.
   #' @param Bias Name of the dataset for which the bias field to be specified.
   #' @param PC Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}, which uses \code{\link[INLA]{inla.spde2.pcmatern}} to specify the model; otherwise uses \code{\link[INLA]{inla.spde2.matern}}.
   #' @param Remove Logical: should the chosen spatial field be removed. Requires one of \code{sharedSpatial}, \code{species}, \code{mark} or \code{bias} to be non-missing, which chooses which field to remove.
@@ -865,17 +866,31 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @param Link Name of the link function to add to the process. If missing, will print the link function of the specified dataset.
   #' @return A new link function for a process.
   #' @examples
-  #' \dontrun{
+  #'  if (requireNamespace('INLA')) {
+  #'    
+  #'  #Get Data
+  #'  data("SolitaryTinamou")
+  #'  proj <- "+proj=longlat +ellps=WGS84"
+  #'  data <- SolitaryTinamou$datasets
+  #'  mesh <- SolitaryTinamou$mesh
+  #'  mesh$crs <- proj
+  #'  Forest <- terra::rast(
+  #'  system.file(
+  #'  'extdata/SolitaryTinamouCovariates.tif', 
+  #'  package = "PointedSDMs"))$Forest
+  #'  
+  #'  
+  #'  #Set model up
+  #'  organizedData <- startSpecies(data, Mesh = mesh, 
+  #'                            speciesName = 'speciesName',
+  #'                            spatialCovariates = Forest,
+  #'                            Projection = proj, responsePA = 'Present')
   #' 
-  #' #Create data object
-  #' dataObj <- startSpecies(...)
-  #' 
-  #' #Print link function for a process
-  #' 
-  #' dataObj$changeLink(datasetName = Dataset, Link = link)
-  #' 
-  #' 
-  #' }
+  #'  #Specify the shared spatial field
+  #'  organizedData$changeLink('Parks', 'logit')
+  #'  
+  #'  
+  #' } 
   changeLink = function(datasetName,
                         Link, ...) {
     
@@ -1293,6 +1308,7 @@ specifySpecies$set('private', 'datasetNames', NULL)
 specifySpecies$set('private', 'originalNames', NULL)
 
 #' @description Initialize function for specifySpecies: used to store some compulsory arguments. Please refer to the wrapper function, \code{intModel} for creating new specifySpecies objects.
+#' @param data The points of the model.
 #' @param projection The projection of the data.
 #' @param Inlamesh An inla.mesh object.
 #' @param initialnames The names of the datasets if data is passed through intModel.
@@ -1390,7 +1406,7 @@ specifySpecies$set('public', 'initialize',  function(data, projection, Inlamesh,
 })
 
 #' @description Function used to add additional datasets to the \code{specifySpecies} object. This function should be used if the user would like to add any additional datasets to the integrated model, but do not have the same standardized variable names as those added initially with \code{\link{intModel}}. Use \code{?intModel} for a more  <- rehensive description on what each argument in this function is used for.
-#' @param ... The datasets to be added to the integrated model: should be either \code{sf}, \code{data.frame} or \code{SpatialPoints*} objects, or a list of objects from these classes.
+#' @param dataList The datasets to be added to the integrated model: should be either \code{sf}, \code{data.frame} or \code{SpatialPoints*} objects, or a list of objects from these classes.
 #' @param responseCounts The name of the response variable for the counts data.
 #' @param responsePA The name of the response variable for the presence absence data.
 #' @param trialsPA The name of the trials variable for the presence absence data.
@@ -1402,6 +1418,7 @@ specifySpecies$set('public', 'initialize',  function(data, projection, Inlamesh,
 #' @param temporalName The name of the temporal variable in the datasets.
 #' @param Coordinates A vector of length 2 describing the names of the coordinates of the data.
 #' @param Offset Name of the offset column in the dataset.
+#' @param dataNames Names of the datasets.
 #' @return Data added to the object.
 #' 
 #' @import methods
@@ -1600,7 +1617,8 @@ specifySpecies$set('private', 'addData', function(dataList, responseCounts, resp
                                                  copymodel = private$copyModel,
                                                  speciesindependent = private$speciesIndependent,
                                                  biasformula = private$biasFormula,
-                                                 covariateformula = private$covariateFormula)
+                                                 covariateformula = private$covariateFormula,
+                                                 marksCopy = NULL)
   
   
   ##MAKE THIS A FUNCTION TOO
