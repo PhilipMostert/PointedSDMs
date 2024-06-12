@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml) [![Codecov test coverage](https://codecov.io/gh/PhilipMostert/PointedSDMs/branch/ChangingToR6/graph/badge.svg)](https://app.codecov.io/gh/PhilipMostert/PointedSDMs?branch=ChangingToR6) [![DOI](https://zenodo.org/badge/368823136.svg)](https://zenodo.org/badge/latestdoi/368823136)
+[![R-CMD-check](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml/badge.svg?branch=main)](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml)[![Codecov test coverage](https://codecov.io/gh/PhilipMostert/PointedSDMs/branch/main/graph/badge.svg)](https://app.codecov.io/gh/PhilipMostert/PointedSDMs?branch=ChangingToR6) [![DOI](https://zenodo.org/badge/368823136.svg)](https://zenodo.org/badge/latestdoi/368823136)
 
 <!-- badges: end -->
 
@@ -43,7 +43,7 @@ install.packages('PointedSDMs')
 *PointedSDMs* includes a selection of functions used to streamline the construction of ISDMs as well and perform model cross-validation. The core functions of the package are:
 
 | Function name    | Function description                                                                                          |
-|-----------------|-------------------------------------------------------|
+|------------------|------------------------------------------------------|
 | `startISDM()`    | Initialize and specify the components used in the integrated model.                                           |
 | `startSpecies()` | Initialize and specify the components used in the multi-species integrated model.                             |
 | `blockedCV()`    | Perform spatial blocked cross-validation.                                                                     |
@@ -53,7 +53,7 @@ install.packages('PointedSDMs')
 The function `intModel()` produces an [R6](https://github.com/r-lib/R6) object, and as a result there are various *slot functions* available to further specify the components of the model. These *slot functions* include:
 
 | `intModel()` slot function   | Function description                                                                                                                                             |
-|------------------|------------------------------------------------------|
+|-------------------|-----------------------------------------------------|
 | `` `.$help()` ``             | Show documentation for each of the slot functions.                                                                                                               |
 | `` `.$plot()` ``             | Used to create a plot of the available data. The output of this function is an object of class [`gg`](https://github.com/tidyverse/ggplot2).                     |
 | `` `.$addBias()` ``          | Add an additional spatial field to a dataset to account for sampling bias in unstructured datasets.                                                              |

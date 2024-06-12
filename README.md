@@ -5,9 +5,9 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/PhilipMostert/PointedSDMs/branch/ChangingToR6/graph/badge.svg)](https://app.codecov.io/gh/PhilipMostert/PointedSDMs?branch=ChangingToR6)
+[![R-CMD-check](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml/badge.svg?branch=main)](https://github.com/PhilipMostert/PointedSDMs/actions/workflows/R-CMD-check.yaml)[![Codecov
+test
+coverage](https://codecov.io/gh/PhilipMostert/PointedSDMs/branch/main/graph/badge.svg)](https://app.codecov.io/gh/PhilipMostert/PointedSDMs?branch=ChangingToR6)
 [![DOI](https://zenodo.org/badge/368823136.svg)](https://zenodo.org/badge/latestdoi/368823136)
 
 <!-- badges: end -->
@@ -175,15 +175,15 @@ summary(modelRun)
 #>     Data class: 'sf', 'data.frame'
 #>     Predictor: geometry ~ .
 #> Time used:
-#>     Pre = 0.932, Running = 11.8, Post = 0.19, Total = 13 
+#>     Pre = 2.41, Running = 17.7, Post = 0.319, Total = 20.5 
 #> Fixed effects:
 #>                   mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 #> Forest           0.027 0.004      0.019    0.027      0.034  0.027   0
 #> NPP              0.000 0.000      0.000    0.000      0.000  0.000   0
 #> Altitude        -0.001 0.000     -0.001   -0.001      0.000 -0.001   0
-#> eBird_intercept -6.853 0.283     -7.409   -6.853     -6.298 -6.853   0
-#> Parks_intercept -6.085 0.401     -6.871   -6.085     -5.299 -6.085   0
-#> Gbif_intercept  -7.411 0.317     -8.033   -7.411     -6.789 -7.411   0
+#> eBird_intercept -6.857 0.283     -7.412   -6.857     -6.301 -6.857   0
+#> Parks_intercept -6.089 0.401     -6.875   -6.089     -5.302 -6.089   0
+#> Gbif_intercept  -7.415 0.317     -8.037   -7.415     -6.793 -7.415   0
 #> 
 #> Random effects:
 #>   Name     Model
@@ -193,19 +193,19 @@ summary(modelRun)
 #> 
 #> Model hyperparameters:
 #>                          mean    sd 0.025quant 0.5quant 0.975quant  mode
-#> Range for eBird_spatial 2.920 0.280      2.430    2.900      3.529 2.845
-#> Stdev for eBird_spatial 0.924 0.058      0.817    0.921      1.044 0.915
-#> Beta for Parks_spatial  0.021 0.061     -0.099    0.022      0.142 0.022
-#> Beta for Gbif_spatial   0.437 0.054      0.330    0.437      0.544 0.436
+#> Range for eBird_spatial 2.915 0.278      2.417    2.898      3.511 2.858
+#> Stdev for eBird_spatial 0.923 0.058      0.814    0.921      1.042 0.918
+#> Beta for Parks_spatial  0.020 0.062     -0.103    0.021      0.141 0.023
+#> Beta for Gbif_spatial   0.441 0.054      0.335    0.440      0.549 0.438
 #> 
-#> Deviance Information Criterion (DIC) ...............: -650.77
+#> Deviance Information Criterion (DIC) ...............: -650.55
 #> Deviance Information Criterion (DIC, saturated) ....: NA
-#> Effective number of parameters .....................: -1473.12
+#> Effective number of parameters .....................: -1472.94
 #> 
-#> Watanabe-Akaike information criterion (WAIC) ...: 1581.04
-#> Effective number of parameters .................: 331.72
+#> Watanabe-Akaike information criterion (WAIC) ...: 1580.61
+#> Effective number of parameters .................: 331.43
 #> 
-#> Marginal log-Likelihood:  -1607.04 
+#> Marginal log-Likelihood:  -1607.03 
 #>  is computed 
 #> Posterior summaries for the linear predictor and the fitted values are computed
 #> (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')
