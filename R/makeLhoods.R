@@ -58,7 +58,9 @@ makeLhoods <- function(data, formula, family, mesh, ips,
             
             if (as.character(formula[[dataset]][[species]][[process]][['LHS']])[2] == paresp) Ntrials <- Ntrialsvar[[1]]
             
-            else Ntrials <- Ntrialsvar[[2]]
+            else 
+              if (!is.na(Ntrialsvar[[2]])) Ntrials <- Ntrialsvar[[2]]
+              else Ntrials <- 1
             
           } else Ntrials <- 1
         } 
