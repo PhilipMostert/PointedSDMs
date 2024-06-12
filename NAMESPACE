@@ -2,6 +2,7 @@
 
 S3method(plot,bruSDM_predict)
 S3method(plot,modISDM_predict)
+S3method(plot,modMarks_predict)
 S3method(plot,modSpecies_predict)
 S3method(predict,bruSDM)
 S3method(predict,modISDM)

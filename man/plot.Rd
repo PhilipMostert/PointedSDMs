@@ -21,7 +21,7 @@
 
 \method{plot}{modISDM_predict}(x, variable = "mean", plot = TRUE, ...)
 
-\method{plot}{bruSDM_predict}(x, variable = "mean", plot = TRUE, ...)
+\method{plot}{modMarks_predict}(x, variable = "mean", plot = TRUE, ...)
 
 \method{plot}{modSpecies_predict}(x, variable = "mean", plot = TRUE, ...)
 }

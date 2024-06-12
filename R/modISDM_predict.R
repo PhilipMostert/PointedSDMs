@@ -7,7 +7,7 @@ setClass('modISDM_predict')
 #' Predict for modISDM
 #' @title Generic predict function for \code{modISDM} objects.
 #' @description Predict function for the object produced by \code{\link{fitISDM}}. Should act identically to \pkg{inlabru}'s generic predict function if wanted, but has additional arguments to help predict certain components created by the model. This is needed since \code{\link{startISDM}} creates variable names which might not be directly apparent to the user.
-#' @param object A \code{bru_sdm} objects.
+#' @param object A \code{modISDM} object.
 #' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
 #' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.
 #' @param mesh An \code{inla.mesh} object.

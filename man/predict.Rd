@@ -85,7 +85,7 @@
 )
 }
 \arguments{
-\item{object}{A \code{bru_sdm} objects.}
+\item{object}{A \code{modSpecies} object.}
 
 \item{data}{Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.}
 
@@ -148,7 +148,7 @@ Predict for modISDM
 
 Predict for modMarks
 
-Predict for bru_sdm
+Predict for modSpecies
 }
 \examples{
 

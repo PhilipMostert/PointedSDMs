@@ -8,7 +8,7 @@ setClass('modMarks_predict')
 #' Predict for modMarks
 #' @title Generic predict function for \code{modMarks} objects.
 #' @description Predict function for the object produced by \code{\link{fitISDM}}. Should act identically to \pkg{inlabru}'s generic predict function if wanted, but has additional arguments to help predict certain components created by the model. This is needed since \code{\link{startMarks}} creates variable names which might not be directly apparent to the user.
-#' @param object A \code{modMarks} objects.
+#' @param object A \code{modMarks} object.
 #' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
 #' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.
 #' @param mesh An \code{inla.mesh} object.
@@ -283,7 +283,7 @@ predict.modMarks <- function(object, data = NULL, formula = NULL, mesh = NULL,
 #' @param ... Argument not used
 #' @return A ggplot2 object.
 #' 
-#' @method plot bruSDM_predict
+#' @method plot modMarks_predict
 #' @rdname plot
 #' 
 #' @exportS3Method
