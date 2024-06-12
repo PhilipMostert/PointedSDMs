@@ -42,8 +42,9 @@ setClass('modISDM_predict')
 #'  mesh$crs <- proj
 #'  
 #'  #Set model up
-#'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
-#'                              Projection = proj, responsePA = 'Present')
+#'  organizedData <- startISDM(data, Mesh = mesh,
+#'                             Projection = proj, 
+#'                             responsePA = 'Present')
 #'  
 #'   ##Run the model
 #'   modelRun <- fitISDM(organizedData, options = list(control.inla = list(int.strategy = 'eb')))

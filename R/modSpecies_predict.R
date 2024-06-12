@@ -44,11 +44,12 @@ setClass('modSpecies_predict')
 #'  mesh$crs <- proj
 #'  
 #'  #Set model up
-#'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+#'  organizedData <- startSpecies(data, Mesh = mesh, speciesName = 'speciesName',
 #'                              Projection = proj, responsePA = 'Present')
 #'  
 #'   ##Run the model
-#'   modelRun <- fitISDM(organizedData, options = list(control.inla = list(int.strategy = 'eb')))
+#'   modelRun <- fitISDM(organizedData, options = list(control.inla = list(int.strategy = 'eb',
+#'                                                     diagonal = 1)))
 #'    
 #'   #Predict spatial field on linear scale
 #'   predictions <- predict(modelRun, mesh = mesh, spatial = TRUE, fun = 'linear')
