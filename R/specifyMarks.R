@@ -1581,6 +1581,7 @@ specifyMarks$set('private', 'addData', function(dataList, responseCounts, respon
                      }
                      
                    }
+                   
                      private$Components <- pointData$makeComponents(spatial = private$Spatial, intercepts = private$Intercepts,
                                                                     marks = markNames, datanames = dataNames, speciesname = speciesName,
                                                                     multinomnames = multinomNames, pointcovariates = pointCovariates,
