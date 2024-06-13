@@ -1176,7 +1176,8 @@ specifyMarks <- R6::R6Class(classname = 'specifyMarks', lock_objects = FALSE, cl
     
     if (!is.null(private$temporalName)) { 
       
-      whichTemp <- grepl('shared_spatial\\(main = geometry', private$Components)
+      if (private$Spatial == 'shared') whichTemp <- grepl('shared_spatial\\(main = geometry', private$Components)
+      else whichTemp <- grepl(paste0('group = ', private$temporalName), private$Components)
       
       private$Components[whichTemp] <- gsub(gsub('list','list\\\\', private$temporalModel),
                                             deparse1(temporalModel), private$Components[whichTemp])
