@@ -159,7 +159,8 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       names(time_data) <- time_variable
       
       timeData <- inlabru::fm_cprod(data, data.frame(time_data))
-      names(timeData)[!names(timeData) %in% c('geometry', '.block')] <- c(time_variable, 'weight')  
+      timeData$.__plot__index__ <- timeData[[time_variable]]
+      #names(timeData)[!names(timeData) %in% c('geometry', '.block')] <- c(time_variable, 'weight')  
       
       ##Can we move this part out?
 
@@ -312,8 +313,8 @@ plot.modISDM_predict <- function(x,
     if (length(variable) > 1) stop('Please only plot one variable at a time for species plots.')
     
     ##Need to create a new var called ..temporal_variable_index.. which is the tempVar
-    temporalName <- names(x[[1]])[!names(x[[1]]) %in% c(".block", 'geometry', 'weight', 'mean', 'sd', 'q0.025', 'median', 'q0.975', 'q0.5', 'smin', 'smax', 'cv','mean.mc_std_err', 'sd.mc_std_err')]
-    
+    #temporalName <- names(x[[1]])[!names(x[[1]]) %in% c(".block", 'geometry', 'weight', 'mean', 'sd', 'q0.025', 'median', 'q0.975', 'q0.5', 'smin', 'smax', 'cv','mean.mc_std_err', 'sd.mc_std_err')]
+    temporalName <- '.__plot__index__'
     x[[1]]$..temporal_variable_index.. <- as.character(data.frame(x[[1]])[, temporalName])
     
     if (inherits(x[[1]], 'sf')) plot_obj <- geom_sf(data = x[[1]], aes(col = .data[[variable]]))

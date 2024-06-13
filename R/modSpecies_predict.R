@@ -14,7 +14,6 @@ setClass('modSpecies_predict')
 #' @param mesh An \code{inla.mesh} object.
 #' @param mask A mask of the study background. Defaults to \code{NULL}.
 #' @param covariates Name of covariates to predict.
-#' @param temporal Make predictions for the temporal component of the model.
 #' @param spatial Logical: include spatial effects in prediction. Defaults to \code{FALSE}.
 #' @param intercepts Logical: include intercept terms in prediction. Defaults to \code{FALSE}.
 #' @param datasets Names of the datasets to include intercept and spatial term.
@@ -59,7 +58,7 @@ setClass('modSpecies_predict')
 #' 
 
 predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL, 
-                           mask = NULL, temporal = FALSE, covariates = NULL, spatial = FALSE,
+                           mask = NULL, covariates = NULL, spatial = FALSE,
                            intercepts = FALSE, datasets = NULL, species,
                            bias = FALSE, biasnames = NULL, predictor = FALSE,
                            fun = 'linear', ...) {
@@ -119,7 +118,8 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
   
   if (is.null(formula) && !intercepts && !spatial && is.null(covariates) && !temporal && !bias && !predictor) stop("Please provide either a formula or components of a formula to be predicted.")
   
-  if (temporal && is.null(object$temporal$temporalVar)) stop('temporal is set to TRUE but no temporal component found in the model.')
+  if (!is.null(object$temporal$temporalVar)) temporal <- TRUE
+  else temporal <- FALSE
   
   if (is.null(data)) {
     
@@ -237,7 +237,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
         names(time_data) <- time_variable
         
         timeData <- inlabru::fm_cprod(data, data.frame(time_data))
-        names(data)[!names(timeData) %in% c('geometry', '.block', 'speciesSpatialGroup')] <- c(time_variable, 'weight')  
+        timeData$.__plot__index__ <- timeData[[time_variable]]
       
         }
       
@@ -434,7 +434,8 @@ plot.modSpecies_predict <- function(x,
     if (length(variable) > 1) stop('Please only plot one variable at a time for species plots.')
     
     ##Need to create a new var called ..temporal_variable_index.. which is the tempVar
-    temporalName <- names(x[[1]])[!names(x[[1]]) %in% c(".block", 'geometry', 'weight', 'mean', 'sd', 'q0.025', 'median', 'q0.975', 'q0.5', 'smin', 'smax', 'cv','mean.mc_std_err', 'sd.mc_std_err')]
+    #temporalName <- names(x[[1]])[!names(x[[1]]) %in% c(".block", 'geometry', 'weight', 'mean', 'sd', 'q0.025', 'median', 'q0.975', 'q0.5', 'smin', 'smax', 'cv','mean.mc_std_err', 'sd.mc_std_err')]
+    temporalName <- '.__plot__index__'
     
     x[[1]]$..temporal_variable_index.. <- as.character(data.frame(x[[1]])[, temporalName])
     
