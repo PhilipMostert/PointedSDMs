@@ -77,7 +77,7 @@ test_that('startSpecies is able to initialize a specifySpecies object, separate 
   objMess <- expect_message(startSpecies(list(PO, PA), Projection = projection, Mesh = mesh, speciesName = 'speciesVar',
                                       IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                                       responsePA = responsePA, spatialCovariates = NULL, temporalName = 'temp',
-                                      pointsSpatial = 'copy'),'Setting pointsSpatial to "shared" since it is required for the temporalModel.')
+                                      pointsSpatial = 'correlate'),'Setting pointsSpatial to "shared" since it is required for the temporalModel.')
   
   ##Test error: data not sf
   PA2 <- as.data.frame(PA)

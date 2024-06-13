@@ -69,7 +69,7 @@ test_that('startISDM is able to initialize a specifyISDM object as well as corre
   objMess <- expect_message(startISDM(list(PO, PA), Projection = projection, Mesh = mesh,
                             IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                             responsePA = responsePA, spatialCovariates = NULL, temporalName = 'temp',
-                            pointsSpatial = 'copy'),'Setting pointsSpatial to "shared" since it is required for the temporalModel.')
+                            pointsSpatial = 'correlate'),'Setting pointsSpatial to "shared" since it is required for the temporalModel.')
   
   ##Test error: data not sf
   PA2 <- as.data.frame(PA)

@@ -118,7 +118,7 @@ test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra 
                      markNames = 'numvar', markFamily = 'gaussian')
   
   spatMod6 <- fitISDM(obj6)
-  expect_setequal(names(spatMod6$summary.random), c('PO_spatial', 'numvar_spatial', 'PO_numvar_spatial'))
+  expect_setequal(names(spatMod6$summary.random), c('shared_spatial', 'numvar_spatial', 'PO_numvar_spatial'))
   expect_setequal(row.names(spatMod6$summary.fixed), c('PO_intercept', 'numvar_intercept'))
   
   })
