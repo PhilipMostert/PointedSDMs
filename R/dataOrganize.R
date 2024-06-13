@@ -581,9 +581,19 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
       
      mainName <- datanames[[1]]
      
-     if (!is.null(temporalname)) spatMain <- paste0(mainName, '_spatial(main = geometry, model = ', paste0(mainName,'_field'), ', group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
-     else spatMain <-  paste0(mainName, '_spatial(main = geometry, model = ', paste0(mainName,'_field'),')')
-     spatCopy <-  paste0(datanames[datanames != mainName], '_spatial(main = geometry, copy = \"', paste0(mainName,'_spatial'),'\", hyper = ', copymodel,')')
+     if (!is.null(temporalname)) {
+       
+       spatMain <- paste0(mainName, '_spatial(main = geometry, model = ', paste0(mainName,'_field'), ', group = ', temporalname, ', ngroup = ', numtime,', control.group = ', temporalmodel,')')
+       spatCopy <-  paste0(datanames[datanames != mainName], '_spatial(main = geometry, copy = \"', paste0(mainName,'_spatial'),'\", group = ', temporalname, ', control.group = ', temporalmodel,', hyper = ', copymodel,')')
+       
+     }
+     else {
+       
+       spatMain <-  paste0(mainName, '_spatial(main = geometry, model = ', paste0(mainName,'_field'),')')
+       spatCopy <-  paste0(datanames[datanames != mainName], '_spatial(main = geometry, copy = \"', paste0(mainName,'_spatial'),'\", hyper = ', copymodel,')')
+       
+     }
+     
      spat <- c(spatMain, spatCopy)    
         
       }
