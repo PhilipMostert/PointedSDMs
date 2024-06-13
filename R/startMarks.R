@@ -92,7 +92,7 @@ startMarks <- function(..., spatialCovariates = NULL,
   
   #copy here?
   #Is this TRUE
-  if (pointsSpatial %in% c('copy', 'correlate') && !is.null(temporalName)) {
+  if (pointsSpatial %in% c('correlate') && !is.null(temporalName)) {
     
     pointsSpatial <- 'shared'
     message('Setting pointsSpatial to "shared" since it is required for the temporalModel.')
