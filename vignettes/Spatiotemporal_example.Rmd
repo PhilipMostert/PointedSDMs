@@ -39,19 +39,17 @@ as well as define some objects required by the model to run.
 
 ```{r, Alabama_map}
 
-proj <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+proj <- "+proj=utm +zone=17 +datum=WGS84 +units=km"#"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
 AL <- USAboundaries::us_states(states = "Alabama", resolution = 'high')
 AL <- as(AL, "sf")
-st_crs(AL) <- proj
+AL <- st_transform(AL, proj)
 
 mesh <- inla.mesh.2d(boundary = inla.sp2segment(AL[1]), 
-                     cutoff = 0.1,
-                     max.edge = c(0.2, 0.8), 
-                     offset = c(0.1, 0.2),
+                     cutoff = 0.1 * 50,
+                     max.edge = c(0.2, 0.8) * 70, 
+                     offset = c(0.1, 0.2) * 150,
                      crs = st_crs(proj))
-
-
 
 ```
 
@@ -71,21 +69,24 @@ eBird2015 <- spocc::occ(
   query = 'Colinus virginianus',
   from = 'gbif',
   date = c("2015-01-01", "2015-12-31"),
-  geometry = AL
+   geometry = st_bbox(st_transform(AL,
+                '+proj=longlat +datum=WGS84 +no_defs'))
 )$gbif
 
 eBird2016 <- spocc::occ(
   query = 'Colinus virginianus',
   from = 'gbif',
   date = c("2016-01-01", "2016-12-31"),
-  geometry = AL
+ geometry = st_bbox(st_transform(AL,
+                '+proj=longlat +datum=WGS84 +no_defs'))
 )$gbif
 
 eBird2017 <- spocc::occ(
   query = 'Colinus virginianus',
   from = 'gbif',
   date = c("2017-01-01", "2017-12-31"),
-  geometry = AL
+ geometry = st_bbox(st_transform(AL,
+                '+proj=longlat +datum=WGS84 +no_defs'))
 )$gbif
 
 eBird <- data.frame(eBird2015$data[[1]]) %>% 
@@ -95,28 +96,35 @@ eBird <- data.frame(eBird2015$data[[1]]) %>%
 
 eBird <- st_as_sf(x = eBird,
                   coords = c('longitude', 'latitude'),
-                  crs = proj)
+                  crs =  '+proj=longlat +datum=WGS84 +no_defs')
 
 eBird$Year <- eBird$year
+
+eBird <- st_transform(eBird, proj)
 
 eBird <- eBird[unlist(st_intersects(AL, eBird)),]
 
 ```
 
-We then get onto the model description, which in this case includes a shared spatial field between the two datasets. This shared spatial field is characterized by an *ar1* process. To add this structure into the model, we specify the parameter *temporalModel* in the function `intModel` appropriately, Furthermore we specified the hyper parameters for both the random field and the temporal effect.
+We then get onto the model description, which in this case includes a shared spatial field between the two datasets. This shared spatial field is characterized by an *ar1* process. To add this structure into the model, we specify the parameter *temporalModel* in the function `startISDM` appropriately, Furthermore we specified the hyper parameters for both the random field and the temporal effect and the priors for the intercepts.
 
 ```{r, setup_model}
 
-hyperParams <- list(rho = list(prior = "pc.prec", param = c(0.01, 0.01)))
+hyperParams <- list(model = 'ar1', 
+                    hyper = list(rho = list(prior = "pc.prec", param = c(0.9, 0.1))))
 
-modelSetup <- intModel(eBird, BBSColinusVirginianus,
-                       Coordinates = c('Longitude', 'Latitude'),                                                    temporalName = 'Year',
+modelSetup <- startISDM(eBird, BBSColinusVirginianus,
+                       temporalName = 'Year',
+                       Boundary = AL,
                        Projection =  proj, Mesh = mesh, 
-                       responsePA =  'NPres', trialsPA = 'Ntrials',
-                       temporalModel = list(model = 'ar1', hyper = hyperParams))
+                       responsePA =  'NPres', trialsPA = 'Ntrials')
 
-modelSetup$specifySpatial(sharedSpatial = TRUE, prior.sigma = c(0.2, 0.01), 
-                          prior.range = c(0.4, 0.01))
+modelSetup$specifySpatial(sharedSpatial = TRUE, prior.sigma = c(1, 0.5), 
+                          prior.range = c(100, 0.5))
+
+modelSetup$specifyRandom(temporalModel = hyperParams)
+
+modelSetup$priorsFixed(Effect = 'intercept', mean.linear = 0, prec.linear = 0.001)
 
 ```
 
@@ -141,7 +149,8 @@ Next we run the model, using the function `fitISDM`. Due to time considerations,
 ```{r, run_model}
 
 mod <- fitISDM(modelSetup,
-                options = list(control.inla = list(int.strategy = 'eb')))
+                options = list(control.inla = list(int.strategy = 'eb',
+                                                   diagonal = 1)))
  
 ```
 
