@@ -77,18 +77,6 @@ fitISDM <- function(data, options = list()) {
   }))
   )
   
-  comp_terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)
-  
-  #Will need to change this to say comp_terms %in% c(formula_terms, bias_terms)
-  comp_keep <- comp_terms %in% c(formula_terms, 
-                                 paste0(data$.__enclos_env__$private$dataSource, '_samplers_field'),
-                                 paste0(data$.__enclos_env__$private$dataSource, 'samplers'))
-  
-  componentsJoint <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
-  
-  ##in case there are duplicates, will it cause an error??
-  componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
-  
   if (!is.null(data$.__enclos_env__$private$temporalName)) {
     
     numTime <- length(unique(unlist(data$.__enclos_env__$private$temporalVars)))
@@ -104,6 +92,19 @@ fitISDM <- function(data, options = list()) {
     data$.__enclos_env__$private$IPS <- newIPS
     
   }
+  
+  comp_terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)
+  
+  #Will need to change this to say comp_terms %in% c(formula_terms, bias_terms)
+  comp_keep <- comp_terms %in% c(formula_terms, 
+                                 paste0(data$.__enclos_env__$private$dataSource, '_samplers_field'),
+                                 paste0(data$.__enclos_env__$private$dataSource, 'samplers'))
+  
+  componentsJoint <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
+  
+  ##in case there are duplicates, will it cause an error??
+  componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
+  
   
   allLiks <- do.call(inlabru::like_list,
                      makeLhoods(data = data$.__enclos_env__$private$modelData,
