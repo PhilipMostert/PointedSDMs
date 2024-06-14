@@ -114,7 +114,7 @@ test_that('specifySpecies initialize works as expected.', {
   expect_true('pointcov' %in% names(check$.__enclos_env__$private$IPS))
   expect_true(all(is.na(check$.__enclos_env__$private$IPS$pointcov)))
   expect_true(all(paste0(spIn,'_covariate') %in% names(check$.__enclos_env__$private$IPS)))
-  expect_setequal(names(check$spatialFields$speciesFields), c('PO_fish', 'PA_bird', 'Pcount_dog'))
+  expect_setequal(names(check$spatialFields$speciesFields), c('fish_PO', 'bird_PA', 'dog_Pcount'))
 
   #Create a model with shared species effects
   checkNoEnv <- specifySpecies$new(data = list(PO, PA, Pcount),
@@ -243,7 +243,7 @@ test_that('specifySpecies initialize works as expected.', {
                                      intercepts = TRUE, temporalmodel = temporalModel)
   expect_true(all(c( "fish_PO_spatial(main = geometry, model = fish_PO_field)",  "bird_PA_spatial(main = geometry, model = bird_PA_field)", "dog_Pcount_spatial(main = geometry, model = dog_Pcount_field)") 
                   %in% checkCopy$.__enclos_env__$private$Components))
-  expect_setequal(c(names(checkCopy$spatialFields$speciesFields)), c('PO_fish', 'PA_bird', 'Pcount_dog'))
+  expect_setequal(c(names(checkCopy$spatialFields$speciesFields)), c('fish_PO', 'bird_PA', 'dog_Pcount'))
   #Change speciesSpatial to replicate
   checkRep <<- specifySpecies$new(data = list(PO, PA, Pcount),
                                      initialnames = c('PO', 'PA', 'Pcount'),
