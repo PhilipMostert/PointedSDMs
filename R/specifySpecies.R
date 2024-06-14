@@ -1516,7 +1516,7 @@ specifySpecies$set('private', 'addData', function(dataList, responseCounts, resp
   #ADD argument common field for species
   if (!private$speciesIndependent) {
     
-    speciesDataNames <- unlist(mapply(FUN = function(x, names) paste0(names,'_', x), x = private$speciesIn, names = names(private$speciesIn)))
+    speciesDataNames <- unlist(mapply(FUN = function(x, names) paste0(x,'_', names), x = private$speciesIn, names = names(private$speciesIn)))
 
     self$spatialFields$speciesFields <- vector(mode = 'list', length = length(speciesDataNames))#length(unique(unlist(private$speciesIn))) * length(names(private$speciesIn)))
     names(self$spatialFields$speciesFields) <- speciesDataNames#do.call(paste0, expand.grid(paste0(unique(unlist(private$speciesIn)),'_'), names(private$speciesIn)))

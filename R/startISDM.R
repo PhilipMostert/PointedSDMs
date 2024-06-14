@@ -171,7 +171,7 @@ startISDM <- function(..., spatialCovariates = NULL,
     
   }
   
-  if (length(initialnames) == 1) pointsSpatial <- 'shared'
+  if (length(initialnames) == 1 & !is.null(pointsSpatial)) pointsSpatial <- 'shared'
   
   if (!is.null(temporalName)) temporalModel <- deparse1(list(model = 'ar1'))
   else temporalModel <- NULL
