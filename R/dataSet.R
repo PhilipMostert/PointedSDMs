@@ -73,11 +73,11 @@ dataSet <- function(datapoints, datanames, coords = c('CoordLoc1', 'CoordLoc2'),
       
       if (inherits(datapoints[[dat]], 'sf')) {
         
+        oldProj <- st_crs(datapoints[[dat]])
         st_geometry(datapoints[[dat]]) <- 'geometry'
         coordsSF <- sf::st_coordinates(datapoints[[dat]])
         colnames(coordsSF) <- coords
         datapoints[[dat]][, coords] <- coordsSF
-        oldProj <- st_crs(datapoints[[dat]])
         
       }
       
