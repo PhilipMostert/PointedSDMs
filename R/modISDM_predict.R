@@ -150,43 +150,6 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (is.null(fun) | fun == 'linear') fun <- ''
     
-    if (temporal) {
-      
-      numeric_time <- order(as.numeric(unique(unlist(object$temporal$temporalIn))))
-      time_variable <- object$temporal$temporalVar
-      
-      time_data <- data.frame(seq_len(max(numeric_time)))
-      names(time_data) <- time_variable
-      
-      timeData <- inlabru::fm_cprod(data, data.frame(time_data))
-      timeData$.__plot__index__ <- timeData[[time_variable]]
-      #names(timeData)[!names(timeData) %in% c('geometry', '.block')] <- c(time_variable, 'weight')  
-      
-      ##Can we move this part out?
-
-      if (intercepts) intercept_terms <- paste0(object$source, '_intercept')
-      else intercept_terms <- NULL
-      
-      if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
-      else
-        if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in intModel.')
-      else spatial_obj <- paste0(datasets, '_spatial')
-      
-      time_formula <- paste0(fun,'(',paste0(c(covariates, intercept_terms, spatial_obj), collapse = ' + '),')')
-      
-      formula <- formula(paste('~',paste0('data.frame(', time_variable,' = ', time_variable, ',formula =', time_formula,')')))
-      
-      #int[['temporalPredictions']] <- predict(object, timeData, ~ data.frame(..temporal_variable_index.. = eval(parse(text = time_variable)), formula = eval(parse(text = time_formula))))
-      int[['temporalPredictions']] <- predict(object, timeData, formula)
-      
-      #int[['temporalPredictions']] <- int[['temporalPredictions']][,!names(int[['temporalPredictions']]@data) %in% time_variable]
-      
-      class(int) <- c('modISDM_predict', class(int))
-      
-      return(int) 
-      
-    }
-    
     if (bias) {
         
         if (!is.null(object$biasData$Fields)) {
@@ -213,6 +176,42 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       
     }
 
+    if (temporal) {
+      
+      numeric_time <- order(as.numeric(unique(unlist(object$temporal$temporalIn))))
+      time_variable <- object$temporal$temporalVar
+      
+      time_data <- data.frame(seq_len(max(numeric_time)))
+      names(time_data) <- time_variable
+      
+      timeData <- inlabru::fm_cprod(data, data.frame(time_data))
+      timeData$.__plot__index__ <- timeData[[time_variable]]
+      #names(timeData)[!names(timeData) %in% c('geometry', '.block')] <- c(time_variable, 'weight')  
+      
+      ##Can we move this part out?
+      
+      if (intercepts) intercept_terms <- paste0(object$source, '_intercept')
+      else intercept_terms <- NULL
+      
+      if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
+      else
+        if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in intModel.')
+      else spatial_obj <- paste0(datasets, '_spatial')
+      
+      time_formula <- paste0(fun,'(',paste0(c(covariates, intercept_terms, spatial_obj), collapse = ' + '),')')
+      
+      formula <- formula(paste('~',paste0('data.frame(', time_variable,' = ', time_variable, ',formula =', time_formula,')')))
+      
+      #int[['temporalPredictions']] <- predict(object, timeData, ~ data.frame(..temporal_variable_index.. = eval(parse(text = time_variable)), formula = eval(parse(text = time_formula))))
+      int[['temporalPredictions']] <- predict(object, timeData, formula)
+      
+      #int[['temporalPredictions']] <- int[['temporalPredictions']][,!names(int[['temporalPredictions']]@data) %in% time_variable]
+      
+      class(int) <- c('modISDM_predict', class(int))
+      
+      return(int) 
+      
+    }
     
     if (spatial) {
       
