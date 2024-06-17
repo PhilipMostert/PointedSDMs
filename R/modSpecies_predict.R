@@ -65,7 +65,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
   
   if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
   
-  if (sum(predictor, temporal) > 1 || sum(predictor, bias) > 1) stop('You cannot combine predictor with either "temporal" or "bias".')
+  if (sum(predictor, bias) > 1) stop('You cannot combine predictor with bias.')
   
   #Why can't you do both here?
   if (bias && spatial) stop('Please choose one of bias and spatial.')
