@@ -13,7 +13,6 @@ setClass('modISDM_predict')
 #' @param mesh An \code{inla.mesh} object.
 #' @param mask A mask of the study background. Defaults to \code{NULL}.
 #' @param covariates Name of covariates to predict.
-#' @param temporal Make predictions for the temporal component of the model.
 #' @param spatial Logical: include spatial effects in prediction. Defaults to \code{FALSE}.
 #' @param intercepts Logical: include intercept terms in prediction. Defaults to \code{FALSE}.
 #' @param datasets Names of the datasets to include intercept and spatial term.
@@ -150,6 +149,19 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (is.null(fun) | fun == 'linear') fun <- ''
     
+    if (temporal) {
+      
+      numeric_time <- order(as.numeric(unique(unlist(object$temporal$temporalIn))))
+      time_variable <- object$temporal$temporalVar
+      
+      time_data <- data.frame(seq_len(max(numeric_time)))
+      names(time_data) <- time_variable
+      
+      data <- inlabru::fm_cprod(data, data.frame(time_data))
+      data$.__plot__index__ <- data[[time_variable]]
+      
+    }
+    
     if (bias) {
         
         if (!is.null(object$biasData$Fields)) {
@@ -164,55 +176,27 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
         
         if (!all(biasnames %in% names(object$summary.random))) stop('Either no bias field has been used or an incorrect dataset name was given.')
       
-      for (bias in biasnames) {
+        if (temporal) { 
+          
+          formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(biasnames,')')))
+          int[['temporalBiasFields']] <- predict(object, newdata = data, formula = formula, ...)
+        
+          }
+        else {
+      
+        for (bias in biasnames) {
 
         formula <- as.formula(paste0('~ ',as.character(fun),'(',paste(bias,')')))
         int[['biasFields']][[bias]] <- predict(object, newdata = data, formula = formula, ...)
         
       }
-      
+        }
+        
       class(int) <- c('modISDM_predict', class(int))
       return(int) 
       
     }
 
-    if (temporal) {
-      
-      numeric_time <- order(as.numeric(unique(unlist(object$temporal$temporalIn))))
-      time_variable <- object$temporal$temporalVar
-      
-      time_data <- data.frame(seq_len(max(numeric_time)))
-      names(time_data) <- time_variable
-      
-      timeData <- inlabru::fm_cprod(data, data.frame(time_data))
-      timeData$.__plot__index__ <- timeData[[time_variable]]
-      #names(timeData)[!names(timeData) %in% c('geometry', '.block')] <- c(time_variable, 'weight')  
-      
-      ##Can we move this part out?
-      
-      if (intercepts) intercept_terms <- paste0(object$source, '_intercept')
-      else intercept_terms <- NULL
-      
-      if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
-      else
-        if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in intModel.')
-      else spatial_obj <- paste0(datasets, '_spatial')
-      
-      time_formula <- paste0(fun,'(',paste0(c(covariates, intercept_terms, spatial_obj), collapse = ' + '),')')
-      
-      formula <- formula(paste('~',paste0('data.frame(', time_variable,' = ', time_variable, ',formula =', time_formula,')')))
-      
-      #int[['temporalPredictions']] <- predict(object, timeData, ~ data.frame(..temporal_variable_index.. = eval(parse(text = time_variable)), formula = eval(parse(text = time_formula))))
-      int[['temporalPredictions']] <- predict(object, timeData, formula)
-      
-      #int[['temporalPredictions']] <- int[['temporalPredictions']][,!names(int[['temporalPredictions']]@data) %in% time_variable]
-      
-      class(int) <- c('modISDM_predict', class(int))
-      
-      return(int) 
-      
-    }
-    
     if (spatial) {
       
       if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
@@ -307,7 +291,7 @@ plot.modISDM_predict <- function(x,
   if (any(!variable%in%c("mean", "sd", "q0.025", "median","q0.975",
                            "smin", "smax", "cv", "var" ))) stop('variable is not a valid variable to plot')
   
-  if (length(x) == 1 && names(x) %in% 'temporalPredictions') {
+  if (length(x) == 1 && '.__plot__index__' %in% names(x[[1]])) {
     
     if (length(variable) > 1) stop('Please only plot one variable at a time for species plots.')
     
