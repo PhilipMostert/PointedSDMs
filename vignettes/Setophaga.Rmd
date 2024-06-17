@@ -63,17 +63,25 @@ Therefore, given a collection of heterogeneous datasets $\{Y_1, Y_2,...,Y_n\}$, 
 
 -   prediction.
 
-The first function of interest with regards to these steps is `intModel`, which is designed to create objects required by *inlabru*, assign the relevant information to individual objects used in model specification, as well as structure the provided datasets together into a homogenized framework.
+The first function of interest with regards to these steps is `startISDM`, which is designed to create objects required by *inlabru* to create an ISDM, assign the relevant information to individual objects used in model specification, as well as structure the provided datasets together into a homogenized framework.
 
-```{r intModel}
+The output of this function is an *R6* object, and so there are several slot functions included to help specify the model at a finer scale. Use either `?specifyISDM` or `.$help()` to get a comprehensive description of these slot functions.
 
-args(intModel)
+```{r startISDM}
+
+args(startISDM)
 
 ```
 
-The output of this function is an *R6* object, and so there are several slot functions included to help specify the model at a finer scale. Use `?dataSDM` to get a comprehensive description of these slot functions.
+The next function is `startSpecies` which is used to create a multi-species ISDM. The arguments for this function are similar to those of `startISDM`, but focus on specifying components for the species in the model. Assistance on the slot functions of the object may be obtained by using `?specifySpecies` or by using `.$help()`.
 
-The next function used is `fitISDM` which takes the data object created with `intModel` and runs the integrated model. The output of this function is in essence an *inlabru* model output with additional information to be used by the sequential functions.
+```{r startSpecies}
+
+args(startSpecies)
+
+```
+
+After the model is specified using one of the above-mentioned functions, inference may be made using `fitISDM`. This function takes the data object created and runs the integrated model; the output of this function is in essence an *inlabru* model output with additional information to be used by the sequential functions.
 
 ```{r fitISDM}
 
@@ -81,7 +89,7 @@ args(fitISDM)
 
 ```
 
-Spatial blocked cross-validation may be performed using the `blockedCV` function -- which iteratively calculates and averages the deviance information criteria (DIC) for models run without data from the selected spatial block. Before this function is used, `.$spatialBlock()` from the object produced by `intModel` is required in order to specify how the data should be spatially blocked (see below for an example).
+Spatial blocked cross-validation may be performed using the `blockedCV` function -- which iteratively calculates and averages the deviance information criteria (DIC) for models run without data from the selected spatial block. Before this function is used, `.$spatialBlock()` from the object produced by one of the `start*` functions is required in order to specify how the data should be spatially blocked (see below for an example).
 
 ```{r args for blockedCV}
 
@@ -112,7 +120,6 @@ The first step in our analysis is to load in the packages required.
 library(INLA)
 library(inlabru)
 library(USAboundaries)
-library(sp)
 library(sf)
 library(blockCV)
 library(ggmap)
@@ -129,15 +136,15 @@ library(spocc)
 
 Finally, additional objects required by *PointedSDMs* and the *R-INLA* [@martins2013bayesian] and *inlabru* [@bachl2019inlabru] packages need to be assembled.
 
-A *SpatialPolygons* object of Pennsylvania (obtained using the *USAboundaries* [@USABoundaries] package) is the first of these objects required, and it will be used to construct an *inla.mesh* object as well as help with the plotting of graphics. In order to create one of these polygons objects, we are first required to define the projection reference system (see `?CRS` ).
+An *sf* object of Pennsylvania (obtained using the *USAboundaries* [@USABoundaries] package) is the first of these objects required, and it will be used to construct an *inla.mesh* object as well as help with the plotting of graphics. In order to create one of these polygons objects, we are first required to define the projection reference system.
 
 ```{r Map of PA}
 
-proj <- '+proj=longlat +datum=WGS84 +no_defs'
+proj <- "+proj=utm +zone=17 +datum=WGS84 +units=km"
+
 PA <- USAboundaries::us_states(states = "Pennsylvania")
-#PA <- PA$geometry
-PA <- as(PA, "sf")
-st_crs(PA) <- proj
+
+PA <- st_transform(PA, proj)
 
 ```
 
@@ -156,7 +163,8 @@ for (bird in species) {
               query = paste('Setophaga', bird),
               from = "gbif",
               date = c("2005-01-01", "2005-12-31"),
-              geometry = PA)$gbif
+              geometry = st_bbox(st_transform(PA,
+                '+proj=longlat +datum=WGS84 +no_defs')))$gbif
   
   rows <- grep("EBIRD", raw_data$data[[paste0('Setophaga_', bird)]]$collectionCode)
 
@@ -166,7 +174,8 @@ for (bird in species) {
   data_sp <- st_as_sf(
     x = raw_data[, names(raw_data) %in% c("longitude", "latitude", 'Species_name')],
     coords = c('longitude', 'latitude'),
-    crs = proj)
+    crs = '+proj=longlat +datum=WGS84 +no_defs')
+  data_sp <- st_transform(data_sp, proj)
 
   dataSets[[paste0('eBird_', bird)]] <- data_sp[unlist(st_intersects(PA, data_sp)),]
   
@@ -185,7 +194,7 @@ dataSets[['BBS']] <- SetophagaData$BBS
 ```
 
 |   **Dataset name**   |   Sampling protocol    | **Number of observations** | **Species name** |                                                                   **Source**                                                                   |
-|:--------------------:|:----------------------:|:--------------------------:|:----------------:|:----------------------------------------------------------------------------------------------------------------------------------------------:|
+|:----------:|:----------:|:----------:|:----------:|:------------------------:|
 |        *BBS*         |         Counts         |             45             |  *Caerulescens*  | [North American Breeding Bird Survey](https://www.pwrc.usgs.gov/bbs/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
 |        *BBA*         | Detection/nondetection |            5165            |  *Caerulescens*  |  [Pennsylvania Breeding Bird Atlas](http://www.pabirdatlas.psu.edu/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}  |
 | *eBird_caerulescens* |      Present only      |            264             |  *Caerulescens*  |                    [eBird](https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                    |
@@ -203,20 +212,21 @@ Species distribution models study the relationship between our in-situ species o
 covariates <- scale(terra::rast(system.file('extdata/SetophagaCovariates.tif', 
                                       package = "PointedSDMs")))
 names(covariates) <- c('elevation', 'canopy')
-crs(covariates) <- proj
+
+plot(covariates)
 
 ```
 
 #### Additional objects
 
-The *R-INLA* package requires a Delaunay triangulated mesh used to approximate our spatial random fields, which is created by supplying the `max.edge`*,* `offset` and `cutoff` arguments as well as our *SpatialPolygons* map of Pennsylvania to the `inla.mesh.2d` function. With this mesh, `intModel` will create integration points required by our model using *inlabru*'s `fm_int` function.
+The *R-INLA* package requires a Delaunay triangulated mesh used to approximate our spatial random fields, which is created by supplying the `max.edge`, `offset` and `cutoff` arguments as well as our *SpatialPolygons* map of Pennsylvania to the `inla.mesh.2d` function. With this mesh, `startISDM` will create integration points required by our model using *inlabru*'s `fm_int` function.
 
 ```{r Mesh, warning = FALSE, message = FALSE, fig.width=8, fig.height=5}
 
 mesh <- inla.mesh.2d(boundary = inla.sp2segment(PA), 
-                     cutoff = 0.2,
-                     max.edge = c(0.1, 0.24), 
-                     offset = c(0.1, 0.4),
+                     cutoff = 0.2 * 5,
+                     max.edge = c(0.1, 0.24) * 40, #120
+                     offset = c(0.1, 0.4) * 100,
                      crs = st_crs(proj))
 
 mesh_plot <- ggplot() +
@@ -228,44 +238,56 @@ mesh_plot
 
 ```
 
-##### `intModel`
+We furthermore define model options which will be used for all runs in this vignette.
 
-The `intModel` function is the first step in the modeling of our species data. The aim of the function is to organize and standardize our data to ensure that each process is correctly modeled in the integrated framework. For this standardization to work, we specify the response variable names of the counts data (`responseCounts`) and present absence (`responsePA`), the coordinate names (`Coordinates`) as well as the coordinate reference system used (`Projection`). In addition, the species variable name (`speciesName`) was also specified in order to model the effects for the species found in the datasets.
+```{r modelOptions}
+
+modelOptions <- list(control.inla = 
+                       list(int.strategy = 'eb',
+                            diagonal = 0.1), 
+                            verbose = TRUE,
+                            safe = TRUE)
+
+```
+
+##### `startISDM`
+
+The `startISDM` function is the first step in the modeling of our species data. The aim of the function is to organize and standardize our data to ensure that each process is correctly modeled in the integrated framework. For this standardization to work, we specify the response variable names of the counts data (`responseCounts`) and present absence (`responsePA`) as well as the coordinate reference system used (`Projection`).
+
+We may specify the formula for the covariate effects using the argument `Formulas = list(covariateFormula = ~.)`. If were to omit this argument, the model would create a formula for the fixed effects included in `spatialCovariates`.
 
 ```{r Model prep, warning = FALSE, message = FALSE}
 
-spatial_data <- intModel(dataSets,
-                        Coordinates = c('X', 'Y'), 
-                        Projection = proj, Mesh = mesh,
-                        responsePA = 'NPres', responseCounts = 'Counts',
-                        spatialCovariates = covariates, speciesName = 'Species_name')
+caerulescensData <- dataSets[c(1,4,5)]
+
+caerulescensModel <- startISDM(caerulescensData, Boundary = PA,
+                          Projection = proj, Mesh = mesh,
+                          responsePA = 'NPres', responseCounts = 'Counts',
+                          spatialCovariates = covariates,
+                          Formulas = 
+                          list(
+          covariateFormula = ~ elevation + I(elevation^2) + canopy + I(canopy^2))
+                             )
 
 ```
 
-As mentioned above, there are some slot functions now inside the `spatial_data` objects, which allow for a finer level of customization of the components for the integrated model.
+As mentioned above, there are some slot functions now inside the `caerulescensModel` objects, which allow for a finer level of customization of the components for the integrated model. Documentation for these slot functions may be found by using
+
+```{r help, eval = FALSE}
+
+caerulescensModel$help()
+
+```
 
 ###### `.$plot`
 
-Let's have a look at a graphical representation of the species' distribution, using the `.$plot()` function within `spatial_data`.
+Let's have a look at a graphical representation of the species' distribution, using the `.$plot()` function within `caerulescensModel`.
 
 ```{r dataset plot, fig.width=8, fig.height=5}
 
-spatial_data$plot(Boundary = FALSE) +
-  geom_sf(data = PA, fill = 'black', alpha = 0.15, lwd = 1.2) +
+caerulescensModel$plot() +
   theme_bw() +
   ggtitle('Plot of the datasets') + 
-  theme(plot.title = element_text(hjust = 0.5))
-
-```
-
-This will create a plot of the location of the species based on their dataset, however if we wanted to plot by species, we could specify this with the `Species = TRUE` argument.
-
-```{r species plot, fig.width=8, fig.height=5}
-
-spatial_data$plot(Species = TRUE, Boundary = FALSE) +
-  geom_sf(data = PA, fill = 'black', alpha = 0.15, lwd = 1.2) +
-  theme_bw() +
-  ggtitle('Plot of the species') + 
   theme(plot.title = element_text(hjust = 0.5))
 
 ```
@@ -276,21 +298,23 @@ When conducting Bayesian analysis, the choice of prior distribution is imperativ
 
 ```{r specifySpatial}
 
-spatial_data$specifySpatial(sharedSpatial = TRUE,
-                            prior.sigma = c(5, 0.01),
-                            prior.range = c(1, 0.01))
+caerulescensModel$specifySpatial(sharedSpatial = TRUE,
+                                 prior.sigma = c(1, 0.1),
+                                 prior.range = c(15, 0.1))
 
 ```
 
 ###### `.$addBias`
 
-Presence only datasets (such as our *eBird* data) are often noted to contain numerous biases, which in turn can heavily skew results obtained from our model. A common approach to account for these biases is by using a variable in the model such as sampling effort (some examples include: distance traveled, number of observations per visit, duration spent observing). However in the absence of such variables, running a second spatial field in the model can improve performance of the integrated model [@simmonds2020more]. To add a second spatial field to our model, we use the `.$addBias` function, which is part of the *intModel* object created above.
+Presence only datasets (such as our *eBird* data) are often noted to contain numerous biases, which in turn can heavily skew results obtained from our model. A common approach to account for these biases is by using a variable in the model such as sampling effort (some examples include: distance traveled, number of observations per visit, duration spent observing). However in the absence of such variables, running a second spatial field in the model can improve performance of the integrated model [@simmonds2020more]. To add a second spatial field to our model, we use the `.$addBias` function, which is part of the `specifyISDM` object created above.
 
 ```{r bias fields, eval = FALSE}
 
-spatial_data$addBias('eBird_caerulescens')
-spatial_data$addBias('eBird_fusca')
-spatial_data$addBias('eBird_magnolia')
+caerulescensModel$addBias(datasetNames = 'eBird_caerulescens')
+
+caerulescensModel$specifySpatial(Bias = TRUE, 
+                                 prior.sigma = c(1, 0.1),
+                                 prior.range = c(15, 0.1))
 
 ```
 
@@ -300,8 +324,9 @@ Suppose we knew *a priori* what the mean and precision values of one of the fixe
 
 ```{r priorsFixed}
 
-spatial_data$priorsFixed(Effect = 'elevation', Species = 'fusca',
-                         mean.linear = 2, prec.linear = 0.05)
+caerulescensModel$priorsFixed(Effect = 'Intercept',
+                              mean.linear = 0, 
+                              prec.linear = 0.1)
 
 ```
 
@@ -311,29 +336,150 @@ If we would like to see what the components required by *inlabru* in our model a
 
 ```{r changeComponents}
 
-spatial_data$changeComponents()
+caerulescensModel$changeComponents()
 
 ```
 
-This model is thus specified with: two environmental covariates, an intercept term per species, a spatial field per species, the three bias fields for the *presence only* data as well as a shared spatial field between the different datasets. If we wanted to add/change or remove a component entirely, this could be done with the `addComponent` and `removeComponent` argument respectively.
+This model is thus specified with: two environmental covariates and their quadratics, intercept terms for the datasets and a shared spatial field.
+
+###### `.$specifyRandom`
+
+To speed up computations, we set the *beta* parameter for the shared spatial effect to `TRUE`. This may be done using the `.$specifyRandom` function.
+
+```{r specifyRandom}
+
+caerulescensModel$specifyRandom(copyModel = list(beta = list(fixed = TRUE)))
+
+caerulescensModel$changeComponents()
+
+```
+
+##### `fitISDM`
+
+The integrated model is easily run with the `fitISDM` function as seen below by supplying the occurrence and *R-INLA* objects (created above with `startISDM`).
+
+```{r fitISDM run}
+
+caerulescensEst <- fitISDM(data = caerulescensModel, 
+                   options = modelOptions)
+
+```
+
+###### `predict` and `plot`
+
+A significant part of SDMs is creating prediction maps to understand the species' spread. Predictions of the integrated SDM's from `fitISDM` are made easy using the `predict` function. By supplying the relevant components, the predict function will create the formula required by *inlabru*'s `predict` function to make predictive maps. In this example, we made predictions for the spatial fields of the species, on the linear scale using 1000 samples.
+
+*PointedSDMs* also provides a general plotting function to plot the maps using the predicted values obtained in the `predict` function. The plot below shows the predictions of the three spatial fields of our species.
+
+```{r predict and plot}
+
+caerulescensPredictions <- predict(caerulescensEst,
+                                   data = fm_pixels(mesh = mesh,
+                                                    mask = PA),
+                                   spatial = TRUE,
+                                   n.samples = 1000)
+
+plot(caerulescensPredictions, variable = c('mean', 'sd'))
+
+
+```
+
+##### `startSpecies`
+
+The next function of interest is `startSpecies`, which is used to construct a multi-species ISDM. The argument `speciesName` is required, and it denotes the name of the species variable common across the datasets. Additional arguments include: `speciesSpatial` to control the type of spatial effect used for the species, `speciesIntercept` to control the intercept for the species and `speciesEnvironment` to control the environmental effects for the species (common across species or shared).
+
+For this example, we use the default argument choices which include: a model with a spatial effect per species (with shared hyperparameters) and a random intercept term for the species. We remove the dataset specific spatial term for computational purposes by setting `pointsSpatial = NULL`.
+
+```{r startSpeciesStart}
+
+speciesModel <- startSpecies(dataSets, Boundary = PA, pointsSpatial = NULL,
+                             Projection = proj, Mesh = mesh,
+                             responsePA = 'NPres', responseCounts = 'Counts',
+                             spatialCovariates = covariates, 
+                             speciesName = 'Species_name')
+
+```
+
+The output of this function is an *R6* object, and additional documentation from the function be be obtained using `?.$help()`.
+
+```{r species help, eval = FALSE}
+
+speciesModel$help()
+
+```
+
+###### Specifying the model
+
+Like the single-species model provided above, we specify the priors for the fixed and random effects using `.$specifySpatial` , `.$priorsFixed` and `.$specifyRandom`. In `.$specifyRandom`, the argument `speciesGroup` is used to change the prior for the precision (inverse variance) of group model for the spatial effects, and `speciesIntercepts` is used to change the prior for the precision for the random intercept term. For both of these parameters, we choose *pc priors.*
+
+```{r specifySpecies}
+
+speciesModel$specifySpatial(Species  = TRUE,
+                            prior.sigma = c(1, 0.1),
+                            prior.range = c(15, 0.1))
+
+speciesModel$priorsFixed(Effect = 'Intercept',
+                         mean.linear = 0, 
+                         prec.linear = 0.1)
+
+speciesModel$specifyRandom(speciesGroup = list(model = "iid", 
+                                               hyper = list(prec = list(prior = "pc.prec",
+                                               param = c(0.1, 0.1)))),
+                           speciesIntercepts = list(prior = 'pc.prec',
+                                                    param = c(0.1, 0.1)))
+
+
+```
+
+###### Fitting, predicting and plotting
+
+We may then estimate the model using `fitISDM`.
+
+```{r fitSpecies}
+
+speciesEst <- fitISDM(data = speciesModel, 
+                      options = modelOptions)
+
+summary(speciesEst)
+
+```
+
+Predictions and plotting are completed as follows:
+
+```{r predictionsSpecies}
+
+speciesPredictions <- predict(speciesEst,
+                                   data = fm_pixels(mesh = mesh,
+                                                    mask = PA),
+                                   spatial = TRUE,
+                                   n.samples = 1000)
+
+plot(speciesPredictions)
+
+```
+
+##### Model evaluation
+
+*PointedSDMs* has two functions to functions to evaluate models. These are `blockedCV` and `datasetOut.`
 
 ###### `.$spatialBlock`
 
-`.$spatialBlock` is used to set up spatial blocked cross-validation for the model by assigning each point in the datasets a block based on where the point is located spatially. For this example, we chose four blocks (`k=4`) for our model, based around a 2x2 grid (`rows = 2, cols = 2`). See the figure below for an illustration of the spatial block: the amount of data within each block appears reasonably equal.
+`.$spatialBlock` is used to set up spatial blocked cross-validation for the model by assigning each point in the datasets a block based on where the point is located spatially. For this example, we chose four blocks (`k=2`) for our model, based around a 2x2 grid (`rows = 2, cols = 2`). See the figure below for an illustration of the spatial block: the amount of data within each block appears reasonably equal.
 
 ```{r spatialBlock, warning = FALSE, message = FALSE,  fig.width=8, fig.height=5}
 
-spatial_data$spatialBlock(k = 4, rows_cols = c(2, 2), plot = TRUE) + theme_bw()
+caerulescensModel$spatialBlock(k = 2, rows_cols = c(2, 2), plot = TRUE) + theme_bw()
 
 ```
 
 ##### `blockedCV`
 
-Spatial blocked cross-validation may then be produced using the `blockedCV` function. We specify `control.inla = list(int.strategy = 'eb')` in our `options` argument in order to speed up the model running time.
+The blocked model may then be estimated with `blockedCV`. Note that this will estimate `k` models, so it may take a while to complete.
 
 ```{r blockedCV, warning = FALSE, eval = FALSE}
 
-spatialBlocked <- blockedCV(data = spatial_data, options = list(control.inla = list(int.strategy = 'eb')))
+spatialBlocked <- blockedCV(data = caerulescensModel, 
+                            options = modelOptions)
 
 ```
 
@@ -343,24 +489,24 @@ spatialBlocked
 
 ```
 
-More so, we can compare the cross-validation score from this model to one without the shared spatial effect (specified with `pointsSpatial = FALSE` in `intModel`).
+More so, we can compare the cross-validation score from this model to one without the shared spatial effect (specified with `pointsSpatial = FALSE` in `startISDM`).
 
 ```{r No fields model, message = FALSE, warning = FALSE}
 
-no_fields <- intModel(dataSets,
-                      Coordinates = c('X', 'Y'), 
+no_fields <- startISDM(dataSets, 
                       pointsSpatial = NULL,
                       Projection = proj, Mesh = mesh,
                       responsePA = 'NPres', responseCounts = 'Counts',
-                      spatialCovariates = covariates, speciesName = 'Species_name')
+                      spatialCovariates = covariates)
 
-no_fields$spatialBlock(k = 4, rows = 2, cols = 2)
+no_fields$spatialBlock(k = 2, rows_cols = c(2, 2), plot = TRUE) + theme_bw()
 
 ```
 
 ```{r spatialBlocked_no_fields, eval = FALSE}
 
-spatialBlocked_no_fields <- blockedCV(data = no_fields, options = list(control.inla = list(int.strategy = 'eb')))
+spatialBlocked_no_fields <- blockedCV(data = no_fields, 
+                                      options = modelOptions)
 
 ```
 
@@ -371,17 +517,6 @@ spatialBlocked_no_fields
 ```
 
 Based on the DIC scores, we conclude that the model with the shared spatial field provides a better fit of the data.
-
-##### `fitISDM`
-
-The integrated model is easily run with the `fitISDM` function as seen below by supplying the occurrence and *R-INLA* objects (created above with `intModel`).
-
-```{r Running model, message=FALSE, warning=FALSE, eval = FALSE}
-
-joint_model <- fitISDM(data = spatial_data, 
-                       options = list(control.inla = list(int.strategy = 'eb')))
-
-```
 
 ```{r Summary of model, message = FALSE, warning = FALSE, echo = TRUE,fig.width=7, fig.height=5}
 
@@ -421,34 +556,11 @@ Furthermore, by setting `predictions = TRUE` we are able to calculate some cross
 
 ```{r Leave one out, message = FALSE, warning = FALSE, eval = FALSE}
 
-dataset_out <- datasetOut(model = joint_model,
+dataset_out <- datasetOut(model = caerulescensEst,
                           dataset = "BBA",
                           predictions = TRUE)
 
 dataset_out
-
-```
-
-##### `predict`
-
-A significant part of SDMs is creating prediction maps to understand the species' spread. Predictions of the integrated SDM's from `fitISDM` are made easy using the `predict` function. By supplying the relevant components, the predict function will create the formula required by *inlabru*'s `predict` function to make predictive maps. In this example, we made predictions for the spatial fields of the species, on the linear scale using 1000 samples.
-
-```{r Projections, message = FALSE, warning = FALSE, eval = FALSE}
-
-projections <- predict(joint_model, mesh = mesh, mask = PA, 
-                       spatial = TRUE,
-                       fun = 'linear', n.samples = 1000)
-
-```
-
-##### `plot`
-
-*PointedSDMs* also provides a general plotting function to plot the maps using the predicted values obtained in the `predict` function. The plot below shows the predictions of the three spatial fields of our species.
-
-```{r Plots, fig.width=8, fig.height=5, message = FALSE, warning = FALSE}
-
-plot(projections, whattoplot = 'mean', 
-     colourLow = 'orange', colourHigh = 'dark red')
 
 ```
 
