@@ -147,6 +147,13 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
       
     }
     
+    if (!object$species$speciesEffects$Intercepts) {
+      
+      data <- fm_cprod(data, data.frame(temp_species_index_var = 1:length(unique(unlist(object$species$speciesIn)))))
+      names(data)[names(data) == 'temp_species_index_var'] <- object[['species']][['speciesVar']]
+      
+    }
+    
   }
   
   if (!any(names(data) %in% object$spatCovs$name)) {
