@@ -116,7 +116,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
   }
   
-  if (is.null(formula) && !intercepts && !spatial && is.null(covariates) && !temporal && !bias && !predictor) stop("Please provide either a formula or components of a formula to be predicted.")
+  if (is.null(formula) && !intercepts && !spatial && is.null(covariates) && !bias && !predictor) stop("Please provide either a formula or components of a formula to be predicted.")
   
   if (!is.null(object$temporal$temporalVar)) temporal <- TRUE
   else temporal <- FALSE

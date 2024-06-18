@@ -58,7 +58,7 @@ setClass('modISDM_predict')
 #TEMPORAL SHOULD NOT BE AN ARGUMENT
 
 predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL, 
-                            mask = NULL, temporal = FALSE, covariates = NULL, spatial = FALSE,
+                            mask = NULL, covariates = NULL, spatial = FALSE,
                             intercepts = FALSE, datasets = NULL, bias = FALSE,
                             biasnames = NULL, predictor = FALSE,
                             fun = 'linear', ...) {
@@ -97,7 +97,7 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
   } else intercept_terms <- NULL
     
-  if (is.null(formula) && !intercepts && !spatial && is.null(covariates) && !temporal && !bias && !predictor) stop("Please provide either a formula or components of a formula to be predicted.")
+  if (is.null(formula) && !intercepts && !spatial && is.null(covariates) && !bias && !predictor) stop("Please provide either a formula or components of a formula to be predicted.")
   
   if (is.null(data)) {
     
