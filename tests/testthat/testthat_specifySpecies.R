@@ -441,7 +441,7 @@ test_that('specifySpatial can correctly specify the spatial fields', {
   expect_false('dog_Pcount_spatial' %in% checkCopy$.__enclos_env__$private$Formulas$Pcount$dog$count$RHS)
   
   checkCopy$specifySpatial(Species = 'fish',  prior.range = c(1,0.1), prior.sigma = c(0.2, 0.5))
-  expect_equal(checkCopy$spatialFields$speciesFields$PO_fish$model, 'pcmatern')
+  expect_equal(checkCopy$spatialFields$speciesFields$fish_PO$model, 'pcmatern')
   
 })
 
