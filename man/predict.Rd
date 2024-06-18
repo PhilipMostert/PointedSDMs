@@ -35,7 +35,6 @@
   formula = NULL,
   mesh = NULL,
   mask = NULL,
-  temporal = FALSE,
   covariates = NULL,
   spatial = FALSE,
   intercepts = FALSE,
