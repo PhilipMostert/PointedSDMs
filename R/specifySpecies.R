@@ -797,7 +797,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
 
         if (private$speciesSpatial == 'shared' || private$speciesSpatial == 'replicate') index <- 'speciesField'
         else
-          if (!private$speciesIndependent) index <- unlist(mapply(FUN = function(x, names) paste0(names,'_', x), x = private$speciesIn[spWhere], names = names(private$speciesIn)[spWhere]))#index <- do.call(paste0, expand.grid(paste0(Species, '_'), private$dataSource))
+          if (!private$speciesIndependent) index <- unlist(mapply(FUN = function(x, names) paste0(x,'_', names), x = private$speciesIn[spWhere], names = names(private$speciesIn)[spWhere]))#index <- do.call(paste0, expand.grid(paste0(Species, '_'), private$dataSource))
           else index <- Species
           ##Change to paste0() species_dataset_spatia,
       }
