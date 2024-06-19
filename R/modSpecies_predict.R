@@ -112,7 +112,10 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
   
   if (is.null(object$spatCovs$covariateFormula)) {
     
-    if (!all(covariates%in%row.names(object$summary.fixed)) && !all(as.vector(outer(paste0(unlist(object[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))%in%row.names(object$summary.fixed))) stop("Covariates provided not in model.")
+    covsEst <- c(row.names(object$summary.fixed), names(object$summary.random)[names(object$summary.random) %in% c(object$spatCovs$name, 
+               as.vector(outer(paste0(unlist(object[['species']][['speciesIn']]),'_'), object$spatCovs$name, FUN = 'paste0')))])
+    
+    if (!all(covariates%in%covsEst) && !all(as.vector(outer(paste0(unlist(object[['species']][['speciesIn']]),'_'), covariates, FUN = 'paste0'))%in%covsEst)) stop("Covariates provided not in model.")
     
   }
   
@@ -164,11 +167,11 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
         
         if (spatCov %in% labels(terms(object$spatCovs$biasFormula))) covIndex <- spatCov
         else 
-          if (!is.null(object$species$speciesEffects$Environmental)) covIndex <- paste0(unique(unlist(object$species$speciesIn)), '_', spatCov)
+          if (object$species$speciesEffects$Environmental) covIndex <- paste0(unique(unlist(object$species$speciesIn)), '_', spatCov)
           else covIndex <- spatCov
       }
       else
-        if (!is.null(object$species$speciesEffects$Environmental)) covIndex <- paste0(unique(unlist(object$species$speciesIn)), '_', spatCov)
+        if (object$species$speciesEffects$Environmental) covIndex <- paste0(unique(unlist(object$species$speciesIn)), '_', spatCov)
         else covIndex <- spatCov
       
       data[, covIndex] <- inlabru::eval_spatial(where =  data, 
