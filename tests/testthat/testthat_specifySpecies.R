@@ -556,7 +556,7 @@ test_that('specifyRandom can correctly change the priors of the random effects',
   
   #Check speciesIntercept
   checkCopy$specifyRandom(speciesIntercepts = list(prior = "pc.prec", param = c(1, 0.1)))
-  expect_true('species_intercepts(main = species, model = \"iid\", constr = FALSE, hyper = list(prec = list(prior = \"pc.prec\", param = c(1, 0.1))))' %in%
+  expect_true('species_intercepts(main = species, model = \"iid\", constr = TRUE, hyper = list(prec = list(prior = \"pc.prec\", param = c(1, 0.1))))' %in%
                 checkCopy$.__enclos_env__$private$Components)
   
 })

@@ -440,7 +440,7 @@ test_that('makeComponents is able to make the correct components for all the pro
                             "PO_factvar_spatial(main = geometry, copy = \"shared_spatial\")" ,
                             "PO_numvar_spatial(main = geometry, copy = \"shared_spatial\")",
                             "PA_binommark_spatial(main = geometry, copy = \"shared_spatial\")",
-                            "species_intercepts(main = species, model = \"iid\", constr = FALSE, hyper = list(prec = list(prior = \"loggamma\", param = c(1, 5e-05))))",
+                            "species_intercepts(main = species, model = \"iid\", constr = TRUE, hyper = list(prec = list(prior = \"loggamma\", param = c(1, 5e-05))))",
                             "factvar(main = factvar, model = \"iid\",constr = FALSE, fixed=TRUE)",                                                      
                             "factvar_phi(main = factvar_phi, model = \"iid\", initial = -10, fixed = TRUE)",                                            
                             "numvar_intercept(1)",                                                                                                      

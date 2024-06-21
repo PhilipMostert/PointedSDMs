@@ -616,9 +616,11 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
       
       if (!is.null(speciesintercept)) {
         
-        if (speciesintercept) 
-        
-        spint <- paste0(speciesname, '_intercepts(main = ', speciesname, ', model = "iid", constr = FALSE, hyper = list(prec = list(prior = "loggamma", param = c(1, 5e-05))))')
+        if (speciesintercept) {
+          
+          if (intercepts) spint <- paste0(speciesname, '_intercepts(main = ', speciesname, ', model = "iid", constr = TRUE, hyper = list(prec = list(prior = "loggamma", param = c(1, 5e-05))))')
+          else spint <- paste0(speciesname, '_intercepts(main = ', speciesname, ', model = "iid", constr = FALSE, hyper = list(prec = list(prior = "loggamma", param = c(1, 5e-05))))')
+        }
         else spint <- paste0(species, '_intercept(1)')
         
       } else spint <- NULL
