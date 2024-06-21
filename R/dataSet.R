@@ -162,6 +162,7 @@ dataSet <- function(datapoints, datanames, coords = c('CoordLoc1', 'CoordLoc2'),
       
       if (!is.null(speciesname)) {
         
+        data[, speciesname] <- gsub("[[:blank:]]",'_', data[, speciesname])
         speciesIndexVAR <- paste0(speciesname, 'INDEX_VAR')
         data[, speciesIndexVAR] <- data[, speciesname]
         
