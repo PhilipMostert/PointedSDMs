@@ -160,6 +160,14 @@ dataSet <- function(datapoints, datanames, coords = c('CoordLoc1', 'CoordLoc2'),
         
       }
       
+      if (paresp %in% data_vars &
+          countsresp %in% data_vars) {
+        
+        warning('Both responsePA and responseCounts were found together in a dataset. Removing responsePA.\nPlease remove the response variable that you do not want to keep.')
+        data_vars <- data_vars[data_vars != paresp]
+        
+      }
+      
       if (!is.null(speciesname)) {
         
         data[, speciesname] <- gsub("[[:blank:]]",'_', data[, speciesname])
