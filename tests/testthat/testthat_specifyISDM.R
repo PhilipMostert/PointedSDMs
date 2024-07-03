@@ -360,6 +360,29 @@ test_that('updateFormula is able to change the formula of a dataset', {
                                                                                             I(covariate^2)), ignore_attr = TRUE)
   expect_true(is.null(check$.__enclos_env__$private$Formulas$PA$PA$PAresp$RHS))
   
+  ##Check covariateFormula
+  check <<- specifyISDM$new(data = list(PO, PA, Pcount),
+                            initialnames = c('PO', 'PA', 'Pcount'),
+                            projection = projection,
+                            Inlamesh = mesh,
+                            responsepa = responsePA,
+                            trialspa = trialName,
+                            responsecounts = responseCounts,
+                            pointcovariates = pointCovs,
+                            spatialcovariates = cov,
+                            formulas = list(covariateFormula = ~ covariate + I(covariate^2)),
+                            offset = NULL,
+                            ips = iPoints, copymodel = copyModel,
+                            spatial = 'shared', temporal = temporalName, 
+                            intercepts = TRUE, temporalmodel = temporalModel)
+  check$updateFormula(processLevel = TRUE, Formula = ~ . - I(covariate^2))
+  expect_equal(deparse1(check$.__enclos_env__$private$covariateFormula), '~covariate')
+  expect_true("Fixed__Effects__Comps(main = ~covariate, model = \"fixed\")" %in% check$.__enclos_env__$private$Components)
+  
+  check$updateFormula(newFormula = ~exp(covariate), processLevel = TRUE)
+  expect_equal(deparse1(check$.__enclos_env__$private$covariateFormula), '~exp(covariate)')
+  expect_true("Fixed__Effects__Comps(main = ~exp(covariate), model = \"fixed\")" %in% check$.__enclos_env__$private$Components)
+  
 })
 
 test_that('changeComponents can change the components of the model', {

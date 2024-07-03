@@ -301,7 +301,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @description Function used to update the formula for a selected observation model. The function is designed to work similarly to the generic \code{update} formula, and should be used to thin terms out of a process from the full model specified in \code{\link{intModel}}. The function also allows the user to add their own formula to the model, such that they can include non-linear components in the model. The function can also be used to print out the formula for a process by not specifying the \code{Formula} or \code{newFormula} arguments.
   #' @param datasetName Name of the dataset (class \code{character}) for which the formula needs to be changed.
   #' @param Formula An updated formula to give to the process. The syntax provided for the formula in this argument should be identical to the formula specification as in base \strong{R}. Should be used to thin terms out of a formula but could be used to add terms as well. If adding new terms not specified in \code{intModel}, remember to add the associated component using \code{.$changeComponents} as well.
-  #' @param allProcesses Logical argument: if \code{TRUE} changes the formulas for all of the processes in a dataset. Defaults to \code{FALSE}.
+  #' @param processLevel Logical argument: if \code{TRUE} changes the formulas for all of the processes in a dataset. Defaults to \code{FALSE}.
   #' @param newFormula Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.
   #' @return An updated formula.
   #' @import methods
@@ -346,11 +346,14 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' 
   updateFormula = function(datasetName = NULL,
                            Formula,
-                           newFormula) {
+                           newFormula,
+                           processLevel = FALSE) {
     
-    if (is.null(datasetName)) stop('Please specify the name of the dataset for which you want to change the formula using datasetName.')
+    if (is.null(datasetName) & !processLevel) stop('Please specify the name of the dataset for which you want to change the formula using datasetName.')
     
-    if (!datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
+    if (processLevel) datasetName <- private$dataSource
+    
+    if (!all(datasetName %in% private$dataSource)) stop ('Dataset name provided not in model.')
     
     if (!missing(Formula) && !missing(newFormula)) stop ('Please provide only one of Formula and newFormula. \n Use Formula to update the current formula; use newFormula to make a completely new formula.')
     
@@ -383,6 +386,24 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
       
     }
     else
+      if (!is.null(private$covariateFormula)) {
+        
+        if (!missing(Formula)) {
+          newForm <- paste0('Fixed__Effects__Comps(main = ', deparse1(update(private$covariateFormula, Formula)),', model = "fixed")')
+          private$covariateFormula <- update(private$covariateFormula, Formula)
+
+          }
+        else {
+          
+          newForm <- paste0('Fixed__Effects__Comps(main = ', deparse1(newFormula),', model = "fixed")')
+          private$covariateFormula <- newFormula
+          
+        }
+        
+        self$changeComponents(addComponent = newForm, print = FALSE)
+        
+      }
+        else
       if (!missing(Formula)) {
         formTerms <- all.vars(Formula)
         formTerms <- formTerms[!formTerms %in% '.']

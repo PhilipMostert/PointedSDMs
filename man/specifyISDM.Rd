@@ -421,7 +421,12 @@ organizedData$addBias(datasetNames = 'eBird')
 \subsection{Method \code{updateFormula()}}{
 Function used to update the formula for a selected observation model. The function is designed to work similarly to the generic \code{update} formula, and should be used to thin terms out of a process from the full model specified in \code{\link{intModel}}. The function also allows the user to add their own formula to the model, such that they can include non-linear components in the model. The function can also be used to print out the formula for a process by not specifying the \code{Formula} or \code{newFormula} arguments.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyISDM$updateFormula(datasetName = NULL, Formula, newFormula)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{specifyISDM$updateFormula(
+  datasetName = NULL,
+  Formula,
+  newFormula,
+  processLevel = FALSE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -433,7 +438,7 @@ Function used to update the formula for a selected observation model. The functi
 
 \item{\code{newFormula}}{Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.}
 
-\item{\code{allProcesses}}{Logical argument: if \code{TRUE} changes the formulas for all of the processes in a dataset. Defaults to \code{FALSE}.}
+\item{\code{processLevel}}{Logical argument: if \code{TRUE} changes the formulas for all of the processes in a dataset. Defaults to \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }
