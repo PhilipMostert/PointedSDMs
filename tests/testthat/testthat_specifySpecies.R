@@ -266,7 +266,7 @@ test_that('specifySpecies initialize works as expected.', {
   expect_equal(names(checkRep$spatialFields$sharedField), 'sharedField')
   
   #No species spatial
-  PO2 <- PO
+  PO2 <<- PO
   checknoSpat <<- specifySpecies$new(data = list(PO, PA, Pcount, PO2),
                                   initialnames = c('PO', 'PA', 'Pcount', 'PO2'),
                                   projection = projection,
@@ -335,8 +335,7 @@ test_that('addBias is able to add bias fields to the model as well as succesfull
   expect_true("sharedBias_biasField(main = geometry, model = sharedBias_bias_field)" %in% checknoSpat$.__enclos_env__$private$Components)
   expect_true(names(checknoSpat$spatialFields$biasFields) == 'sharedBias')
   expect_true(inherits(checknoSpat$spatialFields$biasFields$sharedBias, 'inla.spde2'))
-  
-  
+
 })
 
 test_that('updateFormula is able to change the formula of a dataset', {
@@ -370,6 +369,53 @@ test_that('updateFormula is able to change the formula of a dataset', {
   expect_equal(check$.__enclos_env__$private$Formulas$PA$bird$PAresp$LHS, PAresp ~ exp(PA_intercept + shared_spatial + pointcov + bird_covariate + 
                                                                                        I(bird_covariate^2)), ignore_attr = TRUE)
   expect_true(is.null(check$.__enclos_env__$private$Formulas$PA$bird$PAresp$RHS))
+  
+  #Test process level + covariate formula
+  checknoSpat2 <<- specifySpecies$new(data = list(PO, PA, Pcount, PO2),
+                                      initialnames = c('PO', 'PA', 'Pcount', 'PO2'),
+                                      projection = projection,
+                                      Inlamesh = mesh, speciesspatial = NULL,
+                                      responsepa = responsePA,
+                                      trialspa = trialName,
+                                      speciesindependent = FALSE,
+                                      responsecounts = responseCounts,
+                                      pointcovariates = pointCovs,
+                                      spatialcovariates = cov,
+                                      formulas = NULL,
+                                      offset = NULL,
+                                      speciesintercept = FALSE,
+                                      speciesenvironment = TRUE,
+                                      speciesname = speciesName,
+                                      ips = iPoints, copymodel = copyModel,
+                                      spatial = 'shared', temporal = NULL, 
+                                      intercepts = TRUE, temporalmodel = temporalModel)
+  checknoSpat2$updateFormula(processLevel = TRUE, Formula = ~ . - covariate)
+  expect_false(any(unlist(lapply(checknoSpat2$.__enclos_env__$private$Formulas, function (x) any(grepl('covariate', x[[1]][[1]]$RHS))))))
+  
+  checknoSpat3 <<- specifySpecies$new(data = list(PO, PA, Pcount, PO2),
+                                      initialnames = c('PO', 'PA', 'Pcount', 'PO2'),
+                                      projection = projection,
+                                      Inlamesh = mesh, speciesspatial = NULL,
+                                      responsepa = responsePA,
+                                      trialspa = trialName,
+                                      speciesindependent = FALSE,
+                                      responsecounts = responseCounts,
+                                      pointcovariates = pointCovs,
+                                      spatialcovariates = cov,
+                                      formulas = list(covariateFormula = ~ covariate + I(covariate^2)),
+                                      offset = NULL,
+                                      speciesintercept = FALSE,
+                                      speciesenvironment = TRUE,
+                                      speciesname = speciesName,
+                                      ips = iPoints, copymodel = copyModel,
+                                      spatial = 'shared', temporal = NULL, 
+                                      intercepts = TRUE, temporalmodel = temporalModel)
+  
+  checknoSpat3$updateFormula(speciesName = 'dog', Formula = ~ .- I(covariate^2))
+  expect_true(all(c("dog_Fixed__Effects__Comps(main = ~dog_covariate - 1, model = \"fixed\")",
+                    "bird_Fixed__Effects__Comps(main = ~bird_covariate + I(bird_covariate^2) - 1, model = \"fixed\")",
+                    "fish_Fixed__Effects__Comps(main = ~fish_covariate + I(fish_covariate^2) - 1, model = \"fixed\")") %in%
+                    checknoSpat3$.__enclos_env__$private$Components))
   
 })
 

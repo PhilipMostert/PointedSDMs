@@ -343,6 +343,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @description Function used to update the formula for a selected observation model. The function is designed to work similarly to the generic \code{update} formula, and should be used to thin terms out of a process from the full model specified in \code{\link{intModel}}. The function also allows the user to add their own formula to the model, such that they can include non-linear components in the model. The function can also be used to print out the formula for a process by not specifying the \code{Formula} or \code{newFormula} arguments.
   #' @param datasetName Name of the dataset (class \code{character}) for which the formula needs to be changed.
   #' @param speciesName Name of the species for which to change a formula for. Defaults to \code{NULL} which chnages the formula for all species present in \code{datasetName}.
+  #' @param processLevel Logical argument: if \code{TRUE} changes the formulas for all of the processes in a dataset. Defaults to \code{FALSE}.
   #' @param Formula An updated formula to give to the process. The syntax provided for the formula in this argument should be identical to the formula specification as in base \strong{R}. Should be used to thin terms out of a formula but could be used to add terms as well. If adding new terms not specified in \code{intModel}, remember to add the associated component using \code{.$changeComponents} as well.
   #' @param newFormula Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.
   #' @return An updated formula.
@@ -387,17 +388,27 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' 
   updateFormula = function(datasetName = NULL, 
                            speciesName = NULL,
-                           Formula,
+                           Formula, 
+                           processLevel = FALSE,
                            newFormula) {
     
-    if (all(is.null(datasetName), is.null(speciesName))) stop ('At least one of: datasetName, speciesName needs to be specified.')
+    if (all(is.null(datasetName), is.null(speciesName)) & !processLevel) stop ('At least one of: datasetName, speciesName needs to be specified.')
     
-    if (length(speciesName) > 1) stop('Please only supply one species name at a time.')
+    #if (length(speciesName) > 1) stop('Please only supply one species name at a time.')
+    
+    if (processLevel) {
+      
+      datasetName <- unique(private$dataSource)
+      speciesName <-  unique(unlist(private$speciesIn))
+      
+    }
+    else {
     
     if (is.null(datasetName)) datasetName <- names(private$speciesIn)[sapply(private$speciesIn, FUN = function(x) speciesName %in% x)] #Datasets where all species occur
     
     if (is.null(speciesName)) speciesName <- unlist(private$speciesIn[datasetName])
     
+    }
     #if (length(datasetName) != 1) stop ('Please only provide one dataset name.')
     
     if (!all(datasetName %in% private$dataSource)) stop ('Dataset name provided not in model.')
@@ -410,7 +421,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
     
     if (!missing(Formula) && length(as.character(Formula)) == 3) stop ("Please remove the response variable of the formula.")
         
-    if (!all(sapply(private$speciesIn[datasetName], function(x) speciesName %in% x))) stop('Species provided not available in the dataset.') 
+    if (!all(sapply(private$speciesIn[datasetName], function(x) any(speciesName %in% x)))) stop('Species provided not available in the dataset.') 
     else name_index <- speciesName
           
     if (missing(Formula) && missing(newFormula)) {
@@ -435,6 +446,31 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
       
     }
     else
+      if (!is.null(private$covariateFormula)) {
+        
+        if (!missing(Formula)) {
+          if (!private$speciesEnvironment) newForm <- makeFormulaComps(form = update(private$covariateFormula, Formula), species = FALSE, speciesnames = speciesName, type = 'cov')
+          else newForm <- makeFormulaComps(form = update(private$covariateFormula, Formula), species = TRUE, speciesnames = speciesName, type = 'cov')
+            
+          private$covariateFormula <- update(private$covariateFormula, Formula)
+          
+        }
+        else {
+          
+          if (!private$speciesEnvironment) newForm <- makeFormulaComps(form = newFormula, species = FALSE, speciesnames = speciesName, type = 'cov')
+          else newForm <- makeFormulaComps(form = newFormula, species = TRUE, speciesnames = speciesName, type = 'cov')          
+          
+          private$covariateFormula <- newFormula
+          
+        }
+        
+        for (spec in 1:length(newForm)) {
+        
+        self$changeComponents(addComponent = newForm[spec], print = FALSE)
+        
+          }
+      }
+    else
       if (!missing(Formula)) {
         
         for (dataset in datasetName) {
@@ -455,9 +491,10 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
             
             if (!is.null(private$Formulas[[dataset]][[1]][[1]]$RHS)) {
               
-          
+              if (!is.null(private$Formulas[[dataset]][[species]][[1]]$RHS)) {
           private$Formulas[[dataset]][[species]][[1]]$RHS <- removeFormula(formulaRemove =  Formula2,
                                                                      oldFormula = private$Formulas[[dataset]][[species]][[1]]$RHS)
+              }
           
             }
           

@@ -436,6 +436,7 @@ Function used to update the formula for a selected observation model. The functi
   datasetName = NULL,
   speciesName = NULL,
   Formula,
+  processLevel = FALSE,
   newFormula
 )}\if{html}{\out{</div>}}
 }
@@ -448,6 +449,8 @@ Function used to update the formula for a selected observation model. The functi
 \item{\code{speciesName}}{Name of the species for which to change a formula for. Defaults to \code{NULL} which chnages the formula for all species present in \code{datasetName}.}
 
 \item{\code{Formula}}{An updated formula to give to the process. The syntax provided for the formula in this argument should be identical to the formula specification as in base \strong{R}. Should be used to thin terms out of a formula but could be used to add terms as well. If adding new terms not specified in \code{intModel}, remember to add the associated component using \code{.$changeComponents} as well.}
+
+\item{\code{processLevel}}{Logical argument: if \code{TRUE} changes the formulas for all of the processes in a dataset. Defaults to \code{FALSE}.}
 
 \item{\code{newFormula}}{Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.}
 }

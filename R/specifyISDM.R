@@ -389,13 +389,13 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
       if (!is.null(private$covariateFormula)) {
         
         if (!missing(Formula)) {
-          newForm <- paste0('Fixed__Effects__Comps(main = ', deparse1(update(private$covariateFormula, Formula)),', model = "fixed")')
+          newForm <-  makeFormulaComps(form = update(private$covariateFormula, Formula), species = FALSE, speciesnames = NULL, type = 'cov')
           private$covariateFormula <- update(private$covariateFormula, Formula)
 
           }
         else {
           
-          newForm <- paste0('Fixed__Effects__Comps(main = ', deparse1(newFormula),', model = "fixed")')
+          newForm <-  makeFormulaComps(form = newFormula, species = FALSE, speciesnames = NULL, type = 'cov')
           private$covariateFormula <- newFormula
           
         }
