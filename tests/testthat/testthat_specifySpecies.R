@@ -565,8 +565,8 @@ test_that('specifyRandom can correctly change the priors of the random effects',
                 check$.__enclos_env__$private$Components)
   
   ##Check replicate
-  checkRep$specifyRandom(speciesGroup = list(model = "iid", hyper = list(prior = "pc.prec", param = c(1,0.1))))
-  expect_true('speciesShared(main = geometry, model = speciesField, group = speciesSpatialGroup, control.group = list(model = "iid", hyper = list(prior = "pc.prec", param = c(1, 0.1))))' %in%
+  checkRep$specifyRandom(speciesGroup = list(model = "iid", hyper = list(prec = list(prior = 'pc.prec', param = c(1, 0,1)))))
+  expect_true('speciesShared(main = geometry, model = speciesField, group = speciesSpatialGroup, control.group = list(model = \"iid\", hyper = list(prior = \"pc.prec\", param = c(1, 0.1))))' %in%
               checkRep$.__enclos_env__$private$Components)
   
   #Check species Copy
