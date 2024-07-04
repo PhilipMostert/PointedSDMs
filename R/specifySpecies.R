@@ -1199,7 +1199,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
                            speciesIntercepts = list(prior = 'loggamma', param = c(1, 5e-5)),
                            speciesGroup = list(model = "iid", hyper = list(prec = list(prior = 'loggamma', param = c(1, 5e-5))))) {
     
-    if (!is.null(private$temporalName)) { 
+    if (!is.null(private$temporalName) & !missing(temporalModel)) { 
       
       if (private$Spatial == 'shared') whichTemp <- grepl('shared_spatial\\(main = geometry', private$Components)
       else whichTemp <- grepl(paste0('group = ', private$temporalName), private$Components)
@@ -1212,7 +1212,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
     
     if (!is.null(private$Spatial)) {
     
-    if (private$Spatial == 'copy') {
+    if (private$Spatial == 'copy' & !missing(copyModel)) {
       
       whichCopied <- grepl('beta = list\\(',private$Components) & !grepl('_biasField',private$Components)
       
@@ -1224,7 +1224,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
     }
     }
     
-    if (private$biasCopy) {
+    if (private$biasCopy & !missing(copyBias)) {
       
       whichCopied <- grepl('beta = list\\(',private$Components) & grepl('_biasField',private$Components)
       
@@ -1238,7 +1238,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
     
     if (!is.null(private$speciesSpatial)) {
     
-    if (private$speciesSpatial == 'copy') {
+    if (private$speciesSpatial == 'copy' & !missing(speciesCopy)) {
       
       whichSpecies <- grepl(paste0(unique(unlist(private$speciesIn)),'_',collapse = '|'), private$Components)
       whichCopied <- grepl('beta = list\\(',private$Components)
@@ -1251,7 +1251,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
       
     }
     
-    if (private$speciesSpatial == 'replicate') {
+    if (private$speciesSpatial == 'replicate' & !missing(speciesGroup)) {
       
       whichSpatial <- grepl('speciesShared\\(main = geometry', private$Components)
       
@@ -1265,7 +1265,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
       
     }
     
-    if (private$speciesIntercepts) {
+    if (private$speciesIntercepts & !missing(speciesIntercepts)) {
       
       
       whichIntercepts <- grepl(paste0(private$speciesName, '_intercepts\\(main ='), private$Components)

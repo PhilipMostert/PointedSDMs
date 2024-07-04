@@ -1174,7 +1174,7 @@ specifyMarks <- R6::R6Class(classname = 'specifyMarks', lock_objects = FALSE, cl
                            copyModel = list(beta = list(fixed = FALSE)),
                            copyBias = list(beta = list(fixed = FALSE))) {
     
-    if (!is.null(private$temporalName)) { 
+    if (!is.null(private$temporalName) & !missing(temporalModel)) { 
       
       if (private$Spatial == 'shared') whichTemp <- grepl('shared_spatial\\(main = geometry', private$Components)
       else whichTemp <- grepl(paste0('group = ', private$temporalName), private$Components)
@@ -1187,7 +1187,7 @@ specifyMarks <- R6::R6Class(classname = 'specifyMarks', lock_objects = FALSE, cl
     
     if (!is.null(private$Spatial)) {
       
-      if (private$Spatial == 'copy') {
+      if (private$Spatial == 'copy' & !missing(copyModel)) {
         
         whichCopied <- grepl('beta = list\\(',private$Components) & !grepl('_biasField',private$Components)
         
@@ -1200,7 +1200,7 @@ specifyMarks <- R6::R6Class(classname = 'specifyMarks', lock_objects = FALSE, cl
       
     }
     
-    if (private$biasCopy) {
+    if (private$biasCopy & !missing(copyBias)) {
       
       whichCopied <- grepl('beta = list\\(',private$Components) & grepl('_biasField',private$Components)
       

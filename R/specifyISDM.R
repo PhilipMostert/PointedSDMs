@@ -1015,7 +1015,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
                            copyModel = list(beta = list(fixed = FALSE)),
                            copyBias = list(beta = list(fixed = FALSE))) {
     
-    if (!is.null(private$temporalName)) { 
+    if (!is.null(private$temporalName) & !missing(temporalModel)) { 
     
     if (private$Spatial == 'shared') whichTemp <- grepl('shared_spatial\\(main = geometry', private$Components)
     else whichTemp <- grepl(paste0('group = ', private$temporalName), private$Components)
@@ -1026,7 +1026,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
     private$temporalModel <- deparse1(temporalModel)
     }
     
-    if (!is.null(private$Spatial)) {
+    if (!is.null(private$Spatial) & !missing(copyModel)) {
     
     if (private$Spatial == 'copy') {
       
@@ -1041,7 +1041,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
       
     }
     
-  if (private$biasCopy) {
+  if (private$biasCopy & !missing(copyBias)) {
     
     whichCopied <- grepl('beta = list\\(',private$Components) & grepl('_biasField',private$Components)
     
