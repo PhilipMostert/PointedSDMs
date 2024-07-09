@@ -1,4 +1,5 @@
 test_that('startISDM is able to initialize a specifyISDM object as well as correctly add the data to the integrated model', {
+  
   skip_on_cran()
   
   ##Set up arbitrary data

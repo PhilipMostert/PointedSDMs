@@ -287,6 +287,7 @@ test_that('specifyISDM initialize works as expected.', {
 })
 
 test_that('addBias is able to add bias fields to the model as well as succesfully update the relevant formulas and components of the model.', {
+  
   skip_on_cran()
   
   #Check adding bias to the present only dataset
@@ -337,6 +338,7 @@ test_that('addBias is able to add bias fields to the model as well as succesfull
 })
 
 test_that('updateFormula is able to change the formula of a dataset', {
+  
   skip_on_cran()
   
   #Test error: species/mark/dataset all NULL
@@ -386,6 +388,7 @@ test_that('updateFormula is able to change the formula of a dataset', {
 })
 
 test_that('changeComponents can change the components of the model', {
+  
   skip_on_cran()
   
   #remove binmark_spatial from model
@@ -409,6 +412,7 @@ test_that('changeComponents can change the components of the model', {
 })
 
 test_that('priorsFixed can add the correct priors to the fixed effects', {
+  
   skip_on_cran()
   
   #incorrect effect
@@ -428,6 +432,7 @@ test_that('priorsFixed can add the correct priors to the fixed effects', {
 })
 
 test_that('specifySpatial can correctly specify the spatial fields', {
+  
   skip_on_cran()
   
   #Check errors:
@@ -448,6 +453,7 @@ test_that('specifySpatial can correctly specify the spatial fields', {
 })
 
 test_that('changeLink can correctly change the link function of a process', {
+  
   skip_on_cran()
   
   expect_error(checknoSpat$changeLink(datasetName = 'PO2'))
@@ -463,6 +469,7 @@ test_that('changeLink can correctly change the link function of a process', {
   })
 
 test_that('spatialBlock can correctly block the spatial domain', {
+  
   skip_on_cran()
   
   checknoSpat$spatialBlock(k = 2, rows_cols = c(1,2), plot = FALSE)
@@ -493,6 +500,7 @@ test_that('addSamplers can correctly add new samplers to a process', {
 })
 
 test_that('specifyRandom can correctly change the priors of the random effects', {
+  
   skip_on_cran()
   #new again
   check <<- specifyISDM$new(data = list(PO, PA, Pcount),
