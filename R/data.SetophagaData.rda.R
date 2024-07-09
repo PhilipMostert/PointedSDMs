@@ -22,7 +22,7 @@ NULL
 #' @name BBA
 #' @docType data
 #' @keywords data
-#' @references \url{http://www.pabirdatlas.psu.edu}
+#' @references \url{https://ebird.org/atlaspa/home}
 NULL
 
 #' Dataset of setophaga caerulescens obtained from the North American Breeding Bird survey across Pennsylvania state.
