@@ -8,6 +8,6 @@
 Dataset of setophaga caerulescens obtained from the Pennsylvania Atlas of Breeding Birds.
 }
 \references{
-\url{http://www.pabirdatlas.psu.edu}
+\url{https://ebird.org/atlaspa/home}
 }
 \keyword{data}
