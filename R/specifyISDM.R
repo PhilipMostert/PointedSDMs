@@ -71,7 +71,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @return A ggplot object.
   #' @import ggplot2
   #' @examples
-  #' 
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -90,6 +90,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #'   #Create plot of data
   #'   organizedData$plot()
   #' 
+  #' }
   #' }
   
   plot = function(datasetNames,
@@ -182,7 +183,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @param temporalModel List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details. \code{temporalName} needs to be specified in \code{intModel} prior.
   #' @return A bias field to the model.
   #' @examples
-  #'  
+  #'  \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -200,6 +201,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' #Add bias field to eBird records
   #' organizedData$addBias(datasetNames = 'eBird')
   #' 
+  #' }
   #' }
   addBias = function(datasetNames = NULL,
                      allPO = FALSE,
@@ -308,7 +310,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @import stats
   #' 
   #' @examples
-  #' 
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -340,7 +342,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #'  organizedData$changeComponents(addComponent = 'scaling') 
   #'  
   #' }
-  #' 
+  #' }
   #' @return If \code{Formula} and \code{newFormula} are missing, will print out the formula for the specified processes. 
   #' 
   #' 
@@ -444,7 +446,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
     }
   }
   ,
-  #' @description Function to add and specify custom components to model, which are required by \pkg{inlabru}. The main purpose of the function is to re-specify or completely change components already in the model, however the user can also add completely new components to the model as well. In this case, the components need to be added to the correct formulas in the model using the \code{.$updateFormula} function. If \code{addComponent} and \code{removeComponent} are both missing, the function will print out the components to be supplied to \pkg{inlabru}'s \code{\link{bru}} function.
+  #' @description Function to add and specify custom components to model, which are required by \pkg{inlabru}. The main purpose of the function is to re-specify or completely change components already in the model, however the user can also add completely new components to the model as well. In this case, the components need to be added to the correct formulas in the model using the \code{.$updateFormula} function. If \code{addComponent} and \code{removeComponent} are both missing, the function will print out the components to be supplied to \pkg{inlabru}'s \code{\link[inlabru]{bru}} function.
   #' @param addComponent Component to add to the integrated model. Note that if the user is re-specifying a component already present in the model, they do not need to remove the old component using \code{removeComponent}.
   #' @param removeComponent Component (or just the name of a component) present in the model which should be removed.
   #' @param print Logical: should the updated components be printed. Defaults to \code{TRUE}.
@@ -520,6 +522,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @param prec.linear Precision value for the prior of the fixed effect. Defaults to \code{0.001}.
   #' @return New priors for the fixed effects.
   #' @examples
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -543,6 +546,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #'  #Add prior to Forest
   #'  organizedData$priorsFixed(Effect = 'Forest', mean.linear = 2, prec.linear = 0.1)
   #'
+  #' }
   #' }
   
   priorsFixed = function(Effect, datasetName = NULL,
@@ -609,6 +613,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @return A new model for the spatial effects.
   #' 
   #' @examples 
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -634,6 +639,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #'                        prior.sigma = c(1,0.001))
   #'
   #' } 
+  #' }
   
   specifySpatial = function(sharedSpatial = FALSE,
                             datasetName,
@@ -732,6 +738,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @param Link Name of the link function to add to the process. If missing, will print the link function of the specified dataset.
   #' @return A new link function for a process.
   #' @examples
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -756,6 +763,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #'  
   #'  
   #' } 
+  #' }
   changeLink = function(datasetName,
                         Link) {
     
@@ -779,6 +787,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @import ggplot2
   #' @importFrom R.devices suppressGraphics
   #' @importFrom blockCV spatialBlock
+  #' @importFrom blockCV cv_plot
   #' 
   #' @examples
   #'  if (requireNamespace('INLA')) {
@@ -953,7 +962,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @param Samplers A \code{Spatial*} object representing the integration domain.
   #' @return New samplers for a process.
   #' @example
-  #' 
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -972,7 +981,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' organizedData$addSamplers(datasetName = 'eBird', Samplers = SolitaryTinamou$region)
   #' 
   #' }
-  #' 
+  #' }
   addSamplers = function(datasetName, Samplers) {
     
     if (!datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
@@ -990,7 +999,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @param copyBias List of model specifications given to the hyper parameters for the \code{"copy"} bias model. Defaults to \code{list(beta = list(fixed = FALSE))}.
   #' @return An updated component list. 
   #' @example
-  #' 
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -1009,6 +1018,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' #Add integration domain for the eBird records
   #' organizedData$specifyRandom(copyModel =  list(beta = list(fixed = TRUE)))
   #' 
+  #' }
   #' }
   
   specifyRandom = function(temporalModel = list(model = 'ar1'),

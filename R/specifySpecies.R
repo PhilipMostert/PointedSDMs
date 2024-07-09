@@ -76,7 +76,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @return A ggplot object.
   #' @import ggplot2
   #' @examples
-  #' 
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -96,6 +96,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #'   #Create plot of data
   #'   organizedData$plot()
   #' 
+  #' }
   #' }
   
   plot = function(datasetNames, Species = TRUE, 
@@ -215,7 +216,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @param temporalModel List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details. \code{temporalName} needs to be specified in \code{intModel} prior.
   #' @return A bias field to the model.
   #' @examples
-  #'  
+  #'  \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -234,6 +235,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' #Add bias field to eBird records
   #' organizedData$addBias(datasetNames = 'eBird')
   #' 
+  #' }
   #' }
   addBias = function(datasetNames = NULL,
                      allPO = FALSE,
@@ -351,7 +353,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @import stats
   #' 
   #' @examples
-  #' 
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -382,7 +384,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #'  organizedData$changeComponents(addComponent = 'scaling') 
   #'  
   #' }
-  #' 
+  #' }
   #' @return If \code{Formula} and \code{newFormula} are missing, will print out the formula for the specified processes. 
   #' 
   #' 
@@ -546,7 +548,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
     }
   }
   ,
-  #' @description Function to add and specify custom components to model, which are required by \pkg{inlabru}. The main purpose of the function is to re-specify or completely change components already in the model, however the user can also add completely new components to the model as well. In this case, the components need to be added to the correct formulas in the model using the \code{.$updateFormula} function. If \code{addComponent} and \code{removeComponent} are both missing, the function will print out the components to be supplied to \pkg{inlabru}'s \code{\link{bru}} function.
+  #' @description Function to add and specify custom components to model, which are required by \pkg{inlabru}. The main purpose of the function is to re-specify or completely change components already in the model, however the user can also add completely new components to the model as well. In this case, the components need to be added to the correct formulas in the model using the \code{.$updateFormula} function. If \code{addComponent} and \code{removeComponent} are both missing, the function will print out the components to be supplied to \pkg{inlabru}'s \code{\link[inlabru]{bru}} function.
   #' @param addComponent Component to add to the integrated model. Note that if the user is re-specifying a component already present in the model, they do not need to remove the old component using \code{removeComponent}.
   #' @param removeComponent Component (or just the name of a component) present in the model which should be removed.
   #' @param print Logical: should the updated components be printed. Defaults to \code{TRUE}.
@@ -625,6 +627,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @param prec.linear Precision value for the prior of the fixed effect. Defaults to \code{0.001}.
   #' @return New priors for the fixed effects.
   #' @examples
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -649,6 +652,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #'  #Add prior to Forest
   #'  organizedData$priorsFixed(Effect = 'Forest', mean.linear = 2, prec.linear = 0.1)
   #'
+  #' }
   #' }
   
   priorsFixed = function(Effect, Species = NULL, datasetName = NULL,
@@ -742,6 +746,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @return A new model for the spatial effects.
   #' 
   #' @examples 
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -768,6 +773,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #'                        prior.sigma = c(1,0.001))
   #'
   #' } 
+  #' }
   
   specifySpatial = function(sharedSpatial = FALSE,
                             datasetName,
@@ -903,6 +909,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @param Link Name of the link function to add to the process. If missing, will print the link function of the specified dataset.
   #' @return A new link function for a process.
   #' @examples
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -928,6 +935,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #'  
   #'  
   #' } 
+  #' }
   changeLink = function(datasetName,
                         Link, ...) {
     
@@ -955,8 +963,10 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @import ggplot2
   #' @importFrom R.devices suppressGraphics
   #' @importFrom blockCV spatialBlock
+  #' @importFrom blockCV cv_plot
   #' 
   #' @examples
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -982,7 +992,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #'  organizedData$spatialBlock(k = 2, rows = 2, cols = 1, plot = FALSE)
   #'
   #' } 
-  #'
+  #' }
   spatialBlock = function(k, rows_cols, plot = FALSE, seed = 1234, ...) {
     
     
@@ -1129,7 +1139,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @param Samplers A \code{Spatial*} object representing the integration domain.
   #' @return New samplers for a process.
   #' @example
-  #' 
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -1148,7 +1158,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' organizedData$addSamplers(datasetName = 'eBird', Samplers = SolitaryTinamou$region)
   #' 
   #' }
-  #' 
+  #' }
   addSamplers = function(datasetName, Samplers) {
     
     if (!datasetName %in% private$dataSource) stop ('Dataset name provided not in model.')
@@ -1170,7 +1180,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @param speciesGroup Prior distribution for the precision parameter for the iid group model. Defaults to \code{INLA}'s default.
   #'   #' @return An updated component list. 
   #' @example
-  #' 
+  #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
   #'  #Get Data
@@ -1191,7 +1201,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' organizedData$specifyRandom(copyModel =  list(beta = list(fixed = TRUE)))
   #' 
   #' }
-  
+  #' }
   specifyRandom = function(temporalModel = list(model = 'ar1'),
                            copyModel = list(beta = list(fixed = FALSE)),
                            copyBias =  list(beta = list(fixed = FALSE)),
@@ -1265,6 +1275,8 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
       
     }
     
+    if (!is.null(private$speciesIntercepts)) {
+    
     if (private$speciesIntercepts & !missing(speciesIntercepts)) {
       
       
@@ -1276,6 +1288,8 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
       
       private$speciesIntPrior <- deparse1(speciesIntercepts)
       
+      
+    }
       
     }
 

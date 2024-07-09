@@ -12,7 +12,7 @@ A data object containing the data and the relevant information about the integra
 ## Method `specifyISDM$plot`
 ## ------------------------------------------------
 
-
+\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -32,12 +32,13 @@ A data object containing the data and the relevant information about the integra
   organizedData$plot()
 
 }
+}
 
 ## ------------------------------------------------
 ## Method `specifyISDM$addBias`
 ## ------------------------------------------------
 
- 
+ \dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -56,12 +57,13 @@ A data object containing the data and the relevant information about the integra
 organizedData$addBias(datasetNames = 'eBird')
 
 }
+}
 
 ## ------------------------------------------------
 ## Method `specifyISDM$updateFormula`
 ## ------------------------------------------------
 
-
+\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -93,7 +95,7 @@ organizedData$addBias(datasetNames = 'eBird')
  organizedData$changeComponents(addComponent = 'scaling') 
  
 }
-
+}
 
 ## ------------------------------------------------
 ## Method `specifyISDM$changeComponents`
@@ -131,6 +133,7 @@ organizedData$addBias(datasetNames = 'eBird')
 ## Method `specifyISDM$priorsFixed`
 ## ------------------------------------------------
 
+\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -155,11 +158,13 @@ organizedData$addBias(datasetNames = 'eBird')
  organizedData$priorsFixed(Effect = 'Forest', mean.linear = 2, prec.linear = 0.1)
 
 }
+}
 
 ## ------------------------------------------------
 ## Method `specifyISDM$specifySpatial`
 ## ------------------------------------------------
 
+\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -185,11 +190,13 @@ organizedData$addBias(datasetNames = 'eBird')
                        prior.sigma = c(1,0.001))
 
 } 
+}
 
 ## ------------------------------------------------
 ## Method `specifyISDM$changeLink`
 ## ------------------------------------------------
 
+\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -214,6 +221,7 @@ organizedData$addBias(datasetNames = 'eBird')
  
  
 } 
+}
 
 ## ------------------------------------------------
 ## Method `specifyISDM$spatialBlock`
@@ -326,7 +334,7 @@ A ggplot object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{
+\preformatted{\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -345,6 +353,7 @@ A ggplot object.
   #Create plot of data
   organizedData$plot()
 
+}
 }
 }
 \if{html}{\out{</div>}}
@@ -390,7 +399,7 @@ A bias field to the model.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{ 
+\preformatted{ \dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -408,6 +417,7 @@ A bias field to the model.
 #Add bias field to eBird records
 organizedData$addBias(datasetNames = 'eBird')
 
+}
 }
 }
 \if{html}{\out{</div>}}
@@ -447,7 +457,7 @@ An updated formula.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{
+\preformatted{\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -479,7 +489,7 @@ An updated formula.
  organizedData$changeComponents(addComponent = 'scaling') 
  
 }
-
+}
 }
 \if{html}{\out{</div>}}
 
@@ -490,7 +500,7 @@ An updated formula.
 \if{html}{\out{<a id="method-specifyISDM-changeComponents"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyISDM-changeComponents}{}}}
 \subsection{Method \code{changeComponents()}}{
-Function to add and specify custom components to model, which are required by \pkg{inlabru}. The main purpose of the function is to re-specify or completely change components already in the model, however the user can also add completely new components to the model as well. In this case, the components need to be added to the correct formulas in the model using the \code{.$updateFormula} function. If \code{addComponent} and \code{removeComponent} are both missing, the function will print out the components to be supplied to \pkg{inlabru}'s \code{\link{bru}} function.
+Function to add and specify custom components to model, which are required by \pkg{inlabru}. The main purpose of the function is to re-specify or completely change components already in the model, however the user can also add completely new components to the model as well. In this case, the components need to be added to the correct formulas in the model using the \code{.$updateFormula} function. If \code{addComponent} and \code{removeComponent} are both missing, the function will print out the components to be supplied to \pkg{inlabru}'s \code{\link[inlabru]{bru}} function.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{specifyISDM$changeComponents(addComponent, removeComponent, print = TRUE)}\if{html}{\out{</div>}}
 }
@@ -576,7 +586,8 @@ New priors for the fixed effects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{ if (requireNamespace('INLA')) {
+\preformatted{\dontrun{
+ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -599,6 +610,7 @@ New priors for the fixed effects.
  #Add prior to Forest
  organizedData$priorsFixed(Effect = 'Forest', mean.linear = 2, prec.linear = 0.1)
 
+}
 }
 }
 \if{html}{\out{</div>}}
@@ -644,7 +656,8 @@ A new model for the spatial effects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{ if (requireNamespace('INLA')) {
+\preformatted{\dontrun{
+ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -669,6 +682,7 @@ A new model for the spatial effects.
                        prior.sigma = c(1,0.001))
 
 } 
+}
 }
 \if{html}{\out{</div>}}
 
@@ -698,7 +712,8 @@ A new link function for a process.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{ if (requireNamespace('INLA')) {
+\preformatted{\dontrun{
+ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -722,6 +737,7 @@ A new link function for a process.
  
  
 } 
+}
 }
 \if{html}{\out{</div>}}
 

@@ -29,6 +29,7 @@
 #' 
 #' @examples 
 #' 
+#' \dontrun{
 #'  if (requireNamespace('INLA')) {
 #'    
 #'  #Get Data
@@ -58,6 +59,7 @@
 #'                         Projection = proj, pointsSpatial = 'copy', responsePA = 'Present',
 #'                         Formulas = list(covariateFormula = ~ NPP + I(NPP^2)))                    
 #'                       
+#'  }
 #'  }
 #' 
 #' @export

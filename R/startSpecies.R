@@ -32,7 +32,8 @@
 #' @import methods
 #' 
 #' @examples 
-#' 
+#'  
+#'  \dontrun{
 #'  if (requireNamespace('INLA')) {
 #'  
 #'  ##REDO WITH OTHER DATA
@@ -82,6 +83,7 @@
 #'                         responsePA = 'Present',
 #'                         speciesName = 'speciesName')
 #'                      
+#'  }
 #'  }
 #' 
 #' @export

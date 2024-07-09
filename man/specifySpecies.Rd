@@ -12,7 +12,7 @@ A data object containing the data and the relevant information about the integra
 ## Method `specifySpecies$plot`
 ## ------------------------------------------------
 
-
+\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -33,12 +33,13 @@ A data object containing the data and the relevant information about the integra
   organizedData$plot()
 
 }
+}
 
 ## ------------------------------------------------
 ## Method `specifySpecies$addBias`
 ## ------------------------------------------------
 
- 
+ \dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -58,12 +59,13 @@ A data object containing the data and the relevant information about the integra
 organizedData$addBias(datasetNames = 'eBird')
 
 }
+}
 
 ## ------------------------------------------------
 ## Method `specifySpecies$updateFormula`
 ## ------------------------------------------------
 
-
+\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -94,7 +96,7 @@ organizedData$addBias(datasetNames = 'eBird')
  organizedData$changeComponents(addComponent = 'scaling') 
  
 }
-
+}
 
 ## ------------------------------------------------
 ## Method `specifySpecies$changeComponents`
@@ -134,6 +136,7 @@ organizedData$addBias(datasetNames = 'eBird')
 ## Method `specifySpecies$priorsFixed`
 ## ------------------------------------------------
 
+\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -159,11 +162,13 @@ organizedData$addBias(datasetNames = 'eBird')
  organizedData$priorsFixed(Effect = 'Forest', mean.linear = 2, prec.linear = 0.1)
 
 }
+}
 
 ## ------------------------------------------------
 ## Method `specifySpecies$specifySpatial`
 ## ------------------------------------------------
 
+\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -190,11 +195,13 @@ organizedData$addBias(datasetNames = 'eBird')
                        prior.sigma = c(1,0.001))
 
 } 
+}
 
 ## ------------------------------------------------
 ## Method `specifySpecies$changeLink`
 ## ------------------------------------------------
 
+\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -220,11 +227,13 @@ organizedData$addBias(datasetNames = 'eBird')
  
  
 } 
+}
 
 ## ------------------------------------------------
 ## Method `specifySpecies$spatialBlock`
 ## ------------------------------------------------
 
+\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -250,7 +259,7 @@ organizedData$addBias(datasetNames = 'eBird')
  organizedData$spatialBlock(k = 2, rows = 2, cols = 1, plot = FALSE)
 
 } 
-
+}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -335,7 +344,7 @@ A ggplot object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{
+\preformatted{\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -355,6 +364,7 @@ A ggplot object.
   #Create plot of data
   organizedData$plot()
 
+}
 }
 }
 \if{html}{\out{</div>}}
@@ -400,7 +410,7 @@ A bias field to the model.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{ 
+\preformatted{ \dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -419,6 +429,7 @@ A bias field to the model.
 #Add bias field to eBird records
 organizedData$addBias(datasetNames = 'eBird')
 
+}
 }
 }
 \if{html}{\out{</div>}}
@@ -461,7 +472,7 @@ An updated formula.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{
+\preformatted{\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -492,7 +503,7 @@ An updated formula.
  organizedData$changeComponents(addComponent = 'scaling') 
  
 }
-
+}
 }
 \if{html}{\out{</div>}}
 
@@ -503,7 +514,7 @@ An updated formula.
 \if{html}{\out{<a id="method-specifySpecies-changeComponents"></a>}}
 \if{latex}{\out{\hypertarget{method-specifySpecies-changeComponents}{}}}
 \subsection{Method \code{changeComponents()}}{
-Function to add and specify custom components to model, which are required by \pkg{inlabru}. The main purpose of the function is to re-specify or completely change components already in the model, however the user can also add completely new components to the model as well. In this case, the components need to be added to the correct formulas in the model using the \code{.$updateFormula} function. If \code{addComponent} and \code{removeComponent} are both missing, the function will print out the components to be supplied to \pkg{inlabru}'s \code{\link{bru}} function.
+Function to add and specify custom components to model, which are required by \pkg{inlabru}. The main purpose of the function is to re-specify or completely change components already in the model, however the user can also add completely new components to the model as well. In this case, the components need to be added to the correct formulas in the model using the \code{.$updateFormula} function. If \code{addComponent} and \code{removeComponent} are both missing, the function will print out the components to be supplied to \pkg{inlabru}'s \code{\link[inlabru]{bru}} function.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{specifySpecies$changeComponents(addComponent, removeComponent, print = TRUE)}\if{html}{\out{</div>}}
 }
@@ -594,7 +605,8 @@ New priors for the fixed effects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{ if (requireNamespace('INLA')) {
+\preformatted{\dontrun{
+ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -618,6 +630,7 @@ New priors for the fixed effects.
  #Add prior to Forest
  organizedData$priorsFixed(Effect = 'Forest', mean.linear = 2, prec.linear = 0.1)
 
+}
 }
 }
 \if{html}{\out{</div>}}
@@ -666,7 +679,8 @@ A new model for the spatial effects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{ if (requireNamespace('INLA')) {
+\preformatted{\dontrun{
+ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -692,6 +706,7 @@ A new model for the spatial effects.
                        prior.sigma = c(1,0.001))
 
 } 
+}
 }
 \if{html}{\out{</div>}}
 
@@ -721,7 +736,8 @@ A new link function for a process.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{ if (requireNamespace('INLA')) {
+\preformatted{\dontrun{
+ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -746,6 +762,7 @@ A new link function for a process.
  
  
 } 
+}
 }
 \if{html}{\out{</div>}}
 
@@ -781,7 +798,8 @@ If \code{plot = TRUE}, a plot of the grid.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{ if (requireNamespace('INLA')) {
+\preformatted{\dontrun{
+ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -806,7 +824,7 @@ If \code{plot = TRUE}, a plot of the grid.
  organizedData$spatialBlock(k = 2, rows = 2, cols = 1, plot = FALSE)
 
 } 
-
+}
 }
 \if{html}{\out{</div>}}
 

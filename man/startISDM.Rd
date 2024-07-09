@@ -67,6 +67,7 @@ Note: the point covariate will only be included in the formulas for where they a
 }
 \examples{
 
+\dontrun{
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -96,6 +97,7 @@ Note: the point covariate will only be included in the formulas for where they a
                         Projection = proj, pointsSpatial = 'copy', responsePA = 'Present',
                         Formulas = list(covariateFormula = ~ NPP + I(NPP^2)))                    
                       
+ }
  }
 
 }

@@ -78,7 +78,8 @@ If some of these terms should not be included in certain observation models in t
 Note: the point covariate will only be included in the formulas for where they are present in a given dataset, and so these terms do not need to be thinned out if they are not required by certain observation models.
 }
 \examples{
-
+ 
+ \dontrun{
  if (requireNamespace('INLA')) {
  
  ##REDO WITH OTHER DATA
@@ -128,6 +129,7 @@ Note: the point covariate will only be included in the formulas for where they a
                         responsePA = 'Present',
                         speciesName = 'speciesName')
                      
+ }
  }
 
 }
