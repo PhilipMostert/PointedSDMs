@@ -136,6 +136,8 @@ blockedCV <- function(data, options = list()) {
     
     if (!all(comp_keep)) {
       
+      if (!is.null(data$.__enclos_env__$private$Spatial)) {
+      
       if (data$.__enclos_env__$private$Spatial != 'shared' | data$.__enclos_env__$private$biasCopy) {
         
         Main <- grepl('_spatial', data$.__enclos_env__$private$Components) & grepl('_field', data$.__enclos_env__$private$Components)
@@ -162,6 +164,7 @@ blockedCV <- function(data, options = list()) {
         
       } else thinnedComponents <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
       
+      }
       
     }
     else thinnedComponents <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
