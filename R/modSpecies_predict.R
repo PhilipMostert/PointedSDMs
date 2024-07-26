@@ -325,6 +325,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
         int <- list(mapply(function(x, seq) {
           
           pred <- x[x[[object$species$speciesVar]] == seq,]
+          if ('speciesSpatialGroup' %in% names(pred)) pred <- pred[pred[['speciesSpatialGroup']] == seq,]
           list(pred)
           
           
