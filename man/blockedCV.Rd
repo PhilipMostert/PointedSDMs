@@ -4,12 +4,24 @@
 \alias{blockedCV}
 \title{\emph{blockedCV}: run spatial blocked cross-validation on the integrated model.}
 \usage{
-blockedCV(data, options = list())
+blockedCV(
+  data,
+  options = list(),
+  method = "DIC",
+  predictName = NULL,
+  datasetCombs = NULL
+)
 }
 \arguments{
 \item{data}{An object produced by either \code{\link{startISDM}} of \code{\link{startSpecies}}. Requires the slot function, \code{.$spatialBlock} to be run first in order to specify how the data in the model is blocked.}
 
 \item{options}{A list of \pkg{INLA} or \pkg{inlabru} options to be used in the model. Defaults to \code{list()}.}
+
+\item{method}{Which cross-validation method to perform. Must be one of \code{'DIC'} or \code{'Predict'}. If \code{'DIC'} then the DIC values for each block are obtained. If \code{'Predict'} then predictions are made on a dataset in the left out block. For this to work, please specify the argument \code{methodOptions}.}
+
+\item{predictName}{Name of the dataset to predict onto if \code{method = 'Predict'}.}
+
+\item{datasetCombs}{A list of vectors containing dataset combinations to include in each model run if \code{method = 'Prediction'}. If \code{NULL} then all combinations of the dataset will be estimated.}
 }
 \value{
 An object of class \code{blockedCV}, which is essentially a list of DIC values obtained from each iteration of the model.
