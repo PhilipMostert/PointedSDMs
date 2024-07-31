@@ -21,7 +21,7 @@ reduceComps <- function(componentsOld,
     
     if (paste0(datasetName,'_spatial') == Main) {
       
-      Copy <-  grepl('_spatial', all_comp_terms) & grepl('copy', all_comp_terms)
+      Copy <-  grepl('_spatial', all_comp_terms) & grepl('copy', all_comp_terms) & gsub('\\(.*$', '', all_comp_terms) %in% reducedTerms
       
       compNext <- all_comp_terms[Copy][1]
       nextTerm <- sub("\\(.*", "", compNext)
