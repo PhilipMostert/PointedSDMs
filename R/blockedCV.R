@@ -100,7 +100,7 @@ blockedCV <- function(data, options = list(),
   
   for (dataSub in 1:length(datasetCombs)) {
   
-    dataToUse <- datasetCombs[[dataSub]]
+    dataToUse <- unique(datasetCombs[[dataSub]])
     
   for (fold in unique(unlist(block_index))) {
     
