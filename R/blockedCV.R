@@ -3,10 +3,12 @@
 #' @description This function is used to perform spatial blocked cross-validation with regards to model selection for the integrated model. It does so by leaving out a block of data in the full model, running a model with the remaining data, and then calculating the deviance information criteria (DIC) as a score of model fit.
 #' @param data An object produced by either \code{\link{startISDM}} of \code{\link{startSpecies}}. Requires the slot function, \code{.$spatialBlock} to be run first in order to specify how the data in the model is blocked.
 #' @param options A list of \pkg{INLA} or \pkg{inlabru} options to be used in the model. Defaults to \code{list()}.
-#' 
+#' @param method Which cross-validation method to perform. Must be one of \code{'DIC'} or \code{'Predict'}. If \code{'DIC'} then the DIC values for each block are obtained. If \code{'Predict'} then predictions are made on a dataset in the left out block. For this to work, please specify the argument \code{methodOptions}.
+#' @param predictName Name of the dataset to predict onto if \code{method = 'Predict'}.
+#' @param datasetCombs A list of vectors containing dataset combinations to include in each model run if \code{method = 'Prediction'}. If \code{NULL} then all combinations of the dataset will be estimated.
 #' @import inlabru
 #' @import stats
-
+#' @importFrom utils combn
 #' 
 #' @examples 
 #' 
@@ -41,7 +43,9 @@
 #' 
 #' @export
 #' 
-blockedCV <- function(data, options = list()) {
+blockedCV <- function(data, options = list(),
+                      method = 'DIC', predictName = NULL,
+                      datasetCombs = NULL) {
   
   #How do we do this?
    #Should we make data a list of data files;
@@ -55,7 +59,26 @@ blockedCV <- function(data, options = list()) {
   
   data2ENV(data = data, env = environment())
   
-  deviance <- list()
+  results <- list()
+  
+  if (!method %in% c('DIC', 'Predict')) stop('method needs to be one of "DIC" or "Predict".')
+  
+  if (method == 'Predict') {
+    
+    if (is.null(predictName)) stop('predictName cannot be NULL if method = "Predict".')
+    
+    if (!predictName %in% data$.__enclos_env__$private$dataSource) stop('predictData needs to be the name of a dataset added to the model.')
+    ##CHANGE
+     #Remove predict dataset here, and then add it as its own
+    dataIn <- unique(data$.__enclos_env__$private$dataSource)
+    
+    if (!is.null(datasetCombs)) {
+      
+      if (!all(unique(unlist(datasetCombs)) %in% dataIn)) stop('Dataset added in datasetCombs not available.')
+      
+    } else datasetCombs <- do.call(c, lapply(seq_along(dataIn), combn, x = dataIn, simplify = FALSE))
+    
+  } else datasetCombs = list(data$.__enclos_env__$private$dataSource)
   
   block_index <- lapply(unlist(data$.__enclos_env__$private$modelData, recursive = FALSE), function(x) data.frame(x)[, '.__block_index__'])
   
@@ -75,14 +98,18 @@ blockedCV <- function(data, options = list()) {
     
   }
   
+  for (dataSub in 1:length(datasetCombs)) {
+  
+    dataToUse <- datasetCombs[[dataSub]]
+    
   for (fold in unique(unlist(block_index))) {
     
     ##Maybe make block_index in dataSDM as a list such that we can see which datasets are not in block i to easily remove them.
      #Get formula terms only after likelihood construction, and then thin components from there.
      #And also for the whole, control.family thing
     
-    
-    trainData <- lapply(data$.__enclos_env__$private$modelData, function(data) {
+    #Subset here based on dataSub
+    trainData <- lapply(data$.__enclos_env__$private$modelData[dataToUse], function(data) {
       
       lapply(data, function(x) {
         
@@ -94,10 +121,17 @@ blockedCV <- function(data, options = list()) {
       
       
     })
+    sourceIN <- which(unique(data$.__enclos_env__$private$dataSource) %in% names(trainData))
+    sourcePred <- which(data$.__enclos_env__$private$dataSource %in% predictName)
+    comp_terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)
     
     ##Check if all copy + bias Main in here
     
-    testData <- lapply(data$.__enclos_env__$private$modelData, function(data) {
+    #modelData[predictName]
+    
+    if (method == 'Predict') {
+    
+      testData <- lapply(data$.__enclos_env__$private$modelData[predictName], function(data) {
       
       lapply(data, function(x) {
         
@@ -107,13 +141,55 @@ blockedCV <- function(data, options = list()) {
         
       })
       
-      
     })
-    
+      
+      #if testData dosen't cover all blocks stop
+      
+      testLike <- do.call(inlabru::like_list,
+                          makeLhoods(data = testData, #Is this an sf dataset?
+                                     formula = data$.__enclos_env__$private$Formulas[predictName],
+                                     family = data$.__enclos_env__$private$Family[predictName],
+                                     mesh = data$.__enclos_env__$private$INLAmesh,
+                                     ips = data$.__enclos_env__$private$IPS,
+                                     samplers = data$.__enclos_env__$private$Samplers,
+                                     paresp = data$.__enclos_env__$private$responsePA,
+                                     ntrialsvar = data$.__enclos_env__$private$trialsPA,
+                                     markstrialsvar = data$.__enclos_env__$private$trialsMarks,
+                                     speciesname = data$.__enclos_env__$private$speciesName,
+                                     speciesindex = data$.__enclos_env__$private$speciesIndex))
+      
+      #Collapse into 1 sf
+       #how? do.call(rbind, testData) or do.call(c, testData)
+      
+      #For comps: take environmental covariates: paste
+       #if shared then keep
+      if (!is.null(data$.__enclos_env__$private$Spatial)) {
+       if (data$.__enclos_env__$private$Spatial == 'copy') spatRM <- TRUE
+       else spatRM <- FALSE #What about if species copy?
+      } else spatRM <- FALSE
+      
+      formIn <- testLike[[1]]$used$effect
+      
+      predComp <- comp_terms %in% formIn
+      
+      if (spatRM) {
+        
+        compsChange <- data$.__enclos_env__$private$Components
+        whichRM <- grepl(paste0(predictName, '_spatial'), compsChange)
+        compsChange[whichRM] <- paste0(predictName, '_spatial(main = geometry, model = predict_field)')
+        predict_field <- data$spatialFields$datasetFields[[1]]
+        
+      } else compsChange <- data$.__enclos_env__$private$Components
+      
+      compPreds <- formula(paste('~ - 1 +', paste(c(compsChange[predComp], 'olikhoodvar(main = olikhoodvar, model = "offset")'), collapse = ' + ')))
+      testLike[[1]]$used$effect <- c(testLike[[1]]$used$effect, 'olikhoodvar')
+      
+    }
+
     trainLiks <- do.call(inlabru::like_list,
                  makeLhoods(data = trainData,
-                 formula = data$.__enclos_env__$private$Formulas,
-                 family = data$.__enclos_env__$private$Family,
+                 formula = data$.__enclos_env__$private$Formulas[sourceIN],
+                 family = data$.__enclos_env__$private$Family[sourceIN],
                  mesh = data$.__enclos_env__$private$INLAmesh,
                  ips = data$.__enclos_env__$private$IPS,
                  samplers = data$.__enclos_env__$private$Samplers,
@@ -129,8 +205,6 @@ blockedCV <- function(data, options = list()) {
       else labels(terms(x$formula))
       
     })))
-    
-    comp_terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)
     
     comp_keep <- comp_terms %in% formula_terms
     
@@ -148,9 +222,12 @@ blockedCV <- function(data, options = list()) {
         if (!any(MainBias)) MainBias <- 'NOTALLMAINBIAS'
         else MainBias <- sub("\\(.*", "", comp_terms[MainBias])
         
-        whichMissing <- names(trainData)[sapply(unlist(trainData, recursive = F), is.null)]
-        warning('More than 2 datasets missing from the block with either pointsSpatial = "copy" or copyModel = TRUE for the bias field.\n Will choose the first available dataset to copy on.')
+        whichMissing <- union(data$.__enclos_env__$private$dataSource[!data$.__enclos_env__$private$dataSource %in% dataToUse], 
+                              names(trainData)[sapply(unlist(trainData, recursive = F), is.null)])
+        
         if(paste0(whichMissing[1],'_biasField') == MainBias | paste0(whichMissing[1],'_spatial') == Main) {
+        
+          warning('Main dataset or more than 2 datasets missing from the block with either pointsSpatial = "copy" or copyModel = TRUE for the bias field.\n Will choose the first available dataset to copy on.')
           
           thinnedComponents <- reduceComps(componentsOld =  formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components, collapse = ' + '))),
                                             pointsCopy = ifelse(data$.__enclos_env__$private$Spatial == 'copy', 
@@ -176,6 +253,10 @@ blockedCV <- function(data, options = list()) {
     foldOptions$control.family <- foldOptions$control.family[sapply(unlist(data$.__enclos_env__$private$modelData, recursive = FALSE), 
                                                                     function(x) any(fold_ind %in% data.frame(x)[, '.__block_index__']))]
 
+    #Subset fold options for each family
+    sourceIN <- which(data$.__enclos_env__$private$dataSource %in% names(trainData))
+    foldOptions$control.family <- foldOptions$control.family[sourceIN]
+    
     optionsTrain <- append(options, foldOptions)
     
     ##Calculate DIC for just this model?
@@ -185,21 +266,78 @@ blockedCV <- function(data, options = list()) {
     
     ## -log(intensity)
     ## add an offset argument...
+    
+    if (method == 'DIC') {
+    
     if (inherits(trainedModel, 'try-error')) {
       
       warning('Model failed for a block. Please change your block layout to ensure all datasets are included in all blocks')
-      deviance[[paste0('DIC_fold_', fold)]] <- NA
+      results[[paste0('DIC_fold_', fold)]] <- NA
     }
-    else deviance[[paste0('DIC_fold_', fold)]] <- trainedModel$dic
+    else results[[paste0('DIC_fold_', fold)]] <- trainedModel$dic
     
     }
-  
-  
+    else {
+      
+      if (inherits(trainedModel, 'try-error')) {
+        
+        warning('Model failed for a block. Please change your block layout to ensure all datasets are included in all blocks')
+        #paste_dataset here
+        results[[paste(dataToUse, collapse = ' and ')]][[paste0('fold',fold)]] <- NA
+      
+      }
+      else {
+        
+        #remove bias here
+        predForm <- formula(paste0('~(', paste(formula_terms, collapse = ' + '), ')'))
+        #change testData to one sf dataset
+        for(pd in 1:length(testData[[1]])) {
+        
+        testPredicts <- suppressWarnings(predict(trainedModel, testData[[1]][[pd]], formula = predForm))
+        #IF cp add log(1) or NA to ipoints?
+        if (testLike[[pd]]$family == 'cp') {
+          
+          nIPS <- nrow(data$.__enclos_env__$private$IPS)
+          
+          testLike[[pd]]$data$olikhoodvar <- c(testPredicts$mean, rep(0, nIPS))
+          
+        } else testLike[[pd]]$data$olikhoodvar <- testPredicts$mean
+        
+        }
+        
+        #Need to look at formula, and get the correct comps here
+        foldOptions <- data$.__enclos_env__$private$optionsINLA
+        foldOptions$control.family <- foldOptions$control.family[sourcePred]
+        
+        optionsTest <- append(options, foldOptions)
+        
+        testModel <- try(inlabru::bru(components = compPreds,
+                                   testLike, options = optionsTest))
+        
+        if (inherits(testModel, 'try-error')) results[[paste(dataToUse, collapse = ' and ')]][[paste0('fold',fold)]] <- NA
+        else results[[paste(dataToUse, collapse = ' and ')]][[paste0('fold',fold)]] <- testModel$mlik[[1]]
+        
+      }
+    
+    }
+  }
+    
+  }
   
   comps <- formula(paste0(' ~ ', paste0(gsub('\\(.*$', '', data$.__enclos_env__$private$Components), collapse = ' + ')))
-  deviance <- append(deviance, list(Formula = comps))
-  class(deviance) <- c('blockedCV', 'list')
-  deviance
+  
+  if (method == 'DIC') {
+  
+  results <- append(results, list(Formula = comps))
+  class(results) <- c('blockedCV', 'list')
+  
+  }
+  else {
+    
+    class(results) <- c('blockedCVpred', 'list')
+    
+  }
+  results
 
 }
 
@@ -246,4 +384,38 @@ print.blockedCV <- function(x, ...) {
   cat(mean(dataobj$dic, na.rm = TRUE))
 
 
+}
+
+#' Export class blockedCVpred
+#' 
+#' @export
+
+setClass('blockedCVpred')
+
+#' Print for blockedCVpred
+#' 
+#' @export print.blockedCVpred
+
+#' Export print.blockedCVpred
+#' @title Print function for \code{blockedCV}.
+#' @param x A blockedCV object.
+#' @param ... Unused argument.
+#' 
+#' @exportS3Method 
+
+print.blockedCVpred <- function(x, ...) {
+  
+  cat('Spatial block cross-validation score:')
+  cat('\n\n')
+
+  foldFrame <- do.call(rbind.data.frame, x)
+  foldFrame <- data.frame(foldFrame, mean = rowMeans(foldFrame))
+  colnames(foldFrame) <- c(paste0('fold ', 1:(ncol(foldFrame) - 1)), 'mean')
+  
+  #foldFrame <- data.frame(Data.included = row.names(foldFrame),
+  #                        foldFrame)
+  #names(foldFrame)[1] <- 'Data included'
+  #row.names(foldFrame) <- NULL
+  print.data.frame(foldFrame)
+  
 }
