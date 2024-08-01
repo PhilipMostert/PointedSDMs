@@ -181,7 +181,7 @@ blockedCV <- function(data, options = list(),
         
       } else compsChange <- data$.__enclos_env__$private$Components
       
-      compPreds <- formula(paste('~ - 1 +', paste(c(compsChange[predComp], 'olikhoodvar(main = log(olikhoodvar), model = "offset")'), collapse = ' + ')))
+      compPreds <- formula(paste('~ - 1 +', paste(c(compsChange[predComp], 'olikhoodvar(main = olikhoodvar, model = "offset")'), collapse = ' + ')))
       testLike[[1]]$used$effect <- c(testLike[[1]]$used$effect, 'olikhoodvar')
       
     }
@@ -289,7 +289,7 @@ blockedCV <- function(data, options = list(),
       else {
         
         #remove bias here
-        predForm <- formula(paste0('~exp(', paste(formula_terms, collapse = ' + '), ')'))
+        predForm <- formula(paste0('~(', paste(formula_terms, collapse = ' + '), ')'))
         #change testData to one sf dataset
         for(pd in 1:length(testData[[1]])) {
         
@@ -299,7 +299,7 @@ blockedCV <- function(data, options = list(),
           
           nIPS <- nrow(data$.__enclos_env__$private$IPS)
           
-          testLike[[pd]]$data$olikhoodvar <- c(testPredicts$mean, rep(1, nIPS))
+          testLike[[pd]]$data$olikhoodvar <- c(testPredicts$mean, rep(0, nIPS))
           
         } else testLike[[pd]]$data$olikhoodvar <- testPredicts$mean
         
