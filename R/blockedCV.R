@@ -315,7 +315,7 @@ blockedCV <- function(data, options = list(),
                                    testLike, options = optionsTest))
         
         if (inherits(testModel, 'try-error')) results[[paste(dataToUse, collapse = ' and ')]][[paste0('fold',fold)]] <- NA
-        else results[[paste(dataToUse, collapse = ' and ')]][[paste0('fold',fold)]] <- testModel$mlik[[1]]
+        else results[[paste(dataToUse, collapse = ' and ')]][[paste0('fold',fold)]] <- trainedModel$mlik[[1]] - testModel$mlik[[1]]
         
       }
     
