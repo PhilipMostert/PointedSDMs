@@ -288,11 +288,17 @@ blockedCV <- function(data, options = list(),
       }
       else {
         
-        #remove bias here
-        predForm <- formula(paste0('~(', paste(formula_terms, collapse = ' + '), ')'))
-        #change testData to one sf dataset
+        if (!is.null(data$.__enclos_env__$private$biasFormula)) biasFormlabels <- labels(terms(data$.__enclos_env__$private$biasFormula))
+        else biasFormlabels <- NULL
+
         for(pd in 1:length(testData[[1]])) {
+          
+        covInPres <- testLike[[pd]]$used$effect
+        covInPres <- covInPres[!covInPres %in% c('olikhoodvar', biasFormlabels, grep('_biasField', covInPres))] #bias
         
+        predForm <- formula(paste0('~(', paste(covInPres, collapse = ' + '), ')'))
+          
+          
         testPredicts <- suppressWarnings(predict(trainedModel, testData[[1]][[pd]], formula = predForm))
         #IF cp add log(1) or NA to ipoints?
         if (testLike[[pd]]$family == 'cp') {
@@ -407,6 +413,7 @@ print.blockedCVpred <- function(x, ...) {
   
   cat('Spatial block cross-validation score:')
   cat('\n\n')
+  cat('Marginal likelihoods obtained by using the predictions from the model as an offset:')
 
   foldFrame <- do.call(rbind.data.frame, x)
   foldFrame <- data.frame(foldFrame, mean = rowMeans(foldFrame))
