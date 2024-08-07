@@ -56,7 +56,7 @@
 datasetOut <- function(model, dataset,
                        predictions = TRUE) {
   
-  if (!inherits(model, 'bruSDM') && !inherits(model, 'modISDM')) stop('model needs to be either a bruSDM or modISDM  object.')
+  if (!inherits(model, 'bruSDM') && !inherits(model, 'modISDM')) stop('model needs to be either a bruSDM or modISDM  object. This function is not availble for a modSpecies object.')
   
   if (missing(dataset)) dataset <- unique(model[['source']])
   
@@ -184,11 +184,13 @@ datasetOut <- function(model, dataset,
         
         #if (!is.null(model[['species']][['speciesIn']])) covs <- as.vector(outer(paste0(reduced_species,'_'), model$spatCovs$name, FUN = 'paste0'))
         #else covs <- model$spatCovs$name
-        train <- predict(model_reduced, data = model$bru_info$lhoods[[data]]$data, formula = eval(parse(text = paste0('~(',paste(gsub('\\(.*$', '', labels(terms(reduced_components))), collapse = ' + '),')'))))  
+        
+        ##Is this not the same as the other -- we do not need the covariates for the left out dataset
+        train <- predict(model_reduced, data = model$bru_info$lhoods[[data]]$data, predictor = TRUE) #formula = eval(parse(text = paste0('~(',paste(gsub('\\(.*$', '', labels(terms(reduced_components))), collapse = ' + '),')')))  
        
-        reduced_lik[[data]]$data[,'offset'] <- train$predictions$mean
+        reduced_lik[[data]]$data[,'trainModelOffset'] <- train$predictions$mean
         #reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
-        reduced_lik[[data]]$used$effect <- c(reduced_lik[[data]]$used$effect, 'offset')
+        reduced_lik[[data]]$used$effect <- c('trainedModelIntercept', 'trainModelOffset')#c(reduced_lik[[data]]$used$effect, 'trainModelOffset')
         
       }
      
@@ -198,7 +200,7 @@ datasetOut <- function(model, dataset,
     #  reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
 
 #      }
-      offset_components <- update(model$componentsJoint, ~ . + offset)
+      offset_components <- update(reduced_components, ~ . + trainedModelIntercept(1) + trainModelOffset(main = trainModelOffset, model = 'offset'))
 
       reduced_mlik <- inlabru::bru(offset_components, reduced_lik,
                                    options = model$optionsJoint)
