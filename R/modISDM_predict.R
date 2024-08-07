@@ -80,9 +80,11 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     if (!is.null(object$covariateFormula)) covariates <- c(covariates, 'Fixed__Effects__Comps')
     
     if (!is.null(object$spatCovs$biasFormula)) covariates <- covariates[!covariates %in% labels(terms(object$spatCovs$biasFormula))]
-    if (!object$spatial$points) spatial <- FALSE
-    else spatial <- TRUE
     
+    
+    if (is.null(object$spatial$points)) spatial <- FALSE
+    else spatial <- TRUE
+
   }
   
   if (intercepts) {

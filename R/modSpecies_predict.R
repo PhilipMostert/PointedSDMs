@@ -93,7 +93,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (!is.null(object$spatCovs$biasFormula)) covariates <- covariates[!covariates %in% labels(terms(object$spatCovs$biasFormula))]
     
-    if(!object$spatial$points & !object$spatial$species) spatial <- FALSE
+    if(is.null(object$spatial$points) & is.null(object$spatial$species)) spatial <- FALSE
     else spatial <- TRUE
     
   }

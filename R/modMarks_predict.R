@@ -87,7 +87,7 @@ predict.modMarks <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (!is.null(object$spatCovs$biasFormula)) covariates <- covariates[!covariates %in% labels(terms(object$spatCovs$biasFormula))]
     
-    if (!object$spatial$points) spatial <- FALSE
+    if (is.null(object$spatial$points)) spatial <- FALSE
     else spatial <- TRUE
     
   }
