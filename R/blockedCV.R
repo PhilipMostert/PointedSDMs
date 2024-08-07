@@ -168,22 +168,27 @@ blockedCV <- function(data, options = list(),
        else spatRM <- FALSE #What about if species copy?
       } else spatRM <- FALSE
       
-      formIn <- testLike[[1]]$used$effect
+      oldIn <- lapply(testLike, function(x) x$used$effect)
       
-      predComp <- comp_terms %in% formIn
+      #predComp <- comp_terms %in% formIn
       
-      if (spatRM) {
+      #if (spatRM) {
         
-        compsChange <- data$.__enclos_env__$private$Components
-        whichRM <- grepl(paste0(predictName, '_spatial'), compsChange)
-        compsChange[whichRM] <- paste0(predictName, '_spatial(main = geometry, model = predict_field)')
-        predict_field <- data$spatialFields$datasetFields[[1]]
+      #  compsChange <- data$.__enclos_env__$private$Components
+      #  whichRM <- grepl(paste0(predictName, '_spatial'), compsChange)
+      #  compsChange[whichRM] <- paste0(predictName, '_spatial(main = geometry, model = predict_field)')
+      #  predict_field <- data$spatialFields$datasetFields[[1]]
         
-      } else compsChange <- data$.__enclos_env__$private$Components
+      #} else compsChange <- data$.__enclos_env__$private$Components
       
-      compPreds <- formula(paste('~ - 1 +', paste(c(compsChange[predComp], 'olikhoodvar(main = olikhoodvar, model = "offset")'), collapse = ' + ')))
-      testLike[[1]]$used$effect <- c(testLike[[1]]$used$effect, 'olikhoodvar')
+      #compPreds <- formula(paste('~ - 1 +', paste(c(compsChange[predComp], 'olikhoodvar(main = olikhoodvar, model = "offset")'), collapse = ' + ')))
       
+      for (lik in 1:length(testLike)) {
+        
+      testLike[[lik]]$used$effect <- c('testIntercept', 'olikhoodvar')#c(testLike[[1]]$used$effect, 'olikhoodvar')
+      
+      }
+
     }
 
     trainLiks <- do.call(inlabru::like_list,
@@ -293,9 +298,10 @@ blockedCV <- function(data, options = list(),
 
         for(pd in 1:length(testData[[1]])) {
           
-        covInPres <- testLike[[pd]]$used$effect
-        covInPres <- covInPres[!covInPres %in% c('olikhoodvar', biasFormlabels, grep('_biasField', covInPres))] #bias
-        
+        #covInPres <- testLike[[pd]]$used$effect
+        #covInPres <- covInPres[!covInPres %in% c('olikhoodvar', biasFormlabels, grep('_biasField', covInPres))] #bias
+        covInPres <- intersect(oldIn[[pd]], formula_terms)
+        ##Get all old vars in test like and thin with formula terms
         predForm <- formula(paste0('~(', paste(covInPres, collapse = ' + '), ')'))
           
           
@@ -316,7 +322,7 @@ blockedCV <- function(data, options = list(),
         foldOptions$control.family <- foldOptions$control.family[sourcePred]
         
         optionsTest <- append(options, foldOptions)
-        
+        compPreds <- ~ olikhoodvar(main = olikhoodvar, model = "offset") + testIntercept(1) - 1
         testModel <- try(inlabru::bru(components = compPreds,
                                    testLike, options = optionsTest))
         
