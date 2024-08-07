@@ -185,7 +185,7 @@ blockedCV <- function(data, options = list(),
       
       for (lik in 1:length(testLike)) {
         
-      testLike[[lik]]$used$effect <- c('testIntercept', 'olikhoodvar')#c(testLike[[1]]$used$effect, 'olikhoodvar')
+      testLike[[lik]]$used$effect <- c(paste0('testIntercept', lik), 'olikhoodvar')#c(testLike[[1]]$used$effect, 'olikhoodvar')
       
       }
 
@@ -304,16 +304,17 @@ blockedCV <- function(data, options = list(),
         ##Get all old vars in test like and thin with formula terms
         predForm <- formula(paste0('~(', paste(covInPres, collapse = ' + '), ')'))
           
-          
-        testPredicts <- suppressWarnings(predict(trainedModel, testData[[1]][[pd]], formula = predForm))
+        #Change this to testLike[[pd]]$data
+        testPredicts <- suppressWarnings(predict(trainedModel,testLike[[pd]]$data, formula = predForm)) # testData[[1]][[pd]]
         #IF cp add log(1) or NA to ipoints?
-        if (testLike[[pd]]$family == 'cp') {
+        #if (testLike[[pd]]$family == 'cp') {
           
-          nIPS <- nrow(data$.__enclos_env__$private$IPS)
+        #  nIPS <- nrow(data$.__enclos_env__$private$IPS)
           
-          testLike[[pd]]$data$olikhoodvar <- c(testPredicts$mean, rep(0, nIPS))
+        #  testLike[[pd]]$data$olikhoodvar <- c(testPredicts$mean, rep(0, nIPS))
           
-        } else testLike[[pd]]$data$olikhoodvar <- testPredicts$mean
+        #} else 
+        testLike[[pd]]$data$olikhoodvar <- testPredicts$mean
         
         }
         
@@ -322,7 +323,9 @@ blockedCV <- function(data, options = list(),
         foldOptions$control.family <- foldOptions$control.family[sourcePred]
         
         optionsTest <- append(options, foldOptions)
-        compPreds <- ~ olikhoodvar(main = olikhoodvar, model = "offset") + testIntercept(1) - 1
+        compsIntercepts <- paste0('testIntercept', 1:length(testData[[1]]),'(1)')
+        compPreds <- formula(paste0('~ - 1 + olikhoodvar(main = olikhoodvar, model = "offset") + ', paste0(compsIntercepts, collapse = ' + ')))
+
         testModel <- try(inlabru::bru(components = compPreds,
                                    testLike, options = optionsTest))
         
