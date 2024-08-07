@@ -168,7 +168,7 @@ datasetOut <- function(model, dataset,
     
 
     
-    class(model_reduced) <- c('bruSDM',class(model_reduced))
+    class(model_reduced) <- c('modISDM',class(model_reduced))
     
     model_results[[paste0('Leaving_out_',dataname)]] <- model_reduced
     
