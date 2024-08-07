@@ -419,7 +419,7 @@ print.blockedCVpred <- function(x, ...) {
   
   cat('Spatial block cross-validation score:')
   cat('\n\n')
-  cat('Marginal likelihoods obtained by using the predictions from the model as an offset:')
+  cat('Marginal likelihoods obtained by using the predictions from the model as an offset:\n\n')
 
   foldFrame <- do.call(rbind.data.frame, x)
   foldFrame <- data.frame(foldFrame, mean = rowMeans(foldFrame))
