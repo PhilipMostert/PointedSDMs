@@ -217,7 +217,7 @@ blockedCV <- function(data, options = list(),
       
     if (!any(fams)) {
       
-      ips <- caerulescensModel$.__enclos_env__$private$IPS
+      ips <- data$.__enclos_env__$private$IPS
       ips$respIPS <- 0
       ipsLike <- inlabru::like(formula = respIPS ~ .,
                                 include = formula_terms, E = ips$weight,
