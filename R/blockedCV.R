@@ -211,6 +211,24 @@ blockedCV <- function(data, options = list(),
       
     })))
     
+    if (method == 'Predict') {
+    
+      fams <- unlist(lapply(trainLiks, function(x) x$family)) == 'cp'
+      
+    if (!any(fams)) {
+      
+      ips <- caerulescensModel$.__enclos_env__$private$IPS
+      ips$respIPS <- 0
+      ipsLike <- inlabru::like(formula = respIPS ~ .,
+                                include = formula_terms, E = ips$weight,
+                    family = 'poisson', data = ips)
+      trainLiks[['ips']] <- ipsLike
+      uFam <- TRUE
+    } else uFam <- FALSE
+      
+    } else uFam <- FALSE
+    
+    
     comp_keep <- comp_terms %in% formula_terms
     
     if (!all(comp_keep)) {
@@ -263,6 +281,8 @@ blockedCV <- function(data, options = list(),
     foldOptions$control.family <- foldOptions$control.family[sourceIN]
     
     optionsTrain <- append(options, foldOptions)
+    
+    if (uFam) optionsTrain$control.family <- append(optionsTrain$control.family, list(list(link = 'log')))
     
     ##Calculate DIC for just this model?
     trainedModel <- try(inlabru::bru(components = thinnedComponents,
@@ -331,6 +351,7 @@ blockedCV <- function(data, options = list(),
         
         if (inherits(testModel, 'try-error')) results[[paste(dataToUse, collapse = ' and ')]][[paste0('fold',fold)]] <- NA
         else results[[paste(dataToUse, collapse = ' and ')]][[paste0('fold',fold)]] <- testModel$mlik[[1]] #trainedModel$mlik[[1]] - 
+        
         
       }
     
