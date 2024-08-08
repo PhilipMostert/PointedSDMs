@@ -165,7 +165,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
   }
   
-  if (!any(names(data) %in% object$spatCovs$name)) {
+  if (!any(names(data) %in% c(object$spatCovs$name,  paste0(unique(unlist(object$species$speciesIn)), '_', object$spatCovs$name)))) {
     
     for (spatCov in object$spatCovs$name) {
       
