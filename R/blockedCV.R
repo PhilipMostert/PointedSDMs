@@ -219,9 +219,22 @@ blockedCV <- function(data, options = list(),
       
       ips <- data$.__enclos_env__$private$IPS
       ips$respIPS <- 0
+      
+      if (inherits(data, 'specifySpecies')) {
+        
+        if (fields$.__enclos_env__$private$speciesSpatial == 'replicate') ips <- fm_cprod(ips, data.frame(speciesSpatialGroup = 1:max(data$.__enclos_env__$private$speciesTable$index)))
+        
+        if (!is.null(fields$.__enclos_env__$private$Intercepts)) {
+          
+          if (fields$.__enclos_env__$private$Intercepts) ips <- fm_cprod(ips, data.frame(specIntTermRem = 1:max(data$.__enclos_env__$private$speciesTable$index)))
+          names(ips)[names(ips) == 'specIntTermRem'] <- data$.__enclos_env__$private$speciesName
+        }
+      } 
+      
       ipsLike <- inlabru::like(formula = respIPS ~ .,
                                 include = formula_terms, E = ips$weight,
                     family = 'poisson', data = ips)
+      
       trainLiks[['ips']] <- ipsLike
       uFam <- TRUE
     } else uFam <- FALSE
