@@ -222,11 +222,11 @@ blockedCV <- function(data, options = list(),
       
       if (inherits(data, 'specifySpecies')) {
         
-        if (fields$.__enclos_env__$private$speciesSpatial == 'replicate') ips <- fm_cprod(ips, data.frame(speciesSpatialGroup = 1:max(data$.__enclos_env__$private$speciesTable$index)))
+        if (data$.__enclos_env__$private$speciesSpatial == 'replicate') ips <- fm_cprod(ips, data.frame(speciesSpatialGroup = 1:max(data$.__enclos_env__$private$speciesTable$index)))
         
-        if (!is.null(fields$.__enclos_env__$private$Intercepts)) {
+        if (!is.null(data$.__enclos_env__$private$Intercepts)) {
           
-          if (fields$.__enclos_env__$private$Intercepts) ips <- fm_cprod(ips, data.frame(specIntTermRem = 1:max(data$.__enclos_env__$private$speciesTable$index)))
+          if (data$.__enclos_env__$private$Intercepts) ips <- fm_cprod(ips, data.frame(specIntTermRem = 1:max(data$.__enclos_env__$private$speciesTable$index)))
           names(ips)[names(ips) == 'specIntTermRem'] <- data$.__enclos_env__$private$speciesName
         }
       } 
