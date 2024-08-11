@@ -226,7 +226,7 @@ blockedCV <- function(data, options = list(),
         
         if (!is.null(data$.__enclos_env__$private$Intercepts)) {
           
-          if (data$.__enclos_env__$private$Intercepts) ips <- fm_cprod(ips, data.frame(specIntTermRem = 1:max(data$.__enclos_env__$private$speciesTable$index)))
+          if (data$.__enclos_env__$private$speciesIntercepts) ips <- fm_cprod(ips, data.frame(specIntTermRem = 1:max(data$.__enclos_env__$private$speciesTable$index)))
           names(ips)[names(ips) == 'specIntTermRem'] <- data$.__enclos_env__$private$speciesName
         }
       } 
@@ -456,7 +456,7 @@ print.blockedCVpred <- function(x, ...) {
   
   cat('Spatial block cross-validation score:')
   cat('\n\n')
-  cat('Marginal likelihoods obtained by using the predictions from the model as an offset:\n\n')
+  cat('Log marginal likelihoods obtained by using the predictions from the model as an offset:\n\n')
 
   foldFrame <- do.call(rbind.data.frame, x)
   foldFrame <- data.frame(foldFrame, mean = rowMeans(foldFrame))
