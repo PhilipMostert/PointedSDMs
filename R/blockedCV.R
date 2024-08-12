@@ -346,7 +346,7 @@ blockedCV <- function(data, options = list(),
         #if (testLike[[pd]]$family == 'cp') {
           
         #  nIPS <- nrow(data$.__enclos_env__$private$IPS)
-          
+        testLike[[pd]]$inla.family <- 'gaussian'
         #  testLike[[pd]]$data$olikhoodvar <- c(testPredicts$mean, rep(0, nIPS))
           
         #} else 
@@ -359,6 +359,7 @@ blockedCV <- function(data, options = list(),
         foldOptions$control.family <- foldOptions$control.family[sourcePred]
         
         optionsTest <- append(options, foldOptions)
+        optionsTest$control.family[[1]]$link <- 'default'
         compsIntercepts <- paste0('testIntercept', 1:length(testData[[1]]),'(1)')
         compPreds <- formula(paste0('~ - 1 + olikhoodvar(main = olikhoodvar, model = "offset") + ', paste0(compsIntercepts, collapse = ' + ')))
 
@@ -366,7 +367,7 @@ blockedCV <- function(data, options = list(),
                                    testLike, options = optionsTest))
         
         if (inherits(testModel, 'try-error')) results[[paste(dataToUse, collapse = ' and ')]][[paste0('fold',fold)]] <- NA
-        else results[[paste(dataToUse, collapse = ' and ')]][[paste0('fold',fold)]] <- testModel$mlik[[1]] #trainedModel$mlik[[1]] - 
+        else results[[paste(dataToUse, collapse = ' and ')]][[paste0('fold',fold)]] <- testModel$mlik[[1]] #mean(testModel$residuals$deviance.residuals)##trainedModel$mlik[[1]] - 
         
         
       }
