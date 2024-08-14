@@ -214,7 +214,7 @@ blockedCV <- function(data, options = list(),
     if (method == 'Predict') {
     
       fams <- unlist(lapply(trainLiks, function(x) x$family)) == 'cp'
-      
+
     if (!any(fams)) {
       
       ips <- data$.__enclos_env__$private$IPS
@@ -329,14 +329,55 @@ blockedCV <- function(data, options = list(),
       }
       else {
         
-        if (!is.null(data$.__enclos_env__$private$biasFormula)) biasFormlabels <- labels(terms(data$.__enclos_env__$private$biasFormula))
+        if (!is.null(data$.__enclos_env__$private$biasFormula)) biasFormlabels <- c(labels(terms(data$.__enclos_env__$private$biasFormula)), 'Bias__Effects__Comps')
         else biasFormlabels <- NULL
 
         for(pd in 1:length(testData[[1]])) {
           
         #covInPres <- testLike[[pd]]$used$effect
         #covInPres <- covInPres[!covInPres %in% c('olikhoodvar', biasFormlabels, grep('_biasField', covInPres))] #bias
-        covInPres <- intersect(oldIn[[pd]], formula_terms)
+          
+        #IF species only include the species in the likelihood
+          #Remove bias
+          covInPres <- formula_terms
+          covInPres <- covInPres[!covInPres %in% biasFormlabels]
+          covInPres <- covInPres[!covInPres %in% grepl('_biasField', covInPres)]
+          
+        if (!is.null(data$.__enclos_env__$private$speciesName)) {
+          
+          likeSpec <- unique(testLike[[pd]]$data[[paste0(data$.__enclos_env__$private$speciesName, 'INDEX_VAR')]])
+          notSpec <- unique(unlist(data$.__enclos_env__$private$speciesIn))
+          notSpec <- notSpec[notSpec != likeSpec]
+          
+          if (data$.__enclos_env__$private$speciesEnvironment) {
+            
+            specCov <- apply(expand.grid(paste0(notSpec,'_'), data$.__enclos_env__$private$spatcovsNames), MARGIN = 1, FUN = paste0,collapse = '')
+            specCov <- c(specCov, paste0(notSpec, '_Fixed__Effects__Comps'))
+            covInPres <- covInPres[!covInPres %in% specCov]
+            
+          }
+          
+          if (!is.null(data$.__enclos_env__$private$speciesIntercepts)) {
+          
+            if (!data$.__enclos_env__$private$speciesIntercepts)  covInPres <- covInPres[!covInPres %in% paste0(notSpec,'_intercept')]
+          
+          }
+          
+          if (!is.null(data$.__enclos_env__$private$speciesSpatial)) {
+            
+            if (data$.__enclos_env__$private$speciesSpatial == 'copy') {
+              
+              rmSpat <-  grepl(paste0(notSpec, collapse = '|'), covInPres) & grepl('_spatial', covInPres) 
+              covInPres <- covInPres[!rmSpat]
+              
+            }
+            
+          }
+          
+        }
+          #if bias
+          
+        #covInPres <- intersect(oldIn[[pd]], formula_terms)
         ##Get all old vars in test like and thin with formula terms
         predForm <- formula(paste0('~(', paste(covInPres, collapse = ' + '), ')'))
           
