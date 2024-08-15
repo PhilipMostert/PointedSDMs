@@ -212,6 +212,8 @@ blockedCV <- function(data, options = list(),
     })))
     
     if (method == 'Predict') {
+      
+      if (any(grepl('_biasField', formula_terms)) & length(dataToUse) == 1) formula_terms <- formula_terms[!grepl('_biasField', formula_terms)]
     
       fams <- unlist(lapply(trainLiks, function(x) x$family)) == 'cp'
 
@@ -400,7 +402,7 @@ blockedCV <- function(data, options = list(),
         
         optionsTest <- append(options, foldOptions)
         compsIntercepts <- paste0('testIntercept', 1:length(testData[[1]]),'(1)')
-        compPreds <- formula(paste0('~ - 1 + olikhoodvar(main = olikhoodvar, model = "offset") + ', paste0(compsIntercepts, collapse = ' + ')))
+        compPreds <- formula(paste0('~ - 1 + olikhoodvar(main = olikhoodvar, model = "linear") + ', paste0(compsIntercepts, collapse = ' + ')))
 
         testModel <- try(inlabru::bru(components = compPreds,
                                    testLike, options = optionsTest))
