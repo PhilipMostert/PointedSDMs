@@ -19,7 +19,7 @@ setClass('modMarks_predict')
 #' @param datasets Names of the datasets to include intercept and spatial term.
 #' @param marks Names of the marks to include intercept and spatial term.
 #' @param bias Logical include bias field in prediction. Defaults to \code{FALSE}.
-#' @param biasnames Names of the datasets to include bias term. Defaults to \code{NULL}. Note: the chosen dataset needs to be run with a bias field first; this can be done using \code{.$addBias} with the object produced by \code{\link{intModel}}.
+#' @param biasnames Names of the datasets to include bias term. Defaults to \code{NULL}. Note: the chosen dataset needs to be run with a bias field first; this can be done using \code{.$addBias} with the object produced by \code{\link{startMarks}}.
 #' @param predictor Should all terms (except the bias terms) included in the linear predictor be used in the predictions. Defaults to \code{FALSE}.
 #' @param fun Function used to predict. Set to \code{'linear'} if effects on the linear scale are desired.
 #' @param ... Additional arguments used by the inlabru \code{predict} function.
@@ -251,8 +251,16 @@ predict.modMarks <- function(object, data = NULL, formula = NULL, mesh = NULL,
         else
           if (object$spatial$points == 'copy') spatial_obj <- paste0(object$source[1], '_spatial')
           else
-            if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in intModel.')
+            if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in startMarks')
           else spatial_obj <- paste0(datasets, '_spatial')
+          
+          if (object$spatial$points == 'correlate') {
+            
+            if (any(object$dataType == "Present absence")) data$._dataset_index_var_. <- which(object$dataType == "Present absence")[1]
+            else data$._dataset_index_var_. <- 1
+            
+          }
+          
     }
     else spatial_obj <- NULL
 

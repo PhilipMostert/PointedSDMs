@@ -19,7 +19,7 @@ setClass('modSpecies_predict')
 #' @param datasets Names of the datasets to include intercept and spatial term.
 #' @param species Names of the species to predict. Default of \code{NULL} results in all species being predicted.
 #' @param bias Logical include bias field in prediction. Defaults to \code{FALSE}.
-#' @param biasnames Names of the datasets to include bias term. Defaults to \code{NULL}. Note: the chosen dataset needs to be run with a bias field first; this can be done using \code{.$addBias} with the object produced by \code{\link{intModel}}.
+#' @param biasnames Names of the datasets to include bias term. Defaults to \code{NULL}. Note: the chosen dataset needs to be run with a bias field first; this can be done using \code{.$addBias} with the object produced by \code{\link{startSpecies}}.
 #' @param predictor Should all terms (except the bias terms) included in the linear predictor be used in the predictions. Defaults to \code{FALSE}.
 #' @param fun Function used to predict. Set to \code{'linear'} if effects on the linear scale are desired.
 #' @param ... Additional arguments used by the inlabru \code{predict} function.
@@ -347,15 +347,23 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (spatial) {
       
+      if (object$spatial$points == 'correlate') {
+        
+        if (any(object$dataType == "Present absence")) data$._dataset_index_var_. <- which(object$dataType == "Present absence")[1]
+        else data$._dataset_index_var_. <- 1
+      
+        }
         
         if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
         else
           if (object$spatial$points == 'copy') spatial_obj <- paste0(object$source[1], '_spatial')
           else
-            if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in intModel.')
+            if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in startSpecies.')
           else spatial_obj <- paste0(datasets, '_spatial')
           }
          else spatial_obj <- NULL
+    
+    
 
     
     if (predictor) formula_components <- c(row.names(object$summary.fixed), names(object$summary.random)[!names(object$summary.random) %in% paste0(object[['source']], '_biasField')])
@@ -432,7 +440,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
 #'  mesh$crs <- proj
 #'  
 #'  #Set model up
-#'  organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+#'  organizedData <- startSpecies(data, Mesh = mesh, Coordinates = c('X', 'Y'),
 #'                              Projection = proj, responsePA = 'Present')
 #'  
 #'   ##Run the model
