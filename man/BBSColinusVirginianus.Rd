@@ -8,6 +8,6 @@
 Dataset of Colinus Virginianus obtained from the North American Breeding Bird survey across Alabama state.
 }
 \references{
-\url{https://www.pwrc.usgs.gov/bbs/}
+\url{https://www.pwrc.usgs.gov/bbs}
 }
 \keyword{data}

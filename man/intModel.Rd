@@ -102,8 +102,6 @@ Note: the point covariate and mark terms will only be included in the formulas f
 }
 \examples{
 
-\dontrun{
-
  if (requireNamespace('INLA')) {
    
  #Get Data
@@ -134,7 +132,6 @@ Note: the point covariate and mark terms will only be included in the formulas f
                      Projection = proj, markNames = 'area', markFamily = 'gamma',
                      responsePA = 'Present')
                       
- }
  }
 
 }

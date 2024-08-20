@@ -109,7 +109,7 @@
 
 \item{biasfield}{Logical include bias field in prediction. Defaults to \code{FALSE}.}
 
-\item{biasnames}{Names of the datasets to include bias term. Defaults to \code{NULL}. Note: the chosen dataset needs to be run with a bias field first; this can be done using \code{.$addBias} with the object produced by \code{\link{intModel}}.}
+\item{biasnames}{Names of the datasets to include bias term. Defaults to \code{NULL}. Note: the chosen dataset needs to be run with a bias field first; this can be done using \code{.$addBias} with the object produced by \code{\link{startSpecies}}.}
 
 \item{predictor}{Should all terms (except the bias terms) included in the linear predictor be used in the predictions. Defaults to \code{FALSE}.}
 

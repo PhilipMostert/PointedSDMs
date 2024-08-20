@@ -1,6 +1,6 @@
 test_that('intModel is able to initialize a dataSDM object as well as correctly add the data to the integrated model', {
-  skip_on_cran()
-  
+
+  testthat::skip('Function is outdated')  
   ##Set up arbitrary data
   projection <- '+proj=tmerc'
   

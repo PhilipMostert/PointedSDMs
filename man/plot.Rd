@@ -102,7 +102,7 @@ Plot for modSpecies_predict
  mesh$crs <- proj
  
  #Set model up
- organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+ organizedData <- startISDM(data, Mesh = mesh, Coordinates = c('X', 'Y'),
                              Projection = proj, responsePA = 'Present')
  
   ##Run the model
@@ -159,7 +159,7 @@ Plot for modSpecies_predict
  mesh$crs <- proj
  
  #Set model up
- organizedData <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+ organizedData <- startSpecies(data, Mesh = mesh, Coordinates = c('X', 'Y'),
                              Projection = proj, responsePA = 'Present')
  
   ##Run the model
