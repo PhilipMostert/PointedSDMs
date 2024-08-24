@@ -1,7 +1,7 @@
 Package: PointedSDMs
 Type: Package
 Title: Fit Models Derived from Point Processes to Species Distributions using 'inlabru'
-Version: 2.1.1
+Version: 2.1.2
 Authors@R: c(
   person(given = "Philip", family = "Mostert", email = "philip.s.mostert@ntnu.no",
           role = c("aut", "cre")),
@@ -28,7 +28,8 @@ Imports:
     raster,
     sp (>= 1.4-5),
     R.devices,
-    blockCV (>= 3.0.0)
+    blockCV (>= 3.0.0),
+    FNN
 Suggests:
     testthat (>= 3.0.0),
     sn,
