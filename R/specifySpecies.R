@@ -1702,22 +1702,22 @@ specifySpecies$set('private', 'addData', function(dataList, responseCounts, resp
     # combine with rest of data
     fullGeom <- cbind(fullGeom, fullGeomCovs) 
     # split by dataset 
-    split <- split(fullGeom, factor(fullGeom$._dataset_index_var_., levels = unique(fullGeom$._dataset_index_var_.)))
-    names(split) <- names(pointData$Data)
+    splitVar <-split(fullGeom, factor(fullGeom$._dataset_index_var_., levels = unique(fullGeom$._dataset_index_var_.)))
+    names(splitVar) <- names(pointData$Data)
     # split by species & update columns
-    split <- lapply(split, function(x){
+    splitVar <- lapply(splitVar, function(x){
       # split by species name
-      xSplit <- split(x, factor(x$simpleScientificNameINDEX_VAR, levels = unique(x$simpleScientificNameINDEX_VAR)))
+      xSplit <- split(x, factor(x[[paste0(private$speciesName,'INDEX_VAR')]], levels = unique(x[[paste0(private$speciesName,'INDEX_VAR')]])))
       ds <- names(dataColNames)[x$._dataset_index_var_.[1]]
       # for each species, update names of covariates
       xSplit <- lapply(xSplit, function(x2){
         # drop irrelevant occurence columns
-        colsKeep <- dataColNames[[ds]][[paste0(ds, "_", x2$simpleScientificNameINDEX_VAR[1])]]
+        colsKeep <- dataColNames[[ds]][[paste0(ds, "_", x2[[paste0(private$speciesName,'INDEX_VAR')]][1])]]
         x2 <- x2[,c(colsKeep, allCovs)]
         # update cov names
         if (!is.null(private$speciesName) && private$speciesEnvironment) {
           dfNames <- names(x2)
-          dfNames[dfNames %in% modelCovs] <- paste0(x2$simpleScientificNameINDEX_VAR[1],'_', dfNames[dfNames %in% modelCovs])
+          dfNames[dfNames %in% modelCovs] <- paste0(x2[[paste0(private$speciesName,'INDEX_VAR')]][1],'_', dfNames[dfNames %in% modelCovs])
           # update cov names
           names(x2) <- dfNames
         }
@@ -1729,7 +1729,7 @@ specifySpecies$set('private', 'addData', function(dataList, responseCounts, resp
       # return
       return(xSplit)
     })
-    pointData$Data <- split
+    pointData$Data <- splitVar
     # annotate integration mesh
     if (!is.null(private$IPS)) {
       # annotate all environmental data
