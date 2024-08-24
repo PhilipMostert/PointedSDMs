@@ -1857,7 +1857,10 @@ specifySpecies$set('private', 'spatialCovariates', function(spatialCovariates) {
   #if (class(spatialCovariates) %in% c('RasterLayer', 'RasterBrick', 'RasterStack')) objSpat <- terra::rast(spatialCovariates)
   
   if (inherits(spatialCovariates, 'Spatial')) covsClass <- sapply(spatialCovariates@data, class)
-  else if (inherits(spatialCovariates, 'SpatRaster')) covsClass <- sapply(as.data.frame(spatialCovariates), class)
+  #   else if (inherits(spatialCovariates, 'SpatRaster')) covsClass <- sapply(seq(spatialCovariates[1]), function(x){
+  #         class(unlist(spatialCovariates[[x]][,1]))
+  #     }) |> setNames(names(spatialCovariates))
+  else if (inherits(spatialCovariates, 'SpatRaster')) covsClass <- sapply(spatialCovariates[1], class)
   else covsClass <- sapply(as.data.frame(terra::rast(spatialCovariates)), class)
   
   
