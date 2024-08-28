@@ -273,12 +273,16 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
         
         if (!is.null(covariates)) {
           
-          if (paste0(spec, '_Fixed__Effects__Comps') %in% names(object$summary.random)) species_covs <- paste(spec, '_Fixed__Effects__Comps')
+          species_covs <- NULL
           
+          if (paste0(spec, '_Fixed__Effects__Comps') %in% names(object$summary.random)) species_covs <- paste0(spec, '_Fixed__Effects__Comps')
+          
+          if(is.null(species_covs)) {
           
           if (object[['species']][['speciesEffects']][['Environmental']]) species_covs <- paste0(spec, '_', covariates)
           else species_covs <- covariates
           
+          }
         }
         else species_covs <- NULL
         
