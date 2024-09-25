@@ -1690,7 +1690,7 @@ specifySpecies$set('private', 'addData', function(dataList, responseCounts, resp
       naCovs <- names(naRows)[sapply(naRows, length) > 0]  # identify covs with missing data
       for(cov in naCovs){  # fill missing values for rows/covs using nearest neighbour 
         fullGeomCovs[naRows[[cov]], cov] <- 
-          nearestValue(st_coordinates(fullGeom[naRows[[cov]],])[,c("X","Y")], 
+          nearestValue(matrix(st_coordinates(fullGeom[naRows[[cov]],])[,c("X","Y")], ncol = 2), 
                        get('spatialcovariates', envir = private$spatcovsEnv)[cov])
         # out <- inlabru::bru_fill_missing(where = fullGeom[naRows[[cov]],], 
         #     data = get('spatialcovariates', 
@@ -1741,7 +1741,7 @@ specifySpecies$set('private', 'addData', function(dataList, responseCounts, resp
         naCovs <- names(naRows)[sapply(naRows, length) > 0]  # identify covs with missing data
         for(cov in naCovs){  # fill missing values for rows/covs using nearest neighbour 
           meshCovs[naRows[[cov]], cov] <- 
-            nearestValue(st_coordinates(private$IPS[naRows[[cov]],])[,c("X","Y")], 
+            nearestValue(matrix(st_coordinates(private$IPS[naRows[[cov]],])[,c("X","Y")], ncol = 2), 
                          get('spatialcovariates', envir = private$spatcovsEnv)[cov])
         }
         
