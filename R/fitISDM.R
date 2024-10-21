@@ -79,6 +79,8 @@ fitISDM <- function(data, options = list()) {
   
   if (!is.null(data$.__enclos_env__$private$temporalName)) {
     
+    if (!data$.__enclos_env__$private$temporalName %in% names(data$.__enclos_env__$private$IPS)) {
+    
     numTime <- length(unique(unlist(data$.__enclos_env__$private$temporalVars)))
     
     newIPS <- rep(list(data$.__enclos_env__$private$IPS), numTime)
@@ -91,6 +93,7 @@ fitISDM <- function(data, options = list()) {
     
     data$.__enclos_env__$private$IPS <- newIPS
     
+    }
   }
   
   comp_terms <- gsub('\\(.*$', '', data$.__enclos_env__$private$Components)

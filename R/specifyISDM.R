@@ -1169,6 +1169,15 @@ specifyISDM$set('public', 'initialize',  function(data, projection, Inlamesh, in
   
   if (!missing(offset)) private$Offset <- offset
   
+  private$Spatial <- spatial
+  private$Intercepts <- intercepts
+  
+  private$covariateFormula <- formulas$covariateFormula
+  private$biasFormula <- formulas$biasFormula
+  
+  private$Projection <- projection
+  private$INLAmesh <- Inlamesh
+  
   private$pointCovariates <- pointcovariates
   
   if (!is.null(spatialcovariates)) private$spatialCovariates(spatialcovariates)
@@ -1188,14 +1197,6 @@ specifyISDM$set('public', 'initialize',  function(data, projection, Inlamesh, in
   }
   private$IPS <- ips
   
-  private$Spatial <- spatial
-  private$Intercepts <- intercepts
-  
-  private$covariateFormula <- formulas$covariateFormula
-  private$biasFormula <- formulas$biasFormula
-  
-  private$Projection <- projection
-  private$INLAmesh <- Inlamesh
   
   private$addData(dataList = data, responseCounts = responsecounts, 
                   responsePA = responsepa, trialsPA = trialspa,
@@ -1317,6 +1318,18 @@ specifyISDM$set('private', 'addData', function(dataList, responseCounts, respons
                 
                 private$temporalVars <- pointData$timeIndex
                 
+                numTime <- length(unique(unlist(private$temporalVars)))
+                
+                newIPS <- rep(list(private$IPS), numTime)
+                
+                newIPS <- do.call(rbind, newIPS)
+                
+                newIPS[, private$temporalName] <- rep(1:numTime, each = nrow(private$IPS))
+                
+                newIPS <- st_transform(newIPS, private$Projection)
+                
+                private$IPS <- newIPS
+                
               }
               
               ##How does this work?
@@ -1385,6 +1398,8 @@ specifyISDM$set('private', 'addData', function(dataList, responseCounts, respons
                                                                                                         envir = private$spatcovsEnv)[cov],
                                                                                              layer = cov)
                       
+                      if (is.character(pointData$Data[[data]][[species]][[covIndex]])) pointData$Data[[data]][[species]][[covIndex]] <- as.factor(pointData$Data[[data]][[species]][[covIndex]])
+                      
                       if (any(is.na(pointData$Data[[data]][[species]][[covIndex]]))) {
                         
                         pointData$Data[[data]][[species]][[covIndex]] <- inlabru::bru_fill_missing(where = pointData$Data[[data]][[species]], 
@@ -1415,6 +1430,8 @@ specifyISDM$set('private', 'addData', function(dataList, responseCounts, respons
                                                                                 envir = private$spatcovsEnv)[covIPS],
                                                                      layer = covIPS
                       )
+                      
+                      if (is.character(private$IPS[[covADD]])) private$IPS[[covADD]] <- as.factor(private$IPS[[covADD]])
                       
                       if (any(is.na(private$IPS[[covADD]]))) {
                         
