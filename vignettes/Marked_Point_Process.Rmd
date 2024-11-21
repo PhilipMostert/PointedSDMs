@@ -34,6 +34,7 @@ library(sp)
 library(ggplot2)
 library(inlabru)
 library(INLA)
+library(fmesher)
 ```
 
 ```{r load_data}
@@ -60,10 +61,10 @@ euc <- euc[unlist(st_intersects(boundary, euc)),]
 
 class(trees)
 
-mesh = inla.mesh.2d(boundary = boundary, 
-                    max.edge = c(10, 20), 
-                    offset = c(15,20),
-                    cutoff = 2)
+mesh = fm_mesh_2d_inla(boundary = boundary, 
+                       max.edge = c(10, 20), 
+                       offset = c(15,20),
+                       cutoff = 2)
 mesh$crs <- st_crs(proj)
 
 ggplot() + 

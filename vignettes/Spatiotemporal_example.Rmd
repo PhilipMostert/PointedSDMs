@@ -25,6 +25,7 @@ Studying the complex ecological systems across both space and time is imperative
 ```{r, load_packages}
 
 library(PointedSDMs)
+library(fmesher)
 library(inlabru)
 library(ggplot2)
 library(spocc)
@@ -45,11 +46,11 @@ AL <- USAboundaries::us_states(states = "Alabama", resolution = 'high')
 AL <- as(AL, "sf")
 AL <- st_transform(AL, proj)
 
-mesh <- inla.mesh.2d(boundary = inla.sp2segment(AL[1]), 
-                     cutoff = 0.1 * 50,
-                     max.edge = c(0.2, 0.8) * 70, 
-                     offset = c(0.1, 0.2) * 150,
-                     crs = st_crs(proj))
+mesh <- fm_mesh_2d_inla(boundary = inla.sp2segment(AL[1]), 
+                        cutoff = 0.1 * 50,
+                        max.edge = c(0.2, 0.8) * 70, 
+                        offset = c(0.1, 0.2) * 150,
+                        crs = st_crs(proj))
 
 ```
 

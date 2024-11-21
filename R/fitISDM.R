@@ -44,7 +44,7 @@ fitISDM <- function(data, options = list()) {
   if (!inherits(data, 'dataSDM') && !inherits(data, 'specifySpecies') && !inherits(data, 'specifyISDM') &&
       !inherits(data, 'specifyMarks')) stop('data needs to be either a specifySpecies, specifyISDM or specifyMarks object.')
   
-  if (is.null(data$.__enclos_env__$private$INLAmesh)) stop('An inla.mesh object is required before any model is run.')
+  if (is.null(data$.__enclos_env__$private$INLAmesh)) stop('An fm_mesh_2d object is required before any model is run.')
   
   data2ENV(data = data, env = environment())
   

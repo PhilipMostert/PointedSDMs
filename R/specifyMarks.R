@@ -1294,7 +1294,7 @@ specifyMarks$set('private', 'originalNames', NULL)
 #' @param data The points of the model.
 #' @param coordinates A vector of length 2 containing the names of the coordinates.
 #' @param projection The projection of the data.
-#' @param Inlamesh An inla.mesh object.
+#' @param Inlamesh An \code{fm_mesh_2d} object.
 #' @param speciesindependent Independent species effects.
 #' @param initialnames The names of the datasets if data is passed through intModel.
 #' @param responsecounts The name of the response variable for the count data.
@@ -1331,7 +1331,7 @@ specifyMarks$set('public', 'initialize',  function(data,coordinates,
   if (missing(projection)) stop('projection needs to be given.')
   if (missing(Inlamesh)) stop('Mesh needs to be given.')
   
-  if (!inherits(Inlamesh, 'inla.mesh')) stop('Mesh needs to be an inla.mesh object.')
+  if (!inherits(Inlamesh, 'fm_mesh_2d')) stop('Mesh needs to be an fm_mesh_2d object.')
   
   if (inherits(projection, 'CRS')) projection <- as(projection, 'character')
   else if (!inherits(projection, 'character')) stop('Projection needs to be a character object.')

@@ -1117,7 +1117,7 @@ specifyISDM$set('private', 'originalNames', NULL)
 
 #' @description Initialize function for specifyISDM: used to store some compulsory arguments. Please refer to the wrapper function, \code{intModel} for creating new specifyISDM objects.
 #' @param projection The projection of the data.
-#' @param Inlamesh An inla.mesh object.
+#' @param Inlamesh An \code{fm_mesh_2d} object.
 #' @param initialnames The names of the datasets if data is passed through intModel.
 #' @param responsecounts The name of the response variable for the count data.
 #' @param responsepa The name of the response variable for the presence absence data.
@@ -1146,7 +1146,7 @@ specifyISDM$set('public', 'initialize',  function(data, projection, Inlamesh, in
   if (missing(projection)) stop('projection needs to be given.')
   if (missing(Inlamesh)) stop('Mesh needs to be given.')
   
-  if (!inherits(Inlamesh, 'inla.mesh')) stop('Mesh needs to be an inla.mesh object.')
+  if (!inherits(Inlamesh, 'fm_mesh_2d')) stop('Mesh needs to be an fm_mesh_2d object.')
   
   if (!inherits(projection, 'character')) stop('Projection needs to be a character object.')
   

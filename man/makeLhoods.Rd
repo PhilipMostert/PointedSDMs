@@ -26,7 +26,7 @@ makeLhoods(
 
 \item{family}{A list of vectors containing the families within each dataset.}
 
-\item{mesh}{An inla.mesh object.}
+\item{mesh}{An \code{fm_mesh_2d} object.}
 
 \item{ips}{Integration points used.}
 

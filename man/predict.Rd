@@ -89,7 +89,7 @@
 
 \item{formula}{Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.}
 
-\item{mesh}{An \code{inla.mesh} object.}
+\item{mesh}{An \code{fm_mesh_2d} object.}
 
 \item{mask}{A mask of the study background. Defaults to \code{NULL}.}
 

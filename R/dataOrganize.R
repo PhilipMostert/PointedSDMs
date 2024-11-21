@@ -896,7 +896,7 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
 })
 
 #' @description Function to make the datasets into likelihoods.
-#' @param mesh An inla.mesh object.
+#' @param mesh An \code{fm_mesh_2d} object.
 #' @param ips Integration points used.
 #' @param paresp The response variable name for the presence absence datasets.
 #' @param ntrialsvar The trials variable name for the presence absence datasets.
@@ -973,7 +973,6 @@ dataOrganize$set('public', 'makeLhoods', function(mesh, ips,
                                                  include = self$Formulas[[dataset]][[species]][[process]][['RHS']],
                                                  data = self$Data[[dataset]][[species]], 
                                                  Ntrials = Ntrials,
-                                                 mesh = mesh,
                                                  ips = IPS,
                                                  family = self$Family[[dataset]][process])
         

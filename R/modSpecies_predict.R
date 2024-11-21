@@ -11,7 +11,7 @@ setClass('modSpecies_predict')
 #' @param object A \code{modSpecies} object.
 #' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
 #' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.
-#' @param mesh An \code{inla.mesh} object.
+#' @param mesh An \code{fm_mesh_2d} object.
 #' @param mask A mask of the study background. Defaults to \code{NULL}.
 #' @param covariates Name of covariates to predict.
 #' @param spatial Logical: include spatial effects in prediction. Defaults to \code{FALSE}.
@@ -63,7 +63,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
                            bias = FALSE, biasnames = NULL, predictor = FALSE,
                            fun = 'linear', ...) {
   
-  if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
+  if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an fm_mesh_2d object is required.")
   
   if (sum(predictor, bias) > 1) stop('You cannot combine predictor with bias.')
   

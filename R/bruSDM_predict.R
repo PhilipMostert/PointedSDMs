@@ -11,7 +11,7 @@ setClass('bruSDM_predict')
 #' @param object A \code{bru_sdm} objects.
 #' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
 #' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.
-#' @param mesh An \code{inla.mesh} object.
+#' @param mesh An \code{fm_mesh_2d} object.
 #' @param mask A mask of the study background. Defaults to \code{NULL}.
 #' @param covariates Name of covariates to predict.
 #' @param temporal Make predictions for the temporal component of the model.
@@ -65,7 +65,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
                            marks = NULL, biasfield = FALSE, biasnames = NULL, predictor = FALSE,
                            fun = 'linear', format = 'sf', ...) {
   
-  if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
+  if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an fm_mesh_2d object is required.")
   
   ## if datasets !is.null but at least one not in model stop
   # else datasets <- all datasets in the model.

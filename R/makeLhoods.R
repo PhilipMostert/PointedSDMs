@@ -3,7 +3,7 @@
 #' @param data A list of sf objects containing the datasets for which likelihoods need to be constructed.
 #' @param formula A list of formulas to add to the likelihoods.
 #' @param family A list of vectors containing the families within each dataset.
-#' @param mesh An inla.mesh object.
+#' @param mesh An \code{fm_mesh_2d} object.
 #' @param ips Integration points used.
 #' @param paresp The response variable name for the presence absence datasets.
 #' @param ntrialsvar The trials variable name for the presence absence datasets.
@@ -104,7 +104,6 @@ makeLhoods <- function(data, formula, family, mesh, ips,
                                                  include = formula[[dataset]][[species]][[process]][['RHS']],
                                                  data = data[[dataset]][[species]], 
                                                  Ntrials = Ntrials,
-                                                 mesh = mesh,
                                                  ips = IPS,
                                                  domain = list(geometry = mesh),
                                                  samplers = samplers[[names(data)[[dataset]]]],
