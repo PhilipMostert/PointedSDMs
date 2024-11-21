@@ -31,7 +31,7 @@ Pcount$count <- rpois(n = nrow(Pcount), lambda = 2)
 Pcount$temp <- 2
 
 if (requireNamespace("INLA")) {
-  mesh <<- fmesher::fm_mesh_2d_inla(boundary = INLA::inla.sp2segment(SpatialPoly), 
+  mesh <<- fmesher::fm_mesh_2d_inla(boundary = fmesher::fm_as_segm(SpatialPoly), 
                               max.edge = 2, crs = fmesher::fm_crs(projection))
   #iPoints <<- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
   iPoints <<- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)

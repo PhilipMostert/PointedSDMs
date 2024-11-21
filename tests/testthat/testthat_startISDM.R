@@ -29,7 +29,7 @@ test_that('startISDM is able to initialize a specifyISDM object as well as corre
   PA$pointcov <- runif(n = nrow(PA))
   PA$temp <- sample(x = 1:2, size = nrow(PA), replace = TRUE)
   if (requireNamespace("INLA")) {
-    mesh <<- fmesher::fm_mesh_2d_inla(boundary = INLA::inla.sp2segment(SpatialPoly), 
+    mesh <<- fmesher::fm_mesh_2d_inla(boundary = fmesher::fm_as_segm(SpatialPoly), 
                                 max.edge = 2, crs = fmesher::fm_crs(projection))
     #iPoints <<- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
     iPoints <<- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)

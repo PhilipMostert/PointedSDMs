@@ -55,7 +55,7 @@ Pgon <- st_sfc(st_polygon(list(PolyPoints)), crs = st_crs(Projection))
 
 
 Meshpars <- list(cutoff=0.8, max.edge=c(1, 3), offset=c(1,1))
-Mesh <- fmesher::fm_mesh_2d_inla(boundary = INLA::inla.sp2segment(Pgon),
+Mesh <- fmesher::fm_mesh_2d_inla(boundary = fmesher::fm_as_segm(Pgon),
                                  cutoff = Meshpars$cutoff,
                                  max.edge = Meshpars$cutoff,
                                  offset = Meshpars$offset,

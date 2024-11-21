@@ -29,7 +29,7 @@ test_that('makeLhoods makes a list of likelihoods', {
   PA$binommark <- sample(x = 2:3, size = nrow(PA), replace = TRUE)
   PA$marktrial <- sample(x = 3:5, size = nrow(PA), replace = TRUE)
   PA$species <- sample(x = c('bird'), nrow(PA), replace = TRUE)
-  mesh <- fmesher::fm_mesh_2d_inla(boundary = INLA::inla.sp2segment(SpatialPoly), 
+  mesh <- fmesher::fm_mesh_2d_inla(boundary = fmesher::fm_as_segm(SpatialPoly), 
                                    max.edge = 2, crs = fmesher::fm_crs(projection))
   iPoints <- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)
 
