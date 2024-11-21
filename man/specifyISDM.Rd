@@ -252,6 +252,57 @@ organizedData$addBias(datasetNames = 'eBird')
  
 } 
 
+
+## ------------------------------------------------
+## Method `specifyISDM$addSamplers`
+## ------------------------------------------------
+
+\dontrun{
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- "+proj=longlat +ellps=WGS84"
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ 
+ #Set model up
+ organizedData <- startISDM(data, Mesh = mesh,
+                           Projection = proj, 
+                           responsePA = 'Present')
+ 
+#Add integration domain for the eBird records
+organizedData$addSamplers(datasetName = 'eBird', Samplers = SolitaryTinamou$region)
+
+}
+}
+
+## ------------------------------------------------
+## Method `specifyISDM$specifyRandom`
+## ------------------------------------------------
+
+\dontrun{
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- "+proj=longlat +ellps=WGS84"
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ 
+ #Set model up
+ organizedData <- startISDM(data, Mesh = mesh,
+                           Projection = proj, 
+                           responsePA = 'Present',
+                           pointsSpatial = copy)
+ 
+#Add integration domain for the eBird records
+organizedData$specifyRandom(copyModel =  list(beta = list(fixed = TRUE)))
+
+}
+}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -825,6 +876,33 @@ Function to add an integration domain for the PO datasets.
 \subsection{Returns}{
 New samplers for a process.
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- "+proj=longlat +ellps=WGS84"
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ 
+ #Set model up
+ organizedData <- startISDM(data, Mesh = mesh,
+                           Projection = proj, 
+                           responsePA = 'Present')
+ 
+#Add integration domain for the eBird records
+organizedData$addSamplers(datasetName = 'eBird', Samplers = SolitaryTinamou$region)
+
+}
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyISDM-specifyRandom"></a>}}
@@ -853,6 +931,34 @@ Function to specify the models and priors for the random effects included in the
 \subsection{Returns}{
 An updated component list.
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+ if (requireNamespace('INLA')) {
+   
+ #Get Data
+ data("SolitaryTinamou")
+ proj <- "+proj=longlat +ellps=WGS84"
+ data <- SolitaryTinamou$datasets
+ mesh <- SolitaryTinamou$mesh
+ mesh$crs <- proj
+ 
+ #Set model up
+ organizedData <- startISDM(data, Mesh = mesh,
+                           Projection = proj, 
+                           responsePA = 'Present',
+                           pointsSpatial = copy)
+ 
+#Add integration domain for the eBird records
+organizedData$specifyRandom(copyModel =  list(beta = list(fixed = TRUE)))
+
+}
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyISDM-new"></a>}}

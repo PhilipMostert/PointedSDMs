@@ -45,7 +45,7 @@ intModel(
 
 \item{Mesh}{An \code{inla.mesh} object required for the spatial random fields and the integration points in the model (see \code{\link[INLA]{inla.mesh.2d}} from the \pkg{INLA} package for more details).}
 
-\item{IPS}{The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[inlabru]{fm_int}} from the \pkg{inlabru} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} object.}
+\item{IPS}{The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[fmesher]{fm_int}} from the \pkg{fmesher} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} object.}
 
 \item{Boundary}{A \code{sf} object of the study area. If not missing, this object is used to help create the integration points.}
 

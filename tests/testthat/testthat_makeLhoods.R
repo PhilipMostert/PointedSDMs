@@ -30,9 +30,9 @@ test_that('makeLhoods makes a list of likelihoods', {
   PA$marktrial <- sample(x = 3:5, size = nrow(PA), replace = TRUE)
   PA$species <- sample(x = c('bird'), nrow(PA), replace = TRUE)
   mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
-                             max.edge = 2, crs = inlabru::fm_crs(projection))
+                             max.edge = 2, crs = fmesher::fm_crs(projection))
   #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-  iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
+  iPoints <- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)
 
   coordnames <- c('x.1', 'x.2')
   responseCounts <- 'count'

@@ -25,6 +25,7 @@ Depends:
 Imports:
     terra,
     ggplot2,
+    fmesher,
     raster,
     sp (>= 1.4-5),
     R.devices,
@@ -36,7 +37,6 @@ Suggests:
     INLA (>= 21.08.31),
     rasterVis,
     ggmap,
-    ggpolypath,
     RColorBrewer,
     cowplot,
     knitr,
@@ -45,7 +45,7 @@ Suggests:
     spocc,
     covr
 Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 License: GPL (>= 3)
 VignetteBuilder: knitr
 Config/testthat/edition: 3

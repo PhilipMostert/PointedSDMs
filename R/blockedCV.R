@@ -226,12 +226,12 @@ blockedCV <- function(data, options = list(),
         
         if (!is.null(data$.__enclos_env__$private$speciesSpatial)) {
           
-        if (data$.__enclos_env__$private$speciesSpatial == 'replicate') ips <- fm_cprod(ips, data.frame(speciesSpatialGroup = 1:max(data$.__enclos_env__$private$speciesTable$index)))
+        if (data$.__enclos_env__$private$speciesSpatial == 'replicate') ips <- fmesher::fm_cprod(ips, data.frame(speciesSpatialGroup = 1:max(data$.__enclos_env__$private$speciesTable$index)))
         
         }
         if (!is.null(data$.__enclos_env__$private$Intercepts)) {
           
-          if (data$.__enclos_env__$private$speciesIntercepts) ips <- fm_cprod(ips, data.frame(specIntTermRem = 1:max(data$.__enclos_env__$private$speciesTable$index)))
+          if (data$.__enclos_env__$private$speciesIntercepts) ips <- fmesher::fm_cprod(ips, data.frame(specIntTermRem = 1:max(data$.__enclos_env__$private$speciesTable$index)))
           names(ips)[names(ips) == 'specIntTermRem'] <- data$.__enclos_env__$private$speciesName
         }
       } 

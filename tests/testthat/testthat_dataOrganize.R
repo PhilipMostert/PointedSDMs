@@ -31,9 +31,9 @@ PA$marktrial <- sample(x = 1:3, size = nrow(PA), replace = TRUE)
 PA$species <- sample(x = c('bird1', 'bird2'), nrow(PA), replace = TRUE)
 PA$temp <- sample(x = c(1,2), nrow(PA), replace = TRUE)
 mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
-                           max.edge = 2, crs = inlabru::fm_crs(projection))
+                           max.edge = 2, crs = fmesher::fm_crs(projection))
 #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
+iPoints <- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)
 
 
 spData <- list(PO, PA)

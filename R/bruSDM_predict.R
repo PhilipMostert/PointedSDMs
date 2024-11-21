@@ -142,24 +142,24 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (!is.null(mask)) {
       
-      data <- inlabru::fm_pixels(mesh, mask = mask, format = format)
+      data <- fmesher::fm_pixels(mesh, mask = mask, format = format)
       
     }   
-    else data <- inlabru::fm_int(mesh, format = format)
+    else data <- fmesher::fm_int(mesh, format = format)
   }
   
   if (speciespreds) {
   
   if (object[['species']][['speciesEffects']][['Intercepts']]) {
     
-    data <- fm_cprod(data, data.frame(speciesIndexREMOVE = 1:length(unique(unlist(object$species$speciesIn)))))
+    data <- fmesher::fm_cprod(data, data.frame(speciesIndexREMOVE = 1:length(unique(unlist(object$species$speciesIn)))))
     names(data)[names(data) == 'speciesIndexREMOVE'] <- object[['species']][['speciesVar']]
     
   }
     
   if (object$spatial$species == 'replicate') {
       
-  if (!object[['species']][['speciesVar']] %in% names(data)) data <- fm_cprod(data, data.frame(speciesSpatialGroup = 1:length(unique(unlist(object$species$speciesIn)))))
+  if (!object[['species']][['speciesVar']] %in% names(data)) data <- fmesher::fm_cprod(data, data.frame(speciesSpatialGroup = 1:length(unique(unlist(object$species$speciesIn)))))
   else data$speciesSpatialGroup <- data[[object[['species']][['speciesVar']]]]
     
   }
@@ -213,7 +213,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       time_data <- data.frame(seq_len(max(numeric_time)))
       names(time_data) <- time_variable
       
-      timeData <- inlabru::fm_cprod(data, data.frame(time_data))
+      timeData <- fmesher::fm_cprod(data, data.frame(time_data))
       names(timeData)[!names(timeData) %in% c('geometry', '.block')] <- c(time_variable, 'weight')  
       
       #bias

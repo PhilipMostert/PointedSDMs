@@ -961,7 +961,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @param datasetName Name of the dataset for the samplers.
   #' @param Samplers A \code{Spatial*} object representing the integration domain.
   #' @return New samplers for a process.
-  #' @example
+  #' @examples
   #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
@@ -998,7 +998,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @param copyModel List of model specifications given to the hyper parameters for the \code{"copy"} model. Defaults to \code{list(beta = list(fixed = FALSE))}.
   #' @param copyBias List of model specifications given to the hyper parameters for the \code{"copy"} bias model. Defaults to \code{list(beta = list(fixed = FALSE))}.
   #' @return An updated component list. 
-  #' @example
+  #' @examples
   #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
@@ -1184,8 +1184,8 @@ specifyISDM$set('public', 'initialize',  function(data, projection, Inlamesh, in
   
   if (is.null(ips)) {
     
-    if (!is.null(boundary)) ips <- st_transform(inlabru::fm_int(samplers = boundary, domain = Inlamesh), projection)
-    else ips <- st_transform(inlabru::fm_int(domain = Inlamesh), projection)
+    if (!is.null(boundary)) ips <- st_transform(fmesher::fm_int(samplers = boundary, domain = Inlamesh), projection)
+    else ips <- st_transform(fmesher::fm_int(domain = Inlamesh), projection)
     
     
   }
@@ -1193,7 +1193,7 @@ specifyISDM$set('public', 'initialize',  function(data, projection, Inlamesh, in
   st_geometry(ips) <- 'geometry'
   
   if (!is.null(spatial)) {
-  if (spatial == 'correlate') ips <- fm_cprod(ips, data = data.frame(._dataset_index_var_. = 1:length(initialnames)))
+  if (spatial == 'correlate') ips <- fmesher::fm_cprod(ips, data = data.frame(._dataset_index_var_. = 1:length(initialnames)))
   }
   private$IPS <- ips
   

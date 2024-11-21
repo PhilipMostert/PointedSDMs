@@ -39,9 +39,9 @@ spIn <- c('bird', 'dog', 'fish')
 
 if (requireNamespace("INLA")) {
   mesh <<- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
-                              max.edge = 2, crs = inlabru::fm_crs(projection))
+                              max.edge = 2, crs = fmesher::fm_crs(projection))
   #iPoints <<- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-  iPoints <<- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
+  iPoints <<- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)
   
 }
 

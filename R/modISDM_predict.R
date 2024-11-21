@@ -110,10 +110,10 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (!is.null(mask)) {
       
-      data <- inlabru::fm_pixels(mesh, mask = mask)
+      data <- fmesher::fm_pixels(mesh, mask = mask)
       
     }   
-    else data <- inlabru::fm_int(mesh)
+    else data <- fmesher::fm_int(mesh)
   }
   
   if (!is.null(object$temporal$temporalVar)) temporal <- TRUE
@@ -164,7 +164,7 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       time_data <- data.frame(seq_len(max(numeric_time)))
       names(time_data) <- time_variable
       
-      data <- inlabru::fm_cprod(data, data.frame(time_data))
+      data <- fmesher::fm_cprod(data, data.frame(time_data))
       data$.__plot__index__ <- data[[time_variable]]
       
     }

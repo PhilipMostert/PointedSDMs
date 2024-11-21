@@ -30,9 +30,9 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
   PA$marktrial <- sample(x = 2:5, size = nrow(PA), replace = TRUE)
   PA$species <- sample(x = c('bird'), nrow(PA), replace = TRUE)
   mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
-                             max.edge = 2, crs = inlabru::fm_crs(projection))
+                             max.edge = 2, crs = fmesher::fm_crs(projection))
   #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-  iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
+  iPoints <- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)
   
   coordnames <- c('long', 'lat')
   responseCounts <- 'count'

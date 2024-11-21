@@ -43,7 +43,7 @@ startSpecies(
 
 \item{speciesName}{Name of the species variable name (class \code{character}). Specifying this argument turns the model into a stacked species distribution model, and calculates covariate values for the individual species, as well as a species group model in the shared spatial field. Defaults to \code{NULL}. Note that if this argument is non-\code{NULL} and \code{pointsIntercepts} is missing, \code{pointsIntercepts} will be set to \code{FALSE}.}
 
-\item{IPS}{The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[inlabru]{fm_int}} from the \pkg{inlabru} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} object.}
+\item{IPS}{The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[fmesher]{fm_int}} from the \pkg{fmesher} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} object.}
 
 \item{Boundary}{A \code{sf} object of the study area. If not missing, this object is used to help create the integration points.}
 

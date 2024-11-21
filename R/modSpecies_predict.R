@@ -134,31 +134,31 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (!is.null(mask)) {
       
-      data <- inlabru::fm_pixels(mesh, mask = mask)
+      data <- fmesher::fm_pixels(mesh, mask = mask)
       
     }   
-    else data <- inlabru::fm_int(mesh)
+    else data <- fmesher::fm_int(mesh)
   }
   
   if (speciespreds) {
     
     if (object[['species']][['speciesEffects']][['Intercepts']]) {
       
-      data <- fm_cprod(data, data.frame(speciesIndexREMOVE = 1:length(unique(unlist(object$species$speciesIn)))))
+      data <- fmesher::fm_cprod(data, data.frame(speciesIndexREMOVE = 1:length(unique(unlist(object$species$speciesIn)))))
       names(data)[names(data) == 'speciesIndexREMOVE'] <- object[['species']][['speciesVar']]
       
     }
     
     if (object$spatial$species == 'replicate') {
       
-      if (!object[['species']][['speciesVar']] %in% names(data)) data <- fm_cprod(data, data.frame(speciesSpatialGroup = 1:length(unique(unlist(object$species$speciesIn)))))
+      if (!object[['species']][['speciesVar']] %in% names(data)) data <- fmesher::fm_cprod(data, data.frame(speciesSpatialGroup = 1:length(unique(unlist(object$species$speciesIn)))))
       else data$speciesSpatialGroup <- data[[object[['species']][['speciesVar']]]]
       
     }
     
     if (!object$species$speciesEffects$Intercepts) {
       
-      data <- fm_cprod(data, data.frame(temp_species_index_var = 1:length(unique(unlist(object$species$speciesIn)))))
+      data <- fmesher::fm_cprod(data, data.frame(temp_species_index_var = 1:length(unique(unlist(object$species$speciesIn)))))
       names(data)[names(data) == 'temp_species_index_var'] <- object[['species']][['speciesVar']]
       
     }
@@ -220,7 +220,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
       time_data <- data.frame(seq_len(max(numeric_time)))
       names(time_data) <- time_variable
       
-      data <- inlabru::fm_cprod(data, data.frame(time_data))
+      data <- fmesher::fm_cprod(data, data.frame(time_data))
       data$.__plot__index__ <- data[[time_variable]]
       
     }
