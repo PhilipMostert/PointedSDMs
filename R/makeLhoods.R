@@ -99,7 +99,13 @@ makeLhoods <- function(data, formula, family, mesh, ips,
         
         }
         }
-          
+
+        # bru_like_list will use the like-tag for list names; inlabru >= 2.12.0
+        if (is.null(names(data[[dataset]])[species])) nameGive <- names(data)[[dataset]]
+        else nameGive <- names(data[[dataset]])[species]
+        
+        like_name <- paste0(nameGive, '_', sub(' .*', '', as.character(formula[[dataset]][[species]][[process]][['LHS']])[2]))
+        
         Likelihoods[[Likindex]] <- inlabru::like(formula = formula[[dataset]][[species]][[process]][['LHS']], ## but obs change these in function call
                                                  include = formula[[dataset]][[species]][[process]][['RHS']],
                                                  data = data[[dataset]][[species]], 
@@ -107,12 +113,10 @@ makeLhoods <- function(data, formula, family, mesh, ips,
                                                  ips = IPS,
                                                  domain = list(geometry = mesh),
                                                  samplers = samplers[[names(data)[[dataset]]]],
-                                                 family = family[[dataset]][process])
+                                                 family = family[[dataset]][process],
+                                                 tag = like_name)
         
-        if (is.null(names(data[[dataset]])[species])) nameGive <- names(data)[[dataset]]
-        else nameGive <- names(data[[dataset]])[species]
-        
-        names(Likelihoods)[[Likindex]] <- paste0(nameGive, '_', sub(' .*', '', as.character(formula[[dataset]][[species]][[process]][['LHS']])[2]))
+        names(Likelihoods)[[Likindex]] <- like_name
         
       } 
       

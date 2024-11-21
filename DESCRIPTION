@@ -19,7 +19,7 @@ Depends:
     R (>= 4.1),  
     stats,
     sf,
-    inlabru (>= 2.8.0),
+    inlabru (>= 2.12.0),
     R6 (>= 2.5),
     methods,
 Imports:

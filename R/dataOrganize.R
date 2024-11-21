@@ -968,18 +968,22 @@ dataOrganize$set('public', 'makeLhoods', function(mesh, ips,
         }
         else IPS <- ips
         ##rm formulas for now
+
+        # bru_like_list will use the like-tag, not the list names.
+        if (is.null(names(self$Data[[dataset]])[species])) nameGive <- names(self$Data)[[dataset]]
+        else nameGive <- names(self$Data[[dataset]])[species]
+        
+        like_name <- paste0(nameGive, '_', as.character(self$Formulas[[dataset]][[species]][[process]][['LHS']])[2])
         
         Likelihoods[[Likindex]] <- inlabru::like(formula = self$Formulas[[dataset]][[species]][[process]][['LHS']],
                                                  include = self$Formulas[[dataset]][[species]][[process]][['RHS']],
                                                  data = self$Data[[dataset]][[species]], 
                                                  Ntrials = Ntrials,
                                                  ips = IPS,
-                                                 family = self$Family[[dataset]][process])
+                                                 family = self$Family[[dataset]][process],
+                                                 tag = like_name)
         
-        if (is.null(names(self$Data[[dataset]])[species])) nameGive <- names(self$Data)[[dataset]]
-        else nameGive <- names(self$Data[[dataset]])[species]
-        
-        names(Likelihoods)[[Likindex]] <- paste0(nameGive, '_', as.character(self$Formulas[[dataset]][[species]][[process]][['LHS']])[2])
+        names(Likelihoods)[[Likindex]] <- like_name
         
       }
       

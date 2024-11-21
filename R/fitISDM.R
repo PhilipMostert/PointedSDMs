@@ -135,8 +135,8 @@ fitISDM <- function(data, options = list()) {
                                                               samplers = data$.__enclos_env__$private$biasData[[bias]],
                                                               ips = data$.__enclos_env__$private$IPS,
                                                               domain = list(coordinates = data$.__enclos_env__$private$INLAmesh),
-                                                              include = c(paste0(bias, '_samplers_field'), paste0(bias,'_samplers'), data$.__enclos_env__$private$spatcovsNames))
-      
+                                                              include = c(paste0(bias, '_samplers_field'), paste0(bias,'_samplers'), data$.__enclos_env__$private$spatcovsNames),
+                                                              tag = paste0(bias, '_samplers'))
       
     }
     
