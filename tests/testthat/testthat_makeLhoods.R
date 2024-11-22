@@ -29,10 +29,9 @@ test_that('makeLhoods makes a list of likelihoods', {
   PA$binommark <- sample(x = 2:3, size = nrow(PA), replace = TRUE)
   PA$marktrial <- sample(x = 3:5, size = nrow(PA), replace = TRUE)
   PA$species <- sample(x = c('bird'), nrow(PA), replace = TRUE)
-  mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
-                             max.edge = 2, crs = inlabru::fm_crs(projection))
-  #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-  iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
+  mesh <- fmesher::fm_mesh_2d_inla(boundary = fmesher::fm_as_segm(SpatialPoly), 
+                                   max.edge = 2, crs = fmesher::fm_crs(projection))
+  iPoints <- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)
 
   coordnames <- c('x.1', 'x.2')
   responseCounts <- 'count'
@@ -66,7 +65,7 @@ test_that('makeLhoods makes a list of likelihoods', {
   
   #Expect a list of Lhoods
   expect_type(Lhoods, 'list')
-  expect_true(all(unlist(lapply(Lhoods, class)) == c("bru_like", "list")))
+  expect_true(all(vapply(Lhoods, function(x) inherits(x, "bru_like"), logical(1))))
   
   #Names should be in format: dataset_species_response
   expect_setequal(names(Lhoods), c("PO_fish_geometry", "PA_bird_PAresp"))

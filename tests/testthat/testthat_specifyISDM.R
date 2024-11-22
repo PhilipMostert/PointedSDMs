@@ -31,10 +31,10 @@ Pcount$count <- rpois(n = nrow(Pcount), lambda = 2)
 Pcount$temp <- 2
 
 if (requireNamespace("INLA")) {
-  mesh <<- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
-                              max.edge = 2, crs = inlabru::fm_crs(projection))
+  mesh <<- fmesher::fm_mesh_2d_inla(boundary = fmesher::fm_as_segm(SpatialPoly), 
+                              max.edge = 2, crs = fmesher::fm_crs(projection))
   #iPoints <<- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-  iPoints <<- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
+  iPoints <<- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)
   
 }
 
@@ -158,7 +158,7 @@ test_that('specifyISDM initialize works as expected.', {
                                ips = iPoints, copymodel = copyModel,
                                spatial = 'shared', temporal = temporalName, 
                                intercepts = TRUE, temporalmodel = temporalModel),
-               'Mesh needs to be an inla.mesh object.')
+               'Mesh needs to be an fm_mesh_2d object.')
   
   ##Check projection error
   expect_error(specifyISDM$new(data = list(PO, PA, Pcount),

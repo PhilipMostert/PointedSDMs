@@ -6,8 +6,8 @@
 #' @param ... The datasets to be used in the model. Must come as either \code{sf} objects, or as a list of named \code{sf} objects. 
 #' @param spatialCovariates The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{SpatialRaster} object. Can be either \code{numeric}, \code{factor} or \code{character} data. Defaults to \code{NULL} which includes no spatial effects in the model.
 #' @param Projection The coordinate reference system used by both the spatial points and spatial covariates. Must be of class \code{character}.
-#' @param Mesh An \code{inla.mesh} object required for the spatial random fields and the integration points in the model (see \code{\link[INLA]{inla.mesh.2d}} from the \pkg{INLA} package for more details). 
-#' @param IPS The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[inlabru]{fm_int}} from the \pkg{inlabru} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} and \code{Boundary }objects.
+#' @param Mesh An \code{fm_mesh_2d} object required for the spatial random fields and the integration points in the model (see \code{\link[fmesher]{fm_mesh_2d_inla}} from the \pkg{fmesher} package for more details). 
+#' @param IPS The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[fmesher]{fm_int}} from the \pkg{fmesher} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} and \code{Boundary }objects.
 #' @param Boundary A \code{sf} object of the study area. If not missing, this object is used to help create the integration points.
 #' @param markNames A vector with the mark names (class \code{character}) to be included in the integrated model. Marks are variables which are used to describe the individual points in the model (for example, in the field of ecology the size of the species or its feeding type could be considered). Defaults to \code{NULL}, however if this argument is non-\code{NULL}, the model run will become a marked point process. The marks must be included in the same data object as the points.
 #' @param markFamily A vector with the statistical families (class \code{character}) assumed for the marks. Must be the same length as markNames, and the position of the mark in the vector \code{markName} is associated with the position of the family in \code{markFamily}. Defaults to \code{NULL} which assigns each mark as "Gaussian".
@@ -70,7 +70,7 @@ startMarks <- function(..., spatialCovariates = NULL,
   
   if (!inherits(Projection, 'character')) stop('Projection needs to be a character object.')
   
-  if (!inherits(Mesh, 'inla.mesh')) stop('Mesh needs to be a inla.mesh object.')
+  if (!inherits(Mesh, 'fm_mesh_2d')) stop('Mesh needs to be a fm_mesh_2d object.')
   
   if (!is.null(pointsSpatial)) {
     

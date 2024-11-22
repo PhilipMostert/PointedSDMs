@@ -125,14 +125,8 @@ datasetOut <- function(model, dataset,
       
     }
 
-    
-    reduced_terms <- unique(unlist(lapply(model$bru_info$lhoods[index], function(x) {
-      
-      if (!identical(unlist(x$used), character(0))) unlist(x$used)
-      else labels(terms(x$formula))
-      
-    })))
-    
+    reduced_terms <- unlist(inlabru::bru_used(model$bru_info$lhoods[index]))
+
     reduced_components <- reduceComps(componentsOld = model$componentsJoint,
                           pointsCopy = ifelse(model$spatial$points == 'copy', 
                                       TRUE, FALSE),
@@ -178,6 +172,10 @@ datasetOut <- function(model, dataset,
     
     if (predictions) {
       
+      # Seems you require names, but haven't used tags, so they're all NA
+      if (all(is.na(names(model$bru_info$lhoods)))) {
+        names(model$bru_info$lhoods) <- model[["source"]]
+      }
       reduced_lik <- model$bru_info$lhoods
       
       for (data in names(model$bru_info$lhoods)[!index]) { 

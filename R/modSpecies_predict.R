@@ -11,7 +11,7 @@ setClass('modSpecies_predict')
 #' @param object A \code{modSpecies} object.
 #' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
 #' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.
-#' @param mesh An \code{inla.mesh} object.
+#' @param mesh An \code{fm_mesh_2d} object.
 #' @param mask A mask of the study background. Defaults to \code{NULL}.
 #' @param covariates Name of covariates to predict.
 #' @param spatial Logical: include spatial effects in prediction. Defaults to \code{FALSE}.
@@ -63,7 +63,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
                            bias = FALSE, biasnames = NULL, predictor = FALSE,
                            fun = 'linear', ...) {
   
-  if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
+  if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an fm_mesh_2d object is required.")
   
   if (sum(predictor, bias) > 1) stop('You cannot combine predictor with bias.')
   
@@ -134,31 +134,31 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (!is.null(mask)) {
       
-      data <- inlabru::fm_pixels(mesh, mask = mask)
+      data <- fmesher::fm_pixels(mesh, mask = mask)
       
     }   
-    else data <- inlabru::fm_int(mesh)
+    else data <- fmesher::fm_int(mesh)
   }
   
   if (speciespreds) {
     
     if (object[['species']][['speciesEffects']][['Intercepts']]) {
       
-      data <- fm_cprod(data, data.frame(speciesIndexREMOVE = 1:length(unique(unlist(object$species$speciesIn)))))
+      data <- fmesher::fm_cprod(data, data.frame(speciesIndexREMOVE = 1:length(unique(unlist(object$species$speciesIn)))))
       names(data)[names(data) == 'speciesIndexREMOVE'] <- object[['species']][['speciesVar']]
       
     }
     
     if (object$spatial$species == 'replicate') {
       
-      if (!object[['species']][['speciesVar']] %in% names(data)) data <- fm_cprod(data, data.frame(speciesSpatialGroup = 1:length(unique(unlist(object$species$speciesIn)))))
+      if (!object[['species']][['speciesVar']] %in% names(data)) data <- fmesher::fm_cprod(data, data.frame(speciesSpatialGroup = 1:length(unique(unlist(object$species$speciesIn)))))
       else data$speciesSpatialGroup <- data[[object[['species']][['speciesVar']]]]
       
     }
     
     if (!object$species$speciesEffects$Intercepts) {
       
-      data <- fm_cprod(data, data.frame(temp_species_index_var = 1:length(unique(unlist(object$species$speciesIn)))))
+      data <- fmesher::fm_cprod(data, data.frame(temp_species_index_var = 1:length(unique(unlist(object$species$speciesIn)))))
       names(data)[names(data) == 'temp_species_index_var'] <- object[['species']][['speciesVar']]
       
     }
@@ -220,7 +220,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
       time_data <- data.frame(seq_len(max(numeric_time)))
       names(time_data) <- time_variable
       
-      data <- inlabru::fm_cprod(data, data.frame(time_data))
+      data <- fmesher::fm_cprod(data, data.frame(time_data))
       data$.__plot__index__ <- data[[time_variable]]
       
     }

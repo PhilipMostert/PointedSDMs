@@ -53,7 +53,7 @@ blockedCV <- function(data, options = list(),
   
   if (!inherits(data, 'dataSDM') && !inherits(data, 'specifySpecies') && !inherits(data, 'specifyISDM')) stop('data needs to be a dataSDM object.')
   
-  if (is.null(data$.__enclos_env__$private$INLAmesh)) stop('An inla.mesh object is required before any model is run.')
+  if (is.null(data$.__enclos_env__$private$INLAmesh)) stop('An fm_mesh_2d object is required before any model is run.')
   
   if (!data$.__enclos_env__$private$blockedCV) stop('Please use ".$spatialBlock" before using this function.')
   
@@ -226,12 +226,12 @@ blockedCV <- function(data, options = list(),
         
         if (!is.null(data$.__enclos_env__$private$speciesSpatial)) {
           
-        if (data$.__enclos_env__$private$speciesSpatial == 'replicate') ips <- fm_cprod(ips, data.frame(speciesSpatialGroup = 1:max(data$.__enclos_env__$private$speciesTable$index)))
+        if (data$.__enclos_env__$private$speciesSpatial == 'replicate') ips <- fmesher::fm_cprod(ips, data.frame(speciesSpatialGroup = 1:max(data$.__enclos_env__$private$speciesTable$index)))
         
         }
         if (!is.null(data$.__enclos_env__$private$Intercepts)) {
           
-          if (data$.__enclos_env__$private$speciesIntercepts) ips <- fm_cprod(ips, data.frame(specIntTermRem = 1:max(data$.__enclos_env__$private$speciesTable$index)))
+          if (data$.__enclos_env__$private$speciesIntercepts) ips <- fmesher::fm_cprod(ips, data.frame(specIntTermRem = 1:max(data$.__enclos_env__$private$speciesTable$index)))
           names(ips)[names(ips) == 'specIntTermRem'] <- data$.__enclos_env__$private$speciesName
         }
       } 

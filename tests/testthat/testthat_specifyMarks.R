@@ -25,10 +25,9 @@ PA$pointcov <- runif(n = nrow(PA))
 PA$binommark <- sample(x = 2:5, size = nrow(PA), replace = TRUE)
 PA$marktrial <- sample(x = 0:1, size = nrow(PA), replace = TRUE)
 PA$species <- sample(x = c('bird'), nrow(PA), replace = TRUE)
-mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
-                           max.edge = 2, crs = inlabru::fm_crs(projection))
-#iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
+mesh <- fmesher::fm_mesh_2d_inla(boundary = fmesher::fm_as_segm(SpatialPoly), 
+                           max.edge = 2, crs = fmesher::fm_crs(projection))
+iPoints <- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)
 
 coordnames <- c('long', 'lat')
 responseCounts <- 'count'
@@ -49,10 +48,9 @@ Pcount$species <- 'dog'
 Pcount$temp <- sample(c(1,2), nrow(Pcount), TRUE)
 
 if (requireNamespace("INLA")) {
-  mesh <<- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
-                              max.edge = 2, crs = inlabru::fm_crs(projection))
-  #iPoints <<- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-  iPoints <<- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
+  mesh <<- fmesher::fm_mesh_2d_inla(boundary = fmesher::fm_as_segm(SpatialPoly), 
+                              max.edge = 2, crs = fmesher::fm_crs(projection))
+  iPoints <<- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)
   
 }
 
@@ -173,7 +171,8 @@ test_that('specifyMarks initialize works as expected.', {
                                 marksintercepts = FALSE,
                                 ips = iPoints, copymodel = copyModel,
                                 spatial = 'shared', temporal = NULL, 
-                                intercepts = TRUE, temporalmodel = temporalModel), 'Mesh needs to be an inla.mesh object.')
+                                intercepts = TRUE, temporalmodel = temporalModel),
+               'Mesh needs to be an fm_mesh_2d object.')
   
   #No data spatial
   PO2 <- PO

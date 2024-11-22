@@ -1,7 +1,7 @@
 Package: PointedSDMs
 Type: Package
 Title: Fit Models Derived from Point Processes to Species Distributions using 'inlabru'
-Version: 2.1.2
+Version: 2.1.2.9000
 Authors@R: c(
   person(given = "Philip", family = "Mostert", email = "philip.s.mostert@ntnu.no",
           role = c("aut", "cre")),
@@ -19,12 +19,13 @@ Depends:
     R (>= 4.1),  
     stats,
     sf,
-    inlabru (>= 2.8.0),
+    inlabru (>= 2.12.0),
     R6 (>= 2.5),
     methods,
 Imports:
     terra,
     ggplot2,
+    fmesher,
     raster,
     sp (>= 1.4-5),
     R.devices,
@@ -36,7 +37,6 @@ Suggests:
     INLA (>= 21.08.31),
     rasterVis,
     ggmap,
-    ggpolypath,
     RColorBrewer,
     cowplot,
     knitr,
@@ -45,7 +45,7 @@ Suggests:
     spocc,
     covr
 Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 License: GPL (>= 3)
 VignetteBuilder: knitr
 Config/testthat/edition: 3

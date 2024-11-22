@@ -44,7 +44,7 @@ fitISDM <- function(data, options = list()) {
   if (!inherits(data, 'dataSDM') && !inherits(data, 'specifySpecies') && !inherits(data, 'specifyISDM') &&
       !inherits(data, 'specifyMarks')) stop('data needs to be either a specifySpecies, specifyISDM or specifyMarks object.')
   
-  if (is.null(data$.__enclos_env__$private$INLAmesh)) stop('An inla.mesh object is required before any model is run.')
+  if (is.null(data$.__enclos_env__$private$INLAmesh)) stop('An fm_mesh_2d object is required before any model is run.')
   
   data2ENV(data = data, env = environment())
   
@@ -135,8 +135,8 @@ fitISDM <- function(data, options = list()) {
                                                               samplers = data$.__enclos_env__$private$biasData[[bias]],
                                                               ips = data$.__enclos_env__$private$IPS,
                                                               domain = list(coordinates = data$.__enclos_env__$private$INLAmesh),
-                                                              include = c(paste0(bias, '_samplers_field'), paste0(bias,'_samplers'), data$.__enclos_env__$private$spatcovsNames))
-      
+                                                              include = c(paste0(bias, '_samplers_field'), paste0(bias,'_samplers'), data$.__enclos_env__$private$spatcovsNames),
+                                                              tag = paste0(bias, '_samplers'))
       
     }
     

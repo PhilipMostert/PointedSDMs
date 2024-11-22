@@ -29,10 +29,10 @@ test_that('startMarks is able to initialize a specifyMarks object as well as cor
   PA$binommark <- sample(x = 2:5, size = nrow(PA), replace = TRUE)
   PA$marktrial <- sample(x = 0:1, size = nrow(PA), replace = TRUE)
   PA$species <- sample(x = c('bird'), nrow(PA), replace = TRUE)
-  mesh <- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
-                             max.edge = 2, crs = inlabru::fm_crs(projection))
+  mesh <- fmesher::fm_mesh_2d_inla(boundary = fmesher::fm_as_segm(SpatialPoly), 
+                             max.edge = 2, crs = fmesher::fm_crs(projection))
   #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-  iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
+  iPoints <- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)
   
   coordnames <- c('long', 'lat')
   responseCounts <- 'count'
@@ -93,12 +93,13 @@ test_that('startMarks is able to initialize a specifyMarks object as well as cor
                          IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                          responsePA = responsePA, spatialCovariates = NULL, pointsSpatial = c('shared', 'copy')),'PointsSpatial needs to be one of: "shared", "copy", "individual", "correlate" or NULL.')
   
-  ##Test error: INLAmesh not an inla.mesh object
+  ##Test error: INLAmesh not an fm_mesh_2d object
   expect_error(startMarks(PO, PA, Projection = projection, Mesh = list(),
                           markNames = markNames,
                           markFamily = marksFamily,
                          IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
-                         responsePA = responsePA, spatialCovariates = NULL), 'Mesh needs to be a inla.mesh object.')
+                         responsePA = responsePA, spatialCovariates = NULL),
+               'Mesh needs to be a fm_mesh_2d object.')
   #Try with cov
   objCov <- startMarks(PO, PA, Projection = projection, Mesh = mesh,
                        markNames = markNames,

@@ -1138,7 +1138,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @param datasetName Name of the dataset for the samplers.
   #' @param Samplers A \code{Spatial*} object representing the integration domain.
   #' @return New samplers for a process.
-  #' @example
+  #' @examples
   #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
@@ -1179,7 +1179,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @param speciesIntercepts Prior distribution for precision parameter for the random species intercept term. Defaults to \code{INLA}'s default choice.
   #' @param speciesGroup Prior distribution for the precision parameter for the iid group model. Defaults to \code{INLA}'s default.
   #'   #' @return An updated component list. 
-  #' @example
+  #' @examples
   #' \dontrun{
   #'  if (requireNamespace('INLA')) {
   #'    
@@ -1360,7 +1360,7 @@ specifySpecies$set('private', 'originalNames', NULL)
 #' @description Initialize function for specifySpecies: used to store some compulsory arguments. Please refer to the wrapper function, \code{intModel} for creating new specifySpecies objects.
 #' @param data The points of the model.
 #' @param projection The projection of the data.
-#' @param Inlamesh An inla.mesh object.
+#' @param Inlamesh An \code{fm_mesh_2d} object.
 #' @param initialnames The names of the datasets if data is passed through intModel.
 #' @param responsecounts The name of the response variable for the count data.
 #' @param responsepa The name of the response variable for the presence absence data.
@@ -1388,7 +1388,7 @@ specifySpecies$set('public', 'initialize',  function(data, projection, Inlamesh,
   if (missing(projection)) stop('projection needs to be given.')
   if (missing(Inlamesh)) stop('Mesh needs to be given.')
   
-  if (!inherits(Inlamesh, 'inla.mesh')) stop('Mesh needs to be an inla.mesh object.')
+  if (!inherits(Inlamesh, 'fm_mesh_2d')) stop('Mesh needs to be an fm_mesh_2d object.')
   
   if (!inherits(projection, 'character')) stop('Projection needs to be a character object.')
   
@@ -1417,8 +1417,8 @@ specifySpecies$set('public', 'initialize',  function(data, projection, Inlamesh,
   
   if (is.null(ips)) {
     
-    if (!is.null(boundary)) ips <- st_transform(inlabru::fm_int(samplers = boundary, domain = Inlamesh), projection)
-    else ips <- st_transform(inlabru::fm_int(domain = Inlamesh), projection)
+    if (!is.null(boundary)) ips <- st_transform(fmesher::fm_int(samplers = boundary, domain = Inlamesh), projection)
+    else ips <- st_transform(fmesher::fm_int(domain = Inlamesh), projection)
     
     
   }
@@ -1426,7 +1426,7 @@ specifySpecies$set('public', 'initialize',  function(data, projection, Inlamesh,
   st_geometry(ips) <- 'geometry'
   
   if (!is.null(spatial)) {
-    if (spatial == 'correlate') ips <- fm_cprod(ips, data = data.frame(._dataset_index_var_. = 1:length(initialnames)))
+    if (spatial == 'correlate') ips <- fmesher::fm_cprod(ips, data = data.frame(._dataset_index_var_. = 1:length(initialnames)))
   }  
   private$IPS <- ips
   

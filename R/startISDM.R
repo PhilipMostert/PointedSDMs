@@ -6,8 +6,8 @@
 #' @param ... The datasets to be used in the model. Must come as either \code{sf} objects, or as a list of named \code{sf} objects. 
 #' @param spatialCovariates The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{SpatialRaster} object. Can be either \code{numeric}, \code{factor} or \code{character} data. Defaults to \code{NULL} which includes no spatial effects in the model.
 #' @param Projection The coordinate reference system used by both the spatial points and spatial covariates. Must be of class \code{character}.
-#' @param Mesh An \code{inla.mesh} object required for the spatial random fields and the integration points in the model (see \code{\link[INLA]{inla.mesh.2d}} from the \pkg{INLA} package for more details). 
-#' @param IPS The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[inlabru]{fm_int}} from the \pkg{inlabru} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} and \code{Boundary }objects.
+#' @param Mesh An \code{fm_mesh_2d} object required for the spatial random fields and the integration points in the model (see \code{\link[fmesher]{fm_mesh_2d_inla}} from the \pkg{fmesher} package for more details). 
+#' @param IPS The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[fmesher]{fm_int}} from the \pkg{fmesher} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} and \code{Boundary }objects.
 #' @param Boundary A \code{sf} object of the study area. If not missing, this object is used to help create the integration points.
 #' @param pointCovariates The non-spatial covariates to be included in the integrated model (for example, in the field of ecology the distance to the nearest road or time spent sampling could be considered). These covariates must be included in the same data object as the points, and do not necessarily need to be present in all datasets.
 #' @param Offset Name of the offset variable (class \code{character}) in the datasets. Defaults to \code{NULL}; if the argument is non-\code{NULL}, the variable name needs to be standardized across datasets (but does not need to be included in all datasets). The offset variable will be transformed onto the log-scale in the integrated model.
@@ -80,7 +80,7 @@ startISDM <- function(..., spatialCovariates = NULL,
   
   if (!inherits(Projection, 'character')) stop('Projection needs to be a character object.')
   
-  if (!inherits(Mesh, 'inla.mesh')) stop('Mesh needs to be a inla.mesh object.')
+  if (!inherits(Mesh, 'fm_mesh_2d')) stop('Mesh needs to be a fm_mesh_2d object.')
   
   if (!is.null(pointsSpatial)) {
     

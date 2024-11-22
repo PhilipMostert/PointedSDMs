@@ -29,14 +29,14 @@ test_that('startISDM is able to initialize a specifyISDM object as well as corre
   PA$pointcov <- runif(n = nrow(PA))
   PA$temp <- sample(x = 1:2, size = nrow(PA), replace = TRUE)
   if (requireNamespace("INLA")) {
-    mesh <<- INLA::inla.mesh.2d(boundary = INLA::inla.sp2segment(SpatialPoly), 
-                                max.edge = 2, crs = inlabru::fm_crs(projection))
+    mesh <<- fmesher::fm_mesh_2d_inla(boundary = fmesher::fm_as_segm(SpatialPoly), 
+                                max.edge = 2, crs = fmesher::fm_crs(projection))
     #iPoints <<- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-    iPoints <<- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
+    iPoints <<- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)
     
   }
   #iPoints <- inlabru::ipoints(samplers = SpatialPoly, domain = mesh)
-  iPoints <- inlabru::fm_int(samplers = SpatialPoly, domain = mesh)
+  iPoints <- fmesher::fm_int(samplers = SpatialPoly, domain = mesh)
   ##Make PA a data.frame object
 
   responseCounts <- 'count'
@@ -86,10 +86,11 @@ test_that('startISDM is able to initialize a specifyISDM object as well as corre
                          IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
                          responsePA = responsePA, spatialCovariates = NULL, pointsSpatial = c('shared', 'copy')),'PointsSpatial needs to be one of: "shared", "copy", "individual", "correlate" or NULL.')
   
-  ##Test error: INLAmesh not an inla.mesh object
+  ##Test error: INLAmesh not an fm_mesh_2d object
   expect_error(startISDM(PO, PA, Projection = projection, Mesh = list(),
                          IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
-                         responsePA = responsePA, spatialCovariates = NULL), 'Mesh needs to be a inla.mesh object.')
+                         responsePA = responsePA, spatialCovariates = NULL),
+               'Mesh needs to be a fm_mesh_2d object.')
   #Try with cov
   objCov <- startISDM(PO, PA, Projection = projection, Mesh = mesh,
                         IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 

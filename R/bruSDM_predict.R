@@ -11,7 +11,7 @@ setClass('bruSDM_predict')
 #' @param object A \code{bru_sdm} objects.
 #' @param data Data containing points of the map with which to predict on. May be \code{NULL} if one of \code{mesh} or \code{mask} is \code{NULL}.
 #' @param formula Formula to predict. May be \code{NULL} if other arguments: \code{covariates}, \code{spatial}, \code{intercepts} are not \code{NULL}.
-#' @param mesh An \code{inla.mesh} object.
+#' @param mesh An \code{fm_mesh_2d} object.
 #' @param mask A mask of the study background. Defaults to \code{NULL}.
 #' @param covariates Name of covariates to predict.
 #' @param temporal Make predictions for the temporal component of the model.
@@ -65,7 +65,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
                            marks = NULL, biasfield = FALSE, biasnames = NULL, predictor = FALSE,
                            fun = 'linear', format = 'sf', ...) {
   
-  if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an inla.mesh object is required.")
+  if (is.null(data) & is.null(mesh)) stop("Either data covering the entire study region or an fm_mesh_2d object is required.")
   
   ## if datasets !is.null but at least one not in model stop
   # else datasets <- all datasets in the model.
@@ -142,24 +142,24 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
     if (!is.null(mask)) {
       
-      data <- inlabru::fm_pixels(mesh, mask = mask, format = format)
+      data <- fmesher::fm_pixels(mesh, mask = mask, format = format)
       
     }   
-    else data <- inlabru::fm_int(mesh, format = format)
+    else data <- fmesher::fm_int(mesh, format = format)
   }
   
   if (speciespreds) {
   
   if (object[['species']][['speciesEffects']][['Intercepts']]) {
     
-    data <- fm_cprod(data, data.frame(speciesIndexREMOVE = 1:length(unique(unlist(object$species$speciesIn)))))
+    data <- fmesher::fm_cprod(data, data.frame(speciesIndexREMOVE = 1:length(unique(unlist(object$species$speciesIn)))))
     names(data)[names(data) == 'speciesIndexREMOVE'] <- object[['species']][['speciesVar']]
     
   }
     
   if (object$spatial$species == 'replicate') {
       
-  if (!object[['species']][['speciesVar']] %in% names(data)) data <- fm_cprod(data, data.frame(speciesSpatialGroup = 1:length(unique(unlist(object$species$speciesIn)))))
+  if (!object[['species']][['speciesVar']] %in% names(data)) data <- fmesher::fm_cprod(data, data.frame(speciesSpatialGroup = 1:length(unique(unlist(object$species$speciesIn)))))
   else data$speciesSpatialGroup <- data[[object[['species']][['speciesVar']]]]
     
   }
@@ -213,7 +213,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       time_data <- data.frame(seq_len(max(numeric_time)))
       names(time_data) <- time_variable
       
-      timeData <- inlabru::fm_cprod(data, data.frame(time_data))
+      timeData <- fmesher::fm_cprod(data, data.frame(time_data))
       names(timeData)[!names(timeData) %in% c('geometry', '.block')] <- c(time_variable, 'weight')  
       
       #bias
