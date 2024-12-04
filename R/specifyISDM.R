@@ -660,7 +660,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
         if (private$Spatial == 'individual') stop('pointsSpatial specified as "individual" in intModel. Please specify a dataset spatial effect to specify with datasetName.')
       
       
-      if (private$Spatial == 'shared') {
+      if (private$Spatial %in% c('shared', 'correlate')) {
         
         field_type <- 'sharedField'
         if (!Remove) index <- 'sharedField'
