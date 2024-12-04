@@ -42,29 +42,29 @@ install.packages('PointedSDMs')
 
 *PointedSDMs* includes a selection of functions used to streamline the construction of ISDMs as well and perform model cross-validation. The core functions of the package are:
 
-| Function name    | Function description                                                                                          |
-|------------------|------------------------------------------------------|
-| `startISDM()`    | Initialize and specify the components used in the integrated model.                                           |
-| `startSpecies()` | Initialize and specify the components used in the multi-species integrated model.                             |
-| `blockedCV()`    | Perform spatial blocked cross-validation.                                                                     |
-| `fitISDM()`      | Estimate and preform inference on the integrated model.                                                       |
-| `datasetOut()`   | Perform dataset-out cross-validation, which calculates the impact individual datasets have on the full model. |
+| Function name | Function description |
+|-------------------|-----------------------------------------------------|
+| `startISDM()` | Initialize and specify the components used in the integrated model. |
+| `startSpecies()` | Initialize and specify the components used in the multi-species integrated model. |
+| `blockedCV()` | Perform spatial blocked cross-validation. |
+| `fitISDM()` | Estimate and preform inference on the integrated model. |
+| `datasetOut()` | Perform dataset-out cross-validation, which calculates the impact individual datasets have on the full model. |
 
 The function `intModel()` produces an [R6](https://github.com/r-lib/R6) object, and as a result there are various *slot functions* available to further specify the components of the model. These *slot functions* include:
 
-| `intModel()` slot function   | Function description                                                                                                                                             |
-|-------------------|-----------------------------------------------------|
-| `` `.$help()` ``             | Show documentation for each of the slot functions.                                                                                                               |
-| `` `.$plot()` ``             | Used to create a plot of the available data. The output of this function is an object of class [`gg`](https://github.com/tidyverse/ggplot2).                     |
-| `` `.$addBias()` ``          | Add an additional spatial field to a dataset to account for sampling bias in unstructured datasets.                                                              |
-| `` `.$updateFormula()` ``    | Used to update a formula for a process. The idea is to start specify the full model with `startISDM()`, and then thin components per dataset with this function. |
-| `` `.$updateComponents()` `` | Change or add new components used by [inlabru](https://besjournals.onlinelibrary.wiley.com/doi/abs/10.1111/2041-210X.13168) in the integrated model.             |
-| `` `.$priorsFixed()` ``      | Change the specification of the prior distribution for the fixed effects in the model.                                                                           |
-| `` `.$specifySpatial()` ``   | Specify the spatial field in the model using penalizing complexity (PC) priors.                                                                                  |
-| `` `.$spatialBlock()` ``     | Used to specify how the points are spatially blocked. Spatial cross-validation is subsequently performed using `blockedCV()`.                                    |
-| `` `.$addSamplers()` ``      | Function to add an integration domain for the PO datasets.                                                                                                       |
-| `` `.$specifyRandom()` ``    | Specify the priors for the random effects in the model.                                                                                                          |
-| `` `.$changeLink()` ``       | Change the link function of a process.                                                                                                                           |
+| `intModel()` slot function | Function description |
+|--------------------|----------------------------------------------------|
+| `` `.$help()` `` | Show documentation for each of the slot functions. |
+| `` `.$plot()` `` | Used to create a plot of the available data. The output of this function is an object of class [`gg`](https://github.com/tidyverse/ggplot2). |
+| `` `.$addBias()` `` | Add an additional spatial field to a dataset to account for sampling bias in unstructured datasets. |
+| `` `.$updateFormula()` `` | Used to update a formula for a process. The idea is to start specify the full model with `startISDM()`, and then thin components per dataset with this function. |
+| `` `.$updateComponents()` `` | Change or add new components used by [inlabru](https://besjournals.onlinelibrary.wiley.com/doi/abs/10.1111/2041-210X.13168) in the integrated model. |
+| `` `.$priorsFixed()` `` | Change the specification of the prior distribution for the fixed effects in the model. |
+| `` `.$specifySpatial()` `` | Specify the spatial field in the model using penalizing complexity (PC) priors. |
+| `` `.$spatialBlock()` `` | Used to specify how the points are spatially blocked. Spatial cross-validation is subsequently performed using `blockedCV()`. |
+| `` `.$addSamplers()` `` | Function to add an integration domain for the PO datasets. |
+| `` `.$specifyRandom()` `` | Specify the priors for the random effects in the model. |
+| `` `.$changeLink()` `` | Change the link function of a process. |
 
 ## Example
 
@@ -130,7 +130,7 @@ To improve stability, we specify priors for the intercepts of the model using ``
 
 model$priorsFixed(Effect = 'Intercept',
                   mean.linear = 0, 
-                  prec.linear = 0.11)
+                  prec.linear = 1)
 
 ```
 
@@ -139,7 +139,7 @@ And *PC* priors for the spatial field using `` `.$specifySpatial()` ``:
 ```{r specifySpatial}
 
 model$specifySpatial(sharedSpatial = TRUE,
-                     prior.range = c(50, 0.1),
+                     prior.range = c(0.2, 0.1),
                      prior.sigma = c(0.1, 0.1))
 
 ```
@@ -148,8 +148,8 @@ We can then estimate the parameters in the model using the `fitISDM()` function:
 
 ```{r fitISDM, warning = FALSE, message = FALSE}
 
-modelRun <- fitISDM(model, options = list(control.inla = list(int.strategy = 'eb',
-                                                              diagonal = 0.1), 
+modelRun <- fitISDM(model, options = list(control.inla = 
+                                            list(int.strategy = 'eb'), 
                                           safe = TRUE))
 summary(modelRun)
 
