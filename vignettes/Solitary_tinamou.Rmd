@@ -11,6 +11,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
+  warning = FALSE,
+  message = FALSE,
   eval = FALSE
 )
 
@@ -48,7 +50,7 @@ covariates <- terra::rast(system.file('extdata/SolitaryTinamouCovariates.tif',
                                       package = "PointedSDMs"))
 
 datasets <- SolitaryTinamou$datasets
-region <- SolitaryTinamou$region
+region <- st_as_sf(SolitaryTinamou$region)
 mesh <- SolitaryTinamou$mesh
 
 ```
@@ -90,7 +92,7 @@ To set up an integrated species distribution model with `PointedSDMs`, we initia
 
 ```{r set up base model, warning = FALSE, message = FALSE}
 
-base <- startISDM(datasets, spatialCovariates = covariates, 
+base <- startISDM(datasets, spatialCovariates = covariates, Boundary = region,
                  Projection = projection, responsePA = 'Present', Offset = 'area',
                  Mesh = mesh, pointsSpatial = NULL)
 
@@ -127,13 +129,16 @@ summary(baseModel)
 
 #### Shared spatial field
 
-Spatial fields are fundamental in our spatial species distribution models, and so we include them in the model by setting `pointsSpatial = TRUE` in `startISDM`. Furthermore, we will remove the intercept terms by specifying `pointsIntercept = FALSE`
+Spatial fields are fundamental in our spatial species distribution models, and so we include them in the model by setting `pointsSpatial = TRUE` in `startISDM`. Furthermore, we will put a stronger prior on the intercept and fixed effects.
 
 ```{r set up model with fields, warning = FALSE, message = FALSE}
 
-fields <- startISDM(datasets, spatialCovariates = covariates,
-                   Projection = projection, Mesh = mesh, responsePA = 'Present', 
-                   pointsIntercept = FALSE)
+fields <- startISDM(datasets, spatialCovariates = covariates, Boundary = region,
+                   Projection = projection, Mesh = mesh, responsePA = 'Present')
+
+fields$priorsFixed(Effect = 'Intercept', prec.linear = 1)
+
+for (cov in names(covariates)) fields$priorsFixed(Effect = cov, prec.linear = 1)
 
 ```
 
@@ -141,16 +146,10 @@ To specify the spatial field in the model, we use the slot function `$specifySpa
 
 ```{r specifySpatial}
 
-fields$specifySpatial(sharedSpatial = TRUE, prior.range = c(50,0.01), 
-                      prior.sigma = c(0.1, 0.01))
-
-```
-
-We furthermore include an additional spatial field (deemed the *bias field*) for our citizen science *eBird* observations with the `$addBias` slot function.
-
-```{r addBias}
-
-fields$addBias('eBird')
+fields$specifySpatial(sharedSpatial = TRUE, 
+                      constr = TRUE,
+                      prior.range = c(3, 0.1), 
+                      prior.sigma = c(1, 0.1))
 
 ```
 
@@ -158,8 +157,8 @@ Finally we run the integrated model, again with `fitISDM` but this time we speci
 
 ```{r run fields model, warning = FALSE, message = FALSE}
 
-fieldsModel <- fitISDM(fields, options = list(control.inla = list(int.strategy = 'eb',
-                                                                  diagonal = 0.05)))
+fieldsModel <- fitISDM(fields, options = list(control.inla = 
+                                                list(int.strategy = 'eb')))
 summary(fieldsModel)
 
 ```
@@ -170,24 +169,43 @@ If we would like to correlate the spatial fields across the datasets , we can sp
 
 ```{r correlate model}
 
-correlate <- startISDM(datasets,
+correlate <- startISDM(datasets, Boundary = region,
                  Projection = projection, Mesh = mesh, 
+                 spatialCovariates = covariates$Altitude,
                  responsePA = 'Present', 
                  pointsSpatial = 'correlate')
 
-correlate$specifySpatial(sharedSpatial = TRUE, prior.range = c(50,0.01), 
-                      prior.sigma = c(0.1, 0.01))
+correlate$priorsFixed(Effect = 'Intercept', prec.linear = 1)
+
+correlate$priorsFixed(Effect = 'Altitude', prec.linear = 1)
+
+correlate$specifySpatial(sharedSpatial = TRUE, 
+                         prior.range = c(3, 0.1), 
+                         prior.sigma = c(1, 0.1))
 
 correlate$changeComponents()
 
 ```
 
+We furthermore include an additional spatial field (deemed the *bias field*) for our citizen science *eBird* observations with the `$addBias` slot function.
+
+```{r addBias}
+
+correlate$addBias('eBird')
+
+correlate$specifySpatial(Bias = TRUE,
+                      prior.range = c(2, 0.1), 
+                      prior.sigma = c(0.1, 0.1))
+
+```
+
+And then estimating the model:
+
 ```{r run correlate model}
 
 correlateModel <- fitISDM(correlate, 
                           options = list(control.inla = 
-                                           list(int.strategy = 'eb',
-                                                diagonal = 0.1)))
+                                           list(int.strategy = 'eb')))
 summary(correlateModel)
 
 ```
@@ -198,7 +216,7 @@ If we wanted to make predictions of the shared spatial random field across the m
 
 ```{r predict spatial, warning = FALSE, message = FALSE}
 
-spatial_predictions <- predict(fieldsModel, mesh = mesh,
+spatial_predictions <- predict(correlateModel, mesh = mesh,
                        mask = region, 
                        spatial = TRUE,
                        fun = 'linear')
@@ -217,7 +235,7 @@ However if we wanted to make predictions of the bias field, we would do this by 
 
 ```{r predict bias, warning = FALSE, message = FALSE}
 
-bias_predictions <- predict(fieldsModel, 
+bias_predictions <- predict(correlateModel, 
                     mesh = mesh, 
                     mask = region, 
                     bias = TRUE,
@@ -237,7 +255,7 @@ The last function of interest is `datasetOut`, which removes a dataset out of th
 
 ```{r datasetOut, warning = FALSE, message = FALSE}
 
-eBird_out <- datasetOut(model = fieldsModel, dataset = 'eBird')
+eBird_out <- datasetOut(model = correlateModel, dataset = 'eBird')
 
 ```
 
