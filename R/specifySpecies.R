@@ -295,11 +295,10 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
     
     if (!is.null(private$temporalName)) {
       
-      if (shareModel) private$Components <- c(private$Components, paste0('sharedBias_biasField(main = geometry, model = sharedBias_bias_field, group =', private$temporalName,', ngroup = ', length(unique(unlist(private$temporalVars))),', control.group = ', temporalModel,')'))
-      
       temporalModel <- deparse1(temporalModel)
       
-      private$Components <- c(private$Components, paste0(datasetNames ,'_biasField(main = geometry, model = ', datasetNames, '_bias_field, group = ', private$temporalName, ', ngroup = ', length(unique(unlist(private$temporalVars))),', control.group = ', temporalModel,')'))
+      if (shareModel) private$Components <- c(private$Components, paste0('sharedBias_biasField(main = geometry, model = sharedBias_bias_field, group =', private$temporalName,', ngroup = ', length(unique(unlist(private$temporalVars))),', control.group = ', temporalModel,')'))
+      else private$Components <- c(private$Components, paste0(datasetNames ,'_biasField(main = geometry, model = ', datasetNames, '_bias_field, group = ', private$temporalName, ', ngroup = ', length(unique(unlist(private$temporalVars))),', control.group = ', temporalModel,')'))
       
       
     }
