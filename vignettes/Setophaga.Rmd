@@ -15,7 +15,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = FALSE
+  eval = FALSE,
+  fig.width=8, fig.height=5
 )
 
 ```
@@ -32,7 +33,7 @@ A major handicap to integrated modeling lies in the fact that the tools required
 
 In light of this impediment to the field of integrated modelling, we decided to make *PointedSDMs*, an *R* package to help simplify the modelling process of integrated species distribution models (ISDMs) for ecologists. It does so by using the *INLA* framework [@rue2009approximate] to approximate the models and by constructing wrapper functions around those provided in the *R* package, *inlabru* [@bachl2019inlabru].
 
-This *R markdown* file illustrates an example of modelling an ISDM with *PointedSDMs,* using five disparate datasets containing species *Setophaga* collected around Pennsylvania state (United States of America). The first part of this file contains a brief introduction to the statistical model used in ISDMs, as well as an introduction to the included functions in the package. The second part of this file uses *PointedSDMs* to run the ISDM for the provided data. We note that, for this particular vignette, no inference was made due to computational intensity of the model. However the *R* script and data are provided below so that the user may carry out inference.
+This *R markdown* file illustrates an example of modelling an ISDM with *PointedSDMs,* using three disparate datasets containing information regarding *Setophaga,* collected around Pennsylvania state (United States of America). The first part of this file contains a brief introduction to the statistical model used in ISDMs, as well as an introduction to the included functions in the package. The second part of this file uses *PointedSDMs* to run the ISDM for the provided data. We note that, for this particular vignette, no inference was made due to computational intensity of the model. However the *R* script and data are provided below so that the you may carry out inference.
 
 ```{r Install PointedSDMs, warning = FALSE, message = FALSE, eval = TRUE}
 
@@ -89,7 +90,7 @@ args(fitISDM)
 
 ```
 
-Spatial blocked cross-validation may be performed using the `blockedCV` function -- which iteratively calculates and averages the deviance information criteria (DIC) for models run without data from the selected spatial block. Before this function is used, `.$spatialBlock()` from the object produced by one of the `start*` functions is required in order to specify how the data should be spatially blocked (see below for an example).
+Spatial blocked cross-validation may be performed using the `blockedCV` function. This function has two types of cross-validation: 1) iteratively calculate and averge the deviance information criteria (DIC) for models run without data from the selected spatial block 2) Estimate predictions for a specified dataset in the left out fold, and use these predictions as an offset in a new model to calculate a cross-validation score. Before this function is used, `.$spatialBlock()` from the object produced by one of the `start*` functions is required in order to specify how the data should be spatially blocked (see below for an example).
 
 ```{r args for blockedCV}
 
@@ -122,13 +123,12 @@ library(inlabru)
 library(USAboundaries)
 library(sf)
 library(blockCV)
-library(ggmap)
+library(ggplot2)
 library(sn)
 library(terra)
 library(RColorBrewer)
 library(cowplot)
 library(knitr)
-library(kableExtra)
 library(dplyr)
 library(spocc)
 
@@ -150,7 +150,7 @@ PA <- st_transform(PA, proj)
 
 #### Species occurrence data
 
-For our analysis, we used five datasets containing the geocoded locations of our studied species'. The first three of these datasets are present only datasets obtained via *eBird* through the *spocc* package [@spocc], which is a toolkit used to obtain species' observation data from a selection of popular online data repositories (*GBIF*, *Vernet*, *BISON*, *iNaturalist* and *eBird*). These data were obtained using the following script:
+For our analysis, we used three datasets containing the geocoded locations of our studied species'. The first is a presence-only dataset obtained via *eBird* through the *spocc* package [@spocc], which is a toolkit used to obtain species' observation data from a selection of popular online data repositories (*GBIF*, *Vernet*, *BISON*, *iNaturalist* and *eBird*). These data were obtained using the following script:
 
 ```{r, get_eBird}
 
@@ -193,24 +193,29 @@ dataSets[['BBS']] <- SetophagaData$BBS
 
 ```
 
-|   **Dataset name**   |   Sampling protocol    | **Number of observations** | **Species name** |                                                                   **Source**                                                                   |
-|:----------:|:----------:|:----------:|:----------:|:------------------------:|
-|        *BBS*         |         Counts         |             45             |  *Caerulescens*  | [North American Breeding Bird Survey](https://www.pwrc.usgs.gov/bbs/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
-|        *BBA*         | Detection/nondetection |            5165            |  *Caerulescens*  |  [Pennsylvania Breeding Bird Atlas](https://ebird.org/atlaspa/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}  |
-| *eBird_caerulescens* |      Present only      |            264             |  *Caerulescens*  |                    [eBird](https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                    |
-|   *eBird_magnolia*   |      Present only      |            354             |    *Magnolia*    |                    [eBird](https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                    |
-|    *eBird_fusca*     |      Present only      |            217             |     *Fusca*      |                    [eBird](https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"}                    |
+| **Dataset name** | Sampling protocol | **Number of observations** | **Species name** | **Source** |
+|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|
+| *BBS* | Counts | 45 | *Caerulescens* | [North American Breeding Bird Survey](https://www.pwrc.usgs.gov/bbs/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
+| *BBA* | Detection/nondetection | 5165 | *Caerulescens* | [Pennsylvania Breeding Bird Atlas](https://ebird.org/atlaspa/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
+| *eBird_caerulescens* | Present only | 264 | *Caerulescens* | [eBird](https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
+| *eBird_magnolia* | Present only | 354 | *Magnolia* | [eBird](https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
+| *eBird_fusca* | Present only | 217 | *Fusca* | [eBird](https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
 
 Table 1: Table illustrating the different datasets used in the analysis.
 
 #### Covariate data
 
-Species distribution models study the relationship between our in-situ species observations and the underlying environment, and so in line with the study conducted by @isaac2020data, we considered two covariates: *elevation*, describing the height above sea level (meters) and *canopy*, describing the proportion of tree canopy covered in the area. These two covariates were obtained from the @hollister2017elevatr and @FEDdata R packages respectively. The script to obtain these spatial covariates is provided in the same github repository as the species occurrence data above; the only thing we did differently was convert the covariates to a *spatRaster* object.
+Species distribution models study the relationship between our in-situ species observations and the underlying environment, and so in line with the study conducted by @isaac2020data, we considered two covariates: *elevation*, describing the height above sea level (meters) and *canopy*, describing the proportion of tree canopy covered in the area. Furthermore, we standardize these covariates to get them onto the same scale. These two covariates were obtained from the @hollister2017elevatr and @FEDdata R packages respectively.
 
 ```{r Covariate data, message = FALSE, warning = FALSE}
 
-covariates <- scale(terra::rast(system.file('extdata/SetophagaCovariates.tif', 
-                                      package = "PointedSDMs")))
+covariates <- terra::rast(system.file('extdata/SetophagaCovariates.tif', 
+                                      package = "PointedSDMs"))
+
+values(covariates$PA_lc_NLCD_2011_Tree_Canopy_L48_nlcd)[is.na(values(covariates$PA_lc_NLCD_2011_Tree_Canopy_L48_nlcd))] <- 0
+
+covariates <- scale(covariates)
+
 names(covariates) <- c('elevation', 'canopy')
 
 plot(covariates)
@@ -219,13 +224,13 @@ plot(covariates)
 
 #### Additional objects
 
-The *R-INLA* package requires a Delaunay triangulated mesh used to approximate our spatial random fields, which is created by supplying the `max.edge`, `offset` and `cutoff` arguments as well as our *SpatialPolygons* map of Pennsylvania to the `fm_mesh_2d_inla` function. With this mesh, `startISDM` will create integration points required by our model using *fmesher*'s `fm_int` function.
+The *R-INLA* package requires a Delaunay triangulated mesh used to approximate our spatial random fields, which is created by supplying the `max.edge`, `offset` and `cutoff` arguments as well as our *sf* map of Pennsylvania to the `fm_mesh_2d_inla` function. With this mesh, `startISDM` will create integration points required by our model using *fmesher*'s `fm_int` function.
 
 ```{r Mesh, warning = FALSE, message = FALSE, fig.width=8, fig.height=5}
 
 mesh <- fm_mesh_2d_inla(boundary = inla.sp2segment(PA), 
                         cutoff = 0.2 * 5,
-                        max.edge = c(0.1, 0.24) * 40, #120
+                        max.edge = c(0.1, 0.24) * 80, #40 #120
                         offset = c(0.1, 0.4) * 100,
                         crs = st_crs(proj))
 
@@ -243,8 +248,8 @@ We furthermore define model options which will be used for all runs in this vign
 ```{r modelOptions}
 
 modelOptions <- list(control.inla = 
-                       list(int.strategy = 'eb',
-                            diagonal = 0.1), 
+                       list(int.strategy = 'ccd',
+                            cmin = 0), 
                             verbose = TRUE,
                             safe = TRUE)
 
@@ -266,7 +271,7 @@ caerulescensModel <- startISDM(caerulescensData, Boundary = PA,
                           spatialCovariates = covariates,
                           Formulas = 
                           list(
-          covariateFormula = ~ elevation + I(elevation^2) + canopy + I(canopy^2))
+          covariateFormula = ~ elevation*canopy)
                              )
 
 ```
@@ -299,8 +304,9 @@ When conducting Bayesian analysis, the choice of prior distribution is imperativ
 ```{r specifySpatial}
 
 caerulescensModel$specifySpatial(sharedSpatial = TRUE,
-                                 prior.sigma = c(1, 0.1),
-                                 prior.range = c(15, 0.1))
+                                 constr = TRUE,
+                                 prior.sigma = c(0.1, 0.05),
+                                 prior.range = c(200, 0.1))
 
 ```
 
@@ -308,13 +314,13 @@ caerulescensModel$specifySpatial(sharedSpatial = TRUE,
 
 Presence only datasets (such as our *eBird* data) are often noted to contain numerous biases, which in turn can heavily skew results obtained from our model. A common approach to account for these biases is by using a variable in the model such as sampling effort (some examples include: distance traveled, number of observations per visit, duration spent observing). However in the absence of such variables, running a second spatial field in the model can improve performance of the integrated model [@simmonds2020more]. To add a second spatial field to our model, we use the `.$addBias` function, which is part of the `specifyISDM` object created above.
 
-```{r bias fields, eval = FALSE}
+```{r bias fields, eval = TRUE}
 
 caerulescensModel$addBias(datasetNames = 'eBird_caerulescens')
 
 caerulescensModel$specifySpatial(Bias = TRUE, 
-                                 prior.sigma = c(1, 0.1),
-                                 prior.range = c(15, 0.1))
+                                 prior.sigma = c(0.1, 0.05),
+                                 prior.range = c(120, 0.1))
 
 ```
 
@@ -326,7 +332,7 @@ Suppose we knew *a priori* what the mean and precision values of one of the fixe
 
 caerulescensModel$priorsFixed(Effect = 'Intercept',
                               mean.linear = 0, 
-                              prec.linear = 0.1)
+                              prec.linear = 1)
 
 ```
 
@@ -352,6 +358,7 @@ caerulescensModel$specifyRandom(copyModel = list(beta = list(fixed = TRUE)))
 
 caerulescensModel$changeComponents()
 
+
 ```
 
 ##### `fitISDM`
@@ -363,13 +370,15 @@ The integrated model is easily run with the `fitISDM` function as seen below by 
 caerulescensEst <- fitISDM(data = caerulescensModel, 
                    options = modelOptions)
 
+summary(caerulescensEst)
+
 ```
 
 ###### `predict` and `plot`
 
-A significant part of SDMs is creating prediction maps to understand the species' spread. Predictions of the integrated SDM's from `fitISDM` are made easy using the `predict` function. By supplying the relevant components, the predict function will create the formula required by *inlabru*'s `predict` function to make predictive maps. In this example, we made predictions for the spatial fields of the species, on the linear scale using 1000 samples.
+A significant part of SDMs is creating prediction maps to understand the species' spread. Predictions of the integrated SDM's from `fitISDM` are made easy using the `predict` function. By supplying the relevant components, the predict function will create the formula required by *inlabru*'s `predict` function to make predictive maps. In this example, we made predictions for the spatial fields of the species, on the linear scale using 100 samples.
 
-*PointedSDMs* also provides a general plotting function to plot the maps using the predicted values obtained in the `predict` function. The plot below shows the predictions of the three spatial fields of our species.
+*PointedSDMs* also provides a general plotting function to plot the maps using the predicted values obtained in the `predict` function. The plot below shows the predictions of the two spatial fields of our species.
 
 ```{r predict and plot}
 
@@ -377,9 +386,18 @@ caerulescensPredictions <- predict(caerulescensEst,
                                    data = fm_pixels(mesh = mesh,
                                                     mask = PA),
                                    spatial = TRUE,
-                                   n.samples = 1000)
+                                   n.samples = 100)
 
 plot(caerulescensPredictions, variable = c('mean', 'sd'))
+
+caerulescensBias <- predict(caerulescensEst,
+                                   data = fm_pixels(mesh = mesh,
+                                                    mask = PA),
+                                   bias = TRUE,
+                                   n.samples = 100)
+
+plot(caerulescensBias, variable = c('mean', 'sd'))
+
 
 
 ```
@@ -392,7 +410,8 @@ For this example, we use the default argument choices which include: a model wit
 
 ```{r startSpeciesStart}
 
-speciesModel <- startSpecies(dataSets, Boundary = PA, pointsSpatial = NULL,
+speciesModel <- startSpecies(dataSets, Boundary = PA, 
+                             pointsSpatial = NULL,
                              Projection = proj, Mesh = mesh,
                              responsePA = 'NPres', responseCounts = 'Counts',
                              spatialCovariates = covariates, 
@@ -410,24 +429,28 @@ speciesModel$help()
 
 ###### Specifying the model
 
-Like the single-species model provided above, we specify the priors for the fixed and random effects using `.$specifySpatial` , `.$priorsFixed` and `.$specifyRandom`. In `.$specifyRandom`, the argument `speciesGroup` is used to change the prior for the precision (inverse variance) of group model for the spatial effects, and `speciesIntercepts` is used to change the prior for the precision for the random intercept term. For both of these parameters, we choose *pc priors.*
+Like the single-species model provided above, we specify the priors for the fixed and random effects using `.$specifySpatial` , `.$priorsFixed` and `.$specifyRandom`. In `.$specifyRandom`, the argument `speciesGroup` is used to change the prior for the precision (inverse variance) of group model for the spatial effects, and `speciesIntercepts` is used to change the prior for the precision for the random intercept term. For both of these parameters, we choose to fix the parameters to variance 1 for simplicity.
 
 ```{r specifySpecies}
 
-speciesModel$specifySpatial(Species  = TRUE,
-                            prior.sigma = c(1, 0.1),
-                            prior.range = c(15, 0.1))
+speciesModel$specifySpatial(Species = TRUE,
+                            constr = TRUE,
+                            prior.sigma = c(0.01, 0.05),
+                            prior.range = c(100, 0.1))
 
 speciesModel$priorsFixed(Effect = 'Intercept',
-                         mean.linear = 0, 
-                         prec.linear = 0.1)
+                         mean.linear = 0,
+                         prec.linear = 1)
 
 speciesModel$specifyRandom(speciesGroup = list(model = "iid", 
-                                               hyper = list(prec = list(prior = "pc.prec",
-                                               param = c(0.1, 0.1)))),
-                           speciesIntercepts = list(prior = 'pc.prec',
-                                                    param = c(0.1, 0.1)))
-
+                                               hyper = list(
+                                                 prec = list(
+                                                 initial = log(1),
+                                                 fixed = TRUE
+                                                 ))),
+                           speciesIntercepts = list(
+                             initial = log(1), fixed  = TRUE
+                           ))
 
 ```
 
@@ -437,8 +460,12 @@ We may then estimate the model using `fitISDM`.
 
 ```{r fitSpecies}
 
+modelOptionsSpecies <- modelOptions
+modelOptionsSpecies$control.inla$h <- 5e-4
+modelOptionsSpecies$control.inla$tolerance <- 5e-5
+
 speciesEst <- fitISDM(data = speciesModel, 
-                      options = modelOptions)
+                      options = modelOptionsSpecies)
 
 summary(speciesEst)
 
@@ -452,7 +479,7 @@ speciesPredictions <- predict(speciesEst,
                                    data = fm_pixels(mesh = mesh,
                                                     mask = PA),
                                    spatial = TRUE,
-                                   n.samples = 1000)
+                                   n.samples = 100)
 
 plot(speciesPredictions)
 
@@ -464,11 +491,12 @@ plot(speciesPredictions)
 
 ###### `.$spatialBlock`
 
-`.$spatialBlock` is used to set up spatial blocked cross-validation for the model by assigning each point in the datasets a block based on where the point is located spatially. For this example, we chose four blocks (`k=2`) for our model, based around a 2x2 grid (`rows = 2, cols = 2`). See the figure below for an illustration of the spatial block: the amount of data within each block appears reasonably equal.
+`.$spatialBlock` is used to set up spatial blocked cross-validation for the model by assigning each point in the datasets a block based on where the point is located spatially. For this example, we chose four blocks (`k=4`) for our model, based around a 50x50 grid (`rows = 50, cols = 50`). See the figure below for an illustration of the spatial block: the amount of data within each block appears reasonably equal.
 
 ```{r spatialBlock, warning = FALSE, message = FALSE,  fig.width=8, fig.height=5}
 
-caerulescensModel$spatialBlock(k = 2, rows_cols = c(2, 2), plot = TRUE) + theme_bw()
+caerulescensModel$spatialBlock(k = 4, rows_cols = c(50, 50), 
+                               plot = TRUE, seed = 123) + theme_bw()
 
 ```
 
@@ -476,7 +504,7 @@ caerulescensModel$spatialBlock(k = 2, rows_cols = c(2, 2), plot = TRUE) + theme_
 
 The blocked model may then be estimated with `blockedCV`. Note that this will estimate `k` models, so it may take a while to complete.
 
-```{r blockedCV, warning = FALSE, eval = FALSE}
+```{r blockedCV, warning = FALSE, eval = TRUE}
 
 spatialBlocked <- blockedCV(data = caerulescensModel, 
                             options = modelOptions)
@@ -489,21 +517,27 @@ spatialBlocked
 
 ```
 
-More so, we can compare the cross-validation score from this model to one without the shared spatial effect (specified with `pointsSpatial = FALSE` in `startISDM`).
+More so, we can compare the cross-validation score from this model to one without the shared spatial effect (specified with `pointsSpatial = NULL` in `startISDM`).
 
 ```{r No fields model, message = FALSE, warning = FALSE}
 
-no_fields <- startISDM(dataSets, 
+no_fields <- startISDM(caerulescensData, 
                       pointsSpatial = NULL,
+                      Boundary = PA,
                       Projection = proj, Mesh = mesh,
                       responsePA = 'NPres', responseCounts = 'Counts',
-                      spatialCovariates = covariates)
+                      spatialCovariates = covariates,
+                      Formulas = 
+                          list(
+          covariateFormula = ~ elevation*canopy)
+          )
 
-no_fields$spatialBlock(k = 2, rows_cols = c(2, 2), plot = TRUE) + theme_bw()
+no_fields$spatialBlock(k = 4, rows_cols = c(50, 50), 
+                       plot = TRUE, seed = 123) + theme_bw()
 
 ```
 
-```{r spatialBlocked_no_fields, eval = FALSE}
+```{r spatialBlocked_no_fields, eval = TRUE}
 
 spatialBlocked_no_fields <- blockedCV(data = no_fields, 
                                       options = modelOptions)
@@ -518,43 +552,13 @@ spatialBlocked_no_fields
 
 Based on the DIC scores, we conclude that the model with the shared spatial field provides a better fit of the data.
 
-```{r Summary of model, message = FALSE, warning = FALSE, echo = TRUE,fig.width=7, fig.height=5}
-
-results_plot <- joint_model$summary.fixed %>%
-                mutate(species = gsub('_.*$','',
-                                      row.names(joint_model$summary.fixed))) %>%
-                mutate(coefficient = row.names(joint_model$summary.fixed))
-
-
-coefficient_plot <- ggplot(results_plot, aes(x = coefficient, y = mean)) +
-                    geom_hline(yintercept = 0, colour = grey(0.25), lty = 2) +
-                    geom_point(aes(x = coefficient, 
-                                   y = mean)) + 
-                    geom_linerange(aes(x = coefficient, 
-                                       ymin = `0.025quant`,
-                                       ymax = `0.975quant`,
-                                       col = species),
-                                       lwd = 1) +
-                                       theme_bw() +
-                    scale_colour_manual(values = c('#003f5c', '#bc5090','#ffa600')) +
-                    theme(legend.position="bottom",
-                    plot.title = element_text(hjust = 0.5)) +
-                    ggtitle("95% credibility intervals of the fixed effects\n
-                            for the three studied species") +
-                    labs(x = 'Variable', y = 'Coefficient value') +
-                    coord_flip()
-
-coefficient_plot
-
-```
-
 ##### `datasetOut`
 
 *PointedSDMs* also includes the function `datasetOut`, which iteratively omits one dataset (and its associated marks) out of the full model. For example, we can calculate the effect on the other variables by leaving out the dataset *BBA*, which contributes the most occurrences used in our joint-likelihood model by a significant amount.
 
 Furthermore, by setting `predictions = TRUE` we are able to calculate some cross-validation score by leaving out the selected dataset. This score is calculated by predicting the covariate values of the left-out using the reduced model (i.e the model with the dataset left out), using the predicted values as an offset in a new model, and then finding the difference between the marginal-likelihood of the full model (i.e the model with all the datasets considered) and the marginal-likelihood of the offset model.
 
-```{r Leave one out, message = FALSE, warning = FALSE, eval = FALSE}
+```{r Leave one out, message = FALSE, warning = FALSE, eval = TRUE}
 
 dataset_out <- datasetOut(model = caerulescensEst,
                           dataset = "BBA",

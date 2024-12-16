@@ -15,7 +15,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = FALSE,
+  eval = TRUE,
   warning = FALSE,
   message = FALSE
 )
@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 Real datasets are often fairly complex, and information on the species other than their location data may also be collected. Additional information could be the length of a specific plant, or the weight of a group of mammals, something which describes the underlying characteristics of the studied species'. Using such information results in a *marked point process (*see @illian2012toolbox for an overview); and this framework may be incorporated in the *PointedSDMs* R package*.*
 
-This vignette gives an illustration on how include marks in the model framework, by using data on Eucalyptus globulus (common name: blue gum) on the *Koala Conservation Center on Philip Island* (Australia), collected by a community group between 1993 and 2004 [@moore2010palatability]. The dataset contains a multitude of different marks, however for this study we will be focusing on two: *food*, which is some index of the food value of the tree (calculated as dry matter intake multiplied by foliage palatability), and *koala*, describing the number of koala visits to each tree. No inference of the model is completed in this vignette due to computational intensity of the model. However the *R* script and data are provided below so that the user may carry out inference.
+This vignette gives an illustration on how include marks in the model framework, by using data on *Eucalyptus globulus* (common name: blue gum) on the *Koala Conservation Center on Philip Island* (Australia), collected by a community group between 1993 and 2004 [@moore2010palatability]. The dataset contains a multitude of different marks, however for this study we will be focusing on two: *food*, which is some index of the food value of the tree (calculated as dry matter intake multiplied by foliage palatability), and *koala*, describing the number of koala visits to each tree. No inference of the model is completed in this vignette due to computational intensity of the model. However the *R* script and data are provided below so that the user may carry out inference.
 
 ```{r, setup}
 library(spatstat)
@@ -45,7 +45,7 @@ boundary <- Koala$boundary
 
 ```
 
-```{r, clean_data, echo = FALSE,fig.width=7, fig.height=5}
+```{r, clean_data, echo = TRUE,fig.width=7, fig.height=5}
 
 proj <- "+init=epsg:27700"
 
@@ -94,6 +94,12 @@ points$specifySpatial(sharedSpatial = TRUE,
 
 pointsModel <- fitISDM(points, options = list(control.inla = list(int.strategy = 'eb')))
 
+```
+
+And predict and plot:
+
+```{r p and p, fig.width=7, fig.height=5}
+
 pointsPredictions <- predict(pointsModel, mask = boundary,
                              mesh = mesh, predictor = TRUE)
 
@@ -129,6 +135,11 @@ marks$specifySpatial(Mark = 'food',
 
 marksModel <- fitISDM(marks, options = list(control.inla = list(int.strategy = 'eb'),
                                              safe = TRUE))
+```
+
+And plotting the results
+
+```{r, p and p 2,fig.width=7, fig.height=5}
 
 foodPredictions <- predict(marksModel, mask = boundary, 
                            mesh = mesh, marks = 'food', spatial = TRUE,
@@ -139,6 +150,7 @@ koalaPredictions <- predict(marksModel, mask = boundary,
 
 plot(foodPredictions, variable = c('mean', 'sd'))
 plot(koalaPredictions, variable = c('mean', 'sd'))
+
 ```
 
 For the second mark model we only include the *food* mark, but this time we use a *log-linear* model with additive Gaussian noise. This is specified using the `.$updateFormula` slot function, and then by adding the scaling component to the *inlabru* components with the `.$addComponents` slot function to ensure that it is actually estimated. Moreover we assume *penalizing complexity* priors for the two spatial effects, as well as specify *bru_max_iter* in the *options* argument to keep the time to estimate down.
