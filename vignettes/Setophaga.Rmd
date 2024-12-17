@@ -194,7 +194,7 @@ dataSets[['BBS']] <- SetophagaData$BBS
 ```
 
 | **Dataset name** | Sampling protocol | **Number of observations** | **Species name** | **Source** |
-|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|
+|:--:|:--:|:--:|:--:|:--:|
 | *BBS* | Counts | 45 | *Caerulescens* | [North American Breeding Bird Survey](https://www.pwrc.usgs.gov/bbs/){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
 | *BBA* | Detection/nondetection | 5165 | *Caerulescens* | [Pennsylvania Breeding Bird Atlas](https://ebird.org/atlaspa/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
 | *eBird_caerulescens* | Present only | 264 | *Caerulescens* | [eBird](https://ebird.org/home){style="text-decoration: underline; color: rgb(252, 111, 9) !important;"} |
@@ -314,7 +314,7 @@ caerulescensModel$specifySpatial(sharedSpatial = TRUE,
 
 Presence only datasets (such as our *eBird* data) are often noted to contain numerous biases, which in turn can heavily skew results obtained from our model. A common approach to account for these biases is by using a variable in the model such as sampling effort (some examples include: distance traveled, number of observations per visit, duration spent observing). However in the absence of such variables, running a second spatial field in the model can improve performance of the integrated model [@simmonds2020more]. To add a second spatial field to our model, we use the `.$addBias` function, which is part of the `specifyISDM` object created above.
 
-```{r bias fields, eval = TRUE}
+```{r bias fields}
 
 caerulescensModel$addBias(datasetNames = 'eBird_caerulescens')
 
@@ -504,7 +504,7 @@ caerulescensModel$spatialBlock(k = 4, rows_cols = c(50, 50),
 
 The blocked model may then be estimated with `blockedCV`. Note that this will estimate `k` models, so it may take a while to complete.
 
-```{r blockedCV, warning = FALSE, eval = TRUE}
+```{r blockedCV, warning = FALSE}
 
 spatialBlocked <- blockedCV(data = caerulescensModel, 
                             options = modelOptions)
@@ -537,7 +537,7 @@ no_fields$spatialBlock(k = 4, rows_cols = c(50, 50),
 
 ```
 
-```{r spatialBlocked_no_fields, eval = TRUE}
+```{r spatialBlocked_no_fields}
 
 spatialBlocked_no_fields <- blockedCV(data = no_fields, 
                                       options = modelOptions)
@@ -558,7 +558,7 @@ Based on the DIC scores, we conclude that the model with the shared spatial fiel
 
 Furthermore, by setting `predictions = TRUE` we are able to calculate some cross-validation score by leaving out the selected dataset. This score is calculated by predicting the covariate values of the left-out using the reduced model (i.e the model with the dataset left out), using the predicted values as an offset in a new model, and then finding the difference between the marginal-likelihood of the full model (i.e the model with all the datasets considered) and the marginal-likelihood of the offset model.
 
-```{r Leave one out, message = FALSE, warning = FALSE, eval = TRUE}
+```{r Leave one out, message = FALSE, warning = FALSE}
 
 dataset_out <- datasetOut(model = caerulescensEst,
                           dataset = "BBA",

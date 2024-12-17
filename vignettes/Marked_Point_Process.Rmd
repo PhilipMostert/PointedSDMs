@@ -15,7 +15,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = TRUE,
+  eval = FALSE,
   warning = FALSE,
   message = FALSE
 )
