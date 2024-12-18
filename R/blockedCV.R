@@ -345,6 +345,59 @@ blockedCV <- function(data, options = list(),
           covInPres <- covInPres[!covInPres %in% biasFormlabels]
           covInPres <- covInPres[!covInPres %in% grepl('_biasField', covInPres)]
           
+          if (sum(grepl('_spatial', covInPres)) > 1) {
+            
+            spatIn <- covInPres[grepl('_spatial', covInPres)]
+            if (paste0(predictName,'_spatial') %in% spatIn) covInPres[!covInPres %in% paste0(dataToUse[!dataToUse%in% predictName],'_spatial')]
+            else {
+              if (any(unlist(data$.__enclos_env__$private$Family)[names(data$.__enclos_env__$private$Family) %in% dataToUse] %in% c('poisson', 'binomial'))) {
+                
+                keepSpat <- unlist(data$.__enclos_env__$private$Family)[names(data$.__enclos_env__$private$Family) %in% dataToUse] %in% c('poisson', 'binomial')
+                keepSpat <- names(unlist(data$.__enclos_env__$private$Family)[names(data$.__enclos_env__$private$Family) %in% dataToUse])[keepSpat][1]
+                covInPres <- covInPres[!covInPres %in% paste0(dataToUse[!dataToUse%in% keepSpat],'_spatial')]
+                
+              } else {
+                
+                keepSpat <- names(unlist(data$.__enclos_env__$private$Family)[names(data$.__enclos_env__$private$Family) %in% dataToUse])[1]
+                covInPres <- covInPres[!covInPres %in% paste0(dataToUse[!dataToUse%in% keepSpat],'_spatial')]
+                
+              }
+              
+            }
+            
+          }
+          
+          if (sum(grepl('_intercept', covInPres)) > 1) {
+            
+            intInt <- covInPres[grepl('_intercept', covInPres)]
+            if (paste0(predictName,'_intercept') %in% intInt) covInPres[!covInPres %in% paste0(dataToUse[!dataToUse%in% predictName],'_intercept')]
+            else {
+              if (any(unlist(data$.__enclos_env__$private$Family)[names(data$.__enclos_env__$private$Family) %in% dataToUse] %in% c('poisson', 'binomial'))) {
+                
+                keepInt <- unlist(data$.__enclos_env__$private$Family)[names(data$.__enclos_env__$private$Family) %in% dataToUse] %in% c('poisson', 'binomial')
+                keepInt <- names(unlist(data$.__enclos_env__$private$Family)[names(data$.__enclos_env__$private$Family) %in% dataToUse])[keepInt][1]
+                covInPres <- covInPres[!covInPres %in% paste0(dataToUse[!dataToUse%in% keepInt],'_intercept')]
+                
+              } else {
+                
+                keepInt <- names(unlist(data$.__enclos_env__$private$Family)[names(data$.__enclos_env__$private$Family) %in% dataToUse])[1]
+                covInPres <- covInPres[!covInPres %in% paste0(dataToUse[!dataToUse%in% keepInt],'_intercept')]
+                
+              }
+              
+            }
+            
+          }
+          ##grepl(_spatial, covInPres) <- if bigger than 1 <- then keep only predict and PA/Counts BUT KEEP shared_spatial
+          ##grepl(_intercept, covInPres) <- then keep only predict and PA/Counts
+
+          #if not shared spatial
+          #Select predData intercept
+          #Else if not in, select first non PO
+          #Else select PO
+          
+          #Same for intercept
+          
         if (!is.null(data$.__enclos_env__$private$speciesName)) {
           
           likeSpec <- unique(testLike[[pd]]$data[[paste0(data$.__enclos_env__$private$speciesName, 'INDEX_VAR')]])
@@ -377,6 +430,7 @@ blockedCV <- function(data, options = list(),
           }
           
         }
+            
           #if bias
           
         #covInPres <- intersect(oldIn[[pd]], formula_terms)
