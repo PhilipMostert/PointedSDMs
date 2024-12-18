@@ -240,8 +240,8 @@ blockedCV <- function(data, options = list(),
                                 include = formula_terms, E = ips$weight,
                     family = 'poisson', data = ips)
       
-      trainLiks[['ips']] <- ipsLike
-      uFam <- TRUE
+      # trainLiks[['ips']] <- ipsLike
+      uFam <- FALSE
     } else uFam <- FALSE
       
     } else uFam <- FALSE
