@@ -343,7 +343,7 @@ blockedCV <- function(data, options = list(),
           #Remove bias
           covInPres <- formula_terms
           covInPres <- covInPres[!covInPres %in% biasFormlabels]
-          covInPres <- covInPres[!covInPres %in% grepl('_biasField', covInPres)]
+          covInPres <- covInPres[!grepl('_biasField', covInPres)]
           
           if (sum(grepl('_spatial', covInPres)) > 1) {
             
