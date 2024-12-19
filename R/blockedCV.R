@@ -348,7 +348,7 @@ blockedCV <- function(data, options = list(),
           if (sum(grepl('_spatial', covInPres)) > 1) {
             
             spatIn <- covInPres[grepl('_spatial', covInPres)]
-            if (paste0(predictName,'_spatial') %in% spatIn) covInPres[!covInPres %in% paste0(dataToUse[!dataToUse%in% predictName],'_spatial')]
+            if (paste0(predictName,'_spatial') %in% spatIn) covInPres <- covInPres[!covInPres %in% paste0(dataToUse[!dataToUse%in% predictName],'_spatial')]
             else {
               if (any(unlist(data$.__enclos_env__$private$Family)[names(data$.__enclos_env__$private$Family) %in% dataToUse] %in% c('poisson', 'binomial'))) {
                 
@@ -370,7 +370,7 @@ blockedCV <- function(data, options = list(),
           if (sum(grepl('_intercept', covInPres)) > 1) {
             
             intInt <- covInPres[grepl('_intercept', covInPres)]
-            if (paste0(predictName,'_intercept') %in% intInt) covInPres[!covInPres %in% paste0(dataToUse[!dataToUse%in% predictName],'_intercept')]
+            if (paste0(predictName,'_intercept') %in% intInt)covInPres <- covInPres[!covInPres %in% paste0(dataToUse[!dataToUse%in% predictName],'_intercept')]
             else {
               if (any(unlist(data$.__enclos_env__$private$Family)[names(data$.__enclos_env__$private$Family) %in% dataToUse] %in% c('poisson', 'binomial'))) {
                 
