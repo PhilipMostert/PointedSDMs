@@ -2,5 +2,5 @@
 #' @name BBSColinusVirginianus
 #' @docType data
 #' @keywords data
-#' @references \url{https://www.pwrc.usgs.gov/bbs}
+#' @references \url{https://www.pwrc.usgs.gov/bbs/}
 NULL
