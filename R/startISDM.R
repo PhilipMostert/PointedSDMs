@@ -181,12 +181,7 @@ startISDM <- function(..., spatialCovariates = NULL,
   if (is.null(pointsSpatial) || pointsSpatial == 'shared') copyModel <- NULL
   else copyModel <- deparse1(list(beta = list(fixed = FALSE)))
   
-  if (!is.null(Formulas$covariateFormula) &&
-      !is.null(Formulas$biasFormula)) {
-    
-    ##Check that there is nothing overlapping here -- remove anything that is
-    
-  }
+  if (any(!names(Formulas) %in% c('covariateFormula', 'biasFormula'))) stop('Formulas must be a named list containing at least one of covariateFormula or biasFormula.')
   
   bruData <- specifyISDM$new(data = dataPoints, projection = Projection,
                              Inlamesh = Mesh, initialnames = initialnames,

@@ -181,13 +181,8 @@ startMarks <- function(..., spatialCovariates = NULL,
   if (is.null(pointsSpatial) || pointsSpatial == 'shared') copyModel <- NULL
   else copyModel <- deparse1(list(beta = list(fixed = FALSE)))
   
+  if (any(!names(Formulas) %in% c('covariateFormula', 'biasFormula'))) stop('Formulas must be a named list containing at least one of covariateFormula or biasFormula.')
   
-  if (!is.null(Formulas$covariateFormula) &&
-      !is.null(Formulas$biasFormula)) {
-    
-    ##Check that there is nothing overlapping here -- remove anything that is
-    
-  }
   bruData <- specifyMarks$new(data = dataPoints,
                          coordinates = c('X', 'Y'),
                          projection = Projection,
