@@ -224,6 +224,7 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
 
 #' @description Function used to create formulas for the processes.
 #' @param spatcovs Names of the spatial covariates used in the model.
+#' @param spatcovclass Class of the spatial covariates.
 #' @param speciesname Name of the species variable.
 #' @param paresp Name of the presence absence response variable.
 #' @param countresp Name of the count data response variable.
@@ -241,7 +242,7 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
 #' @param biasformula Terms to include for PO data.
 #' @param covariateformula Terms to include for the covariate formula.
 
-dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
+dataOrganize$set('public', 'makeFormulas', function(spatcovs, spatcovclass, speciesname,
                                                     paresp, countresp, marks, marksspatial, 
                                                     speciesintercept, speciesenvironment,
                                                     spatial, intercept, temporalname, speciesindependent,
@@ -418,8 +419,19 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, speciesname,
             else {
               
               if (!is.null(speciesname)) {
-              
-              if (speciesenvironment) covs <- paste0(speciesIn, '_', spatcovs)
+              ##factor covs
+              if (speciesenvironment) {
+                
+                
+                covs <- paste0(speciesIn, '_', spatcovs)
+                # if (any(spatcovclass  != 'linear')) covsFact <- paste0(speciesIn, '_', spatcovs[spatcovclass != 'linear'])
+                # else covsFact <- NULL
+                # if (any(spatcovclass == 'linear')) covsLin <- spatcovs[spatcovclass == 'linear'] #covs <- paste0(speciesIn, '_', spatcovs) ##Remove this, or make it c(spatCovsCommunity, spatCovs)
+                # else covsLin <- NULL
+                # 
+                # covs <- c(covsFact, covsLin)
+                
+              }
               else covs <- spatcovs
               
             }
@@ -823,10 +835,23 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
       
       if (!is.null(species) && speciesenvironment) {
       
+      ##Make covariatenames a replicate per number of species  
       speciesCovs <- apply(expand.grid(paste0(species,'_'), covariatenames), MARGIN = 1, FUN = paste0,collapse = '')
       speciesCovClass <- rep(covariateclass, each = length(species))
-      covs <- paste0(speciesCovs, '(main = ', speciesCovs, ', model = \"',speciesCovClass,'\")') #, collapse = ' + '
-      
+      covs <- paste0(speciesCovs, '(main = ', rep(covariatenames, each = length(species)), ', model = \"',speciesCovClass,'\")') #, collapse = ' + '
+
+      # if ('linear' %in% covariateclass) covsLin <- paste0(covariatenames[covariateclass == 'linear'], '(main = ', speciesname, ', weights = ', covariatenames[covariateclass == 'linear'], ', model = "iid",', 'hyper = list(prec = list(fixed = TRUE, initial = log(INLA::inla.set.control.fixed.default()$prec)))',')')  
+      # else covsLin <- NULL
+      # 
+      # if (any(grepl('factor', covariateclass))) {
+      #   
+      #   specCovComb <- apply(expand.grid(paste0(species,'_'), covariatenames[covariateclass != 'linear']), MARGIN = 1, FUN = paste0,collapse = '')
+      #   covsFactor <- paste0(specCovComb, '(main = ~ 0 + ', covariatenames[covariateclass != 'linear'],', model = "fixed", hyper = list(prec = list(fixed = TRUE, initial = log(INLA::inla.set.control.fixed.default()$prec)))',')')  
+      #   
+      # }
+      # else covsFactor <- NULL
+      # grepl('factor', covariateclass)
+      # covs <- c(covsLin, covsFactor)
     }
     else covs <- paste0(covariatenames, '(main = ', covariatenames, ', model = \"',covariateclass,'\")') # , collapse = ' + '
     
