@@ -165,8 +165,20 @@ fitISDM <- function(data, options = list()) {
   }
   
   if (is.null(data$.__enclos_env__$private$speciesIntercepts)) data$.__enclos_env__$private$speciesIntercepts <- FALSE
-  if (data$.__enclos_env__$private$speciesIntercepts) row.names(inlaModel$summary.random[[paste0(data$.__enclos_env__$private$speciesName, '_intercepts')]]) <- data$.__enclos_env__$private$speciesTable[['species']]
   
+  if (!is.null(data$.__enclos_env__$private$speciesName)) {
+  
+  if (data$.__enclos_env__$private$speciesIntercepts) row.names(inlaModel$summary.random[[paste0(data$.__enclos_env__$private$speciesName, '_intercepts')]]) <- data$.__enclos_env__$private$speciesTable[['species']]
+  if (data$.__enclos_env__$private$speciesEnvironment) {
+    
+    for (nm in names(inlaModel$summary.random)[names(inlaModel$summary.random) %in% data$.__enclos_env__$private$spatcovsNames]) {
+      row.names(inlaModel$summary.random[[nm]]) <- data$.__enclos_env__$private$speciesTable[['species']]
+    }
+    
+  }
+  
+  }
+  #Do this for all the covariate effects, but make it with the correct index incase any is not in
   
   inlaModel[['componentsJoint']] <- componentsJoint
   inlaModel[['optionsJoint']] <- optionsJoint
