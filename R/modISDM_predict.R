@@ -123,7 +123,7 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   if (!any(names(data) %in% object$spatCovs$name)) {
     
     for (spatCov in object$spatCovs$name) {
-      
+      ##Fix this
       data[, spatCov] <- inlabru::eval_spatial(where =  data, 
                                                 data = get('spatialcovariates', 
                                                            envir = object$spatCov$env)[spatCov],
@@ -143,6 +143,23 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
         
       }
       
+      
+    }
+    
+  }
+  
+  if (object$spatial$points == 'correlate' & !'._dataset_index_var_.' %in% names(data)) {
+    
+    if (any(object$dataType == "Present absence")) {
+      
+      message('Predicting the spatial effect for the first Presence absence dataset. This may be changed by setting `._dataset_index_var_.` in your prediction data to the corresponding position of dataset in the model.')
+      data$._dataset_index_var_. <- which(object$dataType == "Present absence")[1]
+      
+    }
+    else {
+      
+      message('No presence absence data in the model, so setting `._dataset_index_var_.` to 1. Please change this if you want to predict onto another dataset.')
+      data$._dataset_index_var_. <- 1
       
     }
     
@@ -212,13 +229,6 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
           else
             if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in startISDM')
           else spatial_obj <- paste0(datasets, '_spatial')
-          
-          if (object$spatial$points == 'correlate') {
-            
-            if (any(object$dataType == "Present absence")) data$._dataset_index_var_. <- which(object$dataType == "Present absence")[1]
-            else data$._dataset_index_var_. <- 1
-            
-          }
           
     }
      else spatial_obj <- NULL
