@@ -66,7 +66,7 @@ summary.modSpecies <- function(object, ...) {
       
       cat('Summary for', paste0(species,':'))
       cat('\n')
-      
+      ##Change all of this 
       if (!is.null(object$spatCovs$covariateFormula)) {
         
         speciesCovs <- object$summary.random[[paste0(species, '_Fixed__Effects__Comps')]]
@@ -86,11 +86,11 @@ summary.modSpecies <- function(object, ...) {
       if (any(paste0(species, '_', object$spatCovs$name) %in% names(object$summary.random))) {
         
         factorCovs <- do.call(rbind, object$summary.random[paste0(species, '_', object$spatCovs$name)])
-        row.names(factorCovs) <- paste0(species, '_', factorCovs$ID)
+        row.names(factorCovs) <- factorCovs$ID#paste0(species, '_', factorCovs$ID)
         factorCovs$ID <- NULL
       } else factorCovs <- data.frame()
       
-      if(object$species$speciesEffects$Intercepts) {
+      if (object$species$speciesEffects$Intercepts) {
         
         interceptTerms <- object$summary.random[[paste0(object$species$speciesVar, '_intercepts')]]
         interceptTerms <- interceptTerms[row.names(interceptTerms) == species,]
@@ -98,6 +98,7 @@ summary.modSpecies <- function(object, ...) {
         interceptTerms$ID <- NULL
         
       } else interceptTerms <- data.frame()
+      
       print.data.frame(rbind(object[['summary.fixed']][grepl(paste0('\\<',species,'_'), row.names(object[['summary.fixed']])),], speciesCovs, factorCovs, interceptTerms, biasCovs))   
       
       cat('\n')
