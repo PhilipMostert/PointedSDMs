@@ -193,7 +193,7 @@ organizedData$addBias(datasetNames = 'eBird')
 }
 
 ## ------------------------------------------------
-## Method `specifyISDM$changeLink`
+## Method `specifyISDM$specifyFamily`
 ## ------------------------------------------------
 
 \dontrun{
@@ -315,7 +315,7 @@ organizedData$specifyRandom(copyModel =  list(beta = list(fixed = TRUE)))
 \item \href{#method-specifyISDM-changeComponents}{\code{specifyISDM$changeComponents()}}
 \item \href{#method-specifyISDM-priorsFixed}{\code{specifyISDM$priorsFixed()}}
 \item \href{#method-specifyISDM-specifySpatial}{\code{specifyISDM$specifySpatial()}}
-\item \href{#method-specifyISDM-changeLink}{\code{specifyISDM$changeLink()}}
+\item \href{#method-specifyISDM-specifyFamily}{\code{specifyISDM$specifyFamily()}}
 \item \href{#method-specifyISDM-spatialBlock}{\code{specifyISDM$spatialBlock()}}
 \item \href{#method-specifyISDM-addSamplers}{\code{specifyISDM$addSamplers()}}
 \item \href{#method-specifyISDM-specifyRandom}{\code{specifyISDM$specifyRandom()}}
@@ -622,7 +622,7 @@ Function to change priors for the fixed (and possibly random) effects of the mod
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{Effect}}{Name of the fixed effect covariate to change the prior for. Can take on \code{'intercept'}, which will change the specification for an intercept (specified by one of \code{species} or \code{datasetName}).}
+\item{\code{Effect}}{Name of the fixed effect covariate to change the prior for. Can take on \code{'intercept'}, which will change the specification for an intercept (specified by one of \code{species} or \code{datasetName}).  If any factor covariates are provided or \code{covariateFormula} is set, setting \code{prec.linear} will fix the precision parameter of the effect to the specified precision.}
 
 \item{\code{datasetName}}{Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.}
 
@@ -741,12 +741,12 @@ A new model for the spatial effects.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-specifyISDM-changeLink"></a>}}
-\if{latex}{\out{\hypertarget{method-specifyISDM-changeLink}{}}}
-\subsection{Method \code{changeLink()}}{
-Function used to change the link function for a given process.
+\if{html}{\out{<a id="method-specifyISDM-specifyFamily"></a>}}
+\if{latex}{\out{\hypertarget{method-specifyISDM-specifyFamily}{}}}
+\subsection{Method \code{specifyFamily()}}{
+Function used to specify the family properties of a dataset.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyISDM$changeLink(datasetName, Link)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{specifyISDM$specifyFamily(datasetName, Family, Link)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -754,12 +754,14 @@ Function used to change the link function for a given process.
 \describe{
 \item{\code{datasetName}}{Name of the dataset for which the link function needs to be changed.}
 
+\item{\code{Family}}{The statistical family.}
+
 \item{\code{Link}}{Name of the link function to add to the process. If missing, will print the link function of the specified dataset.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new link function for a process.
+A new link function of family for a process.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
