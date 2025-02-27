@@ -482,7 +482,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
                 
                 varsIn <- all.vars(Formula)
                 varsIn <- varsIn[varsIn %in% c(private$spatcovsNames, paste0(species, '_', dataset, '_spatial'))]
-                
+                ##Change this: don't thinl we will need the species part
                 if (sum(paste0(species, '_', c(private$spatcovsNames, paste0(dataset, '_spatial'))) %in% varsIn) == 0) varsIn <- paste0(species, '_', varsIn)
    
                 Formula2 <- as.formula(paste0('~ . -', paste0(varsIn, collapse = '+')))
@@ -619,8 +619,8 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   }
   ,
   #' @description Function to change priors for the fixed (and possibly random) effects of the model.
-  #' @param Effect Name of the fixed effect covariate to change the prior for. Can take on \code{'intercept'}, which will change the specification for an intercept (specified by one of \code{species} or \code{datasetName}).
-  #' @param Species Name of the species (class \code{character}) for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.
+  #' @param Effect Name of the fixed effect covariate to change the prior for. Can take on \code{'intercept'}, which will change the specification for an intercept (specified by one of \code{species} or \code{datasetName}). If any factor covariates are provided or \code{covariateFormula} is set, setting \code{prec.linear} will fix the precision parameter of the effect to the specified precision.
+  #' @param Species Name of the species (class \code{character}) for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model. Requires \code{speciesEnvironment = FALSE}.
   #' @param datasetName Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.
   #' @param mean.linear Mean value for the prior of the fixed effect. Defaults to \code{0}.
   #' @param prec.linear Precision value for the prior of the fixed effect. Defaults to \code{0.001}.
@@ -657,8 +657,9 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   priorsFixed = function(Effect, Species = NULL, datasetName = NULL,
                          mean.linear = 0, prec.linear = 0.001) {
     
-  ##Add IID prior here?  
     if (!missing(Effect)) {
+      
+      if (length(Effect) > 1) stop('Please only provide one effect name at a time.')
       
       if (Effect %in% c('intercept', 'Intercept')) {
         
@@ -672,7 +673,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
           else if (!datasetName %in% unique(private$dataSource)) stop('datasetName is not the name of a dataset added to the model.')
           
           
-          Effect <- paste0(datasetName,'_intercept')
+          EffectSpec <- paste0(datasetName,'_intercept')
           
         } 
         else {
@@ -680,7 +681,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
             
             if (!is.null(private$speciesIntercepts)) {
               if (!private$speciesIntercepts) Effect <- paste0(Species, '_intercept')
-              else stop('Species intercepts are random effects in the model.')
+              else stop('Please change the species intercept component using `.$specifyRandom`')
               
             } else stop('Species intercepts are not in the model.')
 
@@ -696,32 +697,68 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
         if (any(Effect %in% private$spatcovsNames)) cov_class <- private$spatcovsClass[Effect]
         else cov_class <- 'linear'
         
+        Cov <- Effect
+        Form <- FALSE
         if (private$speciesEnvironment) {
         
         if (!is.null(Species)) {
             
             if (!Species %in% unlist(private$speciesIn)) stop('Species given is not available in the model.')
             
-            Effect <- paste0(Species, '_', Effect) #this won't work, unless we run a for loop...
+          EffectSpec <- paste0(Species, '_', Effect) #this won't work, unless we run a for loop...
+            ##IF effect != 'linear' then we need to fix the precision parameter of the iid model
             
           }
-          else Effect <- paste0(unique(unlist(private$speciesIn)), '_', Effect)
+          else EffectSpec <- paste0(unique(unlist(private$speciesIn)), '_', Effect)
           
         }
+        
+        if (!is.null(private$covariateFormula)) {
+          
+          if (any(grepl(Effect, labels(terms(private$covariateFormula))))) {
+          
+          if (private$speciesEnvironment) EffectSpec <- paste0(species, '_Fixed__Effects__Comps')
+          else EffectSpec <- 'Fixed__Effects__Comps'
+          Cov <- deparse(update.formula(private$covariateFormula, ~ . -1))
+          Form <- TRUE
+        }
 
-      }
+        }
+        
+        if (!is.null(private$biasFormula)) {
+          
+          if (any(grepl(Effect, labels(terms(private$biasFormula))))) {
+            
+            EffectSpec <- 'Bias__Effects__Comps'
+            Cov <- deparse(update.formula(private$biasFormula, ~ . -1))
+            Form <- TRUE
+          }
+          
+        }
+          
+          
+        }
+        
       if (intTRUE) {
         
         newComponent <- c()
         
-        for (eff in Effect) {
+        for (eff in EffectSpec) {
           
           newComponent[eff] <- paste0(eff, '(1, mean.linear = ', mean.linear, ', prec.linear = ', prec.linear,' )') 
           
         }
         
       }
-      else newComponent <- paste0(Effect,'(main = ', Effect, ', model = \"', cov_class, '\", mean.linear = ', mean.linear, ', prec.linear = ', prec.linear, ')')
+      else  {
+        
+        if (Form) newComponent <- paste0(EffectSpec, '(main = ', Cov,', model = "fixed", hyper = list(prec = list(fixed = TRUE, initial = log(', prec.linear, '))))')
+        else
+          if (cov_class == 'linear') newComponent <- paste0(EffectSpec,'(main = ', Cov, ', model = \"', cov_class, '\", mean.linear = ', mean.linear, ', prec.linear = ', prec.linear, ')')
+        else 
+          if (grepl('factor', cov_class)) newComponent <- paste0(EffectSpec,'(main = ', Cov, ', model = \"', cov_class, '\", hyper = list(prec = list(fixed = TRUE, initial = log(', prec.linear, '))))')
+        #else if covariateFormula -- speciesEnv vs not
+      }
       
       for (comp in newComponent) {
         
@@ -903,8 +940,9 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
     
   }
   ,
-  #' @description Function used to change the link function for a given process.
+  #' @description Function used to specify the family properties of a dataset.
   #' @param datasetName Name of the dataset for which the link function needs to be changed.
+  #' @param Family The statistical family.
   #' @param Link Name of the link function to add to the process. If missing, will print the link function of the specified dataset.
   #' @return A new link function for a process.
   #' @examples
@@ -935,8 +973,9 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #'  
   #' } 
   #' }
-  changeLink = function(datasetName,
-                        Link, ...) {
+  changeFamily = function(datasetName,
+                          Family,
+                          Link) {
     
     if (missing(datasetName)) stop('Please provide a dataset name.')
     
@@ -944,10 +983,20 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
     
     if (!datasetName %in% private$dataSource) stop('Dataset name provided not in model.')
     
-    for (i in which(private$dataSource == datasetName)) {
-    
-    private$optionsINLA[['control.family']][[i]] <- list(link = Link)
-    
+    if (!missing(Link)) private$optionsINLA[['control.family']][[which(private$dataSource == datasetName)]] <-  list(link = Link)
+
+    if (!missing(Family)) {
+      
+      if (!Family %in% names(inla.models()$likelihood)) stop('Family not supported by R-INLA. Valid options are found in: `names(INLA::inla.models()$likelihood)`.')
+      else  private$Family[datasetName] <- Family
+      
+      if (missing(Link)) {
+        
+        warning('Link is missing. Therefore will assume default link function')
+        private$optionsINLA[['control.family']][[which(private$dataSource == datasetName)]] <-  list(link = 'default')
+        
+      }
+      
     }
     
   }
@@ -1420,6 +1469,11 @@ specifySpecies$set('public', 'initialize',  function(data, projection, Inlamesh,
     else ips <- st_transform(fmesher::fm_int(domain = Inlamesh), projection)
     
     
+  } else {
+    
+    if (!inherits(ips, 'sf')) stop('IPS needs to be a sf object.')
+    if (!'weight' %in% names(ips)) stop('Weight needs to be a name in IPS.')
+    
   }
   
   st_geometry(ips) <- 'geometry'
@@ -1605,8 +1659,8 @@ specifySpecies$set('private', 'addData', function(dataList, responseCounts, resp
                                marksType = pointData$marksType)
   
   private$dataSource <- unlist(as.vector(pointData$dataSource))
-  
-  pointData$makeFormulas(spatcovs = private$spatcovsNames, speciesname = speciesName, temporalname = private$temporalName,
+  #spatCovsnames would have to become a vector of all combinations
+  pointData$makeFormulas(spatcovs = private$spatcovsNames, spatcovclass = private$spatcovsClass,speciesname = speciesName, temporalname = private$temporalName,
                          paresp = responsePA, countresp = responseCounts, marksspatial = private$marksSpatial, speciesintercept = private$speciesIntercepts, 
                          marks = NULL, spatial = private$Spatial, speciesindependent = private$speciesIndependent, speciesenvironment = private$speciesEnvironment,
                          intercept = private$Intercepts, markintercept = NULL, speciesspatial = private$speciesSpatial, biasformula = private$biasFormula,
@@ -1682,7 +1736,8 @@ specifySpecies$set('private', 'addData', function(dataList, responseCounts, resp
     # merge all data
     fullGeom <- dplyr::bind_rows(lapply(pointData$Data, dplyr::bind_rows))
     # annotate all environmental data
-    fullGeomCovs <- terra::extract(get('spatialcovariates',envir = private$spatcovsEnv), fullGeom, ID = FALSE)
+    fullGeomCovs <- terra::extract(terra::project(get('spatialcovariates',envir = private$spatcovsEnv), 
+                                                  private$Projection), fullGeom, ID = FALSE)
     # fill in missing values
     if(any(is.na(fullGeomCovs))){
       naRows <- lapply(fullGeomCovs, function(x) which(is.na(x)))  # identify missing rows
@@ -1690,7 +1745,7 @@ specifySpecies$set('private', 'addData', function(dataList, responseCounts, resp
       for(cov in naCovs){  # fill missing values for rows/covs using nearest neighbour 
         fullGeomCovs[naRows[[cov]], cov] <- 
           nearestValue(matrix(st_coordinates(fullGeom[naRows[[cov]],])[,c("X","Y")], ncol = 2), 
-                       get('spatialcovariates', envir = private$spatcovsEnv)[cov])
+                       terra::project(get('spatialcovariates', envir = private$spatcovsEnv), private$Projection)[cov])
         # out <- inlabru::bru_fill_missing(where = fullGeom[naRows[[cov]],], 
         #     data = get('spatialcovariates', 
         #             envir = private$spatcovsEnv)[cov],
@@ -1702,7 +1757,14 @@ specifySpecies$set('private', 'addData', function(dataList, responseCounts, resp
     fullGeom <- cbind(fullGeom, fullGeomCovs) 
     # split by dataset 
     splitVar <-split(fullGeom, factor(fullGeom$._dataset_index_var_., levels = unique(fullGeom$._dataset_index_var_.)))
+    
+    #if any factor covariates:
+        #0 if formula else
+       #Formula <- paste0('~0 + ', paste0(factorCovs, ':intexVar, collapse = '+'))
+     # MatrixModels::model.Matrix(,)
+    
     names(splitVar) <- names(pointData$Data)
+    #Maybe we can thin this part
     # split by species & update columns
     splitVar <- lapply(splitVar, function(x){
       # split by species name
@@ -1714,12 +1776,12 @@ specifySpecies$set('private', 'addData', function(dataList, responseCounts, resp
         colsKeep <- dataColNames[[ds]][[paste0(ds, "_", x2[[paste0(private$speciesName,'INDEX_VAR')]][1])]]
         x2 <- x2[,c(colsKeep, allCovs)]
         # update cov names
-        if (!is.null(private$speciesName) && private$speciesEnvironment) {
-          dfNames <- names(x2)
-          dfNames[dfNames %in% modelCovs] <- paste0(x2[[paste0(private$speciesName,'INDEX_VAR')]][1],'_', dfNames[dfNames %in% modelCovs])
-          # update cov names
-          names(x2) <- dfNames
-        }
+        # if (!is.null(private$speciesName) && private$speciesEnvironment) {
+        #   dfNames <- names(x2)
+        #   dfNames[dfNames %in% modelCovs] <- paste0(x2[[paste0(private$speciesName,'INDEX_VAR')]][1],'_', dfNames[dfNames %in% modelCovs])
+        #   # update cov names
+        #   names(x2) <- dfNames
+        # }
         # return
         return(x2)
       })
@@ -1732,7 +1794,8 @@ specifySpecies$set('private', 'addData', function(dataList, responseCounts, resp
     # annotate integration mesh
     if (!is.null(private$IPS)) {
       # annotate all environmental data
-      meshCovs <- terra::extract(get('spatialcovariates',envir = private$spatcovsEnv),
+      meshCovs <- terra::extract(terra::project(get('spatialcovariates',envir = private$spatcovsEnv), 
+                                                private$Projection),
                                  private$IPS, ID = FALSE)
       # fill in missing values
       if(any(is.na(meshCovs))){
@@ -1748,14 +1811,15 @@ specifySpecies$set('private', 'addData', function(dataList, responseCounts, resp
       }
       
       # define mesh cov names
-      if (!is.null(private$speciesName) && private$speciesEnvironment) {
-        # identify unique species
-        speciesIn <- unique(unlist(private$speciesIn))
-        # expand meshCovs
-        meshCovs <- meshCovs[c(biasCovs, rep(modelCovs, length(speciesIn)))]
-        # update names
-        names(meshCovs) <- c(biasCovs, paste0(rep(speciesIn, each = length(modelCovs)), "_", rep(modelCovs, length(speciesIn))))
-      }
+      # if (!is.null(private$speciesName) && private$speciesEnvironment) {
+      #    #Won't need this
+      #   # identify unique species
+      #   speciesIn <- unique(unlist(private$speciesIn))
+      #   # expand meshCovs
+      #   meshCovs <- meshCovs[c(biasCovs, rep(modelCovs, length(speciesIn)))]
+      #   # update names
+      #   names(meshCovs) <- c(biasCovs, paste0(rep(speciesIn, each = length(modelCovs)), "_", rep(modelCovs, length(speciesIn))))
+      # }
       # combine 
       private$IPS <- cbind(private$IPS, meshCovs)
     }
