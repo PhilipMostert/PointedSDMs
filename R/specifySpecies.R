@@ -699,7 +699,8 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
         
         Cov <- Effect
         Form <- FALSE
-        if (private$speciesEnvironment) {
+        
+        if (private$speciesEnvironment == 'stack') {
         
         if (!is.null(Species)) {
             
@@ -712,6 +713,18 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
           else EffectSpec <- paste0(unique(unlist(private$speciesIn)), '_', Effect)
           
         }
+        
+        if (private$speciesEnvironment == 'community') {
+          
+          if (cov_class == 'linear') EffectSpec <- paste0(Effect, 'Community')
+          else EffectSpec <- Effect
+          
+          ##And then how do we change the priors for the deviations around?
+           #Same sort of approach for the intercepts?
+          
+        }
+        
+        if (private$speciesEnvironment == 'shared') EffectSpec <- Effect
         
         if (!is.null(private$covariateFormula)) {
           
@@ -1224,7 +1237,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @param copyModel List of model specifications given to the hyper parameters for the \code{"copy"} model. Defaults to \code{list(beta = list(fixed = FALSE))}.
   #' @param copyBias List of model specifications given to the hyper parameters for the \code{"copy"} bias model. Defaults to \code{list(beta = list(fixed = FALSE))}.
   #' @param speciesCopy List of model specifications given to the hyper parameters for the species  \code{"copy"} model. Defaults to \code{list(beta = list(fixed = FALSE))}.
-  #' @param speciesIntercepts Prior distribution for precision parameter for the random species intercept term. Defaults to \code{INLA}'s default choice.
+  #' @param speciesIntercepts Prior distribution for precision parameter for the random species intercept term. Defaults to \code{list(prec = list(fixed = TRUE, initial = log(INLA::inla.set.control.fixed.default()$prec)))}. 
   #' @param speciesGroup Prior distribution for the precision parameter for the iid group model. Defaults to \code{INLA}'s default.
   #'   #' @return An updated component list. 
   #' @examples
@@ -1254,7 +1267,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
                            copyModel = list(beta = list(fixed = FALSE)),
                            copyBias =  list(beta = list(fixed = FALSE)),
                            speciesCopy = list(beta = list(fixed = FALSE)),
-                           speciesIntercepts = list(prior = 'loggamma', param = c(1, 5e-5)),
+                           speciesIntercepts = list(prec = list(fixed = TRUE, initial = log(INLA::inla.set.control.fixed.default()$prec))),
                            speciesGroup = list(model = "iid", hyper = list(prec = list(prior = 'loggamma', param = c(1, 5e-5))))) {
     
     if (!is.null(private$temporalName) & !missing(temporalModel)) { 
