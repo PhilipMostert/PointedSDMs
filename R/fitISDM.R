@@ -169,12 +169,12 @@ fitISDM <- function(data, options = list()) {
   if (!is.null(data$.__enclos_env__$private$speciesName)) {
   
   if (data$.__enclos_env__$private$speciesIntercepts) row.names(inlaModel$summary.random[[paste0(data$.__enclos_env__$private$speciesName, '_intercepts')]]) <- data$.__enclos_env__$private$speciesTable[['species']]
-  if (data$.__enclos_env__$private$speciesEnvironment) {
-    
+  if (any(names(inlaModel$summary.random) %in% data$.__enclos_env__$private$spatcovsNames)) {
+
     for (nm in names(inlaModel$summary.random)[names(inlaModel$summary.random) %in% data$.__enclos_env__$private$spatcovsNames]) {
       row.names(inlaModel$summary.random[[nm]]) <- data$.__enclos_env__$private$speciesTable[['species']]
     }
-    
+
   }
   
   }
