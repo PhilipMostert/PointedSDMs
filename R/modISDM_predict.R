@@ -70,7 +70,13 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   #Why can't you do both here?
   if (bias && spatial) stop('Please choose one of bias and spatial.')
   
-  if (is.null(datasets)) datasets <- unique(object$source)
+  if (is.null(datasets)) {
+    
+    if (any(object$dataType %in% c('Present absence', 'Count data'))) datasets <- names(object$dataType)[object$dataType %in% c('Present absence', 'Count data')][1]
+    else datasets <- names(object$dataType)[1]
+    
+    #datasets <- unique(object$source)
+  }
   
   if (predictor) {
     
@@ -149,7 +155,7 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   }
   
   if (object$spatial$points == 'correlate' & !'._dataset_index_var_.' %in% names(data)) {
-    
+    ## should be dataset
     if (any(object$dataType == "Present absence")) {
       
       message('Predicting the spatial effect for the first Presence absence dataset. This may be changed by setting `._dataset_index_var_.` in your prediction data to the corresponding position of dataset in the model.')
@@ -225,7 +231,7 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       
       if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
         else
-          if (object$spatial$points == 'copy') spatial_obj <- paste0(object$source[1], '_spatial')
+          if (object$spatial$points == 'copy') spatial_obj <- paste0(datasets, '_spatial')
           else
             if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in startISDM')
           else spatial_obj <- paste0(datasets, '_spatial')
@@ -235,8 +241,8 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       
 
     
-    if (predictor) formula_components <- c(row.names(object$summary.fixed), names(object$summary.random)[!names(object$summary.random) %in% paste0(object[['source']], '_biasField')])
-    else formula_components <- c(covariates, intercept_terms, spatial_obj)
+    #if (predictor) formula_components <- c(row.names(object$summary.fixed), names(object$summary.random)[!names(object$summary.random) %in% paste0(object[['source']], '_biasField')])
+    formula_components <- c(covariates, intercept_terms, spatial_obj)
     
     if (!is.null(object$spatCovs$biasFormula)) formula_components <- formula_components[!formula_components %in% c('Bias__Effects__Comps', paste0(unique(object$species$speciesIn),'_Bias__Effects__Comp'))]
     

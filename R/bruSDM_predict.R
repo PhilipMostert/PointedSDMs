@@ -80,7 +80,14 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
   }
   
-  if (is.null(datasets)) datasets <- unique(object$source)
+  if (is.null(datasets)) {
+    
+    if (any(object$dataType %in% c('Present absence', 'Count data'))) datasets <- names(object$dataType)[object$dataType %in% c('Present absence', 'Count data')][1]
+    else datasets <- names(object$dataType)[1]
+    
+    #datasets <- unique(object$source)
+    
+  }
 
   
   if (!is.null(unlist(object[['species']][['speciesIn']]))) speciespreds <- TRUE
@@ -349,7 +356,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       else marks_spatial <- NULL
       
       if (is.null(marks_spatial)) {
-      
+      ##if correlate then add dataset index var = x
       if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
       else
         if (object$spatial$points == 'copy') spatial_obj <- paste0(object$source[1], '_spatial')

@@ -76,7 +76,14 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
   }
   
-  if (is.null(datasets)) datasets <- unique(object$source)
+  if (is.null(datasets)) {
+    
+    if (any(object$dataType %in% c('Present absence', 'Count data'))) datasets <- names(object$dataType)[object$dataType %in% c('Present absence', 'Count data')][1]
+    else datasets <- names(object$dataType)[1]
+    
+    #datasets <- unique(object$source)
+    
+  }
   
   if (!missing(species))   {
     
@@ -152,7 +159,8 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
   
   if (speciespreds) {
     
-    if (object[['species']][['speciesEffects']][['Intercepts']]) {
+    if (object[['species']][['speciesEffects']][['Intercepts']] |
+        object[['species']][['speciesEffects']][['Environmental']] == 'community') {
       
       data <- fmesher::fm_cprod(data, data.frame(speciesIndexREMOVE = 1:length(unique(unlist(object$species$speciesIn)))))
       names(data)[names(data) == 'speciesIndexREMOVE'] <- object[['species']][['speciesVar']]
@@ -294,7 +302,9 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
           
           if(is.null(species_covs)) {
           #Just need covariate -- do we need to remove if not in formula?
-          if (object[['species']][['speciesEffects']][['Environmental']]) species_covs <- paste0(spec, '_', covariates)
+          if (object[['species']][['speciesEffects']][['Environmental']] == 'stack') species_covs <- paste0(spec, '_', covariates)
+          else 
+            if (object[['species']][['speciesEffects']][['Environmental']] == 'community') species_covs <- c(covariates, paste0(covariates, 'Community'))
           else species_covs <- covariates
           
           }
@@ -368,7 +378,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
         
         if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
         else
-          if (object$spatial$points == 'copy') spatial_obj <- paste0(object$source[1], '_spatial')
+          if (object$spatial$points == 'copy') spatial_obj <- paste0(datasets, '_spatial')
           else
             if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in startSpecies.')
           else spatial_obj <- paste0(datasets, '_spatial')
@@ -378,8 +388,8 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
 
     
-    if (predictor) formula_components <- c(row.names(object$summary.fixed), names(object$summary.random)[!names(object$summary.random) %in% paste0(object[['source']], '_biasField')])
-    else formula_components <- c(covariates, intercept_terms, spatial_obj)
+    #if (predictor) formula_components <- c(row.names(object$summary.fixed), names(object$summary.random)[!names(object$summary.random) %in% paste0(object[['source']], '_biasField')])
+    formula_components <- c(covariates, intercept_terms, spatial_obj)
     
     if (!is.null(object$spatCovs$biasFormula)) formula_components <- formula_components[!formula_components %in% c('Bias__Effects__Comps', paste0(unique(object$species$speciesIn),'_Bias__Effects__Comp'))]
     
