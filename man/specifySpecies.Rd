@@ -945,7 +945,8 @@ Function to specify the models and priors for the random effects included in the
   copyModel = list(beta = list(fixed = FALSE)),
   copyBias = list(beta = list(fixed = FALSE)),
   speciesCopy = list(beta = list(fixed = FALSE)),
-  speciesIntercepts = list(prior = "loggamma", param = c(1, 5e-05)),
+  speciesIntercepts = list(prec = list(fixed = TRUE, initial =
+    log(INLA::inla.set.control.fixed.default()$prec))),
   speciesGroup = list(model = "iid", hyper = list(prec = list(prior = "loggamma", param =
     c(1, 5e-05))))
 )}\if{html}{\out{</div>}}
@@ -962,7 +963,7 @@ Function to specify the models and priors for the random effects included in the
 
 \item{\code{speciesCopy}}{List of model specifications given to the hyper parameters for the species  \code{"copy"} model. Defaults to \code{list(beta = list(fixed = FALSE))}.}
 
-\item{\code{speciesIntercepts}}{Prior distribution for precision parameter for the random species intercept term. Defaults to \code{INLA}'s default choice.}
+\item{\code{speciesIntercepts}}{Prior distribution for precision parameter for the random species intercept term. Defaults to \code{list(prec = list(fixed = TRUE, initial = log(INLA::inla.set.control.fixed.default()$prec)))}.}
 
 \item{\code{speciesGroup}}{Prior distribution for the precision parameter for the iid group model. Defaults to \code{INLA}'s default.
 #' @return An updated component list.}
