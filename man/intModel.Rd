@@ -117,7 +117,7 @@ Note: the point covariate and mark terms will only be included in the formulas f
  #                            Projection = proj, responsePA = 'Present')
  
  #Print summary
- baseModel
+ #baseModel
  
                       
  }
