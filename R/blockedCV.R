@@ -406,6 +406,7 @@ blockedCV <- function(data, options = list(),
           
           if (data$.__enclos_env__$private$speciesEnvironment) {
             
+            #Change this with the _fixed_effects
             specCov <- apply(expand.grid(paste0(notSpec,'_'), data$.__enclos_env__$private$spatcovsNames), MARGIN = 1, FUN = paste0,collapse = '')
             specCov <- c(specCov, paste0(notSpec, '_Fixed__Effects__Comps'))
             covInPres <- covInPres[!covInPres %in% specCov]

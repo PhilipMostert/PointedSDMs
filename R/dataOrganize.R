@@ -401,8 +401,9 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, spatcovclass, spec
               
               if (!pointsResponse[[response]][j] %in% c(paresp, countresp, marks)) {
                 
-                if (speciesenvironment) biascov <- 'Bias__Effects__Comps'#paste0(speciesIn, '_Bias__Effects__Comps')
-                else biascov <- 'Bias__Effects__Comps'
+                biascov <- 'Bias__Effects__Comps'
+                #if (speciesenvironment) biascov <- 'Bias__Effects__Comps'#paste0(speciesIn, '_Bias__Effects__Comps')
+                #else biascov <- 'Bias__Effects__Comps'
               
                 } 
               else biascov <- NULL
@@ -411,7 +412,7 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, spatcovclass, spec
             
             if (!is.null(covariateformula)) {
               
-              if (speciesenvironment) covs <- paste0(speciesIn, '_Fixed__Effects__Comps')
+              if (speciesenvironment %in% c('stack')) covs <- paste0(speciesIn, '_Fixed__Effects__Comps')
               else covs <- 'Fixed__Effects__Comps'
               
             }
@@ -420,18 +421,19 @@ dataOrganize$set('public', 'makeFormulas', function(spatcovs, spatcovclass, spec
               
               if (!is.null(speciesname)) {
               ##factor covs
-              if (speciesenvironment) {
+              if (speciesenvironment == 'community') {
                 
+                spatcovclassuse <- spatcovclass[names(spatcovclass) == spatcovs]
                 
-                covs <- paste0(speciesIn, '_', spatcovs)
-                # if (any(spatcovclass  != 'linear')) covsFact <- paste0(speciesIn, '_', spatcovs[spatcovclass != 'linear'])
-                # else covsFact <- NULL
-                # if (any(spatcovclass == 'linear')) covsLin <- spatcovs[spatcovclass == 'linear'] #covs <- paste0(speciesIn, '_', spatcovs) ##Remove this, or make it c(spatCovsCommunity, spatCovs)
-                # else covsLin <- NULL
-                # 
-                # covs <- c(covsFact, covsLin)
+                if (any(spatcovclassuse  != 'linear')) covsFact <- paste0(speciesIn, '_', spatcovs[spatcovclassuse != 'linear'])
+                else covsFact <- NULL
+                if (any(spatcovclassuse == 'linear')) covsLin <- c(spatcovs[spatcovclassuse == 'linear'], paste0(spatcovs[spatcovclassuse == 'linear'], 'Community')) #covs <- paste0(speciesIn, '_', spatcovs) ##Remove this, or make it c(spatCovsCommunity, spatCovs)
+                else covsLin <- NULL
+
+                covs <- c(covsFact, covsLin)
                 
-              }
+              } else 
+                  if (speciesenvironment == 'stack') covs <- paste0(speciesIn, '_', spatcovs)
               else covs <- spatcovs
               
             }
@@ -630,8 +632,8 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
         
         if (speciesintercept) {
           
-          if (intercepts) spint <- paste0(speciesname, '_intercepts(main = ', speciesname, ', model = "iid", constr = TRUE, hyper = list(prec = list(prior = "loggamma", param = c(1, 5e-05))))')
-          else spint <- paste0(speciesname, '_intercepts(main = ', speciesname, ', model = "iid", constr = FALSE, hyper = list(prec = list(prior = "loggamma", param = c(1, 5e-05))))')
+          if (intercepts) spint <- paste0(speciesname, '_intercepts(main = ', speciesname, ', model = "iid", constr = TRUE, hyper = list(prec = list(fixed = TRUE, initial = log(INLA::inla.set.control.fixed.default()$prec))))')
+          else spint <- paste0(speciesname, '_intercepts(main = ', speciesname, ', model = "iid", constr = FALSE, hyper = list(prec = list(fixed = TRUE, initial = log(INLA::inla.set.control.fixed.default()$prec))))')
         }
         else spint <- paste0(species, '_intercept(1)')
         
@@ -833,28 +835,38 @@ dataOrganize$set('public', 'makeComponents', function(spatial, intercepts,
     
     else {
       
-      if (!is.null(species) && speciesenvironment) {
+      if (!is.null(species) && !is.null(covariatenames)) {
+      
+      if (speciesenvironment == 'stack') {
       
       ##Make covariatenames a replicate per number of species  
       speciesCovs <- apply(expand.grid(paste0(species,'_'), covariatenames), MARGIN = 1, FUN = paste0,collapse = '')
       speciesCovClass <- rep(covariateclass, each = length(species))
       covs <- paste0(speciesCovs, '(main = ', rep(covariatenames, each = length(species)), ', model = \"',speciesCovClass,'\")') #, collapse = ' + '
-
-      # if ('linear' %in% covariateclass) covsLin <- paste0(covariatenames[covariateclass == 'linear'], '(main = ', speciesname, ', weights = ', covariatenames[covariateclass == 'linear'], ', model = "iid",', 'hyper = list(prec = list(fixed = TRUE, initial = log(INLA::inla.set.control.fixed.default()$prec)))',')')  
-      # else covsLin <- NULL
-      # 
-      # if (any(grepl('factor', covariateclass))) {
-      #   
-      #   specCovComb <- apply(expand.grid(paste0(species,'_'), covariatenames[covariateclass != 'linear']), MARGIN = 1, FUN = paste0,collapse = '')
-      #   covsFactor <- paste0(specCovComb, '(main = ~ 0 + ', covariatenames[covariateclass != 'linear'],', model = "fixed", hyper = list(prec = list(fixed = TRUE, initial = log(INLA::inla.set.control.fixed.default()$prec)))',')')  
-      #   
-      # }
-      # else covsFactor <- NULL
-      # grepl('factor', covariateclass)
-      # covs <- c(covsLin, covsFactor)
+      
     }
-    else covs <- paste0(covariatenames, '(main = ', covariatenames, ', model = \"',covariateclass,'\")') # , collapse = ' + '
+    else 
+      if (speciesenvironment == 'community') {
+        ##Also need Community here
+        if ('linear' %in% covariateclass) covsLin <- c(paste0(covariatenames[covariateclass == 'linear'], '(main = ', speciesname, ', weights = ', covariatenames[covariateclass == 'linear'], ', model = "iid", constr = TRUE,', 'hyper = list(prec = list(fixed = TRUE, initial = log(INLA::inla.set.control.fixed.default()$prec)))',')'),
+                                                       paste0(covariatenames[covariateclass == 'linear'], 'Community(main = ', covariatenames[covariateclass == 'linear'], ', model = "linear")'))
+        else covsLin <- NULL
+
+        if (any(grepl('factor', covariateclass))) {
+       #Think we can just leave this as is? ie as an intercept ie as species level
+          specCovComb <- apply(expand.grid(paste0(species,'_'), covariatenames[covariateclass != 'linear']), MARGIN = 1, FUN = paste0,collapse = '')
+          #covsFactor <- paste0(specCovComb, '(main = ~ 0 + ', covariatenames[covariateclass != 'linear'],', model = "fixed", hyper = list(prec = list(fixed = TRUE, initial = log(INLA::inla.set.control.fixed.default()$prec)))',')')
+          covsFactor <- paste0(specCovComb, '(main = ', rep(covariatenames, each = length(species)), ', model = \"',speciesCovClass,'\")')
+
+        }
+        else covsFactor <- NULL
+
+        covs <- c(covsLin, covsFactor)
+        
+      }
+        else covs <- paste0(covariatenames, '(main = ', covariatenames, ', model = \"',covariateclass,'\")') # , collapse = ' + '
     
+      } else covs <- paste0(covariatenames, '(main = ', covariatenames, ', model = \"',covariateclass,'\")')
     }
   } 
   else {
