@@ -788,7 +788,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
   #' @param sharedSpatial Logical: specify the shared spatial field in the model. Requires \code{pointsSpatial == 'shared'} in \code{\link{intModel}}. Defaults to \code{FALSE}.
   #' @param datasetName Name of which of the datasets' spatial fields to be specified. Requires \code{pointsSpatial = 'individual'} in \code{\link{intModel}}.
   #' @param Species Name of the species to change the spatial effect for. If \code{TRUE} then changes the spatial effect for the shared species field.
-  #' @param Bias Name of the dataset for which the bias field to be specified.
+  #' @param Bias Logical: specify the spatial field for the bias effect. If seperate fields are specified for different fields, the argument may be the name of the dataset for which the bias field to be specified.
   #' @param PC Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}, which uses \code{\link[INLA]{inla.spde2.pcmatern}} to specify the model; otherwise uses \code{\link[INLA]{inla.spde2.matern}}.
   #' @param Remove Logical: should the chosen spatial field be removed. Requires one of \code{sharedSpatial}, \code{species}, \code{mark} or \code{bias} to be non-missing, which chooses which field to remove.
   #' @param ... Additional arguments used by \pkg{INLA}'s \code{\link[INLA]{inla.spde2.pcmatern}} or \code{\link[INLA]{inla.spde2.matern}} function, dependent on the value of \code{PC}.

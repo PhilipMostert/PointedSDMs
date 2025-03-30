@@ -692,7 +692,7 @@ Function to specify random fields in the model using penalizing complexity (PC) 
 
 \item{\code{datasetName}}{Name of which of the datasets' spatial fields to be specified. Requires \code{pointsSpatial = 'individual'} in \code{\link{intModel}}.}
 
-\item{\code{Bias}}{Name of the dataset for which the bias field to be specified.}
+\item{\code{Bias}}{Logical: specify the spatial field for the bias effect. If seperate fields are specified for different fields, the argument may be the name of the dataset for which the bias field to be specified.}
 
 \item{\code{PC}}{Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}, which uses \code{\link[INLA]{inla.spde2.pcmatern}} to specify the model; otherwise uses \code{\link[INLA]{inla.spde2.matern}}.}
 

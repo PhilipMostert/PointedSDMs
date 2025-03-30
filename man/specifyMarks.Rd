@@ -680,7 +680,7 @@ Function to specify random fields in the model using penalizing complexity (PC) 
 
 \item{\code{Mark}}{Name of the marks to specify the spatial field for. If \code{TRUE} changes the spatial effect for all marks.}
 
-\item{\code{Bias}}{Name of the dataset for which the bias field to be specified.}
+\item{\code{Bias}}{Logical: specify the spatial field for the bias effect. If seperate fields are specified for different fields, the argument may be the name of the dataset for which the bias field to be specified.}
 
 \item{\code{PC}}{Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}, which uses \code{\link[INLA]{inla.spde2.pcmatern}} to specify the model; otherwise uses \code{\link[INLA]{inla.spde2.matern}}.}
 
