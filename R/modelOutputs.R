@@ -56,8 +56,41 @@ summary.modSpecies <- function(object, ...) {
     }
   }
   
-  if (!is.null(object[['species']][['speciesIn']]) 
-      && any(unlist(object[['species']][['speciesEffects']]))) {
+  if (inherits(object$spatCovs$biasFormula, 'formula')) {
+    
+    cat('Summary of the bias covariates:')
+    cat('\n\n')
+    
+    biasFrame <- object$summary.random[['Bias__Effects__Comps']]
+    row.names(biasFrame) <- biasFrame[,1]
+    biasFrame[,1] <- NULL
+    print.data.frame(biasFrame)
+    cat('\n')
+    
+  }
+  
+  if (object[['species']][['speciesEffects']][['Environmental']] == 'community') {
+    
+    cat('Summary of the community response covariates:')
+    cat('\n\n')
+    comResp <- object$summary.fixed[row.names(object$summary.fixed) %in% paste0(object$spatCovs$name, 'Community'),]
+    print.data.frame(comResp)
+    cat('\n')
+    
+  }
+  
+  if (object[['species']][['speciesEffects']][['Environmental']] == 'shared') {
+    
+    cat('Summary of the shared covariates:')
+    cat('\n\n')
+    comResp <- object$summary.fixed[row.names(object$summary.fixed) %in% object$spatCovs$name,]
+    print.data.frame(comResp)
+    cat('\n')
+    
+  }
+  
+  if (unlist(object[['species']][['speciesEffects']][['Intercepts']] ||
+             object[['species']][['speciesEffects']][['Environmental']] %in% c('community', 'stack'))) {
     
     cat('Summary of the fixed effects for the species:')
     cat('\n\n')
@@ -74,6 +107,19 @@ summary.modSpecies <- function(object, ...) {
         speciesCovs <- speciesCovs[, -c(1)]
         
       } else speciesCovs <- data.frame()
+      
+      if (object[['species']][['speciesEffects']][['Environmental']] == 'community') {
+        
+        
+        randomDevs <- do.call(rbind, lapply(object$summary.random[object$spatCovs$name], function(x) {
+          x[row.names(x) %in% species,]
+          
+        }))
+        randomDevs$ID <- NULL
+        row.names(randomDevs) <- paste0(species, '_', row.names(randomDevs))
+        
+        
+      } else randomDevs <- NULL
       
       if (!is.null(object$spatCovs$biasFormula)) {
         
@@ -99,7 +145,7 @@ summary.modSpecies <- function(object, ...) {
         
       } else interceptTerms <- data.frame()
       
-      print.data.frame(rbind(object[['summary.fixed']][grepl(paste0('\\<',species,'_'), row.names(object[['summary.fixed']])),], speciesCovs, factorCovs, interceptTerms, biasCovs))   
+      print.data.frame(rbind(object[['summary.fixed']][grepl(paste0('\\<',species,'_'), row.names(object[['summary.fixed']])),], speciesCovs, randomDevs,factorCovs, interceptTerms, biasCovs))   
       
       cat('\n')
       
@@ -200,7 +246,20 @@ summary.modISDM <- function(object, ...) {
     }
   }
   
+  if (inherits(object$spatCovs$biasFormula, 'formula')) {
     
+    cat('Summary of the bias covariates:')
+    cat('\n\n')
+    
+    biasFrame <- object$summary.random[['Bias__Effects__Comps']]
+    row.names(biasFrame) <- biasFrame[,1]
+    biasFrame[,1] <- NULL
+    print.data.frame(biasFrame)
+    cat('\n')
+    
+  }
+  
+  
     if (!is.null(object$spatCovs$covariateFormula)) {
       
       fixedEffects <- object$summary.random[['Fixed__Effects__Comps']]
@@ -209,16 +268,7 @@ summary.modISDM <- function(object, ...) {
       object$summary.fixed <- rbind(object$summary.fixed, fixedEffects)
       
     }
-    
-    if (!is.null(object$spatCovs$biasFormula)) {
-      
-      biasComps <- object$summary.random[['Bias__Effects__Comps']]
-      row.names(biasComps) <- biasComps$ID
-      biasComps <- biasComps[, -c(1)]
-      biasComps <- biasComps 
-      object$summary.fixed <- rbind(object$summary.fixed, biasComps)
-      
-    }
+
     
     class(object) = 'inla'
     object$call = NULL
