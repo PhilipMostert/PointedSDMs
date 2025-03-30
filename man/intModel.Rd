@@ -103,6 +103,7 @@ Note: the point covariate and mark terms will only be included in the formulas f
 \examples{
 
  if (requireNamespace('INLA')) {
+
    
  #Get Data
  data("SolitaryTinamou")
@@ -112,25 +113,12 @@ Note: the point covariate and mark terms will only be included in the formulas f
  mesh$crs <- proj
  
  #Set base model up
- baseModel <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
-                             Projection = proj, responsePA = 'Present')
+ #baseModel <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
+ #                            Projection = proj, responsePA = 'Present')
  
  #Print summary
  baseModel
  
- #Set up model with dataset specific spatial fields
- 
- indSpat <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
-                     Projection = proj, pointsSpatial = 'individual', responsePA = 'Present')
-                     
- #Model with offset variable
- offSet <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
-                     Projection = proj, Offset = 'area', responsePA = 'Present')
-                     
- #Assume area as a mark
- markModel <- intModel(data, Mesh = mesh, Coordinates = c('X', 'Y'),
-                     Projection = proj, markNames = 'area', markFamily = 'gamma',
-                     responsePA = 'Present')
                       
  }
 
