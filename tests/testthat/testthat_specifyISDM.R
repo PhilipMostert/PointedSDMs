@@ -385,6 +385,7 @@ test_that('updateFormula is able to change the formula of a dataset', {
   expect_equal(deparse1(check$.__enclos_env__$private$covariateFormula), '~exp(covariate)')
   expect_true("Fixed__Effects__Comps(main = ~exp(covariate) - 1, model = \"fixed\")" %in% check$.__enclos_env__$private$Components)
   
+  
 })
 
 test_that('changeComponents can change the components of the model', {
@@ -420,7 +421,7 @@ test_that('priorsFixed can add the correct priors to the fixed effects', {
   
   #arbitrary mean and precision for insect_covariate
   check$priorsFixed(Effect = 'covariate', mean.linear = 200, prec.linear = 20)
-  expect_true("covariate(main = covariate, model = \"linear\", mean.linear = 200, prec.linear = 20)" %in% check$.__enclos_env__$private$Components)
+  expect_true('Fixed__Effects__Comps(main = ~exp(covariate) - 1, model = "fixed", hyper = list(prec = list(fixed = TRUE, initial = log(20))))' %in% check$.__enclos_env__$private$Components)
   
   ##Incorrect datasetName
   expect_error(check$priorsFixed(Effect = 'Intercept', mean.linear = 1, prec.linear = 1, datasetName = 'PCounts'), 'datasetName is not the name of a dataset added to the model.')
@@ -428,6 +429,27 @@ test_that('priorsFixed can add the correct priors to the fixed effects', {
   
   check$priorsFixed(Effect = 'Intercept', mean.linear = 1, prec.linear = 1, datasetName = 'PA')
   expect_true("PA_intercept(1, mean.linear = 1, prec.linear = 1)" %in% check$.__enclos_env__$private$Components)
+  
+  checkCov <- specifyISDM$new(data = list(PO, PA, Pcount),
+                              initialnames = c('PO', 'PA', 'Pcount'),
+                              projection = projection,
+                              Inlamesh = mesh,
+                              responsepa = responsePA,
+                              trialspa = trialName,
+                              responsecounts = responseCounts,
+                              pointcovariates = pointCovs,
+                              spatialcovariates = cov,
+                              formulas = list(covariateFormula = NULL),
+                              offset = NULL,
+                              ips = iPoints, 
+                              copymodel = copyModel,
+                              spatial = 'shared', temporal = temporalName, 
+                              intercepts = TRUE, temporalmodel = temporalModel)
+  
+  checkCov$priorsFixed(Effect = 'covariate', mean.linear = 200, prec.linear = 20)
+  expect_true("covariate(main = covariate, model = \"linear\", mean.linear = 200, prec.linear = 20)" %in% 
+                checkCov$.__enclos_env__$private$Components)
+  
   
 })
 
@@ -458,11 +480,11 @@ test_that('changeLink can correctly change the link function of a process', {
   
   expect_error(checknoSpat$changeLink(datasetName = 'PO2'))
   
-  checknoSpat$changeLink(datasetName = 'PO2', Link = 'exp')
+  checknoSpat$specifyFamily(datasetName = 'PO2', Link = 'exp')
 
   expect_true(checknoSpat$.__enclos_env__$private$optionsINLA$control.family[[4]]$link == 'exp')
   
-  checknoSpat$changeLink(datasetName = 'PA', Link = 'logit')
+  checknoSpat$specifyFamily(datasetName = 'PA', Link = 'logit')
   
   expect_true(checknoSpat$.__enclos_env__$private$optionsINLA$control.family[[2]]$link == 'logit')
   

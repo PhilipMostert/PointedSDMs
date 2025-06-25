@@ -80,7 +80,7 @@ test_that('specifySpecies initialize works as expected.', {
                                formulas = NULL,
                                offset = NULL,
                                speciesintercept = FALSE,
-                               speciesenvironment = TRUE,
+                               speciesenvironment = 'stack',
                                speciesname = speciesName,
                                ips = iPoints, copymodel = copyModel,
                                spatial = 'shared', temporal = temporalName, 
@@ -98,7 +98,7 @@ test_that('specifySpecies initialize works as expected.', {
   
   expect_true(all(check$.__enclos_env__$private$speciesTable$index %in% 1:3))
   expect_true(all(check$.__enclos_env__$private$speciesTable$species %in% spIn))
-  expect_true(check$.__enclos_env__$private$speciesEnvironment)
+  expect_identical(check$.__enclos_env__$private$speciesEnvironment, 'stack')
   expect_true(length(check$.__enclos_env__$private$speciesIndex$species$PO[[1]]) == nrow(PO))
   expect_true(length(check$.__enclos_env__$private$speciesIndex$species$PA[[1]]) == nrow(PA))
   expect_true(length(check$.__enclos_env__$private$speciesIndex$species$Pcount[[1]]) == nrow(Pcount))
@@ -113,7 +113,7 @@ test_that('specifySpecies initialize works as expected.', {
   
   expect_true('pointcov' %in% names(check$.__enclos_env__$private$IPS))
   expect_true(all(is.na(check$.__enclos_env__$private$IPS$pointcov)))
-  expect_true(all(paste0(spIn,'_covariate') %in% names(check$.__enclos_env__$private$IPS)))
+  expect_true(all(paste0('covariate') %in% names(check$.__enclos_env__$private$IPS)))
   expect_setequal(names(check$spatialFields$speciesFields), c('fish_PO', 'bird_PA', 'dog_Pcount'))
 
   #Create a model with shared species effects
@@ -246,7 +246,7 @@ test_that('specifySpecies initialize works as expected.', {
                   %in% checkCopy$.__enclos_env__$private$Components))
   expect_setequal(c(names(checkCopy$spatialFields$speciesFields)), c('fish_PO', 'bird_PA', 'dog_Pcount'))
   #Change speciesSpatial to replicate
-  checkRep <<- specifySpecies$new(data = list(PO, PA, Pcount),
+  checkCom <<- specifySpecies$new(data = list(PO, PA, Pcount),
                                      initialnames = c('PO', 'PA', 'Pcount'),
                                      projection = projection,
                                      Inlamesh = mesh, speciesspatial = 'replicate',
@@ -264,7 +264,8 @@ test_that('specifySpecies initialize works as expected.', {
                                      ips = iPoints, copymodel = copyModel,
                                      spatial = 'shared', temporal = temporalName, 
                                      intercepts = TRUE, temporalmodel = temporalModel)
-  expect_equal(names(checkRep$spatialFields$sharedField), 'sharedField')
+  expect_true(all(c('covariate', 'pointcov') %in% names(checkCom$.__enclos_env__$private$IPS)))
+  
   
   #No species spatial
   PO2 <<- PO
@@ -286,6 +287,27 @@ test_that('specifySpecies initialize works as expected.', {
                                   ips = iPoints, copymodel = copyModel,
                                   spatial = 'shared', temporal = NULL, 
                                   intercepts = TRUE, temporalmodel = temporalModel)
+  
+  #Check speciesEnvironment = community
+  checkRep <<- specifySpecies$new(data = list(PO, PA, Pcount),
+                                  initialnames = c('PO', 'PA', 'Pcount'),
+                                  projection = projection,
+                                  Inlamesh = mesh, speciesspatial = 'replicate',
+                                  responsepa = responsePA,
+                                  trialspa = trialName,
+                                  speciesindependent = FALSE,
+                                  responsecounts = responseCounts,
+                                  pointcovariates = pointCovs,
+                                  spatialcovariates = cov,
+                                  formulas = NULL,
+                                  offset = NULL,
+                                  speciesintercept = FALSE,
+                                  speciesenvironment = 'community',
+                                  speciesname = speciesName,
+                                  ips = iPoints, copymodel = copyModel,
+                                  spatial = 'shared', temporal = temporalName, 
+                                  intercepts = TRUE, temporalmodel = temporalModel)
+  
   
   
 })
@@ -362,8 +384,8 @@ test_that('updateFormula is able to change the formula of a dataset', {
   checknoSpat$updateFormula(speciesName = 'fish', Formula = ~ . - covariate)
   expect_setequal(checknoSpat$.__enclos_env__$private$Formulas$PO$fish$geometry$RHS, c("shared_spatial", "PO_intercept", "fish_intercept", "PO_biasField","sharedBias_biasField"))
   expect_setequal(checknoSpat$.__enclos_env__$private$Formulas$PO2$fish$geometry$RHS, c("shared_spatial", "PO2_intercept", "fish_intercept", "PO2_biasField","sharedBias_biasField"))
-  expect_setequal(checknoSpat$.__enclos_env__$private$Formulas$PA$bird$PAresp$RHS, c("bird_covariate", "shared_spatial", "PA_intercept", "pointcov", "bird_intercept"))
-  expect_setequal(checknoSpat$.__enclos_env__$private$Formulas$Pcount$dog$count$RHS, c("dog_covariate", "shared_spatial", "Pcount_intercept", "dog_intercept"))
+  expect_setequal(checknoSpat$.__enclos_env__$private$Formulas$PA$bird$PAresp$RHS, c("covariate", "shared_spatial", "PA_intercept", "pointcov", "bird_intercept"))
+  expect_setequal(checknoSpat$.__enclos_env__$private$Formulas$Pcount$dog$count$RHS, c("covariate", "shared_spatial", "Pcount_intercept", "dog_intercept"))
   
   
   
@@ -408,16 +430,16 @@ test_that('updateFormula is able to change the formula of a dataset', {
                                       formulas = list(covariateFormula = ~ covariate + I(covariate^2)),
                                       offset = NULL,
                                       speciesintercept = FALSE,
-                                      speciesenvironment = TRUE,
+                                      speciesenvironment = 'stack',
                                       speciesname = speciesName,
                                       ips = iPoints, copymodel = copyModel,
                                       spatial = 'shared', temporal = NULL, 
                                       intercepts = TRUE, temporalmodel = temporalModel)
   
   checknoSpat3$updateFormula(speciesName = 'dog', Formula = ~ .- I(covariate^2))
-  expect_true(all(c("dog_Fixed__Effects__Comps(main = ~dog_covariate - 1, model = \"fixed\")",
-                    "bird_Fixed__Effects__Comps(main = ~bird_covariate + I(bird_covariate^2) - 1, model = \"fixed\")",
-                    "fish_Fixed__Effects__Comps(main = ~fish_covariate + I(fish_covariate^2) - 1, model = \"fixed\")") %in%
+  expect_true(all(c("dog_Fixed__Effects__Comps(main = ~covariate - 1, model = \"fixed\")",
+                    "bird_Fixed__Effects__Comps(main = ~covariate + I(covariate^2) - 1, model = \"fixed\")",
+                    "fish_Fixed__Effects__Comps(main = ~covariate + I(covariate^2) - 1, model = \"fixed\")") %in%
                     checknoSpat3$.__enclos_env__$private$Components))
   
 })
@@ -456,7 +478,7 @@ test_that('priorsFixed can add the correct priors to the fixed effects', {
   
   #arbitrary mean and precision for insect_covariate
   check$priorsFixed(Effect = 'covariate', mean.linear = 200, prec.linear = 20)
-  expect_true(all(paste0(spIn,'_covariate(main = ', spIn,'_covariate, model = "linear", mean.linear = 200, prec.linear = 20)') %in% check$.__enclos_env__$private$Components))
+  expect_true(all(paste0(spIn,'_covariate(main = ', 'covariate, model = "linear", mean.linear = 200, prec.linear = 20)') %in% check$.__enclos_env__$private$Components))
   
   ##Incorrect datasetName
   expect_error(check$priorsFixed(Effect = 'Intercept', mean.linear = 1, prec.linear = 1, datasetName = 'PCounts'), 'datasetName is not the name of a dataset added to the model.')
@@ -497,17 +519,17 @@ test_that('specifySpatial can correctly specify the spatial fields', {
   
 })
 
-test_that('changeLink can correctly change the link function of a process', {
+test_that('changeFamily can correctly change the link function of a process', {
   
   skip_on_cran()
   
   expect_error(checknoSpat$changeLink(datasetName = 'PO2'))
   
-  checknoSpat$changeLink(datasetName = 'PO2', Link = 'exp')
+  checknoSpat$changeFamily(datasetName = 'PO2', Link = 'exp')
   
   expect_true(checknoSpat$.__enclos_env__$private$optionsINLA$control.family[[4]]$link == 'exp')
   
-  checknoSpat$changeLink(datasetName = 'PA', Link = 'logit')
+  checknoSpat$changeFamily(datasetName = 'PA', Link = 'logit')
   
   expect_true(checknoSpat$.__enclos_env__$private$optionsINLA$control.family[[2]] == 'logit')
   
@@ -612,7 +634,7 @@ test_that('specifyRandom can correctly change the priors of the random effects',
   
   #Check speciesIntercept
   checkCopy$specifyRandom(speciesIntercepts = list(prior = "pc.prec", param = c(1, 0.1)))
-  expect_true('species_intercepts(main = species, model = \"iid\", constr = TRUE, hyper = list(prec = list(prior = \"pc.prec\", param = c(1, 0.1))))' %in%
+  expect_true('species_intercepts(main = species, model = \"iid\", constr = TRUE, hyper = list(prec = list(fixed = TRUE, initial = log(INLA::inla.set.control.fixed.default()$prec))))' %in%
                 checkCopy$.__enclos_env__$private$Components)
   
 })
