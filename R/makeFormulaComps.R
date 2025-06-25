@@ -15,7 +15,7 @@ makeFormulaComps <- function(form, species, speciesnames, type) {
   if (type == 'Bias') frontPart <- 'Bias__Effects__Comps(main = '
   else frontPart <- 'Fixed__Effects__Comps(main = '
   
-  if (!species) {
+  if (!species %in% c('stack', 'community')) {
     
   terms <- paste(terms, collapse = ' + ')
   
