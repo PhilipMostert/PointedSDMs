@@ -450,8 +450,8 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
       if (!is.null(private$covariateFormula)) {
         
         if (!missing(Formula)) {
-          if (!private$speciesEnvironment) newForm <- makeFormulaComps(form = update(private$covariateFormula, Formula), species = FALSE, speciesnames = speciesName, type = 'cov')
-          else newForm <- makeFormulaComps(form = update(private$covariateFormula, Formula), species = TRUE, speciesnames = speciesName, type = 'cov')
+          if (private$speciesEnvironment %in% 'shared') newForm <- makeFormulaComps(form = update(private$covariateFormula, Formula), species = FALSE, speciesnames = speciesName, type = 'cov')
+          else newForm <- makeFormulaComps(form = update(private$covariateFormula, Formula), species = 'stack', speciesnames = speciesName, type = 'cov')
             
           private$covariateFormula <- update(private$covariateFormula, Formula)
           
@@ -478,7 +478,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
           
           for (species in name_index)  {
             
-            if (private$speciesEnvironment) {
+            if (private$speciesEnvironment %in% c('stack')) {
                 
                 varsIn <- all.vars(Formula)
                 varsIn <- varsIn[varsIn %in% c(private$spatcovsNames, paste0(species, '_', dataset, '_spatial'))]
