@@ -73,7 +73,7 @@ test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra 
 
   ##Run with species
   obj3 <- startSpecies(PO, PA, Projection = projection, Mesh = mesh, responsePA = responsePA,
-                    IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, speciesEnvironment = 'community',
+                    IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, speciesEnvironment = 'community', 
                     spatialCovariates = cov, speciesName = 'species')
 
   spatMod3 <- fitISDM(data = obj3,
