@@ -72,7 +72,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
   
   if (spatial) {
     
-    if (!object$spatial$points || !object$spatial$species) stop('No spatial effect included in the model.')
+    if (!object$spatial$points && is.null(object$spatial$species)) stop('No spatial effect included in the model.')
     
   }
   
