@@ -107,7 +107,7 @@ makeLhoods <- function(data, formula, family, mesh, ips,
         
         like_name <- paste0(nameGive, '_', sub(' .*', '', as.character(formula[[dataset]][[species]][[process]][['LHS']])[2]))
         
-        Likelihoods[[Likindex]] <- inlabru::like(formula = formula[[dataset]][[species]][[process]][['LHS']], ## but obs change these in function call
+        Likelihoods[[Likindex]] <- inlabru::bru_obs(formula = formula[[dataset]][[species]][[process]][['LHS']], ## but obs change these in function call
                                                  include = formula[[dataset]][[species]][[process]][['RHS']],
                                                  data = data[[dataset]][[species]], 
                                                  Ntrials = Ntrials,

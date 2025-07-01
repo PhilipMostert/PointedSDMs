@@ -140,7 +140,7 @@ fitISDM <- function(data, options = list()) {
       
     }
     
-    biasLikes <- do.call(inlabru::like_list, biasLikes)
+    biasLikes <- do.call(inlabru::bru_like_list, biasLikes)
     
     allLiks <- inlabru::like_list(do.call(append, list(allLiks, biasLikes)))
     
