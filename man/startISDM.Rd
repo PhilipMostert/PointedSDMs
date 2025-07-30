@@ -25,7 +25,7 @@ startISDM(
 \arguments{
 \item{...}{The datasets to be used in the model. Must come as either \code{sf} objects, or as a list of named \code{sf} objects.}
 
-\item{spatialCovariates}{The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{SpatialRaster} object. Can be either \code{numeric}, \code{factor} or \code{character} data. Defaults to \code{NULL} which includes no spatial effects in the model.}
+\item{spatialCovariates}{The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{SpatialRaster} object. Can be either \code{numeric}, \code{factor} or \code{character} data. Defaults to \code{NULL} which includes no spatial effects in the model. Can also be a list of spatial rasters if \code{temporalModel} is non-\code{NULL}. In this case, each item is the covariate, and each layer is the raster for the \code{t} time periods (or one layer if the covariate is non-temporally varying).}
 
 \item{Projection}{The coordinate reference system used by both the spatial points and spatial covariates. Must be of class \code{character}.}
 
