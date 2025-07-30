@@ -211,6 +211,7 @@ dataOrganize$set('public', 'makeMultinom', function(multinomVars, return, oldVar
       
       self$timeNumeric <- multinomNumeric
       self$timeIndex <- multinomIndex
+      self$timeScale <- unique(unlist(multinomIndex))[unique(unlist(multinomNumeric))]
       
     }
   else {
