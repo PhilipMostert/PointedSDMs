@@ -1367,7 +1367,7 @@ specifyISDM$set('private', 'addData', function(dataList, responseCounts, respons
                 
                 pointData$makeMultinom(multinomVars = private$temporalName,
                                        return = 'time', oldVars = NULL)
-                
+       
                 private$temporalVars <- pointData$timeIndex
                 
                 numTime <- length(unique(unlist(private$temporalVars)))
@@ -1436,63 +1436,21 @@ specifyISDM$set('private', 'addData', function(dataList, responseCounts, respons
               ##MAKE THIS A FUNCTION TOO
               if (!is.null(private$spatcovsNames)) {
                 
-                dataColNames <- lapply(pointData$Data, function(x) lapply(x, names))
-                
-                allCovs <- names(get('spatialcovariates',envir = private$spatcovsEnv))
-                biasCovs <- if(is.null(private$biasFormula)) NULL else labels(terms(private$biasFormula))
-                modelCovs <- allCovs[! allCovs %in% biasCovs]
-                
-                fullGeom <- dplyr::bind_rows(lapply(pointData$Data, dplyr::bind_rows))
-                
-                fullGeomCovs <- terra::extract(terra::project(get('spatialcovariates',envir = private$spatcovsEnv), 
-                                                              private$Projection), fullGeom, ID = FALSE)
-                
-                if(any(is.na(fullGeomCovs))){
-                  naRows <- lapply(fullGeomCovs, function(x) which(is.na(x)))  # identify missing rows
-                  naCovs <- names(naRows)[sapply(naRows, length) > 0]  # identify covs with missing data
-                  for(cov in naCovs){  # fill missing values for rows/covs using nearest neighbour 
-                    fullGeomCovs[naRows[[cov]], cov] <- 
-                      nearestValue(matrix(st_coordinates(fullGeom[naRows[[cov]],])[,c("X","Y")], ncol = 2), 
-                                   terra::project(get('spatialcovariates', envir = private$spatcovsEnv), private$Projection)[cov])
-
-                  }
-                }
-                
-                fullGeom <- cbind(fullGeom, fullGeomCovs) 
-                # split by dataset 
-                 splitVar <- split(fullGeom, factor(fullGeom$._dataset_index_var_., levels = unique(fullGeom$._dataset_index_var_.)))
-                 names(splitVar) <- names(pointData$Data)
-                # 
-                 splitVar <- lapply(splitVar, FUN = function(x) {
-                   
-                   ds <- names(dataColNames)[x$._dataset_index_var_.[1]]
-                   colsKeep <- dataColNames[[ds]][[1]]
-                   x <- list(x[,c(colsKeep, allCovs)])
-                   names(x) <- names(dataColNames[[ds]])
-                   x
-                   
-                 })
-                 
-                pointData$Data <- splitVar
+                pointData$Data <- assignCovariate(data = pointData$Data, covariateEnv = private$spatcovsEnv,
+                                                  covariateNames = private$spatcovsNames, timeVariable = private$temporalName, 
+                                                  timeData = private$temporalVars, projection = private$Projection)
                 
                 if (!is.null(private$IPS)) {
-                  # annotate all environmental data
-                  meshCovs <- terra::extract(terra::project(get('spatialcovariates',envir = private$spatcovsEnv), 
-                                                            private$Projection),
-                                             private$IPS, ID = FALSE)
-                  # fill in missing values
-                  if(any(is.na(meshCovs))){
-                    naRows <- lapply(meshCovs, function(x) which(is.na(x)))  # identify missing rows
-                    naCovs <- names(naRows)[sapply(naRows, length) > 0]  # identify covs with missing data
-                    for(cov in naCovs){  # fill missing values for rows/covs using nearest neighbour 
-                      meshCovs[naRows[[cov]], cov] <- 
-                        nearestValue(matrix(st_coordinates(private$IPS[naRows[[cov]],])[,c("X","Y")], ncol = 2), 
-                                     get('spatialcovariates', envir = private$spatcovsEnv)[cov])
-                    }
-                    
-                    
-                  }
-                  private$IPS <- cbind(private$IPS, meshCovs)
+                  
+                  ##Fix this 
+                  if (!is.null(private$temporalName)) timeDataIPS <- pointData$timeScale[private$IPS[[private$temporalName]]]
+                  else timeDataIPS <- NULL
+                  
+                  private$IPS <- assignCovariate(data = list(IPS = private$IPS), covariateEnv = private$spatcovsEnv,
+                                                 covariateNames = private$spatcovsNames, timeVariable = private$temporalName, 
+                                                 timeData = timeDataIPS, IPS = TRUE,
+                                                 projection = private$Projection)
+                  
                 }
                 
               }
@@ -1500,6 +1458,8 @@ specifyISDM$set('private', 'addData', function(dataList, responseCounts, respons
               
               if (!is.null(c(private$Offset, private$pointCovariates))) {
                 
+                #Check if own IPS given or not
+                 #If pointCovariate in IPS keep; otherwise NA (or nothing)
                 datMatrix <- as.data.frame(matrix(NA, nrow = nrow(private$IPS), ncol = length(c(private$Offset, private$pointCovariates))))
                 names(datMatrix) <- c(private$pointCovariates, private$Offset)
                 private$IPS <- cbind(private$IPS, datMatrix)
@@ -1581,17 +1541,45 @@ specifyISDM$set('private', 'spatialCovariates', function(spatialCovariates) {
   } 
   else spatcovsEnv <- parent.frame()
   
-  if (!class(spatialCovariates) %in% c('SpatRaster',
-                                       'SpatialPixelsDataFrame')) stop('The spatial Covariates need to be a spatRaster object or a SpatialPixelsDataFrame.')
+  if (inherits(spatialCovariates, 'list')) {
+    
+    if (is.null(private$temporalName)) stop ('The environmental covariates should only be a list if a temporal model is being set up.')
+    ##Check that each layer == 'spatRaster' or 'spatialpixels'
+    if (!all(sapply(spatialCovariates, class) %in% 'SpatRaster')) stop('The list of spatial covariates needs to contain a named list of spatRaster objects.')
+    
+    if (is.null(names(spatialCovariates))) {
+      
+      if (length(sapply(spatialCovariates, names)) == length(spatialCovariates)) names(spatialCovariates) <- sapply(spatialCovariates, names)
+      else {
+        
+        warning('spatialCovariates needs to be a named list of spatialRaster objects. No names provided so will create generic covariate names. Please add names if you do not want this.')
+        
+        names(spatialCovariates) <- paste0('covariate_', seq(1, length(spatialCovariates)))
+        
+      }
+      
+    }
+    #spatcovsIncl should be a name of the cov
+    
+    #covsClass should be a named vector (take first)
+    
+    
+  } 
+  else 
+    if (!class(spatialCovariates) %in% c('SpatRaster')) stop('The spatial covariates need to be a spatRaster object.')
   
   spatcovsIncl <- names(spatialCovariates)
+  #if null then make generic names (cov1, cov2, etc..)
   
-  #if (class(spatialCovariates) %in% c('RasterLayer', 'RasterBrick', 'RasterStack')) objSpat <- terra::rast(spatialCovariates)
+  #Take 1:
+   #sapply(sapply(covList, as.data.frame), function(x) class(x[[1]]))
+  #if names NULL then give spatcovsIncl
   
   if (inherits(spatialCovariates, 'Spatial')) covsClass <- sapply(spatialCovariates@data, class)
   else if (inherits(spatialCovariates, 'SpatRaster')) covsClass <- sapply(as.data.frame(spatialCovariates), class)
   else covsClass <- sapply(as.data.frame(terra::rast(spatialCovariates)), class)
   
+  if (is.null(names(covsClass))) names(covsClass) <- spatcovsIncl
   
   if (is.null(private$ptcovsClass))   private$ptcovsClass <- covsClass
   else private$ptcovsClass <- c(private$ptcovsClass, covsClass) #correct? ## maybe even do this by names...

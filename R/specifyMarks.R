@@ -1812,8 +1812,7 @@ specifyMarks$set('private', 'spatialCovariates', function(spatialCovariates) {
   } 
   else spatcovsEnv <- parent.frame()
   
-  if (!class(spatialCovariates) %in% c('SpatRaster',
-                                       'SpatialPixelsDataFrame')) stop('The spatial Covariates need to be a spatRaster object or a SpatialPixelsDataFrame.')
+  if (!class(spatialCovariates) %in% c('SpatRaster')) stop('The spatial Covariates need to be a spatRaster object.')
   
   spatcovsIncl <- names(spatialCovariates)
   
