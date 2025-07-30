@@ -23,7 +23,8 @@ print.modSpecies <- function(x, ...) {
 #' @param object modSpecies object.
 #' @param ... Not used argument
 #' @rdname summary
-#' @exportS3Method 
+#' @method summary modSpecies
+#' @export
 
 summary.modSpecies <- function(object, ...) {
   #cat('----bru_sdm summary STILL IN DEVELOPMENT----\n\n')
@@ -213,7 +214,8 @@ print.modISDM <- function(x, ...) {
 #' @param object modISDM object.
 #' @param ... Not used argument
 #' @rdname summary
-#' @exportS3Method 
+#' @method summary modISDM
+#' @export
 
 summary.modISDM <- function(object, ...) {
   #cat('----bru_sdm summary STILL IN DEVELOPMENT----\n\n')
@@ -301,7 +303,8 @@ print.modMarks <- function(x, ...) {
 #' @param object modMarks object.
 #' @param ... Not used argument
 #' @rdname summary
-#' @exportS3Method 
+#' @method summary modMarks
+#' @export
 
 summary.modMarks <- function(object, ...) {
   #cat('----bru_sdm summary STILL IN DEVELOPMENT----\n\n')
