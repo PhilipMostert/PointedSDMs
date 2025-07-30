@@ -145,7 +145,7 @@ blockedCV <- function(data, options = list(),
       
       #if testData dosen't cover all blocks stop
       
-      testLike <- do.call(inlabru::like_list,
+      testLike <- do.call(c,
                           makeLhoods(data = testData, #Is this an sf dataset?
                                      formula = data$.__enclos_env__$private$Formulas[predictName],
                                      family = data$.__enclos_env__$private$Family[predictName],
@@ -191,7 +191,7 @@ blockedCV <- function(data, options = list(),
 
     }
 
-    trainLiks <- do.call(inlabru::like_list,
+    trainLiks <- do.call(c,
                  makeLhoods(data = trainData,
                  formula = data$.__enclos_env__$private$Formulas[sourceIN],
                  family = data$.__enclos_env__$private$Family[sourceIN],
@@ -236,8 +236,8 @@ blockedCV <- function(data, options = list(),
         }
       } 
       
-      ipsLike <- inlabru::like(formula = respIPS ~ .,
-                                include = formula_terms, E = ips$weight,
+      ipsLike <- inlabru::bru_obs(formula = respIPS ~ .,
+                                include = bru_used(effects = formula_terms), E = ips$weight,
                     family = 'poisson', data = ips)
       
       # trainLiks[['ips']] <- ipsLike
@@ -299,6 +299,8 @@ blockedCV <- function(data, options = list(),
     foldOptions$control.family <- foldOptions$control.family[sourceIN]
     
     optionsTrain <- append(options, foldOptions)
+    
+    optionsTrain$control.compute <- list(dic = TRUE)
     
     if (uFam) optionsTrain$control.family <- append(optionsTrain$control.family, list(list(link = 'log')))
     
