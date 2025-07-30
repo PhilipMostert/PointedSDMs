@@ -7,7 +7,7 @@
 \alias{summary.modMarks}
 \title{Generic summary function for \code{bruSDM}.}
 \usage{
-\method{summary}{bruSDM}(object, ...)
+summary.bruSDM(object, ...)
 
 \method{summary}{modSpecies}(object, ...)
 
