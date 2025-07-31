@@ -189,7 +189,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
       predData <- terra::extract(x = terra::project(get('spatialcovariates', 
                                                  envir = object$spatCov$env),
-                                                 fm_wkt(data)), 
+                                                 fmesher::fm_wkt(data)), 
                                          y = data, ID = FALSE)
       
       if (any(is.na(predData))) {
@@ -201,7 +201,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
             nearestValue(matrix(st_coordinates(data[naRows[[cov]],])[,c("X","Y")], ncol = 2), 
                          terra::project(get('spatialcovariates', 
                                             envir = object$spatCov$env),
-                                        fm_wkt(data))[cov])
+                                        fmesher::fm_wkt(data))[cov])
         }
       }
     
