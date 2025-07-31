@@ -9,6 +9,7 @@
 #' @param projection The required projection.
 #' 
 #' @import terra
+#' @importFrom dplyr bind_rows
 #' 
 
 assignCovariate <- function(data, covariateEnv, covariateNames,
@@ -24,7 +25,7 @@ assignCovariate <- function(data, covariateEnv, covariateNames,
   #biasCovs <- if(is.null(private$biasFormula)) NULL else labels(terms(private$biasFormula))
   #modelCovs <- allCovs[! allCovs %in% biasCovs]
   
-  fullGeom <- dplyr::bind_rows(lapply(data, dplyr::bind_rows))
+  fullGeom <- bind_rows(lapply(data, bind_rows))
   ## do this per layer if list
   #Maybe easiest to do if temporal
   
@@ -66,6 +67,9 @@ assignCovariate <- function(data, covariateEnv, covariateNames,
           }
           
           for (timeP in uniTempVars) {
+            
+            ##Fix with using the layer argument in terra::extract ie layer = fullGeom[[timeVariable]]
+             #But then figure out how to deal with NA values
             
             timeIn <- unlist(timeData) == timeP
             
