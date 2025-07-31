@@ -55,7 +55,7 @@
 #'  #                            Projection = proj, responsePA = 'Present')
 #'  
 #'  #Print summary
-#'  baseModel
+#'  #baseModel
 #'  
 #'                       
 #'  }
