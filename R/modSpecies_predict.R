@@ -347,13 +347,16 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
       
       .__speciesEval.__ <- paste('Predictions = list(', paste(species,'=',species, collapse = ' , '),')')
       
-      .__thin.__ <- paste0(paste(paste0(species, '[!1:length(',species,') %in% seq(', 1:length(species),',length(',species,'),', length(species), ')] <- FALSE'), collapse=';'),';')
+      #.__thin.__ <- paste0(paste(paste0(species, '[!1:length(',species,') %in% seq(', 1:length(species),',length(',species,'),', length(species), ')] <- FALSE'), collapse=';'),';')
       
       
       predictionFormula <- paste('{',
                                  .__speciesFormulas.__,
-                                 .__thin.__,
+                                 #.__thin.__, DO WE NEED TO FIX THIS?
                                  .__speciesEval.__ ,'}')
+
+        # dataCentroids <- sf::st_coordinates(data)
+        # data <- data[order(dataCentroids[, "X"], dataCentroids[, "Y"]), ]
       
         int <- predict(object, data, formula = parse(text = predictionFormula), ...)
         
