@@ -680,7 +680,7 @@ specifySpecies <- R6::R6Class(classname = 'specifySpecies', lock_objects = FALSE
           
             
             if (!is.null(private$speciesIntercepts)) {
-              if (!private$speciesIntercepts) Effect <- paste0(Species, '_intercept')
+              if (!private$speciesIntercepts) EffectSpec <- paste0(Species, '_intercept')
               else stop('Please change the species intercept component using `.$specifyRandom`')
               
             } else stop('Species intercepts are not in the model.')
