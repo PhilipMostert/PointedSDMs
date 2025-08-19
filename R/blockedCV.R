@@ -406,9 +406,8 @@ blockedCV <- function(data, options = list(),
           notSpec <- unique(unlist(data$.__enclos_env__$private$speciesIn))
           notSpec <- notSpec[notSpec != likeSpec]
           
-          if (data$.__enclos_env__$private$speciesEnvironment) {
+          if (data$.__enclos_env__$private$speciesEnvironment == 'stack') {
             
-            #Change this with the _fixed_effects
             specCov <- apply(expand.grid(paste0(notSpec,'_'), data$.__enclos_env__$private$spatcovsNames), MARGIN = 1, FUN = paste0,collapse = '')
             specCov <- c(specCov, paste0(notSpec, '_Fixed__Effects__Comps'))
             covInPres <- covInPres[!covInPres %in% specCov]
@@ -416,7 +415,7 @@ blockedCV <- function(data, options = list(),
           }
           
           if (!is.null(data$.__enclos_env__$private$speciesIntercepts)) {
-          
+
             if (!data$.__enclos_env__$private$speciesIntercepts)  covInPres <- covInPres[!covInPres %in% paste0(notSpec,'_intercept')]
           
           }
