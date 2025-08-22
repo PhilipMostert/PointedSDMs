@@ -73,6 +73,7 @@ makeLhoods <- function(data, formula, family, mesh, ips,
             speciesRep <- data.frame(rep(unique(data.frame(data[[dataset]][[species]])[,speciesname]), nrow(ips)))
             names(speciesRep) <- speciesname
             speciesRep$speciesSpatialGroup <- speciesRep[,speciesname]
+            speciesRep[,paste0(speciesname, 'INDEX_VAR')] <- unique(data[[dataset]][[species]][,paste0(speciesname, 'INDEX_VAR')][[1]])
             IPS <- ips
             
             namesKeep <- names(IPS)[names(IPS) %in% c('weight', '.block',names(data[[dataset]][[species]]))]
@@ -106,8 +107,9 @@ makeLhoods <- function(data, formula, family, mesh, ips,
         
         like_name <- paste0(nameGive, '_', sub(' .*', '', as.character(formula[[dataset]][[species]][[process]][['LHS']])[2]))
         
-        Likelihoods[[Likindex]] <- inlabru::like(formula = formula[[dataset]][[species]][[process]][['LHS']], ## but obs change these in function call
-                                                 include = formula[[dataset]][[species]][[process]][['RHS']],
+        Likelihoods[[Likindex]] <- inlabru::bru_obs(formula = formula[[dataset]][[species]][[process]][['LHS']], ## but obs change these in function call
+                                                 #include = formula[[dataset]][[species]][[process]][['RHS']],
+                                                 used = inlabru::bru_used(effect = formula[[dataset]][[species]][[process]][['RHS']]),
                                                  data = data[[dataset]][[species]], 
                                                  Ntrials = Ntrials,
                                                  ips = IPS,

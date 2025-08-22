@@ -30,7 +30,9 @@ Imports:
     sp (>= 1.4-5),
     R.devices,
     blockCV (>= 3.0.0),
-    FNN
+    FNN,
+    dplyr,
+    lifecycle
 Suggests:
     testthat (>= 3.0.0),
     sn,

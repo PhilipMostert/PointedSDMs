@@ -67,6 +67,7 @@ Internal functions used to temporarily store data and other information before a
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeFormulas(
   spatcovs,
+  spatcovclass,
   speciesname,
   paresp,
   countresp,

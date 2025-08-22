@@ -76,7 +76,14 @@ predict.modMarks <- function(object, data = NULL, formula = NULL, mesh = NULL,
     
   }
   
-  if (is.null(datasets)) datasets <- unique(object$source)
+  if (is.null(datasets)) {
+    
+    if (any(object$dataType %in% c('Present absence', 'Count data'))) datasets <- names(object$dataType)[object$dataType %in% c('Present absence', 'Count data')][1]
+    else datasets <- names(object$dataType)[1]
+    
+    #datasets <- unique(object$source)
+    
+  }
   
   if (predictor) {
     

@@ -198,7 +198,7 @@ organizedData$addBias(datasetNames = 'eBird')
 }
 
 ## ------------------------------------------------
-## Method `specifySpecies$changeLink`
+## Method `specifySpecies$changeFamily`
 ## ------------------------------------------------
 
 \dontrun{
@@ -324,7 +324,7 @@ organizedData$specifyRandom(copyModel =  list(beta = list(fixed = TRUE)))
 \item \href{#method-specifySpecies-changeComponents}{\code{specifySpecies$changeComponents()}}
 \item \href{#method-specifySpecies-priorsFixed}{\code{specifySpecies$priorsFixed()}}
 \item \href{#method-specifySpecies-specifySpatial}{\code{specifySpecies$specifySpatial()}}
-\item \href{#method-specifySpecies-changeLink}{\code{specifySpecies$changeLink()}}
+\item \href{#method-specifySpecies-changeFamily}{\code{specifySpecies$changeFamily()}}
 \item \href{#method-specifySpecies-spatialBlock}{\code{specifySpecies$spatialBlock()}}
 \item \href{#method-specifySpecies-addSamplers}{\code{specifySpecies$addSamplers()}}
 \item \href{#method-specifySpecies-specifyRandom}{\code{specifySpecies$specifyRandom()}}
@@ -640,9 +640,9 @@ Function to change priors for the fixed (and possibly random) effects of the mod
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{Effect}}{Name of the fixed effect covariate to change the prior for. Can take on \code{'intercept'}, which will change the specification for an intercept (specified by one of \code{species} or \code{datasetName}).}
+\item{\code{Effect}}{Name of the fixed effect covariate to change the prior for. Can take on \code{'intercept'}, which will change the specification for an intercept (specified by one of \code{species} or \code{datasetName}). If any factor covariates are provided or \code{covariateFormula} is set, setting \code{prec.linear} will fix the precision parameter of the effect to the specified precision.}
 
-\item{\code{Species}}{Name of the species (class \code{character}) for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model.}
+\item{\code{Species}}{Name of the species (class \code{character}) for which the prior should change. Defaults to \code{NULL} which will change the prior for all species added to the model. Requires \code{speciesEnvironment = FALSE}.}
 
 \item{\code{datasetName}}{Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.}
 
@@ -716,7 +716,9 @@ Function to specify random fields in the model using penalizing complexity (PC) 
 
 \item{\code{Species}}{Name of the species to change the spatial effect for. If \code{TRUE} then changes the spatial effect for the shared species field.}
 
-\item{\code{Bias}}{Logical: specify the spatial field for the bias effect. If seperate fields are specified for different fields, the argument may be the name of the dataset for which the bias field to be specified.  #' @param PC Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}, which uses \code{\link[INLA]{inla.spde2.pcmatern}} to specify the model; otherwise uses \code{\link[INLA]{inla.spde2.matern}}.}
+\item{\code{Bias}}{Logical: specify the spatial field for the bias effect. If seperate fields are specified for different fields, the argument may be the name of the dataset for which the bias field to be specified.}
+
+\item{\code{PC}}{Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}, which uses \code{\link[INLA]{inla.spde2.pcmatern}} to specify the model; otherwise uses \code{\link[INLA]{inla.spde2.matern}}.}
 
 \item{\code{Remove}}{Logical: should the chosen spatial field be removed. Requires one of \code{sharedSpatial}, \code{species}, \code{mark} or \code{bias} to be non-missing, which chooses which field to remove.}
 
@@ -764,18 +766,20 @@ A new model for the spatial effects.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-specifySpecies-changeLink"></a>}}
-\if{latex}{\out{\hypertarget{method-specifySpecies-changeLink}{}}}
-\subsection{Method \code{changeLink()}}{
-Function used to change the link function for a given process.
+\if{html}{\out{<a id="method-specifySpecies-changeFamily"></a>}}
+\if{latex}{\out{\hypertarget{method-specifySpecies-changeFamily}{}}}
+\subsection{Method \code{changeFamily()}}{
+Function used to specify the family properties of a dataset.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifySpecies$changeLink(datasetName, Link, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{specifySpecies$changeFamily(datasetName, Family, Link)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{datasetName}}{Name of the dataset for which the link function needs to be changed.}
+
+\item{\code{Family}}{The statistical family.}
 
 \item{\code{Link}}{Name of the link function to add to the process. If missing, will print the link function of the specified dataset.}
 }
@@ -941,7 +945,8 @@ Function to specify the models and priors for the random effects included in the
   copyModel = list(beta = list(fixed = FALSE)),
   copyBias = list(beta = list(fixed = FALSE)),
   speciesCopy = list(beta = list(fixed = FALSE)),
-  speciesIntercepts = list(prior = "loggamma", param = c(1, 5e-05)),
+  speciesIntercepts = list(prec = list(fixed = TRUE, initial =
+    log(INLA::inla.set.control.fixed.default()$prec))),
   speciesGroup = list(model = "iid", hyper = list(prec = list(prior = "loggamma", param =
     c(1, 5e-05))))
 )}\if{html}{\out{</div>}}
@@ -958,7 +963,7 @@ Function to specify the models and priors for the random effects included in the
 
 \item{\code{speciesCopy}}{List of model specifications given to the hyper parameters for the species  \code{"copy"} model. Defaults to \code{list(beta = list(fixed = FALSE))}.}
 
-\item{\code{speciesIntercepts}}{Prior distribution for precision parameter for the random species intercept term. Defaults to \code{INLA}'s default choice.}
+\item{\code{speciesIntercepts}}{Prior distribution for precision parameter for the random species intercept term. Defaults to \code{list(prec = list(fixed = TRUE, initial = log(INLA::inla.set.control.fixed.default()$prec)))}.}
 
 \item{\code{speciesGroup}}{Prior distribution for the precision parameter for the iid group model. Defaults to \code{INLA}'s default.
 #' @return An updated component list.}

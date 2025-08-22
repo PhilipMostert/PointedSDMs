@@ -109,7 +109,7 @@ fitISDM <- function(data, options = list()) {
   componentsJoint <- formula(paste(paste('~ - 1 +', paste(labels(terms(componentsJoint)), collapse = ' + '))))
   
   
-  allLiks <- do.call(inlabru::like_list,
+  allLiks <- do.call(c,
                      makeLhoods(data = data$.__enclos_env__$private$modelData,
                                 formula = data$.__enclos_env__$private$Formulas,
                                 family = data$.__enclos_env__$private$Family,
@@ -129,20 +129,21 @@ fitISDM <- function(data, options = list()) {
     
     for (bias in names(data$.__enclos_env__$private$biasData)) {
       
-      biasLikes[[paste0(bias, '_samplers')]] <- inlabru::like(formula = coordinates ~ .,
+      biasLikes[[paste0(bias, '_samplers')]] <- inlabru::bru_obs(formula = coordinates ~ .,
                                                               family = 'cp',
-                                                              data = do.call(sp::rbind.SpatialPointsDataFrame, data$.__enclos_env__$private$modelData[[bias]]),
+                                                              data = do.call(rbind, data$.__enclos_env__$private$modelData[[bias]]),
                                                               samplers = data$.__enclos_env__$private$biasData[[bias]],
                                                               ips = data$.__enclos_env__$private$IPS,
                                                               domain = list(coordinates = data$.__enclos_env__$private$INLAmesh),
-                                                              include = c(paste0(bias, '_samplers_field'), paste0(bias,'_samplers'), data$.__enclos_env__$private$spatcovsNames),
+                                                              #include = c(paste0(bias, '_samplers_field'), paste0(bias,'_samplers'), data$.__enclos_env__$private$spatcovsNames),
+                                                              used = bru_used(effects =  c(paste0(bias, '_samplers_field'), paste0(bias,'_samplers'), data$.__enclos_env__$private$spatcovsNames)),
                                                               tag = paste0(bias, '_samplers'))
       
     }
     
-    biasLikes <- do.call(inlabru::like_list, biasLikes)
+    biasLikes <- do.call(c, biasLikes)
     
-    allLiks <- inlabru::like_list(do.call(append, list(allLiks, biasLikes)))
+    allLiks <- c(do.call(append, list(allLiks, biasLikes)))
     
     data$.__enclos_env__$private$optionsINLA$control.family <- append(data$.__enclos_env__$private$optionsINLA$control.family,
                                                                       lapply(1:length(biasLikes), function(x) list(link = 'log')))
@@ -165,8 +166,20 @@ fitISDM <- function(data, options = list()) {
   }
   
   if (is.null(data$.__enclos_env__$private$speciesIntercepts)) data$.__enclos_env__$private$speciesIntercepts <- FALSE
-  if (data$.__enclos_env__$private$speciesIntercepts) row.names(inlaModel$summary.random[[paste0(data$.__enclos_env__$private$speciesName, '_intercepts')]]) <- data$.__enclos_env__$private$speciesTable[['species']]
   
+  if (!is.null(data$.__enclos_env__$private$speciesName)) {
+  
+  if (data$.__enclos_env__$private$speciesIntercepts) row.names(inlaModel$summary.random[[paste0(data$.__enclos_env__$private$speciesName, '_intercepts')]]) <- data$.__enclos_env__$private$speciesTable[['species']]
+  if (any(names(inlaModel$summary.random) %in% data$.__enclos_env__$private$spatcovsNames)) {
+
+    for (nm in names(inlaModel$summary.random)[names(inlaModel$summary.random) %in% data$.__enclos_env__$private$spatcovsNames]) {
+      row.names(inlaModel$summary.random[[nm]]) <- data$.__enclos_env__$private$speciesTable[['species']]
+    }
+
+  }
+  
+  }
+  #Do this for all the covariate effects, but make it with the correct index incase any is not in
   
   inlaModel[['componentsJoint']] <- componentsJoint
   inlaModel[['optionsJoint']] <- optionsJoint

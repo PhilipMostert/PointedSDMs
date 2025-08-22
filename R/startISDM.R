@@ -4,7 +4,7 @@
 #' As a result, the arguments associated with this function are predominantly related to describing variable names within the datasets that are relevant, and arguments related to what terms should be included in the formula for the integrated model. The output of this function is an \code{R6} object, and so there are a variety of public methods within the output of this function which can be used to further specify the model (see \code{?specifyISDM} or \code{.$help()} for a comprehensive description of these public methods).
 #' 
 #' @param ... The datasets to be used in the model. Must come as either \code{sf} objects, or as a list of named \code{sf} objects. 
-#' @param spatialCovariates The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{SpatialRaster} object. Can be either \code{numeric}, \code{factor} or \code{character} data. Defaults to \code{NULL} which includes no spatial effects in the model.
+#' @param spatialCovariates The spatial covariates used in the model. These covariates must be measured at every location (pixel) in the study area, and must be a \code{SpatialRaster} object. Can be either \code{numeric}, \code{factor} or \code{character} data. Defaults to \code{NULL} which includes no spatial effects in the model. Can also be a list of spatial rasters if \code{temporalModel} is non-\code{NULL}. In this case, each item is the covariate, and each layer is the raster for the \code{t} time periods (or one layer if the covariate is non-temporally varying).
 #' @param Projection The coordinate reference system used by both the spatial points and spatial covariates. Must be of class \code{character}.
 #' @param Mesh An \code{fm_mesh_2d} object required for the spatial random fields and the integration points in the model (see \code{\link[fmesher]{fm_mesh_2d_inla}} from the \pkg{fmesher} package for more details). 
 #' @param IPS The integration points to be used in the model (that is, the points on the map where the intensity of the model is calculated). See \code{\link[fmesher]{fm_int}} from the \pkg{fmesher} package for more details regarding these points; however defaults to \code{NULL} which will create integration points from the \code{Mesh} and \code{Boundary }objects.
@@ -181,12 +181,7 @@ startISDM <- function(..., spatialCovariates = NULL,
   if (is.null(pointsSpatial) || pointsSpatial == 'shared') copyModel <- NULL
   else copyModel <- deparse1(list(beta = list(fixed = FALSE)))
   
-  if (!is.null(Formulas$covariateFormula) &&
-      !is.null(Formulas$biasFormula)) {
-    
-    ##Check that there is nothing overlapping here -- remove anything that is
-    
-  }
+  if (any(!names(Formulas) %in% c('covariateFormula', 'biasFormula'))) stop('Formulas must be a named list containing at least one of covariateFormula or biasFormula.')
   
   bruData <- specifyISDM$new(data = dataPoints, projection = Projection,
                              Inlamesh = Mesh, initialnames = initialnames,

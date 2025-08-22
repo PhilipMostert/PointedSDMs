@@ -73,7 +73,7 @@ test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra 
 
   ##Run with species
   obj3 <- startSpecies(PO, PA, Projection = projection, Mesh = mesh, responsePA = responsePA,
-                    IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts,
+                    IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, speciesEnvironment = 'community', 
                     spatialCovariates = cov, speciesName = 'species')
 
   spatMod3 <- fitISDM(data = obj3,
@@ -83,9 +83,11 @@ test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra 
   expect_setequal(spatMod3$species$speciesIn$PA, c('bird'))
   expect_equal(spatMod3$species$speciesVar, 'species')
   expect_true(spatMod3$species$speciesEffects$Intercepts)
-  expect_true(spatMod3$species$speciesEffects$Environmental)
+  expect_setequal(spatMod3$species$speciesEffects$Environmental, 'community')
   
-  expect_setequal(names(spatMod3$summary.random), c('PO_spatial', 'PA_spatial', 'speciesShared', 'species_intercepts'))
+  expect_setequal(names(spatMod3$summary.random), c('PO_spatial', 'PA_spatial', 'speciesShared', 'species_intercepts', 'covariate', 'cov2'))
+  expect_setequal(row.names(spatMod3$summary.fixed), c("covariateCommunity", "cov2Community", "PO_intercept", "PA_intercept"))
+  
   expect_setequal(sapply(spatMod3$.args$control.family, function(x) x$link), c('log', 'log', 'cloglog', 'cloglog'))
   
   

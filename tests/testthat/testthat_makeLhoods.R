@@ -65,7 +65,7 @@ test_that('makeLhoods makes a list of likelihoods', {
   
   #Expect a list of Lhoods
   expect_type(Lhoods, 'list')
-  expect_true(all(vapply(Lhoods, function(x) inherits(x, "bru_like"), logical(1))))
+  expect_true(all(vapply(Lhoods, function(x) inherits(x, "bru_obs"), logical(1))))
   
   #Names should be in format: dataset_species_response
   expect_setequal(names(Lhoods), c("PO_fish_geometry", "PA_bird_PAresp"))

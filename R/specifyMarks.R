@@ -1370,6 +1370,11 @@ specifyMarks$set('public', 'initialize',  function(data,coordinates,
     else ips <- st_transform(fmesher::fm_int(domain = Inlamesh), projection)
     
     
+  } else {
+    
+    if (!inherits(ips, 'sf')) stop('IPS needs to be a sf object.')
+    if (!'weight' %in% names(ips)) stop('Weight needs to be a name in IPS.')
+    
   }
   
   st_geometry(ips) <- 'geometry'
@@ -1552,7 +1557,7 @@ specifyMarks$set('private', 'addData', function(dataList, responseCounts, respon
                    
                    ##Add here that if markSpatial then add mark_spatial
                    #Also add markModel in the initial call.
-                   pointData$makeFormulas(spatcovs = private$spatcovsNames, speciesname = speciesName, temporalname = private$temporalName,
+                   pointData$makeFormulas(spatcovs = private$spatcovsNames, spatcovclass = NULL, speciesname = speciesName, temporalname = private$temporalName,
                                           paresp = responsePA, countresp = responseCounts, marksspatial = private$marksSpatial, speciesintercept = private$speciesIntercepts, 
                                           marks = markNames, spatial = private$Spatial, speciesindependent = private$speciesIndependent, speciesenvironment = private$speciesEnvironment,
                                           intercept = private$Intercepts, markintercept = private$marksIntercepts, speciesspatial = private$speciesSpatial, biasformula = private$biasFormula,
@@ -1807,8 +1812,7 @@ specifyMarks$set('private', 'spatialCovariates', function(spatialCovariates) {
   } 
   else spatcovsEnv <- parent.frame()
   
-  if (!class(spatialCovariates) %in% c('SpatRaster',
-                                       'SpatialPixelsDataFrame')) stop('The spatial Covariates need to be a spatRaster object or a SpatialPixelsDataFrame.')
+  if (!class(spatialCovariates) %in% c('SpatRaster')) stop('The spatial Covariates need to be a spatRaster object.')
   
   spatcovsIncl <- names(spatialCovariates)
   

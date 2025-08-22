@@ -11,7 +11,7 @@
 #' @param Boundary A \code{sf} object of the study area. If not missing, this object is used to help create the integration points.
 #' @param speciesSpatial Argument to specify if each species should have their own spatial effect with different hyperparameters to be estimated using \pkg{INLA}'s "replicate" feature, of if a the field's should be estimated per species copied across datasets using \pkg{INLA}'s "copy" feature. Possible values include: \code{'replicate'}, \code{'copy'}, \code{'shared'} or \code{NULL} if no species-specific spatial effects should be estimated.
 #' @param speciesIntercept Argument to control the species intercept term. Defaults to \code{TRUE} which creates a random intercept term, \code{FALSE} creates a fixed intercept term, and \code{NULL} removes the intercept term.
-#' @param speciesEnvironment Argument to control the species environmental term. Defaults to \code{TRUE} which creates species level environental effects. To create shared effects across the species, use \code{FALSE}.
+#' @param speciesEnvironment Argument to control the species environmental term. Defaults to \code{"stack"} which creates species specific effects. Setting the argument to \code{"community"} will create a community mean and variations around for each covariate, and setting the argument to \code{"shared"} will create shared responses to the covariates. Note that if \code{covariateFormula} is provided in the \code{Formulas} argument, then this argument cannot be set to \code{"community"}. 
 #' @param pointCovariates The non-spatial covariates to be included in the integrated model (for example, in the field of ecology the distance to the nearest road or time spent sampling could be considered). These covariates must be included in the same data object as the points.
 #' @param Offset Name of the offset variable (class \code{character}) in the datasets. Defaults to \code{NULL}; if the argument is non-\code{NULL}, the variable name needs to be standardized across datasets (but does not need to be included in all datasets). The offset variable will be transformed onto the log-scale in the integrated model.
 #' @param pointsIntercept Logical argument: should the points be modeled with intercepts. Defaults to \code{TRUE}.  Note that if this argument is non-\code{NULL} and \code{pointsIntercepts} is missing, \code{pointsIntercepts} will be set to \code{FALSE}.
@@ -92,7 +92,7 @@ startSpecies <- function(..., spatialCovariates = NULL,
                       Projection, Mesh, 
                       speciesSpatial = 'replicate', 
                       speciesIntercept = TRUE, 
-                      speciesEnvironment = TRUE, 
+                      speciesEnvironment = 'stack', 
                       speciesName,
                       IPS = NULL, Boundary = NULL, pointCovariates = NULL,
                       Offset = NULL, pointsIntercept = TRUE, 
@@ -215,10 +215,22 @@ startSpecies <- function(..., spatialCovariates = NULL,
   if (is.null(pointsSpatial) || pointsSpatial == 'shared') copyModel <- NULL
   else copyModel <- deparse1(list(beta = list(fixed = FALSE)))
   
-  if (!is.null(Formulas$covariateFormula) &&
-      !is.null(Formulas$biasFormula)) {
+  if (any(!names(Formulas) %in% c('covariateFormula', 'biasFormula'))) stop('Formulas must be a named list containing at least one of covariateFormula or biasFormula.')
+  
+  if (is.logical(speciesEnvironment)) {
     
-    ##Check that there is nothing overlapping here -- remove anything that is
+    lifecycle::deprecate_warn(when = '2.1.4', 
+   what = "PointedSDMs::startSpecies(speciesEnvironment = 'Must now be one of community, stack or shared. Setting speciesEnvironment to TRUE will create a community model and setting it to FALSE will create a stacked model')",always = TRUE)
+    
+    if (speciesEnvironment) speciesEnvironment <- 'community'
+    else 'stacked'
+  } else 
+    if (!speciesEnvironment %in% c('community', 'stack', 'shared') | length(speciesEnvironment) != 1) stop('speciesEnvironment must be one of "community", "stacked" or "shared".')
+  
+  if (!is.null(Formulas$covariateFormula) & speciesEnvironment == 'community') {
+    
+    warning ('speciesEnvironment cannot be "community" if covariateFormula is provided. Setting speciesEnvironment to "stack".')
+    speciesEnvironment <- 'stack'
     
   }
   

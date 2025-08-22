@@ -15,7 +15,7 @@ makeFormulaComps <- function(form, species, speciesnames, type) {
   if (type == 'Bias') frontPart <- 'Bias__Effects__Comps(main = '
   else frontPart <- 'Fixed__Effects__Comps(main = '
   
-  if (!species) {
+  if (!species %in% c('stack', 'community')) {
     
   terms <- paste(terms, collapse = ' + ')
   
@@ -29,30 +29,17 @@ makeFormulaComps <- function(form, species, speciesnames, type) {
   
   else {
     
-    newTerms <- list()
+    #newTerms <- list()
     newList <- list()
     
     for (species in speciesnames) {
       
-      speciespart <- paste0('\\1',species,'_\\2')
+      terms <- paste(terms, collapse = ' + ')
       
-      for (cov in terms) {
-        
-        covpart <- paste0("(.*)(",cov,')')
-        
-        newParts <- sub(covpart, speciespart, terms)
-        newParts <- newParts[!newParts %in% terms]
-        
-        if (all(newParts %in% terms)) newTerms[[species]][[cov]] <- NULL ##Assume there won't be some half parts?
-        else newTerms[[species]][[cov]] <- newParts
-        
-      }
+      newFormula <- formula(paste('~ ', terms, '-1 '))
       
-      speciesFormula <- formula(paste('~', paste(unique(unlist(newTerms[[species]])), collapse = ' + '), '-1'))
-      
-      
-      newList[[species]] <- paste0(species, '_', frontPart, paste(speciesFormula, collapse = ''),', model = "fixed")')
-      
+      newList[[species]] <- paste0(species, '_', frontPart, paste(newFormula, collapse = ''),', model = "fixed")')
+
     }
     
     unlist(newList)

@@ -515,7 +515,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   }
   ,
   #' @description Function to change priors for the fixed (and possibly random) effects of the model.
-  #' @param Effect Name of the fixed effect covariate to change the prior for. Can take on \code{'intercept'}, which will change the specification for an intercept (specified by one of \code{species} or \code{datasetName}).
+  #' @param Effect Name of the fixed effect covariate to change the prior for. Can take on \code{'intercept'}, which will change the specification for an intercept (specified by one of \code{species} or \code{datasetName}).  If any factor covariates are provided or \code{covariateFormula} is set, setting \code{prec.linear} will fix the precision parameter of the effect to the specified precision.
   #' @param datasetName Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.
   #' @param mean.linear Mean value for the prior of the fixed effect. Defaults to \code{0}.
   #' @param prec.linear Precision value for the prior of the fixed effect. Defaults to \code{0.001}.
@@ -558,7 +558,6 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
         
         intTRUE <- TRUE
         
-          
           if (!private$Intercepts) stop('Fixed effect is given as "intercept", but intercepts have been turned off in intModel.')
           
           if (is.null(datasetName)) datasetName <- unique(private$dataSource)
@@ -570,6 +569,29 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
       else {
         
         intTRUE <- FALSE
+        Form <- FALSE
+        
+        if (!is.null(private$covariateFormula)) {
+          
+          if (any(grepl(Effect, labels(terms(private$covariateFormula))))) {
+            
+            EffectComp <- 'Fixed__Effects__Comps'
+            Cov <- deparse(update.formula(private$covariateFormula, ~ . -1))
+            Form <- TRUE
+          }
+          
+        }
+        
+        if (!is.null(private$biasFormula)) {
+          
+          if (any(grepl(Effect, labels(terms(private$biasFormula))))) {
+            
+            EffectComp <- 'Bias__Effects__Comps'
+            Cov <- deparse(update.formula(private$biasFormula, ~ . -1))
+            Form <- TRUE
+          }
+          
+        }
         
         if (!Effect %in% c(private$spatcovsNames, private$pointCovariates)) stop('Fixed effect provided not present in the model. Please add covariates using the "spatialCovariates" or "pointCovariates" argument in intModel.')
         
@@ -591,7 +613,15 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
         }
         
       }
-      else newComponent <- paste0(Effect,'(main = ', Effect, ', model = \"', cov_class, '\", mean.linear = ', mean.linear, ', prec.linear = ', prec.linear, ')')
+      else {
+        
+        if (Form) newComponent <- paste0(EffectComp, '(main = ', Cov,', model = "fixed", hyper = list(prec = list(fixed = TRUE, initial = log(', prec.linear, '))))')
+        else 
+          if (cov_class == 'linear' ) newComponent <- paste0(Effect,'(main = ', Effect, ', model = \"', cov_class, '\", mean.linear = ', mean.linear, ', prec.linear = ', prec.linear, ')')
+          else 
+            if (grepl('factor', cov_class)) newComponent <- paste0(Effect,'(main = ', Cov, ', model = \"', cov_class, '\", hyper = list(prec = list(fixed = TRUE, initial = log(', prec.linear, '))))')
+        
+      }
       
       for (comp in newComponent) {
         
@@ -732,10 +762,11 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
     
   }
   ,
-  #' @description Function used to change the link function for a given process.
+  #' @description Function used to specify the family properties of a dataset.
   #' @param datasetName Name of the dataset for which the link function needs to be changed.
+  #' @param Family The statistical family.
   #' @param Link Name of the link function to add to the process. If missing, will print the link function of the specified dataset.
-  #' @return A new link function for a process.
+  #' @return A new link function of family for a process.
   #' @examples
   #' \dontrun{
   #'  if (requireNamespace('INLA')) {
@@ -763,8 +794,9 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #'  
   #' } 
   #' }
-  changeLink = function(datasetName,
-                        Link) {
+  specifyFamily = function(datasetName,
+                           Family,
+                           Link) {
     
     if (missing(datasetName)) stop('Please provide a dataset name.')
     
@@ -772,8 +804,22 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
     
     if (!datasetName %in% private$dataSource) stop('Dataset name provided not in model.')
     
-    private$optionsINLA[['control.family']][[which(private$dataSource == datasetName)]] <-  list(link = Link)
+    if (!missing(Link)) private$optionsINLA[['control.family']][[which(private$dataSource == datasetName)]] <-  list(link = Link)
     
+    if (!missing(Family)) {
+      
+      #If changing family and link missing, have to make link default?
+      if (!Family %in% names(inla.models()$likelihood)) stop('Family not supported by R-INLA. Valid options are found in: `names(INLA::inla.models()$likelihood)`.')
+      else  private$Family[datasetName] <- Family
+      
+      if (missing(Link)) {
+        
+        warning('Link is missing. Therefore will assume default link function')
+        private$optionsINLA[['control.family']][[which(private$dataSource == datasetName)]] <-  list(link = 'default')
+        
+      }
+      
+    }
   }
   ,
   #' @description Function to spatially block the datasets, which will then be used for model cross-validation with \code{\link{blockedCV}}. See the \code{\link[blockCV]{spatialBlock}} function from \pkg{blockCV} for how the spatial blocking works and for further details on the function's arguments.
@@ -1187,7 +1233,14 @@ specifyISDM$set('public', 'initialize',  function(data, projection, Inlamesh, in
     else ips <- st_transform(fmesher::fm_int(domain = Inlamesh), projection)
     
     
+  } 
+  else {
+    
+    if (!inherits(ips, 'sf')) stop('IPS needs to be a sf object.')
+    if (!'weight' %in% names(ips)) stop('Weight needs to be a name in IPS.')
+    
   }
+
   
   st_geometry(ips) <- 'geometry'
   
@@ -1304,7 +1357,7 @@ specifyISDM$set('private', 'addData', function(dataList, responseCounts, respons
               
               private$dataSource <- unlist(as.vector(pointData$dataSource))
               
-              pointData$makeFormulas(spatcovs = private$spatcovsNames, speciesname = NULL, temporalname = private$temporalName,
+              pointData$makeFormulas(spatcovs = private$spatcovsNames, spatcovclass = NULL, speciesname = NULL, temporalname = private$temporalName,
                                      paresp = responsePA, countresp = responseCounts, marksspatial = private$marksSpatial, speciesintercept = NULL, 
                                      marks = NULL, spatial = private$Spatial, speciesindependent = NULL, speciesenvironment = FALSE,
                                      intercept = private$Intercepts, markintercept = NULL, speciesspatial = NULL, biasformula = private$biasFormula,
@@ -1314,7 +1367,7 @@ specifyISDM$set('private', 'addData', function(dataList, responseCounts, respons
                 
                 pointData$makeMultinom(multinomVars = private$temporalName,
                                        return = 'time', oldVars = NULL)
-                
+       
                 private$temporalVars <- pointData$timeIndex
                 
                 numTime <- length(unique(unlist(private$temporalVars)))
@@ -1383,70 +1436,20 @@ specifyISDM$set('private', 'addData', function(dataList, responseCounts, respons
               ##MAKE THIS A FUNCTION TOO
               if (!is.null(private$spatcovsNames)) {
                 
-                for (data in names(pointData$Data)) {
-                  
-                  for (species in 1:length(pointData$Data[[data]])) {
-                    
-                    for (cov in private$spatcovsNames) {
-                      
-                      if (!is.null(private$speciesName) && private$speciesEnvironment) covIndex <- paste0(pointData$SpeciesInData[[data]][species],'_', cov)
-                      else covIndex <- cov
-                      
-                      pointData$Data[[data]][[species]][[covIndex]] <- inlabru::eval_spatial(where = pointData$Data[[data]][[species]], 
-                                                                                             data = get('spatialcovariates', 
-                                                                                                        envir = private$spatcovsEnv)[cov],
-                                                                                             layer = cov)
-                      
-                      if (is.character(pointData$Data[[data]][[species]][[covIndex]])) pointData$Data[[data]][[species]][[covIndex]] <- as.factor(pointData$Data[[data]][[species]][[covIndex]])
-                      
-                      if (any(is.na(pointData$Data[[data]][[species]][[covIndex]]))) {
-                        
-                        pointData$Data[[data]][[species]][[covIndex]] <- inlabru::bru_fill_missing(where = pointData$Data[[data]][[species]], 
-                                                                                                   data = get('spatialcovariates', 
-                                                                                                              envir = private$spatcovsEnv)[cov],
-                                                                                                   layer = cov,
-                                                                                                   values = pointData$Data[[data]][[species]][[covIndex]])
-                        
-                      }
-                      
-                      
-                    }
-                    
-                  }
-                }
+                pointData$Data <- assignCovariate(data = pointData$Data, covariateEnv = private$spatcovsEnv,
+                                                  covariateNames = private$spatcovsNames, timeVariable = private$temporalName, 
+                                                  timeData = private$temporalVars, projection = private$Projection)
                 
                 if (!is.null(private$IPS)) {
                   
-                  for (covIPS in private$spatcovsNames) {
-                    
-                    if (!is.null(private$speciesName) && private$speciesEnvironment) covIPSindex <- paste0(unique(unlist(private$speciesIn)), '_', covIPS)
-                    else covIPSindex <- covIPS
-                    
-                    for (covADD in covIPSindex) {
-                      
-                      private$IPS[[covADD]] <- inlabru::eval_spatial(where =  private$IPS, 
-                                                                     data = get('spatialcovariates', 
-                                                                                envir = private$spatcovsEnv)[covIPS],
-                                                                     layer = covIPS
-                      )
-                      
-                      if (is.character(private$IPS[[covADD]])) private$IPS[[covADD]] <- as.factor(private$IPS[[covADD]])
-                      
-                      if (any(is.na(private$IPS[[covADD]]))) {
-                        
-                        private$IPS[[covADD]] <- inlabru::bru_fill_missing(where = private$IPS, 
-                                                                           data = get('spatialcovariates', 
-                                                                                      envir = private$spatcovsEnv)[covIPS],
-                                                                           layer = covIPS,
-                                                                           values = private$IPS[[covADD]])
-                        
-                      }
-                      
-                    }
-                    
-                    
-                  }
+                  ##Fix this 
+                  if (!is.null(private$temporalName)) timeDataIPS <- pointData$timeScale[private$IPS[[private$temporalName]]]
+                  else timeDataIPS <- NULL
                   
+                  private$IPS <- assignCovariate(data = list(IPS = private$IPS), covariateEnv = private$spatcovsEnv,
+                                                 covariateNames = private$spatcovsNames, timeVariable = private$temporalName, 
+                                                 timeData = timeDataIPS, IPS = TRUE,
+                                                 projection = private$Projection)
                   
                 }
                 
@@ -1455,6 +1458,8 @@ specifyISDM$set('private', 'addData', function(dataList, responseCounts, respons
               
               if (!is.null(c(private$Offset, private$pointCovariates))) {
                 
+                #Check if own IPS given or not
+                 #If pointCovariate in IPS keep; otherwise NA (or nothing)
                 datMatrix <- as.data.frame(matrix(NA, nrow = nrow(private$IPS), ncol = length(c(private$Offset, private$pointCovariates))))
                 names(datMatrix) <- c(private$pointCovariates, private$Offset)
                 private$IPS <- cbind(private$IPS, datMatrix)
@@ -1536,17 +1541,45 @@ specifyISDM$set('private', 'spatialCovariates', function(spatialCovariates) {
   } 
   else spatcovsEnv <- parent.frame()
   
-  if (!class(spatialCovariates) %in% c('SpatRaster',
-                                       'SpatialPixelsDataFrame')) stop('The spatial Covariates need to be a spatRaster object or a SpatialPixelsDataFrame.')
+  if (inherits(spatialCovariates, 'list')) {
+    
+    if (is.null(private$temporalName)) stop ('The environmental covariates should only be a list if a temporal model is being set up.')
+    ##Check that each layer == 'spatRaster' or 'spatialpixels'
+    if (!all(sapply(spatialCovariates, class) %in% 'SpatRaster')) stop('The list of spatial covariates needs to contain a named list of spatRaster objects.')
+    
+    if (is.null(names(spatialCovariates))) {
+      
+      if (length(sapply(spatialCovariates, names)) == length(spatialCovariates)) names(spatialCovariates) <- sapply(spatialCovariates, names)
+      else {
+        
+        warning('spatialCovariates needs to be a named list of spatialRaster objects. No names provided so will create generic covariate names. Please add names if you do not want this.')
+        
+        names(spatialCovariates) <- paste0('covariate_', seq(1, length(spatialCovariates)))
+        
+      }
+      
+    }
+    #spatcovsIncl should be a name of the cov
+    
+    #covsClass should be a named vector (take first)
+    
+    
+  } 
+  else 
+    if (!class(spatialCovariates) %in% c('SpatRaster')) stop('The spatial covariates need to be a spatRaster object.')
   
   spatcovsIncl <- names(spatialCovariates)
+  #if null then make generic names (cov1, cov2, etc..)
   
-  #if (class(spatialCovariates) %in% c('RasterLayer', 'RasterBrick', 'RasterStack')) objSpat <- terra::rast(spatialCovariates)
+  #Take 1:
+   #sapply(sapply(covList, as.data.frame), function(x) class(x[[1]]))
+  #if names NULL then give spatcovsIncl
   
   if (inherits(spatialCovariates, 'Spatial')) covsClass <- sapply(spatialCovariates@data, class)
   else if (inherits(spatialCovariates, 'SpatRaster')) covsClass <- sapply(as.data.frame(spatialCovariates), class)
   else covsClass <- sapply(as.data.frame(terra::rast(spatialCovariates)), class)
   
+  if (is.null(names(covsClass))) names(covsClass) <- spatcovsIncl
   
   if (is.null(private$ptcovsClass))   private$ptcovsClass <- covsClass
   else private$ptcovsClass <- c(private$ptcovsClass, covsClass) #correct? ## maybe even do this by names...

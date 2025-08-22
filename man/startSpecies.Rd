@@ -11,7 +11,7 @@ startSpecies(
   Mesh,
   speciesSpatial = "replicate",
   speciesIntercept = TRUE,
-  speciesEnvironment = TRUE,
+  speciesEnvironment = "stack",
   speciesName,
   IPS = NULL,
   Boundary = NULL,
@@ -39,7 +39,7 @@ startSpecies(
 
 \item{speciesIntercept}{Argument to control the species intercept term. Defaults to \code{TRUE} which creates a random intercept term, \code{FALSE} creates a fixed intercept term, and \code{NULL} removes the intercept term.}
 
-\item{speciesEnvironment}{Argument to control the species environmental term. Defaults to \code{TRUE} which creates species level environental effects. To create shared effects across the species, use \code{FALSE}.}
+\item{speciesEnvironment}{Argument to control the species environmental term. Defaults to \code{"stack"} which creates species specific effects. Setting the argument to \code{"community"} will create a community mean and variations around for each covariate, and setting the argument to \code{"shared"} will create shared responses to the covariates. Note that if \code{covariateFormula} is provided in the \code{Formulas} argument, then this argument cannot be set to \code{"community"}.}
 
 \item{speciesName}{Name of the species variable name (class \code{character}). Specifying this argument turns the model into a stacked species distribution model, and calculates covariate values for the individual species, as well as a species group model in the shared spatial field. Defaults to \code{NULL}. Note that if this argument is non-\code{NULL} and \code{pointsIntercepts} is missing, \code{pointsIntercepts} will be set to \code{FALSE}.}
 

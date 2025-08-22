@@ -70,7 +70,13 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   #Why can't you do both here?
   if (bias && spatial) stop('Please choose one of bias and spatial.')
   
-  if (is.null(datasets)) datasets <- unique(object$source)
+  if (is.null(datasets)) {
+    
+    if (any(object$dataType %in% c('Present absence', 'Count data'))) datasets <- names(object$dataType)[object$dataType %in% c('Present absence', 'Count data')][1]
+    else datasets <- names(object$dataType)[1]
+    
+    #datasets <- unique(object$source)
+  }
   
   if (predictor) {
     
@@ -123,7 +129,7 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   if (!any(names(data) %in% object$spatCovs$name)) {
     
     for (spatCov in object$spatCovs$name) {
-      
+      ##Fix this
       data[, spatCov] <- inlabru::eval_spatial(where =  data, 
                                                 data = get('spatialcovariates', 
                                                            envir = object$spatCov$env)[spatCov],
@@ -143,6 +149,23 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
         
       }
       
+      
+    }
+    
+  }
+  
+  if (object$spatial$points == 'correlate' & !'._dataset_index_var_.' %in% names(data)) {
+    ## should be dataset
+    if (any(object$dataType == "Present absence")) {
+      
+      message('Predicting the spatial effect for the first Presence absence dataset. This may be changed by setting `._dataset_index_var_.` in your prediction data to the corresponding position of dataset in the model.')
+      data$._dataset_index_var_. <- which(object$dataType == "Present absence")[1]
+      
+    }
+    else {
+      
+      message('No presence absence data in the model, so setting `._dataset_index_var_.` to 1. Please change this if you want to predict onto another dataset.')
+      data$._dataset_index_var_. <- 1
       
     }
     
@@ -208,25 +231,18 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
       
       if ('shared_spatial' %in% names(object$summary.random))  spatial_obj <- 'shared_spatial'
         else
-          if (object$spatial$points == 'copy') spatial_obj <- paste0(object$source[1], '_spatial')
+          if (object$spatial$points == 'copy') spatial_obj <- paste0(datasets, '_spatial')
           else
             if (!all(paste0(datasets,'_spatial') %in% names(object$summary.random))) stop('Spatial effects not provided in startISDM')
           else spatial_obj <- paste0(datasets, '_spatial')
-          
-          if (object$spatial$points == 'correlate') {
-            
-            if (any(object$dataType == "Present absence")) data$._dataset_index_var_. <- which(object$dataType == "Present absence")[1]
-            else data$._dataset_index_var_. <- 1
-            
-          }
           
     }
      else spatial_obj <- NULL
       
 
     
-    if (predictor) formula_components <- c(row.names(object$summary.fixed), names(object$summary.random)[!names(object$summary.random) %in% paste0(object[['source']], '_biasField')])
-    else formula_components <- c(covariates, intercept_terms, spatial_obj)
+    #if (predictor) formula_components <- c(row.names(object$summary.fixed), names(object$summary.random)[!names(object$summary.random) %in% paste0(object[['source']], '_biasField')])
+    formula_components <- c(covariates, intercept_terms, spatial_obj)
     
     if (!is.null(object$spatCovs$biasFormula)) formula_components <- formula_components[!formula_components %in% c('Bias__Effects__Comps', paste0(unique(object$species$speciesIn),'_Bias__Effects__Comp'))]
     
