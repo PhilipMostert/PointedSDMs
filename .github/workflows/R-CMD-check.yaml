@@ -46,10 +46,9 @@ jobs:
           use-public-rspm: true
           extra-repositories: "https://inla.r-inla-download.org/R/testing"
           
-      - name: Install github
+      - name: Install extra
         run: |
-          install.packages('devtools')
-          devtools::install_github("rvalavi/blockCV", dependencies = TRUE)
+          install.packages('blockCV', type = "source")
         shell: Rscript {0}
           
       - name: Install system dependencies on Linux (GL)
