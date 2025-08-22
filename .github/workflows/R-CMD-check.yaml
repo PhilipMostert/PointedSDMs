@@ -46,11 +46,6 @@ jobs:
           use-public-rspm: true
           extra-repositories: "https://inla.r-inla-download.org/R/testing"
           
-      - name: Install extra
-        run: |
-          install.packages('blockCV', type = "source")
-        shell: Rscript {0}
-          
       - name: Install system dependencies on Linux (GL)
         if: runner.os == 'Linux'
         run: |
@@ -73,6 +68,11 @@ jobs:
           dependencies: '"all"'
           extra-packages: |
              rcmdcheck
+             
+      - name: Install extra
+        run: |
+          install.packages('blockCV', type = "source")
+        shell: Rscript {0}       
 
       - uses: r-lib/actions/check-r-package@v2
         env:
