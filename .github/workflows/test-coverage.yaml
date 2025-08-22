@@ -48,8 +48,8 @@ jobs:
           
       - name: Install github
         run: |
-          install.packages('remotes')
-          remotes::install_github("rvalavi/blockCV", dependencies = TRUE)
+          install.packages('devtools')
+          devtools::install_github("rvalavi/blockCV", dependencies = TRUE)
         shell: Rscript {0}
           
       - name: Install system dependencies on MacOS (X11, gdal)
