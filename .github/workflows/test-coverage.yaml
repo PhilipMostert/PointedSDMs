@@ -45,6 +45,8 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
           extra-repositories: "https://inla.r-inla-download.org/R/testing"
+      - run: |
+          R -e 'install.packages("remotes"); remotes::install_github("rvalavi/blockCV")'
           
       - name: Install system dependencies on MacOS (X11, gdal)
         if: runner.os == 'macOS'
@@ -63,9 +65,6 @@ jobs:
           sudo apt-get update -y && sudo apt-get install -y libglu1-mesa-dev
 
       - uses: r-lib/actions/setup-r-dependencies@v2
-        if: runner.os == 'macOS'
-        run: |
-          Rscript -e "remotes::install_github('rvalavi/blockCV', dependencies = TRUE)"
         with:
           dependencies: '"all"'
           extra-packages: |

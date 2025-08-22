@@ -45,6 +45,9 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
           extra-repositories: "https://inla.r-inla-download.org/R/testing"
+      - run: |
+          R -e 'install.packages("remotes"); remotes::install_github("rvalavi/blockCV")'
+      
           
       - name: Install system dependencies on Linux (GL)
         if: runner.os == 'Linux'
@@ -64,9 +67,6 @@ jobs:
           
 
       - uses: r-lib/actions/setup-r-dependencies@v2
-        if: runner.os == 'macOS'
-        run: |
-          Rscript -e "remotes::install_github('rvalavi/blockCV', dependencies = TRUE)"
         with:
           dependencies: '"all"'
           extra-packages: |
