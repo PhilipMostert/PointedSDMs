@@ -48,6 +48,8 @@ jobs:
           
       - name: Install system dependencies on MacOS (X11, gdal)
         if: runner.os == 'macOS'
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           brew install --cask xquartz
           brew install pkg-config
@@ -56,6 +58,8 @@ jobs:
           brew install udunits
           brew install proj@9
           brew install gdal
+          Rscript -e 'install.packages("remotes", repos="https://cloud.r-project.org")'
+          Rscript -e 'remotes::install_github("rvaliev/blockCV", dependencies = TRUE)'
           
       - name: Install system dependencies on Linux (GL)
         if: runner.os == 'Linux'
@@ -67,11 +71,6 @@ jobs:
           dependencies: '"all"'
           extra-packages: |
              rcmdcheck
-             
-      - name: Install extra
-        run: |
-          install.packages('blockCV', type = "source")
-        shell: Rscript {0}
              
       - name: Session info
         run: |
