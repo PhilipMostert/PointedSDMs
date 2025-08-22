@@ -57,7 +57,7 @@ jobs:
           brew install proj@9
           brew install gdal
           Rscript -e "install.packages('remotes', repos='https://cloud.r-project.org')"
-          Rscript -e "remotes::install_github('rvalei/blockCV', dependencies = TRUE)"
+          Rscript -e "remotes::install_github('rvalavi/blockCV', dependencies = TRUE)"
           
       - name: Install system dependencies on Linux (GL)
         if: runner.os == 'Linux'
