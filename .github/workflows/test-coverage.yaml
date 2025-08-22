@@ -51,6 +51,9 @@ jobs:
         run: |
           brew install --cask xquartz
           brew install pkg-config
+          brew install gsl
+          brew install udunits
+          brew install udunits
           brew install proj@9
           brew install gdal
           
