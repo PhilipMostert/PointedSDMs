@@ -61,6 +61,8 @@ jobs:
           brew install udunits
           brew install proj@9
           brew install gdal
+          Rscript -e remotes::install_github("rvalei/blockCV", dependencies = TRUE)
+
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
