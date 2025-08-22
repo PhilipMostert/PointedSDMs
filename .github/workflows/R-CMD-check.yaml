@@ -61,11 +61,12 @@ jobs:
           brew install udunits
           brew install proj@9
           brew install gdal
-          Rscript -e "install.packages('remotes', repos='https://cloud.r-project.org')"
-          Rscript -e "remotes::install_github('rvalavi/blockCV', dependencies = TRUE)"
-
+          
 
       - uses: r-lib/actions/setup-r-dependencies@v2
+        if: runner.os == 'macOS'
+        run: |
+          Rscript -e "remotes::install_github('rvalavi/blockCV', dependencies = TRUE)"
         with:
           dependencies: '"all"'
           extra-packages: |
