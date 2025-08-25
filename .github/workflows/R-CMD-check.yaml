@@ -72,7 +72,8 @@ jobs:
           dependencies: '"all"'
           extra-packages: |
              rcmdcheck
-             
+      
+      - uses: r-lib/actions/check-r-package@v2    
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
         with:
