@@ -64,7 +64,7 @@ jobs:
           brew install proj@9
           brew install gdal
           Rscript -e 'install.packages("remotes", repos="https://cloud.r-project.org")'
-          Rscript -e 'install.packages('blockCV', type = "source", dependencies = TRUE)'
+          Rscript -e 'install.packages("blockCV", type = "source", dependencies = TRUE)'
           
 
       - uses: r-lib/actions/setup-r-dependencies@v2
