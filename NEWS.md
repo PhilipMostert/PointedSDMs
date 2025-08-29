@@ -1,7 +1,8 @@
-# PointedSDMs 2.1.2
+# PointedSDMs 2.1.4
 
 #### Changes and fixes since previous version:
 
--   Various fixes to `predict` for the multi-species model.
--   Documentation updates.
--   Fixes to the two cross-validation functions. Most notably in `blockedCV`. A new method has been added which allows the user to compare different combinations of datasets in the model by leaving datasets out of a train model, predicting on a dataset, and using the prediction as an offset in a testing model.\
+-   `startSpecies` update: `speciesEnvironment` may now take the options: `'community'` which estimates a community and species-specific effects, `"stack"` which estimates species-specific effects or `'shared'` which estimates community effects.
+-   Updates to reflect changes in *inlabru*.
+-   Bug fixes across multiple functions.
+-   Addition of new functions such as `assignCovariate` and `nearestValue` to assist with aligning covariate information and observation data.
