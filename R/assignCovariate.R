@@ -52,7 +52,7 @@ assignCovariate <- function(data, covariateEnv, covariateNames,
         
         if (any(is.na(fullGeomCovs[[cov]]))) fullGeomCovs[[cov]][is.na(fullGeomCovs[[cov]])] <- nearestValue(matrix(st_coordinates(fullGeom[is.na(fullGeomCovs[[cov]]),])[,c("X","Y")], ncol = 2), 
                                                                                                              terra::project(CovsGeom[[cov]], 
-                                                                                                                            projection)[cov])
+                                                                                                                            projection)[[1]])
       }
       
       else {
