@@ -29,7 +29,7 @@ assignCovariate <- function(data, covariateEnv, covariateNames,
   ## do this per layer if list
   #Maybe easiest to do if temporal
   
-  CovsGeom <- get('spatialcovariates',envir = covariateEnv)
+  CovsGeom <- lapply(get('spatialcovariates',envir = covariateEnv), function(x) terra::project(x, projection))
   
   if (!is.null(timeVariable) && inherits(CovsGeom, 'list')) {
     
@@ -46,13 +46,11 @@ assignCovariate <- function(data, covariateEnv, covariateNames,
       
       if (terra::nlyr(CovsGeom[[cov]]) == 1) {
         
-        fullGeomCovs[[cov]] <- terra::extract(terra::project(CovsGeom[[cov]],
-                                                             projection),
+        fullGeomCovs[[cov]] <- terra::extract(CovsGeom[[cov]],
                                               fullGeom, ID = FALSE)[,1]
         
         if (any(is.na(fullGeomCovs[[cov]]))) fullGeomCovs[[cov]][is.na(fullGeomCovs[[cov]])] <- nearestValue(matrix(st_coordinates(fullGeom[is.na(fullGeomCovs[[cov]]),])[,c("X","Y")], ncol = 2), 
-                                                                                                             terra::project(CovsGeom[[cov]], 
-                                                                                                                            projection)[[1]])
+                                                                                                             CovsGeom[[cov]][[1]])
       }
       
       else {
@@ -73,15 +71,13 @@ assignCovariate <- function(data, covariateEnv, covariateNames,
             
             timeIn <- unlist(timeData) == timeP
             
-            fullGeomCovs[timeIn, cov] <- terra::extract(terra::project(terra::subset(CovsGeom[[cov]], timeP),
-                                                                       projection), 
+            fullGeomCovs[timeIn, cov] <- terra::extract(terra::subset(CovsGeom[[cov]], timeP), 
                                                         fullGeom[timeIn,], 
                                                         ID = FALSE)[,1]
             
             if (any(is.na(fullGeomCovs[timeIn, cov]))) fullGeomCovs[timeIn, cov][is.na(fullGeomCovs[timeIn, cov])] <- nearestValue(matrix(st_coordinates(fullGeom[timeIn & is.na(fullGeomCovs[[cov]]),])[,c("X","Y")], 
                                                                                                                                           ncol = 2), 
-                                                                                                                                   terra::project(terra::subset(CovsGeom[[cov]], timeP), 
-                                                                                                                                                  projection))
+                                                                                                                                   terra::subset(CovsGeom[[cov]], timeP))
             
           }
           
@@ -90,11 +86,10 @@ assignCovariate <- function(data, covariateEnv, covariateNames,
           
           warning(paste0('Covariate ', cov, ' is a temporal covariate which does not contain the same temporal variables as the observation data, or has a length identical to the number of temporal locations. Will extract data from the first layer only.'))
           
-          fullGeomCovs[[cov]] <- terra::extract(terra::project(CovsGeom[[cov]][[1]], projection), fullGeom, ID = FALSE)[,1]
+          fullGeomCovs[[cov]] <- terra::extract(CovsGeom[[cov]][[1]], fullGeom, ID = FALSE)[,1]
           
           if (any(is.na(fullGeomCovs[[cov]]))) fullGeomCovs[[cov]][is.na(fullGeomCovs[[cov]])] <- nearestValue(matrix(st_coordinates(fullGeom[is.na(fullGeomCovs[[cov]]),])[,c("X","Y")], ncol = 2), 
-                                                                                                               terra::project(CovsGeom[[cov]][[1]], 
-                                                                                                                              projection)[[1]])
+                                                                                                               CovsGeom[[cov]][[1]])
           
         }
         
@@ -114,8 +109,7 @@ assignCovariate <- function(data, covariateEnv, covariateNames,
       
     }
     
-    fullGeomCovs <- terra::extract(terra::project(CovsGeom, 
-                                                  projection), 
+    fullGeomCovs <- terra::extract(CovsGeom, 
                                    fullGeom, ID = FALSE)
     
   }
@@ -128,8 +122,7 @@ assignCovariate <- function(data, covariateEnv, covariateNames,
     for(cov in naCovs){  # fill missing values for rows/covs using nearest neighbour 
       fullGeomCovs[naRows[[cov]], cov] <- 
         nearestValue(matrix(st_coordinates(fullGeom[naRows[[cov]],])[,c("X","Y")], ncol = 2), 
-                     terra::project(CovsGeom, 
-                                    projection)[cov])
+                     CovsGeom[cov])
       
     }
   }
