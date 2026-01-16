@@ -1819,7 +1819,21 @@ specifyMarks$set('private', 'spatialCovariates', function(spatialCovariates) {
   #if (class(spatialCovariates) %in% c('RasterLayer', 'RasterBrick', 'RasterStack')) objSpat <- terra::rast(spatialCovariates)
   
   if (inherits(spatialCovariates, 'Spatial')) covsClass <- sapply(spatialCovariates@data, class)
-  else if (inherits(spatialCovariates, 'SpatRaster')) covsClass <- sapply(as.data.frame(spatialCovariates), class)
+  else 
+    if (inherits(spatialCovariates, 'SpatRaster')) {
+    
+      numCovs <- names(spatialCovariates)[is.num(spatialCovariates) | is.int(spatialCovariates)]
+      nmCovs <- rep('numeric', length(numCovs))
+      names(nmCovs) <- numCovs
+      
+      facCovs <- names(spatialCovariates)[is.factor(spatialCovariates)]
+      fcCovs <- rep('factor', length(facCovs))
+      names(fcCovs) <- facCovs
+      
+      covsClass <- c(nmCovs, fcCovs) 
+      #covsClass <- sapply(as.data.frame(spatialCovariates), class)
+    
+  }
   else covsClass <- sapply(as.data.frame(terra::rast(spatialCovariates)), class)
   
   
