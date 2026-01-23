@@ -125,6 +125,7 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   if (!is.null(object$temporal$temporalVar)) temporal <- TRUE
   else temporal <- FALSE
   
+  if (!is.null(object$spatCovs$name)) {
   
   if (!any(names(data) %in% object$spatCovs$name)) {
     
@@ -160,6 +161,7 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
     #   
     # }
     
+  }
   }
   
   if (object$spatial$points == 'correlate' & !'._dataset_index_var_.' %in% names(data)) {
