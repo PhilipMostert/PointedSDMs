@@ -128,29 +128,37 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   
   if (!any(names(data) %in% object$spatCovs$name)) {
     
-    for (spatCov in object$spatCovs$name) {
-      ##Fix this
-      data[, spatCov] <- inlabru::eval_spatial(where =  data, 
-                                                data = get('spatialcovariates', 
-                                                           envir = object$spatCov$env)[spatCov],
-                                                layer = spatCov)
-      
-      if (any(is.na( data[, spatCov]))) {
-        
-        for (indFix in spatCov) {
-          
-          data[[indFix]] <- inlabru::bru_fill_missing(where =  data, 
-                                                      data = get('spatialcovariates', 
-                                                                 envir = object$spatCov$env)[spatCov],
-                                                      layer = spatCov,
-                                                      values = data[[indFix]])
-          
-        }
-        
-      }
-      
-      
-    }
+    data <- PointedSDMs:::assignCovariate(data = list(data), 
+                                          covariateEnv = object$spatCovs$env,
+                                          covariateNames = object$spatCovs$name, 
+                                          timeVariable = object$temporal$temporalVar, 
+                                          timeData = object$temporal$temporalIn, 
+                                          projection = fm_wkt(object$bru_info$lhoods[[1]]$data), 
+                                          IPS = TRUE)
+    
+    # for (spatCov in object$spatCovs$name) {
+    #   ##Fix this
+    #   data[, spatCov] <- inlabru::eval_spatial(where =  data, 
+    #                                             data = get('spatialcovariates', 
+    #                                                        envir = object$spatCov$env)[spatCov],
+    #                                             layer = spatCov)
+    #   
+    #   if (any(is.na( data[, spatCov]))) {
+    #     
+    #     for (indFix in spatCov) {
+    #       
+    #       data[[indFix]] <- inlabru::bru_fill_missing(where =  data, 
+    #                                                   data = get('spatialcovariates', 
+    #                                                              envir = object$spatCov$env)[spatCov],
+    #                                                   layer = spatCov,
+    #                                                   values = data[[indFix]])
+    #       
+    #     }
+    #     
+    #   }
+    #   
+    #   
+    # }
     
   }
   
