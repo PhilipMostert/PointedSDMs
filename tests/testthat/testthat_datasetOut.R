@@ -83,6 +83,17 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
   
   expect_true('PA_spatial' %in% names(outPO2$Leaving_out_PO$summary.random))
   expect_identical(deparse1(outPO2$Leaving_out_PO$componentsJoint), '~PA_intercept(1) + PA_spatial(main = geometry, model = PO_field) - 1')
+  
+  #Try shared spatial with PA out
+  obj3 <- startISDM(PO, PA, Projection = projection, Mesh = mesh, spatialCovariates = cov,
+                    IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts, 
+                    responsePA = responsePA, pointsIntercept = TRUE, pointsSpatial = 'shared')
+  
+  spatMod3 <- fitISDM(data = obj3,
+                      options  = list(control.inla=list(int.strategy='eb')))
+  
+  outPO3 <- datasetOut(model = spatMod3, dataset = 'PA', predictions = T)
+  expect_identical(deparse1(outPO3$Leaving_out_PA$componentsJoint), '~shared_spatial(main = geometry, model = shared_field) + covariate(main = covariate, model = "linear") + PO_intercept(1) - 1')
 
   })
   
