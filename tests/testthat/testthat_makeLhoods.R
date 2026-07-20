@@ -74,7 +74,7 @@ test_that('makeLhoods makes a list of likelihoods', {
   expect_setequal(sapply(Lhoods, function(x) x$family), c( "cp", "binomial"))
   
   #Trials are correct for PA response
-  expect_identical(Lhoods$PA_bird_PAresp$Ntrials, PA$trial)
+  expect_identical(Lhoods$PA_bird_PAresp$response_data$BRU_Ntrials, PA$trial)
   
   #Correct formulas
   expect_equal(deparse1(Lhoods$PO_fish_geometry$formula), 'geometry ~ .')
