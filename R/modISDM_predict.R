@@ -129,12 +129,12 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
   
   if (!any(names(data) %in% object$spatCovs$name)) {
     
-    data <- PointedSDMs:::assignCovariate(data = list(data), 
+    data <- assignCovariate(data = list(data), 
                                           covariateEnv = object$spatCovs$env,
                                           covariateNames = object$spatCovs$name, 
                                           timeVariable = object$temporal$temporalVar, 
                                           timeData = object$temporal$temporalIn, 
-                                          projection = fm_wkt(object$bru_info$lhoods[[1]]$data), 
+                                          projection = fmesher::fm_wkt(object$bru_info$lhoods[[1]]$data), 
                                           IPS = TRUE)
     
     # for (spatCov in object$spatCovs$name) {
