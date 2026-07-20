@@ -189,6 +189,10 @@ datasetOut <- function(model, dataset,
         reduced_lik[[data]]$data[,'trainModelOffset'] <- train$predictions$mean
         #reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
         reduced_lik[[data]]$used$effect <- c('trainedModelIntercept', 'trainModelOffset')#c(reduced_lik[[data]]$used$effect, 'trainModelOffset')
+        reduced_lik[[data]]$pred_expr$used$effect <- c('trainedModelIntercept', 'trainModelOffset')
+        
+        reduced_lik[[data]]$pred_expr$pred_text <- 'trainedModelIntercept + trainModelOffset'
+        reduced_lik[[data]]$pred_expr$pred_expr <- expression(trainedModelIntercept + trainModelOffset)
         if (reduced_lik[[data]]$family != 'cp') reduced_lik[[data]]$expr <- expression(trainedModelIntercept + trainModelOffset)
         
       }
