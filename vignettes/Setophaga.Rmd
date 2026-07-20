@@ -56,13 +56,13 @@ Therefore, given a collection of heterogeneous datasets $\{Y_1, Y_2,...,Y_n\}$, 
 
 *PointedSDMs* is designed to simplify the modelling process of integrated species distribution models by using wrapper functions around those found in *R-INLA* and *inlabru*. The simplification is regarding four key steps in the statistical-modelling process:
 
--   data preparation,
+- data preparation,
 
--   model fitting,
+- model fitting,
 
--   cross-validation,
+- cross-validation,
 
--   prediction.
+- prediction.
 
 The first function of interest with regards to these steps is `startISDM`, which is designed to create objects required by *inlabru* to create an ISDM, assign the relevant information to individual objects used in model specification, as well as structure the provided datasets together into a homogenized framework.
 
