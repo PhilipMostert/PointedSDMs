@@ -423,6 +423,7 @@ predict.bruSDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
 #' @title Generic print function for \code{bru_sdm_predict}.
 #' @param x bruSDM_predict object
 #' @param ... Not used.
+#' @export
 
 print.bruSDM_predict <- function(x, ...) {
 

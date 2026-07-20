@@ -499,10 +499,7 @@ blockedCV <- function(data, options = list(),
 setClass('blockedCV')
 
 #' Print for blockedCV
-#' 
 #' @export print.blockedCV
-
-#' Export print.blockedCV
 #' @title Print function for \code{blockedCV}.
 #' @param x A blockedCV object.
 #' @param ... Unused argument.
@@ -545,8 +542,6 @@ setClass('blockedCVpred')
 #' Print for blockedCVpred
 #' 
 #' @export print.blockedCVpred
-
-#' Export print.blockedCVpred
 #' @title Print function for \code{blockedCV}.
 #' @param x A blockedCV object.
 #' @param ... Unused argument.

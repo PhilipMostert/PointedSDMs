@@ -240,8 +240,6 @@ setClass('datasetOut')
 #' Print for bru_sdm_leave_one_out
 #' 
 #' @export print.datasetOut
-
-#' Export print.bru_sdm_leave_one_out
 #' @title Generic print function for \code{datasetOut}.
 #' @param x datasetOut object.
 #' @param ... Unused argument.
