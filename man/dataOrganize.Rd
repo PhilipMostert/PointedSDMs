@@ -8,22 +8,24 @@ Internal functions used to temporarily store data and other information before a
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-dataOrganize-makeData}{\code{dataOrganize$makeData()}}
-\item \href{#method-dataOrganize-makeSpecies}{\code{dataOrganize$makeSpecies()}}
-\item \href{#method-dataOrganize-makeMultinom}{\code{dataOrganize$makeMultinom()}}
-\item \href{#method-dataOrganize-makeFormulas}{\code{dataOrganize$makeFormulas()}}
-\item \href{#method-dataOrganize-makeComponents}{\code{dataOrganize$makeComponents()}}
-\item \href{#method-dataOrganize-makeLhoods}{\code{dataOrganize$makeLhoods()}}
-\item \href{#method-dataOrganize-clone}{\code{dataOrganize$clone()}}
-}
+  \itemize{
+    \item \href{#method-dataOrganize-makeData}{\code{dataOrganize$makeData()}}
+    \item \href{#method-dataOrganize-makeSpecies}{\code{dataOrganize$makeSpecies()}}
+    \item \href{#method-dataOrganize-makeMultinom}{\code{dataOrganize$makeMultinom()}}
+    \item \href{#method-dataOrganize-makeFormulas}{\code{dataOrganize$makeFormulas()}}
+    \item \href{#method-dataOrganize-makeComponents}{\code{dataOrganize$makeComponents()}}
+    \item \href{#method-dataOrganize-makeLhoods}{\code{dataOrganize$makeLhoods()}}
+    \item \href{#method-dataOrganize-clone}{\code{dataOrganize$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-dataOrganize-makeData"></a>}}
 \if{latex}{\out{\hypertarget{method-dataOrganize-makeData}{}}}
-\subsection{Method \code{makeData()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeData(
+\subsection{\code{dataOrganize$makeData()}}{
+  Function to form the data into sf objects, as well as extract other information about the model required.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{dataOrganize$makeData(
   datapoints,
   datanames,
   coords,
@@ -38,34 +40,81 @@ Internal functions used to temporarily store data and other information before a
   markfamily,
   temporalvar,
   offsetname
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{datapoints}}{A list of datasets as either sf, data.frame or SpatialPoints objects.}
+      \item{\code{datanames}}{A vector of the names of the datasets.}
+      \item{\code{coords}}{Names of the coordinates used in the model.}
+      \item{\code{proj}}{The projection reference system used in the model.}
+      \item{\code{marktrialname}}{Name of the trial variable used by the binomial marks.}
+      \item{\code{paresp}}{Name of the response variable used by the presence absence datasets.}
+      \item{\code{countsresp}}{Name of the response variable used by the counts data.}
+      \item{\code{trialname}}{Name of the trial variable used by the presence absence datasets.}
+      \item{\code{speciesname}}{Name of the species name variable.}
+      \item{\code{marks}}{Name of the marks considered in the model.}
+      \item{\code{pointcovnames}}{Name of the point covariates used in the model.}
+      \item{\code{markfamily}}{A vector describing the distribution of the marks.}
+      \item{\code{temporalvar}}{The name of the temporal variable.}
+      \item{\code{offsetname}}{The name of the offset}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-dataOrganize-makeSpecies"></a>}}
 \if{latex}{\out{\hypertarget{method-dataOrganize-makeSpecies}{}}}
-\subsection{Method \code{makeSpecies()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeSpecies(speciesname, repl = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{dataOrganize$makeSpecies()}}{
+  Function used to separate the datasets by species.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{dataOrganize$makeSpecies(speciesname, repl = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{speciesname}}{The name of the species variable.}
+      \item{\code{repl}}{Are species effects replicate. Defaults to \code{FALSE}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-dataOrganize-makeMultinom"></a>}}
 \if{latex}{\out{\hypertarget{method-dataOrganize-makeMultinom}{}}}
-\subsection{Method \code{makeMultinom()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeMultinom(multinomVars, return, oldVars, repl = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{dataOrganize$makeMultinom()}}{
+  Function to make multinomial marks, if any are included in the model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{dataOrganize$makeMultinom(multinomVars, return, oldVars, repl = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{multinomVars}}{Name of the multinomial marks.}
+      \item{\code{return}}{What to return: species or marks.}
+      \item{\code{oldVars}}{If any multinomial marks were included in a previous iteration, what where their names.}
+      \item{\code{repl}}{Species replicate model included. Defaults to \code{FALSE}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-dataOrganize-makeFormulas"></a>}}
 \if{latex}{\out{\hypertarget{method-dataOrganize-makeFormulas}{}}}
-\subsection{Method \code{makeFormulas()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeFormulas(
+\subsection{\code{dataOrganize$makeFormulas()}}{
+  Function used to create formulas for the processes.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{dataOrganize$makeFormulas(
   spatcovs,
   spatcovclass,
   speciesname,
@@ -84,16 +133,43 @@ Internal functions used to temporarily store data and other information before a
   speciesspatial,
   biasformula,
   covariateformula
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{spatcovs}}{Names of the spatial covariates used in the model.}
+      \item{\code{spatcovclass}}{Class of the spatial covariates.}
+      \item{\code{speciesname}}{Name of the species variable.}
+      \item{\code{paresp}}{Name of the presence absence response variable.}
+      \item{\code{countresp}}{Name of the count data response variable.}
+      \item{\code{marks}}{Name of the marks used in the model.}
+      \item{\code{marksspatial}}{Logical: should spatial fields be included for the marks.}
+      \item{\code{speciesintercept}}{Logical: should specific species intercept terms be created for the species.}
+      \item{\code{speciesenvironment}}{Logical: should species specific environmental terms be created.}
+      \item{\code{spatial}}{Logical: are spatial effects run in the model.}
+      \item{\code{intercept}}{Logical: are intercepts run in the model.}
+      \item{\code{temporalname}}{Name of the temporal variable used in the model.}
+      \item{\code{speciesindependent}}{Logical: make independent species effects.}
+      \item{\code{markintercept}}{Logical: are intercepts run for the marks in the model.}
+      \item{\code{pointcovs}}{Name of the point covariates.}
+      \item{\code{speciesspatial}}{Logical: should the species have spatial fields.}
+      \item{\code{biasformula}}{Terms to include for PO data.}
+      \item{\code{covariateformula}}{Terms to include for the covariate formula.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-dataOrganize-makeComponents"></a>}}
 \if{latex}{\out{\hypertarget{method-dataOrganize-makeComponents}{}}}
-\subsection{Method \code{makeComponents()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeComponents(
+\subsection{\code{dataOrganize$makeComponents()}}{
+  Function used to make components for the model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{dataOrganize$makeComponents(
   spatial,
   intercepts,
   datanames,
@@ -117,41 +193,87 @@ Internal functions used to temporarily store data and other information before a
   biasformula,
   covariateformula,
   marksCopy
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{spatial}}{Logical: are spatial effects run in the model.}
+      \item{\code{intercepts}}{Logical: are intercepts run in the model.}
+      \item{\code{datanames}}{Names of the datasets used in the model.}
+      \item{\code{marks}}{Names of the marks used in the model.}
+      \item{\code{speciesname}}{Name of the species variable.}
+      \item{\code{multinomnames}}{Names of the multinomial marks.}
+      \item{\code{pointcovariates}}{Names of the point covariates.}
+      \item{\code{covariatenames}}{Names of the spatially varying covariates.}
+      \item{\code{covariateclass}}{The classes of the spatially varying covariates.}
+      \item{\code{marksspatial}}{Logical: should spatial fields be included for the marks.}
+      \item{\code{marksintercept}}{Logical: should intercepts be included for the marks.}
+      \item{\code{temporalname}}{Name of the temporal variable used in the model.}
+      \item{\code{speciesspatial}}{Logical: Should the species be run with spatial fields.}
+      \item{\code{speciesenvironment}}{Logical: Should the species have their own environmental effects.}
+      \item{\code{numtime}}{Number of time increments included in the model.}
+      \item{\code{offsetname}}{Name of the offset column in the datasets.}
+      \item{\code{copymodel}}{List of the hyper parameters for the \code{copy} model.}
+      \item{\code{speciesindependent}}{Logical: should species effects be made independent.}
+      \item{\code{biasformula}}{Terms to include for PO data.}
+      \item{\code{covariateformula}}{Terms to include for the covariate formula.}
+      \item{\code{marksCopy}}{Names of where each mark occurs in the dataset.}
+      \item{\code{speciesintercept:}}{Logical: should intercept terms be created for each species.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-dataOrganize-makeLhoods"></a>}}
 \if{latex}{\out{\hypertarget{method-dataOrganize-makeLhoods}{}}}
-\subsection{Method \code{makeLhoods()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataOrganize$makeLhoods(
+\subsection{\code{dataOrganize$makeLhoods()}}{
+  Function to make the datasets into likelihoods.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{dataOrganize$makeLhoods(
   mesh,
   ips,
   paresp,
   ntrialsvar,
   markstrialsvar,
   speciesname
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{mesh}}{An \code{fm_mesh_2d} object.}
+      \item{\code{ips}}{Integration points used.}
+      \item{\code{paresp}}{The response variable name for the presence absence datasets.}
+      \item{\code{ntrialsvar}}{The trials variable name for the presence absence datasets.}
+      \item{\code{markstrialsvar}}{The trial variable name for the binomial marks.}
+      \item{\code{speciesname}}{The name of the species variable used.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-dataOrganize-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-dataOrganize-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataOrganize$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{dataOrganize$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{dataOrganize$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

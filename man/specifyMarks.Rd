@@ -9,7 +9,7 @@ A data object containing the data and the relevant information about the integra
 \examples{
 
 ## ------------------------------------------------
-## Method `specifyMarks$plot`
+## Method `specifyMarks$plot()`
 ## ------------------------------------------------
 
 
@@ -37,7 +37,7 @@ A data object containing the data and the relevant information about the integra
 }
 
 ## ------------------------------------------------
-## Method `specifyMarks$addBias`
+## Method `specifyMarks$addBias()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -63,7 +63,7 @@ organizedData$addBias(datasetNames = 'eBird')
 }
 
 ## ------------------------------------------------
-## Method `specifyMarks$updateFormula`
+## Method `specifyMarks$updateFormula()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -91,7 +91,7 @@ organizedData$addBias(datasetNames = 'eBird')
 }
 
 ## ------------------------------------------------
-## Method `specifyMarks$changeComponents`
+## Method `specifyMarks$changeComponents()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -121,7 +121,7 @@ organizedData$addBias(datasetNames = 'eBird')
 }
 
 ## ------------------------------------------------
-## Method `specifyMarks$priorsFixed`
+## Method `specifyMarks$priorsFixed()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -152,7 +152,7 @@ organizedData$addBias(datasetNames = 'eBird')
 }
 
 ## ------------------------------------------------
-## Method `specifyMarks$specifySpatial`
+## Method `specifyMarks$specifySpatial()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -185,7 +185,7 @@ organizedData$addBias(datasetNames = 'eBird')
 }
 
 ## ------------------------------------------------
-## Method `specifyMarks$changeLink`
+## Method `specifyMarks$changeLink()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -219,7 +219,7 @@ organizedData$addBias(datasetNames = 'eBird')
 }
 
 ## ------------------------------------------------
-## Method `specifyMarks$spatialBlock`
+## Method `specifyMarks$spatialBlock()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -247,7 +247,7 @@ organizedData$addBias(datasetNames = 'eBird')
 }
 
 ## ------------------------------------------------
-## Method `specifyMarks$addSamplers`
+## Method `specifyMarks$addSamplers()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -273,7 +273,7 @@ organizedData$addSamplers(datasetName = 'eBird', Samplers = SolitaryTinamou$regi
 }
 
 ## ------------------------------------------------
-## Method `specifyMarks$specifyRandom`
+## Method `specifyMarks$specifyRandom()`
 ## ------------------------------------------------
 
 \dontrun{
@@ -300,88 +300,89 @@ organizedData$specifyRandom(copyModel =  list(beta = list(fixed = TRUE)))
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-specifyMarks-help}{\code{specifyMarks$help()}}
-\item \href{#method-specifyMarks-print}{\code{specifyMarks$print()}}
-\item \href{#method-specifyMarks-plot}{\code{specifyMarks$plot()}}
-\item \href{#method-specifyMarks-addBias}{\code{specifyMarks$addBias()}}
-\item \href{#method-specifyMarks-updateFormula}{\code{specifyMarks$updateFormula()}}
-\item \href{#method-specifyMarks-changeComponents}{\code{specifyMarks$changeComponents()}}
-\item \href{#method-specifyMarks-priorsFixed}{\code{specifyMarks$priorsFixed()}}
-\item \href{#method-specifyMarks-specifySpatial}{\code{specifyMarks$specifySpatial()}}
-\item \href{#method-specifyMarks-changeLink}{\code{specifyMarks$changeLink()}}
-\item \href{#method-specifyMarks-spatialBlock}{\code{specifyMarks$spatialBlock()}}
-\item \href{#method-specifyMarks-addSamplers}{\code{specifyMarks$addSamplers()}}
-\item \href{#method-specifyMarks-specifyRandom}{\code{specifyMarks$specifyRandom()}}
-\item \href{#method-specifyMarks-new}{\code{specifyMarks$new()}}
-\item \href{#method-specifyMarks-samplingBias}{\code{specifyMarks$samplingBias()}}
-}
+  \itemize{
+    \item \href{#method-specifyMarks-help}{\code{specifyMarks$help()}}
+    \item \href{#method-specifyMarks-print}{\code{specifyMarks$print()}}
+    \item \href{#method-specifyMarks-plot}{\code{specifyMarks$plot()}}
+    \item \href{#method-specifyMarks-addBias}{\code{specifyMarks$addBias()}}
+    \item \href{#method-specifyMarks-updateFormula}{\code{specifyMarks$updateFormula()}}
+    \item \href{#method-specifyMarks-changeComponents}{\code{specifyMarks$changeComponents()}}
+    \item \href{#method-specifyMarks-priorsFixed}{\code{specifyMarks$priorsFixed()}}
+    \item \href{#method-specifyMarks-specifySpatial}{\code{specifyMarks$specifySpatial()}}
+    \item \href{#method-specifyMarks-changeLink}{\code{specifyMarks$changeLink()}}
+    \item \href{#method-specifyMarks-spatialBlock}{\code{specifyMarks$spatialBlock()}}
+    \item \href{#method-specifyMarks-addSamplers}{\code{specifyMarks$addSamplers()}}
+    \item \href{#method-specifyMarks-specifyRandom}{\code{specifyMarks$specifyRandom()}}
+    \item \href{#method-specifyMarks-initialize}{\code{specifyMarks$new()}}
+    \item \href{#method-specifyMarks-samplingBias}{\code{specifyMarks$samplingBias()}}
+  }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyMarks-help"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyMarks-help}{}}}
-\subsection{Method \code{help()}}{
-Function to provide documentation for a \code{specifyMarks} object.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$help(...)}\if{html}{\out{</div>}}
+\subsection{\code{specifyMarks$help()}}{
+  Function to provide documentation for a \code{specifyMarks} object.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$help(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{Not used}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Documentation.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Not used}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Documentation.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyMarks-print"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyMarks-print}{}}}
-\subsection{Method \code{print()}}{
-Prints the datasets, their data type and the number of observations, as well as the marks and their respective families.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$print(...)}\if{html}{\out{</div>}}
+\subsection{\code{specifyMarks$print()}}{
+  Prints the datasets, their data type and the number of observations, as well as the marks and their respective families.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$print(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{Not used.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Not used.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyMarks-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyMarks-plot}{}}}
-\subsection{Method \code{plot()}}{
-Makes a plot of the points surrounded by the boundary of the region where they were collected. The points may either be plotted based on which dataset they come from, or which species group they are part of (if \code{speciesName} is non-\code{NULL} in \code{\link{intModel}}).
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$plot(datasetNames, Boundary = TRUE, ...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{datasetNames}}{Name of the datasets to plot. If this argument is missing, the function will plot all the data available to the model.}
-
-\item{\code{Boundary}}{Logical: should a boundary (created using the \code{Mesh} object) be used in the plot. Defaults to \code{TRUE}.}
-
-\item{\code{...}}{Not used.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A ggplot object.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{
-\dontrun{
- if (requireNamespace('INLA')) {
+\subsection{\code{specifyMarks$plot()}}{
+  Makes a plot of the points surrounded by the boundary of the region where they were collected. The points may either be plotted based on which dataset they come from, or which species group they are part of (if \code{speciesName} is non-\code{NULL} in \code{\link{intModel}}).
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$plot(datasetNames, Boundary = TRUE, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{datasetNames}}{Name of the datasets to plot. If this argument is missing, the function will plot all the data available to the model.}
+      \item{\code{Boundary}}{Logical: should a boundary (created using the \code{Mesh} object) be used in the plot. Defaults to \code{TRUE}.}
+      \item{\code{...}}{Not used.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A ggplot object.
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{ if (requireNamespace('INLA')) {
    
  #Get Data
  library(ggplot2)
@@ -402,52 +403,45 @@ A ggplot object.
 
 }
 }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
 
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyMarks-addBias"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyMarks-addBias}{}}}
-\subsection{Method \code{addBias()}}{
-Function used to add additional spatial fields (called \emph{bias fields}) to a selected dataset present in the integrated model. \emph{Bias fields} are typically used to account for sampling biases in opportunistic citizen science data in the absence of any covariate to do such.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$addBias(
+\subsection{\code{specifyMarks$addBias()}}{
+  Function used to add additional spatial fields (called \emph{bias fields}) to a selected dataset present in the integrated model. \emph{Bias fields} are typically used to account for sampling biases in opportunistic citizen science data in the absence of any covariate to do such.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$addBias(
   datasetNames = NULL,
   allPO = FALSE,
   biasField = NULL,
   copyModel = TRUE,
   shareModel = FALSE,
   temporalModel = list(model = "ar1")
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{datasetNames}}{A vector of dataset names (class \code{character}) for which a bias field needs to be added to. If \code{NULL} (default), then \code{allPO} has to be \code{TRUE}.}
-
-\item{\code{allPO}}{Logical: should a bias field be added to all datasets classified as presence only in the integrated model. Defaults to \code{FALSE}.}
-
-\item{\code{biasField}}{An \code{inla.spde} object used to describe the bias field. Defaults to \code{NULL} which uses \code{\link[INLA]{inla.spde2.matern}} to create a Matern model for the field.}
-
-\item{\code{copyModel}}{Create copy models for all the of the datasets specified with either \code{datasetNames} or \code{allPO}. The first dataset in the vector will have its own spatial effect, and the other datasets will "copy" the effect with shared hyperparameters. Defaults to \code{TRUE}.}
-
-\item{\code{shareModel}}{Share a bias field across the datasets specified with \code{datasetNames}. Defaults to \code{FALSE}.}
-
-\item{\code{temporalModel}}{List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details. \code{temporalName} needs to be specified in \code{intModel} prior.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A bias field to the model.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
- if (requireNamespace('INLA')) {
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{datasetNames}}{A vector of dataset names (class \code{character}) for which a bias field needs to be added to. If \code{NULL} (default), then \code{allPO} has to be \code{TRUE}.}
+      \item{\code{allPO}}{Logical: should a bias field be added to all datasets classified as presence only in the integrated model. Defaults to \code{FALSE}.}
+      \item{\code{biasField}}{An \code{inla.spde} object used to describe the bias field. Defaults to \code{NULL} which uses \code{\link[INLA]{inla.spde2.matern}} to create a Matern model for the field.}
+      \item{\code{copyModel}}{Create copy models for all the of the datasets specified with either \code{datasetNames} or \code{allPO}. The first dataset in the vector will have its own spatial effect, and the other datasets will "copy" the effect with shared hyperparameters. Defaults to \code{TRUE}.}
+      \item{\code{shareModel}}{Share a bias field across the datasets specified with \code{datasetNames}. Defaults to \code{FALSE}.}
+      \item{\code{temporalModel}}{List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details. \code{temporalName} needs to be specified in \code{intModel} prior.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A bias field to the model.
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -467,49 +461,43 @@ organizedData$addBias(datasetNames = 'eBird')
 
 }
 }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
 
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyMarks-updateFormula"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyMarks-updateFormula}{}}}
-\subsection{Method \code{updateFormula()}}{
-Function used to update the formula for a selected observation model. The function is designed to work similarly to the generic \code{update} formula, and should be used to thin terms out of a process from the full model specified in \code{\link{intModel}}. The function also allows the user to add their own formula to the model, such that they can include non-linear components in the model. The function can also be used to print out the formula for a process by not specifying the \code{Formula} or \code{newFormula} arguments.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$updateFormula(
+\subsection{\code{specifyMarks$updateFormula()}}{
+  Function used to update the formula for a selected observation model. The function is designed to work similarly to the generic \code{update} formula, and should be used to thin terms out of a process from the full model specified in \code{\link{intModel}}. The function also allows the user to add their own formula to the model, such that they can include non-linear components in the model. The function can also be used to print out the formula for a process by not specifying the \code{Formula} or \code{newFormula} arguments.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$updateFormula(
   datasetName = NULL,
   Points = TRUE,
   Mark = NULL,
   Formula,
   newFormula
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{datasetName}}{Name of the dataset (class \code{character}) for which the formula needs to be changed.}
-
-\item{\code{Points}}{Logical: should the formula be changed for the points (or otherwise, a marked process). Defaults to \code{TRUE}.}
-
-\item{\code{Mark}}{Name of the mark (class \code{character}) to change the formula for. Defaults to \code{NULL}.}
-
-\item{\code{Formula}}{An updated formula to give to the process. The syntax provided for the formula in this argument should be identical to the formula specification as in base \strong{R}. Should be used to thin terms out of a formula but could be used to add terms as well. If adding new terms not specified in \code{intModel}, remember to add the associated component using \code{.$changeComponents} as well.}
-
-\item{\code{newFormula}}{Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-If \code{Formula} and \code{newFormula} are missing, will print out the formula for the specified processes.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
- if (requireNamespace('INLA')) {
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{datasetName}}{Name of the dataset (class \code{character}) for which the formula needs to be changed.}
+      \item{\code{Points}}{Logical: should the formula be changed for the points (or otherwise, a marked process). Defaults to \code{TRUE}.}
+      \item{\code{Mark}}{Name of the mark (class \code{character}) to change the formula for. Defaults to \code{NULL}.}
+      \item{\code{Formula}}{An updated formula to give to the process. The syntax provided for the formula in this argument should be identical to the formula specification as in base \strong{R}. Should be used to thin terms out of a formula but could be used to add terms as well. If adding new terms not specified in \code{intModel}, remember to add the associated component using \code{.$changeComponents} as well.}
+      \item{\code{newFormula}}{Completely change the formula for a process -- primarily used to add non-linear components into the formula. Note: all terms need to be correctly specified here.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    If \code{Formula} and \code{newFormula} are missing, will print out the formula for the specified processes.
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -531,37 +519,32 @@ If \code{Formula} and \code{newFormula} are missing, will print out the formula 
  
 }
 }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
 
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyMarks-changeComponents"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyMarks-changeComponents}{}}}
-\subsection{Method \code{changeComponents()}}{
-Function to add and specify custom components to model, which are required by \pkg{inlabru}. The main purpose of the function is to re-specify or completely change components already in the model, however the user can also add completely new components to the model as well. In this case, the components need to be added to the correct formulas in the model using the \code{.$updateFormula} function. If \code{addComponent} and \code{removeComponent} are both missing, the function will print out the components to be supplied to \pkg{inlabru}'s \code{\link[inlabru]{bru}} function.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$changeComponents(addComponent, removeComponent, print = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{addComponent}}{Component to add to the integrated model. Note that if the user is re-specifying a component already present in the model, they do not need to remove the old component using \code{removeComponent}.}
-
-\item{\code{removeComponent}}{Component (or just the name of a component) present in the model which should be removed.}
-
-\item{\code{print}}{Logical: should the updated components be printed. Defaults to \code{TRUE}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-
- if (requireNamespace('INLA')) {
+\subsection{\code{specifyMarks$changeComponents()}}{
+  Function to add and specify custom components to model, which are required by \pkg{inlabru}. The main purpose of the function is to re-specify or completely change components already in the model, however the user can also add completely new components to the model as well. In this case, the components need to be added to the correct formulas in the model using the \code{.$updateFormula} function. If \code{addComponent} and \code{removeComponent} are both missing, the function will print out the components to be supplied to \pkg{inlabru}'s \code{\link[inlabru]{bru}} function.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$changeComponents(addComponent, removeComponent, print = TRUE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{addComponent}}{Component to add to the integrated model. Note that if the user is re-specifying a component already present in the model, they do not need to remove the old component using \code{removeComponent}.}
+      \item{\code{removeComponent}}{Component (or just the name of a component) present in the model which should be removed.}
+      \item{\code{print}}{Logical: should the updated components be printed. Defaults to \code{TRUE}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -582,48 +565,42 @@ Function to add and specify custom components to model, which are required by \p
  organizedData$changeComponents(removeComponent = 'Forest')
 
 }
-
 }
-}
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyMarks-priorsFixed"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyMarks-priorsFixed}{}}}
-\subsection{Method \code{priorsFixed()}}{
-Function to change priors for the fixed (and possibly random) effects of the model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$priorsFixed(
+\subsection{\code{specifyMarks$priorsFixed()}}{
+  Function to change priors for the fixed (and possibly random) effects of the model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$priorsFixed(
   Effect,
   datasetName = NULL,
   mean.linear = 0,
   prec.linear = 0.001
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{Effect}}{Name of the fixed effect covariate to change the prior for. Can take on \code{'intercept'}, which will change the specification for an intercept (specified by one of \code{species} or \code{datasetName}).}
-
-\item{\code{datasetName}}{Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.}
-
-\item{\code{mean.linear}}{Mean value for the prior of the fixed effect. Defaults to \code{0}.}
-
-\item{\code{prec.linear}}{Precision value for the prior of the fixed effect. Defaults to \code{0.001}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-New priors for the fixed effects.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
- if (requireNamespace('INLA')) {
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{Effect}}{Name of the fixed effect covariate to change the prior for. Can take on \code{'intercept'}, which will change the specification for an intercept (specified by one of \code{species} or \code{datasetName}).}
+      \item{\code{datasetName}}{Name of the dataset for which the prior of the intercept should change (if fixedEffect = 'intercept'). Defaults to \code{NULL} which will change the prior effect of the intercepts for all the datasets in the model.}
+      \item{\code{mean.linear}}{Mean value for the prior of the fixed effect. Defaults to \code{0}.}
+      \item{\code{prec.linear}}{Precision value for the prior of the fixed effect. Defaults to \code{0.001}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    New priors for the fixed effects.
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -648,19 +625,18 @@ New priors for the fixed effects.
 
 }
 }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
 
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyMarks-specifySpatial"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyMarks-specifySpatial}{}}}
-\subsection{Method \code{specifySpatial()}}{
-Function to specify random fields in the model using penalizing complexity (PC) priors for the parameters.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$specifySpatial(
+\subsection{\code{specifyMarks$specifySpatial()}}{
+  Function to specify random fields in the model using penalizing complexity (PC) priors for the parameters.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$specifySpatial(
   sharedSpatial = FALSE,
   datasetName,
   Mark,
@@ -668,35 +644,28 @@ Function to specify random fields in the model using penalizing complexity (PC) 
   PC = TRUE,
   Remove = FALSE,
   ...
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{sharedSpatial}}{Logical: specify the shared spatial field in the model. Requires \code{pointsSpatial == 'shared'} in \code{\link{intModel}}. Defaults to \code{FALSE}.}
-
-\item{\code{datasetName}}{Name of which of the datasets' spatial fields to be specified. Requires \code{pointsSpatial = 'individual'} in \code{\link{intModel}}.}
-
-\item{\code{Mark}}{Name of the marks to specify the spatial field for. If \code{TRUE} changes the spatial effect for all marks.}
-
-\item{\code{Bias}}{Logical: specify the spatial field for the bias effect. If seperate fields are specified for different fields, the argument may be the name of the dataset for which the bias field to be specified.}
-
-\item{\code{PC}}{Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}, which uses \code{\link[INLA]{inla.spde2.pcmatern}} to specify the model; otherwise uses \code{\link[INLA]{inla.spde2.matern}}.}
-
-\item{\code{Remove}}{Logical: should the chosen spatial field be removed. Requires one of \code{sharedSpatial}, \code{species}, \code{mark} or \code{bias} to be non-missing, which chooses which field to remove.}
-
-\item{\code{...}}{Additional arguments used by \pkg{INLA}'s \code{\link[INLA]{inla.spde2.pcmatern}} or \code{\link[INLA]{inla.spde2.matern}} function, dependent on the value of \code{PC}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new model for the spatial effects.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
- if (requireNamespace('INLA')) {
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{sharedSpatial}}{Logical: specify the shared spatial field in the model. Requires \code{pointsSpatial == 'shared'} in \code{\link{intModel}}. Defaults to \code{FALSE}.}
+      \item{\code{datasetName}}{Name of which of the datasets' spatial fields to be specified. Requires \code{pointsSpatial = 'individual'} in \code{\link{intModel}}.}
+      \item{\code{Mark}}{Name of the marks to specify the spatial field for. If \code{TRUE} changes the spatial effect for all marks.}
+      \item{\code{Bias}}{Logical: specify the spatial field for the bias effect. If seperate fields are specified for different fields, the argument may be the name of the dataset for which the bias field to be specified.}
+      \item{\code{PC}}{Logical: should the Matern model be specified with pc priors. Defaults to \code{TRUE}, which uses \code{\link[INLA]{inla.spde2.pcmatern}} to specify the model; otherwise uses \code{\link[INLA]{inla.spde2.matern}}.}
+      \item{\code{Remove}}{Logical: should the chosen spatial field be removed. Requires one of \code{sharedSpatial}, \code{species}, \code{mark} or \code{bias} to be non-missing, which chooses which field to remove.}
+      \item{\code{...}}{Additional arguments used by \pkg{INLA}'s \code{\link[INLA]{inla.spde2.pcmatern}} or \code{\link[INLA]{inla.spde2.matern}} function, dependent on the value of \code{PC}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new model for the spatial effects.
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -723,40 +692,34 @@ A new model for the spatial effects.
 
 } 
 }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
 
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyMarks-changeLink"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyMarks-changeLink}{}}}
-\subsection{Method \code{changeLink()}}{
-Function used to change the link function for a given process.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$changeLink(datasetName, Mark, Link, ...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{datasetName}}{Name of the dataset for which the link function needs to be changed.}
-
-\item{\code{Mark}}{Name of the mark for which the link function needs to be changed.}
-
-\item{\code{Link}}{Name of the link function to add to the process. If missing, will print the link function of the specified dataset.}
-
-\item{\code{...}}{Not used}
-
-\item{\code{Species}}{Name of the species for which the link function needs to be changed.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
- if (requireNamespace('INLA')) {
+\subsection{\code{specifyMarks$changeLink()}}{
+  Function used to change the link function for a given process.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$changeLink(datasetName, Mark, Link, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{datasetName}}{Name of the dataset for which the link function needs to be changed.}
+      \item{\code{Mark}}{Name of the mark for which the link function needs to be changed.}
+      \item{\code{Link}}{Name of the link function to add to the process. If missing, will print the link function of the specified dataset.}
+      \item{\code{...}}{Not used}
+      \item{\code{Species}}{Name of the species for which the link function needs to be changed.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -784,40 +747,34 @@ Function used to change the link function for a given process.
  
 } 
 }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
 
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyMarks-spatialBlock"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyMarks-spatialBlock}{}}}
-\subsection{Method \code{spatialBlock()}}{
-Function to spatially block the datasets, which will then be used for model cross-validation with \code{\link{blockedCV}}. See the \code{\link[blockCV]{spatialBlock}} function from \pkg{blockCV} for how the spatial blocking works and for further details on the function's arguments.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$spatialBlock(k, rows_cols, plot = FALSE, seed = 1234, ...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{k}}{Integer value reflecting the number of folds to use.}
-
-\item{\code{rows_cols}}{Integer value by which the area is divided into longitudinal and latitudinal bins.}
-
-\item{\code{plot}}{Plot the cross-validation folds as well as the points across the boundary. Defaults to \code{FALSE}.}
-
-\item{\code{seed}}{Seed used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}} to make the spatial blocking reproducible across different models. Defaults to \code{1234}.}
-
-\item{\code{...}}{Additional arguments used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
- if (requireNamespace('INLA')) {
+\subsection{\code{specifyMarks$spatialBlock()}}{
+  Function to spatially block the datasets, which will then be used for model cross-validation with \code{\link{blockedCV}}. See the \code{\link[blockCV]{spatialBlock}} function from \pkg{blockCV} for how the spatial blocking works and for further details on the function's arguments.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$spatialBlock(k, rows_cols, plot = FALSE, seed = 1234, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{k}}{Integer value reflecting the number of folds to use.}
+      \item{\code{rows_cols}}{Integer value by which the area is divided into longitudinal and latitudinal bins.}
+      \item{\code{plot}}{Plot the cross-validation folds as well as the points across the boundary. Defaults to \code{FALSE}.}
+      \item{\code{seed}}{Seed used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}} to make the spatial blocking reproducible across different models. Defaults to \code{1234}.}
+      \item{\code{...}}{Additional arguments used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -839,34 +796,31 @@ Function to spatially block the datasets, which will then be used for model cros
 
 } 
 }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
 
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyMarks-addSamplers"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyMarks-addSamplers}{}}}
-\subsection{Method \code{addSamplers()}}{
-Function to add an integration domain for the PO datasets.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$addSamplers(datasetName, Samplers)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{datasetName}}{Name of the dataset for the samplers.}
-
-\item{\code{Samplers}}{A \code{Spatial*} object representing the integration domain.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
- if (requireNamespace('INLA')) {
+\subsection{\code{specifyMarks$addSamplers()}}{
+  Function to add an integration domain for the PO datasets.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$addSamplers(datasetName, Samplers)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{datasetName}}{Name of the dataset for the samplers.}
+      \item{\code{Samplers}}{A \code{Spatial*} object representing the integration domain.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -886,43 +840,39 @@ organizedData$addSamplers(datasetName = 'eBird', Samplers = SolitaryTinamou$regi
 
 }
 }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
 
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyMarks-specifyRandom"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyMarks-specifyRandom}{}}}
-\subsection{Method \code{specifyRandom()}}{
-Function to specify the models and priors for the random effects included in the model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$specifyRandom(
+\subsection{\code{specifyMarks$specifyRandom()}}{
+  Function to specify the models and priors for the random effects included in the model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$specifyRandom(
   temporalModel = list(model = "ar1"),
   copyModel = list(beta = list(fixed = FALSE)),
   copyBias = list(beta = list(fixed = FALSE))
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{temporalModel}}{List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details.}
-
-\item{\code{copyModel}}{List of model specifications given to the hyper parameters for the \code{"copy"} model. Defaults to \code{list(beta = list(fixed = FALSE))}.}
-
-\item{\code{copyBias}}{List of model specifications given to the hyper parameters for the \code{"copy"} bias model. Defaults to \code{list(beta = list(fixed = FALSE))}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-An updated component list.
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
- if (requireNamespace('INLA')) {
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{temporalModel}}{List of model specifications given to the control.group argument in the time effect component. Defaults to \code{list(model = 'ar1')}; see \code{\link[INLA]{control.group}} from the \pkg{INLA} package for more details.}
+      \item{\code{copyModel}}{List of model specifications given to the hyper parameters for the \code{"copy"} model. Defaults to \code{list(beta = list(fixed = FALSE))}.}
+      \item{\code{copyBias}}{List of model specifications given to the hyper parameters for the \code{"copy"} bias model. Defaults to \code{list(beta = list(fixed = FALSE))}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    An updated component list.
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{ if (requireNamespace('INLA')) {
    
  #Get Data
  data("SolitaryTinamou")
@@ -942,18 +892,18 @@ organizedData$specifyRandom(copyModel =  list(beta = list(fixed = TRUE)))
 
 }
 }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
 
-}
-
-}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-specifyMarks-new"></a>}}
-\if{latex}{\out{\hypertarget{method-specifyMarks-new}{}}}
-\subsection{Method \code{new()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$new(
+\if{html}{\out{<a id="method-specifyMarks-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-specifyMarks-initialize}{}}}
+\subsection{\code{specifyMarks$new()}}{
+  Initialize function for specifyMarks: used to store some compulsory arguments. Please refer to the wrapper function, \code{intModel} for creating new specifyMarks objects.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$new(
   data,
   coordinates,
   projection,
@@ -978,17 +928,62 @@ organizedData$specifyRandom(copyModel =  list(beta = list(fixed = TRUE)))
   offset,
   copymodel,
   formulas
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{data}}{The points of the model.}
+      \item{\code{coordinates}}{A vector of length 2 containing the names of the coordinates.}
+      \item{\code{projection}}{The projection of the data.}
+      \item{\code{Inlamesh}}{An \code{fm_mesh_2d} object.}
+      \item{\code{initialnames}}{The names of the datasets if data is passed through intModel.}
+      \item{\code{responsecounts}}{The name of the response variable for the count data.}
+      \item{\code{responsepa}}{The name of the response variable for the presence absence data.}
+      \item{\code{marksnames}}{The names of the marks contained in the data.}
+      \item{\code{marksfamily}}{The statistical family of the marks.}
+      \item{\code{pointcovariates}}{Names of the additional, non-spatial covariates describing the points.}
+      \item{\code{trialspa}}{The name of the trials variable for the presence absence datasets.}
+      \item{\code{trialsmarks}}{The name of the trials variable for the binomial marks datasets.}
+      \item{\code{marksspatial}}{Should spatial fields be included for the marks}
+      \item{\code{spatial}}{Logical argument describing if spatial effects should be included.}
+      \item{\code{intercepts}}{Logical argument describing if intercepts should be included in the model.}
+      \item{\code{spatialcovariates}}{Spatial covariates object used in the model.}
+      \item{\code{boundary}}{A polygon map of the study area.}
+      \item{\code{ips}}{Integration points and their respective weights to be used in the model.}
+      \item{\code{temporal}}{Name of the temporal variable used in the model.}
+      \item{\code{offset}}{Name of the offset column in the datasets.}
+      \item{\code{copymodel}}{List of the specifications for the hyper parameters for the \code{"copy"} model.}
+      \item{\code{formulas}}{Custom formulas to add to the model. List with two objects: covariateFormula and biasFormula.}
+      \item{\code{speciesindependent}}{Independent species effects.}
+      \item{\code{speciesname}}{Name of the species variable used in the data.}
+      \item{\code{speciesintercept}}{Logical argument indicating if species specific intercept terms should be created.}
+      \item{\code{speciesenvironment}}{Logical argument indicating if species specific environmental terms should be created.}
+      \item{\code{marksintercept}}{Logical argument describing if the marks should have intercepts.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-specifyMarks-samplingBias"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyMarks-samplingBias}{}}}
-\subsection{Method \code{samplingBias()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{specifyMarks$samplingBias(datasetName, Samplers)}\if{html}{\out{</div>}}
+\subsection{\code{specifyMarks$samplingBias()}}{
+  Function used to account for preferential sampling in the modeling framework.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{specifyMarks$samplingBias(datasetName, Samplers)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{datasetName}}{Use an existing dataset already in the model to account for preferential sampling. If \code{missing}, then \code{Data} needs to be given.}
+      \item{\code{Samplers}}{Sampling locations of the species for the structured data. May come as a: \code{SpatialPolygons}, \code{SpatialLines} or \code{SpatialPoints} object. If \code{missing}, will assume the sampling locations as the locations given in the points specified with \code{datasetName}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 }
