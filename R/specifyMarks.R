@@ -904,7 +904,7 @@ specifyMarks <- R6::R6Class(classname = 'specifyMarks', lock_objects = FALSE, cl
   #' 
   #' @import ggplot2
   #' @importFrom R.devices suppressGraphics
-  #' @importFrom blockCV spatialBlock
+  #' @importFrom blockCV cv_spatial
   #' @importFrom blockCV cv_plot
   #' 
   #' @examples
