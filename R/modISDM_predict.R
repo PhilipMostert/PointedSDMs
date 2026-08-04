@@ -134,7 +134,7 @@ predict.modISDM <- function(object, data = NULL, formula = NULL, mesh = NULL,
                                           covariateNames = object$spatCovs$name, 
                                           timeVariable = object$temporal$temporalVar, 
                                           timeData = object$temporal$temporalIn, 
-                                          projection = fmesher::fm_wkt(object$bru_info$lhoods[[1]]$data), 
+                                          projection = fmesher::fm_wkt(object$bru_info$model$lhoods[[1]]$data), 
                                           IPS = TRUE)
     
     # for (spatCov in object$spatCovs$name) {
