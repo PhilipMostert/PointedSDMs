@@ -187,25 +187,14 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
   if (!any(names(data) %in% c(object$spatCovs$name, paste0(unique(unlist(object$species$speciesIn)), '_', object$spatCovs$name))) &&
       !is.null(covariates)) {
     
-      predData <- terra::extract(x = terra::project(get('spatialcovariates', 
-                                                 envir = object$spatCov$env),
-                                                 fmesher::fm_wkt(data)), 
-                                         y = data, ID = FALSE)
-      
-      if (any(is.na(predData))) {
-        naRows <- lapply(predData, function(x) which(is.na(x)))
-        naCovs <- names(naRows)[sapply(naRows, length) > 0] 
-        
-        for (cov in naCovs) {
-          predData[naRows[[cov]], cov] <- 
-            nearestValue(matrix(st_coordinates(data[naRows[[cov]],])[,c("X","Y")], ncol = 2), 
-                         terra::project(get('spatialcovariates', 
-                                            envir = object$spatCov$env),
-                                        fmesher::fm_wkt(data))[cov])
-        }
-      }
-    
-      data <- cbind(data, predData); rm(predData)
+    data <- assignCovariate(data = list(data), 
+                            covariateEnv = object$spatCovs$env,
+                            covariateNames = object$spatCovs$name, 
+                            timeVariable = object$temporal$temporalVar, 
+                            speciesName = object$species$speciesVar,
+                            timeData = object$temporal$temporalIn, 
+                            projection = fmesher::fm_wkt(object$bru_info$model$lhoods[[1]]$data), 
+                            IPS = TRUE)
       
   }
   
@@ -350,7 +339,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
       #.__thin.__ <- paste0(paste(paste0(species, '[!1:length(',species,') %in% seq(', 1:length(species),',length(',species,'),', length(species), ')] <- FALSE'), collapse=';'),';')
       
       
-      predictionFormula <- paste('{',
+      predictionFormula <- paste('~{',
                                  .__speciesFormulas.__,
                                  #.__thin.__, DO WE NEED TO FIX THIS?
                                  .__speciesEval.__ ,'}')
@@ -358,7 +347,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
         # dataCentroids <- sf::st_coordinates(data)
         # data <- data[order(dataCentroids[, "X"], dataCentroids[, "Y"]), ]
       
-        int <- predict(object, data, formula = parse(text = predictionFormula), ...)
+        int <- predict(object, data, formula = as.formula(predictionFormula), ...)
         
         int <- list(mapply(function(x, seq) {
           
