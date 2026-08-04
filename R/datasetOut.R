@@ -125,7 +125,7 @@ datasetOut <- function(model, dataset,
       
     }
 
-    reduced_terms <- unlist(inlabru::bru_used(model$bru_info$lhoods[index]))
+    reduced_terms <- unlist(inlabru::bru_used(model$bru_info$model$lhoods[index]))
 
     reduced_components <- reduceComps(componentsOld = model$componentsJoint,
                           pointsCopy = ifelse(model$spatial$points == 'copy', 
@@ -135,7 +135,7 @@ datasetOut <- function(model, dataset,
                           reducedTerms = reduced_terms)
     
     model_reduced <- inlabru::bru(components = reduced_components,
-                                  model$bru_info$lhoods[index],
+                                  model$bru_info$model$lhoods[index],
                                   options = reduced_options)
   
     model_reduced[['componentsJoint']] <- reduced_components
@@ -173,18 +173,18 @@ datasetOut <- function(model, dataset,
     if (predictions) {
       
       # Seems you require names, but haven't used tags, so they're all NA
-      if (all(is.na(names(model$bru_info$lhoods)))) {
-        names(model$bru_info$lhoods) <- model[["source"]]
+      if (all(is.na(names(model$bru_info$model$lhoods)))) {
+        names(model$bru_info$model$lhoods) <- model[["source"]]
       }
-      reduced_lik <- model$bru_info$lhoods
+      reduced_lik <- model$bru_info$model$lhoods
       
-      for (data in names(model$bru_info$lhoods)[!index]) { 
+      for (data in names(model$bru_info$model$lhoods)[!index]) { 
         
         #if (!is.null(model[['species']][['speciesIn']])) covs <- as.vector(outer(paste0(reduced_species,'_'), model$spatCovs$name, FUN = 'paste0'))
         #else covs <- model$spatCovs$name
         
         ##Is this not the same as the other -- we do not need the covariates for the left out dataset
-        train <- predict(model_reduced, data = model$bru_info$lhoods[[data]]$data, predictor = TRUE) #formula = eval(parse(text = paste0('~(',paste(gsub('\\(.*$', '', labels(terms(reduced_components))), collapse = ' + '),')')))  
+        train <- predict(model_reduced, data = model$bru_info$model$lhoods[[data]]$data, predictor = TRUE) #formula = eval(parse(text = paste0('~(',paste(gsub('\\(.*$', '', labels(terms(reduced_components))), collapse = ' + '),')')))  
        
         reduced_lik[[data]]$data[,'trainModelOffset'] <- train$predictions$mean
         #reduced_lik[[data]]$formula <- update(reduced_lik[[data]]$formula, ~ . + offset)
