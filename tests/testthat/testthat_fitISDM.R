@@ -95,12 +95,12 @@ test_that('fitISDM runs a dataSDM object, and produces an INLA model with extra 
   obj4 <- startSpecies(PO, PA, Projection = projection, Mesh = mesh,responsePA = responsePA,
                        IPS = iPoints, trialsPA = trialName, responseCounts = responseCounts,
                        spatialCovariates = cov, speciesName = 'species', speciesIntercept = FALSE,
-                       speciesEnvironment = FALSE)
+                       speciesEnvironment = 'shared')
   
   spatMod4 <- fitISDM(data = obj4,
                       options = list(control.inla=list(int.strategy='eb', diagonal = 100)))
   expect_false(spatMod4$species$speciesEffects$Intercepts)
-  expect_false(spatMod4$species$speciesEffects$Environmental)
+  expect_equal(spatMod4$species$speciesEffects$Environmental, 'shared')
   expect_setequal(row.names(spatMod4$summary.fixed), c('covariate', 'cov2', 'PO_intercept', 'bird_intercept', 'fish_intercept', 'PA_intercept'))
   
   #Try with formulas

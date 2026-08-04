@@ -64,7 +64,7 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
   
   #ie no fish from dataset PO
   expect_setequal(outPO$Leaving_out_PO$names.fixed, c("covariate", "PA_intercept"))
-  expect_setequal(names(outPO$Leaving_out_PO$bru_info$lhoods), 'PA_PAresp')
+  expect_setequal(names(outPO$Leaving_out_PO$bru_info$model$lhoods), 'PA_PAresp')
   
   expect_setequal(outPO$Leaving_out_PO$source, 'PA')
   expect_false('PO' %in% names(outPO$Leaving_out_PO$species$speciesIn))
