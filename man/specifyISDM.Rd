@@ -768,7 +768,7 @@ organizedData$addBias(datasetNames = 'eBird')
 \if{html}{\out{<a id="method-specifyISDM-spatialBlock"></a>}}
 \if{latex}{\out{\hypertarget{method-specifyISDM-spatialBlock}{}}}
 \subsection{\code{specifyISDM$spatialBlock()}}{
-  Function to spatially block the datasets, which will then be used for model cross-validation with \code{\link{blockedCV}}. See the \code{\link[blockCV]{spatialBlock}} function from \pkg{blockCV} for how the spatial blocking works and for further details on the function's arguments.
+  Function to spatially block the datasets, which will then be used for model cross-validation with \code{\link{blockedCV}}. See the \code{\link[blockCV]{cv_spatial}} function from \pkg{blockCV} for how the spatial blocking works and for further details on the function's arguments.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{specifyISDM$spatialBlock(k, rows_cols, plot = FALSE, seed = 1234, ...)}
@@ -780,8 +780,8 @@ organizedData$addBias(datasetNames = 'eBird')
       \item{\code{k}}{Integer value reflecting the number of folds to use.}
       \item{\code{rows_cols}}{Integer value by which the area is divided into longitudinal and latitudinal bins.}
       \item{\code{plot}}{Plot the cross-validation folds as well as the points across the boundary. Defaults to \code{FALSE}.}
-      \item{\code{seed}}{Seed used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}} to make the spatial blocking reproducible across different models. Defaults to \code{1234}.}
-      \item{\code{...}}{Additional arguments used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}}.}
+      \item{\code{seed}}{Seed used by \pkg{blockCV}'s \code{\link[blockCV]{cv_spatial}} to make the spatial blocking reproducible across different models. Defaults to \code{1234}.}
+      \item{\code{...}}{Additional arguments used by \pkg{blockCV}'s \code{\link[blockCV]{cv_spatial}}.}
     }
     \if{html}{\out{</div>}}
   }

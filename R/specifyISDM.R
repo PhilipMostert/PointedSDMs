@@ -822,12 +822,12 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
     }
   }
   ,
-  #' @description Function to spatially block the datasets, which will then be used for model cross-validation with \code{\link{blockedCV}}. See the \code{\link[blockCV]{spatialBlock}} function from \pkg{blockCV} for how the spatial blocking works and for further details on the function's arguments.
+  #' @description Function to spatially block the datasets, which will then be used for model cross-validation with \code{\link{blockedCV}}. See the \code{\link[blockCV]{cv_spatial}} function from \pkg{blockCV} for how the spatial blocking works and for further details on the function's arguments.
   #' @param k Integer value reflecting the number of folds to use.
   #' @param rows_cols Integer value by which the area is divided into longitudinal and latitudinal bins.
   #' @param plot Plot the cross-validation folds as well as the points across the boundary. Defaults to \code{FALSE}.
-  #' @param seed Seed used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}} to make the spatial blocking reproducible across different models. Defaults to \code{1234}. 
-  #' @param ... Additional arguments used by \pkg{blockCV}'s \code{\link[blockCV]{spatialBlock}}.
+  #' @param seed Seed used by \pkg{blockCV}'s \code{\link[blockCV]{cv_spatial}} to make the spatial blocking reproducible across different models. Defaults to \code{1234}. 
+  #' @param ... Additional arguments used by \pkg{blockCV}'s \code{\link[blockCV]{cv_spatial}}.
   #' @return If \code{plot = TRUE}, a plot of the grid. 
   #' @import ggplot2
   #' @importFrom R.devices suppressGraphics
