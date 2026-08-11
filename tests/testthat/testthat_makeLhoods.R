@@ -60,6 +60,7 @@ test_that('makeLhoods makes a list of likelihoods', {
                        paresp = obj$.__enclos_env__$private$responsePA,
                        ntrialsvar = trialName,
                        markstrialsvar = markTrial,
+                       familyoptions = obj$.__enclos_env__$private$optionsINLA$control.family,
                        speciesname = speciesName,
                        speciesindex = obj$.__enclos_env__$private$speciesIndex)
   
@@ -80,6 +81,6 @@ test_that('makeLhoods makes a list of likelihoods', {
   expect_equal(deparse1(Lhoods$PO_fish_geometry$formula), 'geometry ~ .')
   expect_equal(deparse1(Lhoods$PA_bird_PAresp$formula), 'PAresp ~ .')
   
-  
+  expect_setequal(unlist(sapply(Lhoods, function(x) x$control.family)), c('log', 'cloglog'))
   
   })

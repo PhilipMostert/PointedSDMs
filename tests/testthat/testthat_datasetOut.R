@@ -69,7 +69,7 @@ test_that('datasetOut is able to correctly remove the correct datasets and metad
   expect_setequal(outPO$Leaving_out_PO$source, 'PA')
   expect_false('PO' %in% names(outPO$Leaving_out_PO$species$speciesIn))
   expect_false('PO' %in% names(outPO$Leaving_out_PO$marks$marksIn))
-  expect_length(outPO$Leaving_out_PO$optionsJoint$control.family, 1)
+  expect_length(outPO$Leaving_out_PO$bru_info$model$lhoods, 1)
   
   #Try copy spatial
   obj2 <- startISDM(PO, PA, Projection = projection, Mesh = mesh,

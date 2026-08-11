@@ -474,17 +474,21 @@ test_that('specifySpatial can correctly specify the spatial fields', {
   
 })
 
-test_that('changeLink can correctly change the link function of a process', {
+test_that('specifyFamily can correctly change the family of a process', {
   
   skip_on_cran()
   
   expect_error(checknoSpat$changeLink(datasetName = 'PO2'))
   
-  checknoSpat$specifyFamily(datasetName = 'PO2', Link = 'exp')
+  expect_error(checknoSpat$specifyFamily(datasetName = 'PO2', options = 'log'))
+  
+  checknoSpat$specifyFamily(datasetName = 'PO2', Options = list(link = 'exp', fixed = TRUE), Family = 'nbinomial')  
 
   expect_true(checknoSpat$.__enclos_env__$private$optionsINLA$control.family[[4]]$link == 'exp')
+  expect_true(checknoSpat$.__enclos_env__$private$optionsINLA$control.family[[4]]$fixed)
   
-  checknoSpat$specifyFamily(datasetName = 'PA', Link = 'logit')
+  
+  checknoSpat$specifyFamily(datasetName = 'PA',  Options = list(link = 'logit'))
   
   expect_true(checknoSpat$.__enclos_env__$private$optionsINLA$control.family[[2]]$link == 'logit')
   
