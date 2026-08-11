@@ -57,8 +57,10 @@ import(stats)
 import(terra)
 importFrom(R.devices,suppressGraphics)
 importFrom(R6,R6Class)
-importFrom(blockCV,cv_plot)
-importFrom(blockCV,cv_spatial)
+importFrom(blockCV,
+  cv_plot,
+  cv_spatial
+)
 importFrom(dplyr,bind_rows)
 importFrom(raster,raster)
 importFrom(utils,combn)
