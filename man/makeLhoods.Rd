@@ -16,7 +16,8 @@ makeLhoods(
   speciesname,
   speciesindex,
   samplers,
-  pointcovs = NULL
+  pointcovs = NULL,
+  familyoptions
 )
 }
 \arguments{
@@ -43,6 +44,8 @@ makeLhoods(
 \item{samplers}{A list of integration domains for the datasets.}
 
 \item{pointcovs}{A vector of the point covariates used in the model.}
+
+\item{familyoptions}{A list of control.family options.}
 }
 \description{
 Function to make the datasets into likelihoods.

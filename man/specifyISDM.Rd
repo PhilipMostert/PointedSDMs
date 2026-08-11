@@ -217,7 +217,7 @@ organizedData$addBias(datasetNames = 'eBird')
                            Projection = proj, responsePA = 'Present')
 
  #Specify the shared spatial field
- organizedData$changeLink('Parks', 'logit')
+ organizedData$specifyFamily('Parks', Family = 'nbinomial')
  
  
 } 
@@ -718,7 +718,7 @@ organizedData$addBias(datasetNames = 'eBird')
   Function used to specify the family properties of a dataset.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{specifyISDM$specifyFamily(datasetName, Family, Link)}
+    \preformatted{specifyISDM$specifyFamily(datasetName, Family, Options)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -726,7 +726,7 @@ organizedData$addBias(datasetNames = 'eBird')
     \describe{
       \item{\code{datasetName}}{Name of the dataset for which the link function needs to be changed.}
       \item{\code{Family}}{The statistical family.}
-      \item{\code{Link}}{Name of the link function to add to the process. If missing, will print the link function of the specified dataset.}
+      \item{\code{Options}}{A list of control.family options to specify.}
     }
     \if{html}{\out{</div>}}
   }
@@ -755,7 +755,7 @@ organizedData$addBias(datasetNames = 'eBird')
                            Projection = proj, responsePA = 'Present')
 
  #Specify the shared spatial field
- organizedData$changeLink('Parks', 'logit')
+ organizedData$specifyFamily('Parks', Family = 'nbinomial')
  
  
 } 
