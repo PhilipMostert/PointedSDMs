@@ -121,6 +121,7 @@ fitISDM <- function(data, options = list()) {
                                 markstrialsvar = data$.__enclos_env__$private$trialsMarks,
                                 speciesname = data$.__enclos_env__$private$speciesName,
                                 speciesindex = data$.__enclos_env__$private$speciesIndex,
+                                familyoptions = data$.__enclos_env__$private$optionsINLA$control.family,
                                 pointcovs = c(data$.__enclos_env__$private$pointCovariates, data$.__enclos_env__$private$Offset)))
   
   if (length(data$.__enclos_env__$private$biasData) > 0) {
@@ -135,6 +136,7 @@ fitISDM <- function(data, options = list()) {
                                                               samplers = data$.__enclos_env__$private$biasData[[bias]],
                                                               ips = data$.__enclos_env__$private$IPS,
                                                               domain = list(coordinates = data$.__enclos_env__$private$INLAmesh),
+                                                              control.family = list(link = 'log'),
                                                               #include = c(paste0(bias, '_samplers_field'), paste0(bias,'_samplers'), data$.__enclos_env__$private$spatcovsNames),
                                                               used = bru_used(effects =  c(paste0(bias, '_samplers_field'), paste0(bias,'_samplers'), data$.__enclos_env__$private$spatcovsNames)),
                                                               tag = paste0(bias, '_samplers'))
@@ -145,15 +147,15 @@ fitISDM <- function(data, options = list()) {
     
     allLiks <- c(do.call(append, list(allLiks, biasLikes)))
     
-    data$.__enclos_env__$private$optionsINLA$control.family <- append(data$.__enclos_env__$private$optionsINLA$control.family,
-                                                                      lapply(1:length(biasLikes), function(x) list(link = 'log')))
+    # data$.__enclos_env__$private$optionsINLA$control.family <- append(data$.__enclos_env__$private$optionsINLA$control.family,
+    #                                                                   lapply(1:length(biasLikes), function(x) list(link = 'log')))
     
   }
   
-  optionsJoint <- append(data$.__enclos_env__$private$optionsINLA, options)
+  #optionsJoint <- append(data$.__enclos_env__$private$optionsINLA, options)
   
   inlaModel <- inlabru::bru(components = componentsJoint,
-                            allLiks, options = optionsJoint)
+                            allLiks, options = options) #optionsJoint
   
   if (length(data$.__enclos_env__$private$multinomVars) != 0) {
     
@@ -182,7 +184,7 @@ fitISDM <- function(data, options = list()) {
   #Do this for all the covariate effects, but make it with the correct index incase any is not in
   
   inlaModel[['componentsJoint']] <- componentsJoint
-  inlaModel[['optionsJoint']] <- optionsJoint
+  inlaModel[['optionsJoint']] <- options#optionsJoint
   inlaModel[['source']] <- as.vector(unlist(data$.__enclos_env__$private$dataSource))
   inlaModel[['spatCovs']] <- list(name = data$.__enclos_env__$private$spatcovsNames,
                                   class = data$.__enclos_env__$private$ptcovsClass,
