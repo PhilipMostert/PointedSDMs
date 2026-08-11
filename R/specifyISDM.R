@@ -765,7 +765,7 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #' @description Function used to specify the family properties of a dataset.
   #' @param datasetName Name of the dataset for which the link function needs to be changed.
   #' @param Family The statistical family.
-  #' @param Link Name of the link function to add to the process. If missing, will print the link function of the specified dataset.
+  #' @param Options A list of control.family options to specify.
   #' @return A new link function of family for a process.
   #' @examples
   #' \dontrun{
@@ -789,14 +789,14 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
   #'                            Projection = proj, responsePA = 'Present')
   #' 
   #'  #Specify the shared spatial field
-  #'  organizedData$changeLink('Parks', 'logit')
+  #'  organizedData$specifyFamily('Parks', Family = 'nbinomial')
   #'  
   #'  
   #' } 
   #' }
   specifyFamily = function(datasetName,
                            Family,
-                           Link) {
+                           Options) {
     
     if (missing(datasetName)) stop('Please provide a dataset name.')
     
@@ -804,20 +804,31 @@ specifyISDM <- R6::R6Class(classname = 'specifyISDM', lock_objects = FALSE, clon
     
     if (!datasetName %in% private$dataSource) stop('Dataset name provided not in model.')
     
-    if (!missing(Link)) private$optionsINLA[['control.family']][[which(private$dataSource == datasetName)]] <-  list(link = Link)
+    if (!missing(Options)) {
+    
+    if (!inherits(Options, 'list')) stop('Options needs to be a list with names corresponding to those in INLA::control.family().')
+    
+    if (!all(names(Options) %in% names(INLA::control.family()))) stop('At least one of the names provided in Options is not available in INLA::control.family().')
+      
+    if (is.null(Options$link)) {
+        
+    warning('link is missing in Options list. Therefore will assume default link function') 
+    Options <-  append(Options, list(link = 'default'))#list(link = 'default')
+        
+      }
+      
+      private$optionsINLA[['control.family']][[which(private$dataSource == datasetName)]] <- Options
+      
+    }
+    
+    #if (!missing(Link)) private$optionsINLA[['control.family']][[which(private$dataSource == datasetName)]] <-  list(link = Link)
     
     if (!missing(Family)) {
       
       #If changing family and link missing, have to make link default?
-      if (!Family %in% names(inla.models()$likelihood)) stop('Family not supported by R-INLA. Valid options are found in: `names(INLA::inla.models()$likelihood)`.')
+      if (!Family %in% names(INLA::inla.models()$likelihood)) stop('Family not supported by R-INLA. Valid options are found in: names(INLA::inla.models()$likelihood).')
       else  private$Family[datasetName] <- Family
-      
-      if (missing(Link)) {
-        
-        warning('Link is missing. Therefore will assume default link function')
-        private$optionsINLA[['control.family']][[which(private$dataSource == datasetName)]] <-  list(link = 'default')
-        
-      }
+    
       
     }
   }
