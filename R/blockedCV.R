@@ -155,6 +155,7 @@ blockedCV <- function(data, options = list(),
                                      paresp = data$.__enclos_env__$private$responsePA,
                                      ntrialsvar = data$.__enclos_env__$private$trialsPA,
                                      markstrialsvar = data$.__enclos_env__$private$trialsMarks,
+                                     familyoptions = data$.__enclos_env__$private$optionsINLA$control.family[sourcePred],
                                      speciesname = data$.__enclos_env__$private$speciesName,
                                      speciesindex = data$.__enclos_env__$private$speciesIndex))
       
@@ -185,7 +186,11 @@ blockedCV <- function(data, options = list(),
       
       for (lik in 1:length(testLike)) {
         
-      testLike[[lik]]$used$effect <- c(paste0('testIntercept', lik), 'olikhoodvar')#c(testLike[[1]]$used$effect, 'olikhoodvar')
+        testLike[[lik]]$used$effect <- c(paste0('testIntercept', lik), 'olikhoodvar')
+        testLike[[lik]]$pred_expr$used$effect <- c(paste0('testIntercept', lik), 'olikhoodvar')
+        
+        testLike[[lik]]$pred_expr$pred_text <- paste(paste0('testIntercept', lik), '+','olikhoodvar')
+        #testLike[[lik]]$pred_expr$pred_expr <- expression(paste(paste0('testIntercept', lik), '+','olikhoodvar'))
       
       }
 
@@ -201,6 +206,7 @@ blockedCV <- function(data, options = list(),
                  paresp = data$.__enclos_env__$private$responsePA,
                  ntrialsvar = data$.__enclos_env__$private$trialsPA,
                  markstrialsvar = data$.__enclos_env__$private$trialsMarks,
+                 familyoptions = data$.__enclos_env__$private$optionsINLA$control.family[data$.__enclos_env__$private$dataSource %in% names(trainData)],
                  speciesname = data$.__enclos_env__$private$speciesName,
                  speciesindex = data$.__enclos_env__$private$speciesIndex))
       
@@ -287,18 +293,18 @@ blockedCV <- function(data, options = list(),
     }
     else thinnedComponents <- formula(paste('~ - 1 +', paste(data$.__enclos_env__$private$Components[comp_keep], collapse = ' + ')))
 
-    foldOptions <- data$.__enclos_env__$private$optionsINLA
+    #foldOptions <- data$.__enclos_env__$private$optionsINLA
     
     fold_ind <- unique(unlist(block_index))[unique(unlist(block_index)) != fold]
     
-    foldOptions$control.family <- foldOptions$control.family[sapply(unlist(data$.__enclos_env__$private$modelData, recursive = FALSE), 
-                                                                    function(x) any(fold_ind %in% data.frame(x)[, '.__block_index__']))]
+    #foldOptions$control.family <- foldOptions$control.family[sapply(unlist(data$.__enclos_env__$private$modelData, recursive = FALSE), 
+    #                                                                function(x) any(fold_ind %in% data.frame(x)[, '.__block_index__']))]
 
     #Subset fold options for each family
-    sourceIN <- which(data$.__enclos_env__$private$dataSource %in% names(trainData))
-    foldOptions$control.family <- foldOptions$control.family[sourceIN]
+
+    #foldOptions$control.family <- foldOptions$control.family[sourceIN]
     
-    optionsTrain <- append(options, foldOptions)
+    optionsTrain <- options#append(options, foldOptions)
     
     optionsTrain$control.compute <- list(dic = TRUE)
     
@@ -453,15 +459,15 @@ blockedCV <- function(data, options = list(),
         }
         
         #Need to look at formula, and get the correct comps here
-        foldOptions <- data$.__enclos_env__$private$optionsINLA
-        foldOptions$control.family <- foldOptions$control.family[sourcePred]
+        #foldOptions <- data$.__enclos_env__$private$optionsINLA
+        #foldOptions$control.family <- foldOptions$control.family[sourcePred]
         
-        optionsTest <- append(options, foldOptions)
+        #optionsTest <- append(options, foldOptions)
         compsIntercepts <- paste0('testIntercept', 1:length(testData[[1]]),'(1)')
         compPreds <- formula(paste0('~ - 1 + olikhoodvar(main = olikhoodvar, model = "offset") + ', paste0(compsIntercepts, collapse = ' + ')))
 
         testModel <- try(inlabru::bru(components = compPreds,
-                                   testLike, options = optionsTest))
+                                   testLike, options = options))
         
         if (inherits(testModel, 'try-error')) results[[paste(dataToUse, collapse = ' and ')]][[paste0('fold',fold)]] <- NA
         else results[[paste(dataToUse, collapse = ' and ')]][[paste0('fold',fold)]] <- testModel$mlik[[1]] #mean(testModel$residuals$deviance.residuals)##trainedModel$mlik[[1]] - 
