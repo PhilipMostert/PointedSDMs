@@ -12,11 +12,12 @@
 #' @param speciesindex A vector containing the numeric index of where the species occurs in the data
 #' @param samplers A list of integration domains for the datasets.
 #' @param pointcovs A vector of the point covariates used in the model.
+#' @param familyoptions A list of control.family options.
 
 makeLhoods <- function(data, formula, family, mesh, ips,
                        paresp, ntrialsvar, markstrialsvar,
                        speciesname, speciesindex, samplers,
-                       pointcovs = NULL) {
+                       pointcovs = NULL, familyoptions) {
   
   Likelihoods <- list()
 
@@ -116,6 +117,7 @@ makeLhoods <- function(data, formula, family, mesh, ips,
                                                  domain = list(geometry = mesh),
                                                  samplers = samplers[[names(data)[[dataset]]]],
                                                  family = family[[dataset]][process],
+                                                 control.family = familyoptions[[Likindex]],
                                                  tag = like_name)
         
         names(Likelihoods)[[Likindex]] <- like_name
