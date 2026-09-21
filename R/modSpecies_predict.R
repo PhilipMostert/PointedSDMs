@@ -159,27 +159,36 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
   
   if (speciespreds) {
     
-    if (object[['species']][['speciesEffects']][['Intercepts']] |
-        object[['species']][['speciesEffects']][['Environmental']] == 'community') {
+    #if (object[['species']][['speciesEffects']][['Intercepts']] |
+    #    object[['species']][['speciesEffects']][['Environmental']] == 'community') {
       
-      data <- fmesher::fm_cprod(data, data.frame(speciesIndexREMOVE = 1:length(unique(unlist(object$species$speciesIn)))))
+      specVarIn <- object$species$speciesTable[object$species$speciesTable$species %in% species,]$index
+      
+      data <- fmesher::fm_cprod(data, data.frame(speciesIndexREMOVE = specVarIn))
       names(data)[names(data) == 'speciesIndexREMOVE'] <- object[['species']][['speciesVar']]
       
-    }
+    #}
     
     if (object$spatial$species == 'replicate') {
       
-      if (!object[['species']][['speciesVar']] %in% names(data)) data <- fmesher::fm_cprod(data, data.frame(speciesSpatialGroup = 1:length(unique(unlist(object$species$speciesIn)))))
+      if (!object[['species']][['speciesVar']] %in% names(data)) {
+        
+        specSpatIn <- object$species$speciesTable[object$species$speciesTable$species %in% species,]$index
+        data <- fmesher::fm_cprod(data, data.frame(speciesSpatialGroup = specSpatIn))
+        
+      }
       else data$speciesSpatialGroup <- data[[object[['species']][['speciesVar']]]]
       
     }
     
-    if (!object$species$speciesEffects$Intercepts) {
-      
-      data <- fmesher::fm_cprod(data, data.frame(temp_species_index_var = 1:length(unique(unlist(object$species$speciesIn)))))
-      names(data)[names(data) == 'temp_species_index_var'] <- object[['species']][['speciesVar']]
-      
-    }
+    # if (!object$species$speciesEffects$Intercepts) {
+    #   
+    #   specIntIn <- object$species$speciesTable[object$species$speciesTable$species == species,]$index
+    #   
+    #   data <- fmesher::fm_cprod(data, data.frame(temp_species_index_var = specIntIn))
+    #   names(data)[names(data) == 'temp_species_index_var'] <- object[['species']][['speciesVar']]
+    #   
+    # }
     
   }
   
@@ -349,14 +358,21 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
       
         int <- predict(object, data, formula = as.formula(predictionFormula), ...)
         
-        int <- list(mapply(function(x, seq) {
+        if (length(int) == 1)  int <- list(int)
+        else {
+        
+          seqInd <- unique(unlist(lapply(int, function(x) x[[object[['species']][['speciesVar']]]])))
+          
+          int <- list(mapply(function(x, seq) {
           
           pred <- x[x[[object$species$speciesVar]] == seq,]
-          if ('speciesSpatialGroup' %in% names(pred)) pred <- pred[pred[['speciesSpatialGroup']] == seq,]
+          if ('speciesSpatialGroup' %in% names(pred)) pred <- pred[pred[[object$species$speciesVar]] == seq,]
           list(pred)
           
           
-        }, int, seq = 1:length(int)))
+        }, int, seq = seqInd))
+        
+        }
         
       names(int) <- 'speciesPredictions'  
       
