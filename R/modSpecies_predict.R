@@ -361,7 +361,7 @@ predict.modSpecies <- function(object, data = NULL, formula = NULL, mesh = NULL,
         if (length(int) == 1)  int <- list(int)
         else {
         
-          seqInd <- unique(unlist(lapply(int, function(x) x[[object[['species']][['speciesVar']]]])))
+          seqInd <- object$species$speciesTable$index[match(names(int), object$species$speciesTable$species)] #unique(unlist(lapply(int, function(x) x[[object[['species']][['speciesVar']]]])))
           
           int <- list(mapply(function(x, seq) {
           
