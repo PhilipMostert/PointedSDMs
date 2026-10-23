@@ -1602,7 +1602,7 @@ specifyISDM$set('private', 'spatialCovariates', function(spatialCovariates) {
     #covsClass <- sapply(as.data.frame(spatialCovariates), class)
     
   }
-  else covsClass <- sapply(as.data.frame(terra::rast(spatialCovariates)), class)
+  else covsClass <- sapply(as.data.frame(terra::rast(lapply(spatialCovariates, function(x) x[[1]]))), class) #sapply(as.data.frame(terra::rast(spatialCovariates)), class)
   
   if (is.null(names(covsClass))) names(covsClass) <- spatcovsIncl
   
